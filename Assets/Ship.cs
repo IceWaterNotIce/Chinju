@@ -5,6 +5,12 @@ public class Ship : MonoBehaviour, IPointerClickHandler {
     {
         Debug.Log ("clicked");
     }
+    private float m_maxhealth;
+    public float MaxHealth
+    {
+        get { return m_maxhealth; }
+        set { m_maxhealth = value; }
+    }
     private float m_health;
     public float Health
     {
@@ -54,5 +60,5 @@ public class Ship : MonoBehaviour, IPointerClickHandler {
 
     }
 
-   
+    
 }
