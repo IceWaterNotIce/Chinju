@@ -1,7 +1,6 @@
 using UnityEngine;
-using UnityEngine.Rendering;
 
-public class MainSceneManager : MonoBehaviour
+public class PathDrawer : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -14,6 +13,4 @@ public class MainSceneManager : MonoBehaviour
     {
         
     }
-
-
 }

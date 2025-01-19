@@ -4,6 +4,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler {
     public void OnPointerClick (PointerEventData eventData)
     {
         Debug.Log ("clicked");
+        ShipUI.Instance.Initial (this);
     }
     private float m_maxhealth;
     public float MaxHealth
@@ -57,7 +58,8 @@ public class Ship : MonoBehaviour, IPointerClickHandler {
     // Update is called once per frame
     void Update()
     {
-
+        // Move the ship
+        transform.position += transform.right * Speed * Time.deltaTime;
     }
 
     
