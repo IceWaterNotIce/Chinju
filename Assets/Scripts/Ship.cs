@@ -21,7 +21,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         set => m_maxHealth = Mathf.Max(0, value);
     }
 
-    public float Health
+    public virtual float Health
     {
         get => m_health;
         set
@@ -151,6 +151,31 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         UI.Initial(this);
     }
     #endregion
+
+
+    void Start()
+    {
+    }
+
+    // Update is called once per frame
+    public void Update()
+    {
+        Rotate();
+        Move();
+    }
+
+    void Rotate()
+    {
+        m_rotationSpeed = Mathf.MoveTowards(m_rotationSpeed, m_targetRotationSpeed, m_rotationAcceleration * Time.deltaTime);
+        transform.rotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z + m_rotationSpeed * Time.deltaTime);
+    }
+
+    void Move()
+    {
+        m_speed = Mathf.MoveTowards(m_speed, m_targetSpeed, m_acceleration * Time.deltaTime);
+        transform.position += transform.right * Speed * Time.deltaTime;
+    }
+
 
     #region Debug
     private void OnValidate()
