@@ -1,153 +1,164 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using System;
+using System.Collections.Generic;
+
 public class Ship : MonoBehaviour, IPointerClickHandler
 {
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        Debug.Log("clicked");
+    #region Core Systems
+    private ShipUI UI => ShipUI.Instance;
+    #endregion
 
-        if (ShipUI.Instance == null)
-        {
-            Debug.LogError("ShipUI.Instance is null. Ensure ShipUI is properly initialized.");
-            return;
-        }
+    #region Health & Fuel
+    [Header("Health Settings")]
+    [SerializeField] private float m_maxHealth = 100f;
+    [SerializeField] private float m_health = 100f;
+    [SerializeField] private float m_fuelConsumption = 0.1f;
 
-        ShipUI.Instance.Initial(this);
-    }
-
-    private List<Vector3> m_waypoints = new List<Vector3>();
-    private float m_maxhealth;
     public float MaxHealth
     {
-        get { return m_maxhealth; }
-        set { m_maxhealth = value; }
+        get => m_maxHealth;
+        set => m_maxHealth = Mathf.Max(0, value);
     }
-    private float m_health;
+
     public float Health
     {
-        get { return m_health; }
-        set { m_health = value; }
+        get => m_health;
+        set
+        {
+            m_health = Mathf.Clamp(value, 0, m_maxHealth);
+            OnHealthChanged?.Invoke(m_health);
+        }
     }
-    private float m_maxSpeed;
+
+    public float FuelConsumption
+    {
+        get => m_fuelConsumption;
+        set => m_fuelConsumption = Mathf.Max(0, value);
+    }
+
+    public event Action<float> OnHealthChanged;
+    #endregion
+
+    #region Movement
+    [Header("Movement Settings")]
+    [SerializeField] private float m_maxSpeed = 10f;
+    [SerializeField] private float m_acceleration = 2f;
+    [SerializeField] private float m_targetSpeed = 0f;
+    [SerializeField] private float m_speed = 0f;
+
     public float MaxSpeed
     {
-        get { return m_maxSpeed; }
-        set { m_maxSpeed = value; }
+        get => m_maxSpeed;
+        set => m_maxSpeed = Mathf.Max(0, value);
     }
-    private float m_targetSpeed;
-    public float TargetSpeed
-    {
-        get { return m_targetSpeed; }
-        set { m_targetSpeed = value; }
-    }
-    public float m_acceleration;
+
     public float Acceleration
     {
-        get { return m_acceleration; }
-        set { m_acceleration = value; }
+        get => m_acceleration;
+        set => m_acceleration = Mathf.Max(0, value);
     }
-    private float m_speed;
+
+    public float TargetSpeed
+    {
+        get => m_targetSpeed;
+        set => m_targetSpeed = Mathf.Clamp(value, 0, m_maxSpeed);
+    }
+
     public float Speed
     {
-        get { return m_speed; }
-        set { m_speed = value; }
+        get => m_speed;
+        set => m_speed = Mathf.Clamp(value, 0, m_maxSpeed);
     }
-    private float m_maxRotationSpeed;
+    #endregion
+
+    #region Rotation
+    [Header("Rotation Settings")]
+    [SerializeField] private float m_maxRotationSpeed = 90f;
+    [SerializeField] private float m_rotationAcceleration = 45f;
+    [SerializeField] private float m_targetRotation = 0f;
+    [SerializeField] private float m_targetRotationSpeed = 0f;
+    [SerializeField] private float m_rotationSpeed = 0f;
+
     public float MaxRotationSpeed
     {
-        get { return m_maxRotationSpeed; }
-        set { m_maxRotationSpeed = value; }
+        get => m_maxRotationSpeed;
+        set => m_maxRotationSpeed = Mathf.Max(0, value);
     }
-    private float m_targetRotation;
+
+    public float RotationAcceleration
+    {
+        get => m_rotationAcceleration;
+        set => m_rotationAcceleration = Mathf.Max(0, value);
+    }
+
     public float TargetRotation
     {
-        get { return m_targetRotation; }
-        set { m_targetRotation = value; }
+        get => m_targetRotation;
+        set => m_targetRotation = value % 360f; // Normalize angle
     }
-    private float m_targetRotationSpeed;
+
     public float TargetRotationSpeed
     {
-        get { return m_targetRotationSpeed; }
-        set { m_targetRotationSpeed = value; }
+        get => m_targetRotationSpeed;
+        set => m_targetRotationSpeed = Mathf.Clamp(value, -m_maxRotationSpeed, m_maxRotationSpeed);
     }
-    private float m_rotationSpeed;
-
 
     public float RotationSpeed
     {
-        get { return m_rotationSpeed; }
-        set { m_rotationSpeed = value; }
+        get => m_rotationSpeed;
+        set => m_rotationSpeed = Mathf.Clamp(value, -m_maxRotationSpeed, m_maxRotationSpeed);
     }
+    #endregion
 
-    private float m_rotationAcceleration;
-    public float RotationAcceleration
-    {
-        get { return m_rotationAcceleration; }
-        set { m_rotationAcceleration = value; }
-    }
+    #region Combat & Detection
+    [Header("Combat Settings")]
+    [SerializeField] private float m_detectionDistance = 50f;
+    [SerializeField] private bool m_combatMode = false;
 
-
-    private float m_detectionDistance;
     public float DetectionDistance
     {
-        get { return m_detectionDistance; }
-        set { m_detectionDistance = value; }
+        get => m_detectionDistance;
+        set => m_detectionDistance = Mathf.Max(0, value);
     }
-    private float m_fuelConsumption;
-    public float FuelConsumption
+
+    public bool CombatMode
     {
-        get { return m_fuelConsumption; }
-        set { m_fuelConsumption = value; }
+        get => m_combatMode;
+        set => m_combatMode = value;
     }
-    private bool m_mode;
-    public bool Mode
+    #endregion
+
+    #region Waypoints
+    private List<Vector3> m_waypoints = new List<Vector3>();
+    public IReadOnlyList<Vector3> Waypoints => m_waypoints.AsReadOnly();
+
+    public void AddWaypoint(Vector3 point) => m_waypoints.Add(point);
+    public void ClearWaypoints() => m_waypoints.Clear();
+    #endregion
+
+    #region Unity Events
+    public void OnPointerClick(PointerEventData eventData)
     {
-        get { return m_mode; }
-        set { m_mode = value; }
+        Debug.Log("Ship clicked", this);
+        
+        if (UI == null)
+        {
+            Debug.LogError("ShipUI instance not found!", this);
+            return;
+        }
+
+        UI.Initial(this);
     }
+    #endregion
 
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    #region Debug
+    private void OnValidate()
     {
-
+        // Auto-clamp values in Inspector
+        Health = m_health;
+        TargetSpeed = m_targetSpeed;
+        TargetRotationSpeed = m_targetRotationSpeed;
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        Rotate();
-        Move();
-    }
-
-    void Rotate()
-    {
-        m_rotationSpeed = Mathf.MoveTowards(m_rotationSpeed, m_targetRotationSpeed, m_rotationAcceleration * Time.deltaTime);
-        transform.rotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z + m_rotationSpeed * Time.deltaTime);
-    }
-
-    void Move()
-    {
-        m_speed = Mathf.MoveTowards(m_speed, m_targetSpeed, m_acceleration * Time.deltaTime);
-        transform.position += transform.right * Speed * Time.deltaTime;
-    }
-
-    public void AddWaypoint(Vector3 waypoint)
-    {
-        m_waypoints.Add(waypoint);
-    }
-
-    public void DeleteWaypoint(Vector3 waypoint)
-    {
-        m_waypoints.Remove(waypoint);
-    }
-
-    public void ClearWaypoints()
-    {
-        m_waypoints.Clear();
-    }
-
-
+    #endregion
 }

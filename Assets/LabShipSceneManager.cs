@@ -25,7 +25,7 @@ public class LabShipSceneManager : MonoBehaviour
     }
 
     public GameObject ShipPrefab;
-    void CreateShip(Vector2 SpawnPosition, float maxHealth, float acceleration, float maxSpeed,float MaxRotationSpeed, float RotationAcceleration, float detectionDistance, float fuelConsumption, bool mode)
+    void CreateShip(Vector2 SpawnPosition, float maxHealth, float acceleration, float maxSpeed, float MaxRotationSpeed, float RotationAcceleration, float detectionDistance, float fuelConsumption, bool mode)
     {
         GameObject ship = Instantiate(ShipPrefab, SpawnPosition, Quaternion.identity);
         Ship shipScript = ship.GetComponent<Ship>();
@@ -36,6 +36,6 @@ public class LabShipSceneManager : MonoBehaviour
         shipScript.RotationAcceleration = RotationAcceleration;
         shipScript.DetectionDistance = detectionDistance;
         shipScript.FuelConsumption = fuelConsumption;
-        shipScript.Mode = mode;
+        shipScript.CombatMode = mode;
     }
 }
