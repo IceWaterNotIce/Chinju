@@ -4,7 +4,6 @@ using UnityEngine.UIElements;
 public class ShipUI : Singleton<ShipUI>
 {
     public Ship ship;
-
     private VisualElement Panel;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private Label lblSpeedFrontFull;
@@ -13,6 +12,20 @@ public class ShipUI : Singleton<ShipUI>
     private Label lblSpeedFrontQuarter;
     private Label lblSpeedStop;
     private Label lblSpeedBackFull;
+
+    private Label lblRotationLeftFull;
+    private Label lblRotationLeftHalf;
+    private Label lblRotationStop;
+    private Label lblRotationRightHalf;
+    private Label lblRotationRightFull;
+
+    private Button btnTriggerMap;
+
+    void TiggerMap()
+    {
+        //Enable the Line renderer
+        
+    }
 
     void Start()
     {
@@ -40,6 +53,14 @@ public class ShipUI : Singleton<ShipUI>
         lblSpeedStop = Panel.Q<Label>("lblSpeedStop");
         lblSpeedBackFull = Panel.Q<Label>("lblSpeedBackFull");
 
+        lblRotationLeftFull = root.Q<Label>("lblRotationLeftFull");
+        lblRotationLeftHalf = root.Q<Label>("lblRotationLeftHalf");
+        lblRotationStop = root.Q<Label>("lblRotationStop");
+        lblRotationRightHalf = root.Q<Label>("lblRotationRightHalf");
+        lblRotationRightFull = root.Q<Label>("lblRotationRightFull");
+
+
+
         // set the ui position
         Vector2 shipScreenPosition = Camera.main.WorldToScreenPoint(ship.transform.position);
         Debug.Log("Ship Screen Position: " + shipScreenPosition);
@@ -52,7 +73,14 @@ public class ShipUI : Singleton<ShipUI>
         lblSpeedFrontHalf.RegisterCallback<ClickEvent>(ev => SpeedControll(0.5f));
         lblSpeedFrontQuarter.RegisterCallback<ClickEvent>(ev => SpeedControll(0.25f));
         lblSpeedStop.RegisterCallback<ClickEvent>(ev => SpeedControll(0.0f));
-        lblSpeedBackFull.RegisterCallback<ClickEvent>(ev => SpeedControll(-1.0f));
+        lblSpeedBackFull.RegisterCallback<ClickEvent>(ev => SpeedControll(-0.25f));
+
+        // Set the rotation labels
+        lblRotationLeftFull.RegisterCallback<ClickEvent>(ev => RotationControll(1.0f));
+        lblRotationLeftHalf.RegisterCallback<ClickEvent>(ev => RotationControll(0.5f));
+        lblRotationStop.RegisterCallback<ClickEvent>(ev => RotationControll(0.0f));
+        lblRotationRightHalf.RegisterCallback<ClickEvent>(ev => RotationControll(-0.5f));
+        lblRotationRightFull.RegisterCallback<ClickEvent>(ev => RotationControll(-1.0f));
     }
 
     // Update is called once per frame
@@ -69,9 +97,25 @@ public class ShipUI : Singleton<ShipUI>
             return;
         }
         float MaxSpeed = ship.MaxSpeed;
-        float Speed = MaxSpeed * percentage;
-        ship.Speed = Speed;
-        Debug.Log("Speed: " + Speed);
+        float TargetSpeed = MaxSpeed * percentage;
+        ship.TargetSpeed = TargetSpeed;
+        Debug.Log("Speed: " + TargetSpeed);
+
+        // Distory the UI
+        Destroy(gameObject);
+    }
+
+    void RotationControll(float percentage)
+    {
+        if (ship == null)
+        {
+            Debug.LogError("ship rotation control fail. Ship is not set.");
+            return;
+        }
+        float MaxRotationSpeed = ship.MaxRotationSpeed;
+        float TargetRotationSpeed = MaxRotationSpeed * percentage;
+        ship.TargetRotationSpeed = TargetRotationSpeed;
+        Debug.Log("Rotation Speed: " + TargetRotationSpeed);
 
         // Distory the UI
         Destroy(gameObject);

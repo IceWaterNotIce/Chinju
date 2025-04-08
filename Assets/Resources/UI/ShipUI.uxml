@@ -2,15 +2,25 @@
     <engine:VisualElement name="PanelBG" style="flex-grow: 1; flex-direction: row; align-self: auto; justify-content: space-between; width: auto; height: auto; align-items: stretch; position: relative;">
         <engine:VisualElement name="Panel" style="flex-grow: 1; position: absolute; flex-direction: row; top: auto;">
             <engine:VisualElement style="flex-grow: 1; align-self: center; align-items: center;">
-                <engine:Label text="Speed" />
+                <engine:Label text="Speed" style="font-size: 10px;" />
             </engine:VisualElement>
             <engine:VisualElement style="flex-grow: 1; align-self: center; justify-content: flex-start; align-items: center;">
-                <engine:Label text="Full" name="lblSpeedFrontFull" />
-                <engine:Label text="3/4" name="lblSpeedFrontThreeQuarters" />
-                <engine:Label text="1/2" name="lblSpeedFrontHalf" />
-                <engine:Label text="1/4" name="lblSpeedFrontQuarter" />
-                <engine:Label text="Stop" name="lblSpeedStop" />
-                <engine:Label text="Full" name="lblSpeedBackFull" />
+                <engine:Label text="Full" name="lblSpeedFrontFull" style="font-size: 10px;" />
+                <engine:Label text="3/4" name="lblSpeedFrontThreeQuarters" style="font-size: 10px;" />
+                <engine:Label text="1/2" name="lblSpeedFrontHalf" style="font-size: 10px;" />
+                <engine:Label text="1/4" name="lblSpeedFrontQuarter" style="font-size: 10px;" />
+                <engine:Label text="Stop" name="lblSpeedStop" style="font-size: 10px;" />
+                <engine:Label text="Full" name="lblSpeedBackFull" style="font-size: 10px;" />
+            </engine:VisualElement>
+            <engine:VisualElement style="flex-grow: 1; align-self: center; align-items: center;">
+                <engine:Label text="Rotation" style="font-size: 10px;" />
+            </engine:VisualElement>
+            <engine:VisualElement style="flex-grow: 1; align-self: center; justify-content: flex-start; align-items: center;">
+                <engine:Label text="Full" name="lblRotationLeftFull" style="font-size: 10px;" />
+                <engine:Label text="1/2" name="lblRotationLeftHalf" style="font-size: 10px;" />
+                <engine:Label text="Stop" name="lblRotationStop" style="font-size: 10px;" />
+                <engine:Label text="1/2" name="lblRotationRightHalf" style="font-size: 10px;" />
+                <engine:Label text="Full" name="lblRotationRightFull" style="font-size: 10px;" />
             </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>
