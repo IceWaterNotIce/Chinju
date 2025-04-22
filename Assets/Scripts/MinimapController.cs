@@ -28,7 +28,11 @@ public class MinimapController : MonoBehaviour
             Vector2 localPoint;
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(minimapRect, clickPosition, null, out localPoint))
             {
-                JumpToWorldPosition(localPoint);
+                // 檢查點擊是否在小地圖範圍內
+                if (minimapRect.rect.Contains(localPoint))
+                {
+                    JumpToWorldPosition(localPoint);
+                }
             }
             clickPosition = Vector2.zero; // 重置點擊位置
         }
