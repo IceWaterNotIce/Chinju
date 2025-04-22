@@ -17,9 +17,15 @@ public class IslandGenerator : MonoBehaviour
     public Camera mainCamera; // 新增主攝影機引用
     public CameraBound2D cameraController; // 新增 CameraController 引用
 
+    private GameManager gameManager;
+
     void Start() 
     {
-        
+        gameManager = FindObjectOfType<GameManager>();
+        if (useRandomSeed)
+        {
+            seed = Random.Range(0, int.MaxValue);
+        }
         Random.InitState(seed); // 初始化隨機數生成器
         
         Debug.Log("Current Map Seed: " + seed); // 輸出種子供調試
@@ -85,6 +91,27 @@ public class IslandGenerator : MonoBehaviour
             {
                 cameraController.RefreshBounds();
             }
+        }
+
+        // Save map data to GameManager
+        if (gameManager != null)
+        {
+            GameData.MapData mapData = new GameData.MapData
+            {
+                Seed = seed,
+                Width = width,
+                Height = height,
+                IslandDensity = islandDensity
+            };
+            gameManager.SaveMapData(tilemap, mapData);
+        }
+    }
+
+    public void LoadMap(GameData.MapData mapData)
+    {
+        if (gameManager != null)
+        {
+            gameManager.LoadMapData(tilemap, mapData, chinjuTile);
         }
     }
 }

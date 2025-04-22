@@ -176,6 +176,26 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         transform.position += transform.right * Speed * Time.deltaTime;
     }
 
+    public GameData.ShipData SaveShipData()
+    {
+        return new GameData.ShipData
+        {
+            Position = transform.position,
+            Health = Health,
+            Fuel = FuelConsumption, // 假設 FuelConsumption 表示燃料
+            Speed = Speed,
+            Rotation = transform.rotation.eulerAngles.z
+        };
+    }
+
+    public void LoadShipData(GameData.ShipData data)
+    {
+        transform.position = data.Position;
+        Health = data.Health;
+        FuelConsumption = data.Fuel;
+        Speed = data.Speed;
+        TargetRotation = data.Rotation;
+    }
 
     #region Debug
     private void OnValidate()
