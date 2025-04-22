@@ -3,11 +3,19 @@ using UnityEngine;
 public class EnemyShip : Ship 
 {
     #region Enemy-Specific Properties
-    public float AttackRange { get; set; } = 5f;  // 預設攻擊範圍
-    public float AttackCooldown { get; set; } = 2f;
+    [SerializeField] private float attackRange = 5f;  // 預設攻擊範圍
+    [SerializeField] private float attackCooldown = 2f;
+    [SerializeField] private int damage = 10;
+    [SerializeField] private Transform playerTarget;  // 玩家參考目標
     private float m_lastAttackTime;
-    public int Damage { get; set; } = 10;
-    public Transform PlayerTarget { get; set; }  // 玩家參考目標
+    public float AttackRange => attackRange;  // 只讀屬性
+    public float AttackCooldown => attackCooldown;
+    public int Damage => damage;
+    public Transform PlayerTarget
+    {
+        get => playerTarget;
+        set => playerTarget = value;
+    }
     #endregion
 
     // 覆寫父類 Update 加入敵艦邏輯
