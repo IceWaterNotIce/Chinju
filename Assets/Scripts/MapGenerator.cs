@@ -21,7 +21,7 @@ public class IslandGenerator : MonoBehaviour
 
     void Start() 
     {
-        gameManager = FindObjectOfType<GameManager>();
+        gameManager = Object.FindFirstObjectByType<GameManager>(); // 使用 FindFirstObjectByType 替代 FindObjectOfType
         if (useRandomSeed)
         {
             seed = Random.Range(0, int.MaxValue);
