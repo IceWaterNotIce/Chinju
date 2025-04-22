@@ -6,8 +6,38 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/LabShipLine.unity
+    path: Assets/Scenes/Main.unity
+    guid: db7c038ddb4d71c4aae1c068571a4b9a
+  - enabled: 1
+    path: Assets/Scenes/Test.unity
+    guid: b69ee785fa02cd940a55a24835da84f0
+  - enabled: 1
+    path: Assets/Scenes/Labs/LabShipLine.unity
     guid: 99c9720ab356a0642a771bea13969a05
+  - enabled: 1
+    path: Assets/Scenes/Labs/LapMap.unity
+    guid: 5669afe9d623ec449bac9136eee63d4a
+  - enabled: 1
+    path: Assets/Scenes/Labs/Base.unity
+    guid: 7d68d41b573b4a746923ae66ea5b448f
+  - enabled: 1
+    path: Assets/Scenes/Labs/LabCamera.unity
+    guid: dcc3ad07c9227414a82cb51f42a3452a
+  - enabled: 1
+    path: Assets/Scenes/Labs/LabEnemyShip.unity
+    guid: 7340dc8cddeb7394db8ddbacf013dab1
+  - enabled: 1
+    path: Assets/Scenes/Labs/LabIslandGenerator.unity
+    guid: f05c248632510364cafedc13b12b2439
+  - enabled: 1
+    path: Assets/Scenes/Labs/LabMiniMap.unity
+    guid: 505d2e91825d93d47bbb2301c9cad883
+  - enabled: 1
+    path: Assets/Scenes/Labs/LabShipPath.unity
+    guid: 6b5de7bada7dba7408b1ef4d9b34491b
+  - enabled: 1
+    path: Assets/Scenes/Labs/LabShipUI.unity
+    guid: f3cf8678c2d0f944080bd01fd2384190
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_UseUCBPForAssetBundles: 0
