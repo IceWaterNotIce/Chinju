@@ -5,6 +5,7 @@ public class IslandGenerator : MonoBehaviour
 {
     public Tilemap tilemap;
     public TileBase oceanTile, grassTile;
+    public TileBase chinjuTile; // 新增Chinju Tile
     public int width = 100;
     public int height = 100;
     public float islandDensity = 0.1f;
@@ -12,6 +13,9 @@ public class IslandGenerator : MonoBehaviour
     [Header("Random Seed")]
     public int seed = 12345; // 預設種子
     public bool useRandomSeed = true; // 是否每次隨機生成
+
+    public Camera mainCamera; // 新增主攝影機引用
+    public CameraBound2D cameraController; // 新增 CameraController 引用
 
     void Start() 
     {
@@ -36,6 +40,9 @@ public class IslandGenerator : MonoBehaviour
         }
 
         // 隨機生成島嶼（使用確定性隨機）
+        Vector3Int centerIslandTile = Vector3Int.zero;
+        float closestDistance = float.MaxValue;
+
         for (int x = 0; x < width; x++) 
         {
             for (int y = 0; y < height; y++) 
@@ -49,7 +56,34 @@ public class IslandGenerator : MonoBehaviour
                 if (noiseValue > 1f - islandDensity) 
                 {
                     tilemap.SetTile(new Vector3Int(x, y, 0), grassTile);
+
+                    // 計算與地圖中心的距離
+                    float distance = Vector2.Distance(new Vector2(x, y), new Vector2(width / 2, height / 2));
+                    if (distance < closestDistance)
+                    {
+                        closestDistance = distance;
+                        centerIslandTile = new Vector3Int(x, y, 0);
+                    }
                 }
+            }
+        }
+
+        // 替換中心島嶼圖塊為Chinju Tile
+        if (centerIslandTile != Vector3Int.zero)
+        {
+            tilemap.SetTile(centerIslandTile, chinjuTile);
+
+            // 將主攝影機移動到中心島嶼圖塊的位置
+            Vector3 worldPosition = tilemap.GetCellCenterWorld(centerIslandTile); // 使用 GetCellCenterWorld 確保獲取中心點
+            if (mainCamera != null)
+            {
+                mainCamera.transform.position = new Vector3(worldPosition.x, worldPosition.y, mainCamera.transform.position.z);
+            }
+
+            // 通知 CameraController 更新邊界
+            if (cameraController != null)
+            {
+                cameraController.RefreshBounds();
             }
         }
     }
