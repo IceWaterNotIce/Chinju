@@ -36,6 +36,8 @@ public class LobbySceneUIManager : MonoBehaviour
     Button BtnGoToSignIn;
     Button BtnGoToSignUp;
 
+    Button StartNewGameBtn;
+
 
     void Start()
     {
@@ -104,8 +106,8 @@ public class LobbySceneUIManager : MonoBehaviour
         UsernameLabel = root.Q<Label>("UsernameLabel");
         LastPasswordChangeLabel = root.Q<Label>("LastPasswordChangeLabel");
 
-
-
+        StartNewGameBtn = root.Q<Button>("BtnStartNewGame");
+        StartNewGameBtn.clicked += OnStartNewGameBtnClick;
     }
     
 
@@ -206,5 +208,11 @@ public class LobbySceneUIManager : MonoBehaviour
             UsernameLabel.text = "N/A";
             LastPasswordChangeLabel.text = "N/A";
         }
+    }
+
+    public void OnStartNewGameBtnClick()
+    {
+        GameManager.Instance.StartNewGame();
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Main"); // Load the main game scene
     }
 }

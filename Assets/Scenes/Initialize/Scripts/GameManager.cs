@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.IO;
 using UnityEngine.Tilemaps;
+using System.Collections.Generic;
 
 public class GameManager : Singleton<GameManager>
 {
@@ -64,6 +65,35 @@ public class GameManager : Singleton<GameManager>
             tilemap.SetTile(position, chinjuTile);
         }
         Debug.Log("Map data loaded.");
+    }
+
+    public void StartNewGame()
+    {
+        // Reset game data
+        currentGameData = new GameData
+        {
+            PlayerDatad = new GameData.PlayerData // Fully qualify PlayerData
+            {
+                Oils = 100,
+                Gold = 500,
+                Cube = 0,
+                Ships = new List<GameData.ShipData>()
+            },
+            MapDatad = new GameData.MapData // Fully qualify MapData
+            {
+                Seed = Random.Range(0, int.MaxValue),
+                Width = 100,
+                Height = 100,
+                IslandDensity = 0.1f,
+                ChinjuTiles = new List<Vector3Int>()
+            }
+        };
+
+        // Save the new game state
+        SaveGame(currentGameData);
+
+        // Notify other systems (e.g., UI, map generator) to update
+        Debug.Log("New game started.");
     }
 
     private void OnApplicationQuit()

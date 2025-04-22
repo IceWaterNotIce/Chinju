@@ -178,14 +178,22 @@ public class Ship : MonoBehaviour, IPointerClickHandler
 
     public GameData.ShipData SaveShipData()
     {
-        return new GameData.ShipData
+        GameData.ShipData shipData = new GameData.ShipData
         {
             Position = transform.position,
-            Health = Health,
-            Fuel = FuelConsumption, // 假設 FuelConsumption 表示燃料
+            Health = (int)Health,
+            Fuel = (int)FuelConsumption, // Explicitly cast float to int
             Speed = Speed,
             Rotation = transform.rotation.eulerAngles.z
         };
+
+        if (shipData.Fuel > 0)
+        {
+            shipData.Speed += Acceleration;
+            shipData.Rotation = TargetRotation;
+        }
+
+        return shipData;
     }
 
     public void LoadShipData(GameData.ShipData data)
