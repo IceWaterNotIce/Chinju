@@ -89,6 +89,10 @@ public class IslandGenerator : MonoBehaviour
             // 通知 CameraController 更新邊界
             if (cameraController != null)
             {
+                if (cameraController.targetTilemap == null)
+                {
+                    cameraController.targetTilemap = tilemap; // 確保 CameraController 的 Tilemap 已設置
+                }
                 cameraController.RefreshBounds();
             }
         }

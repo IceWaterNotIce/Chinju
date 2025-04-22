@@ -48,13 +48,28 @@ public class CameraBound2D : MonoBehaviour
     {
         if (targetTilemap == null)
         {
-            Debug.LogError("Tilemap not assigned!");
+            Debug.LogError("Tilemap not assigned! Please assign a Tilemap to the CameraBound2D script.");
+            return;
+        }
+
+        if (!targetTilemap.gameObject.activeInHierarchy)
+        {
+            Debug.LogError("Tilemap is not active in the hierarchy! Please activate the Tilemap.");
             return;
         }
 
         targetTilemap.CompressBounds(); // 壓縮邊界到實際有圖塊的區域
         mapBounds = targetTilemap.localBounds;
 
+        if (cam == null)
+        {
+            cam = GetComponent<Camera>();
+            if (cam == null)
+            {
+                Debug.LogError("Camera component is missing! Please ensure the CameraBound2D script is attached to a GameObject with a Camera.");
+                return;
+            }
+        }
         camOrthoSize = cam.orthographicSize;
         camRatio = (float)Screen.width / Screen.height;
 
