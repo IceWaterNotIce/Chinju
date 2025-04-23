@@ -2,6 +2,7 @@ using UnityEngine;
 using System.IO;
 using UnityEngine.Tilemaps;
 using System.Collections.Generic;
+using UnityEngine.InputSystem;
 
 public class GameManager : Singleton<GameManager>
 {
@@ -10,15 +11,44 @@ public class GameManager : Singleton<GameManager>
 
     private string saveFilePath;
     public GameData currentGameData = new GameData();
+    public Tilemap targetTilemap; // 新增 targetTilemap 變數
+    public TileBase chinjuTile; // 新增 chinjuTile 變數
+    private InputSystem_Actions inputActions; // 使用 InputSystem_Actions
 
     void Start()
     {
         saveFilePath = Path.Combine(Application.persistentDataPath, "savegame.json");
+        inputActions = new InputSystem_Actions();
+        inputActions.UI.Click.performed += OnClickPerformed; // 綁定 Click 行為
+        inputActions.Enable(); // 啟用輸入系統
     }
 
     void Update()
     {
         // ...existing code...
+    }
+
+    private void OnClickPerformed(InputAction.CallbackContext context)
+    {
+        // 確保滑鼠位置正確轉換為世界座標
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        Vector3 worldPoint = Camera.main.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, Camera.main.nearClipPlane));
+        Vector3Int cellPosition = targetTilemap.WorldToCell(worldPoint);
+
+        TileBase clickedTile = targetTilemap.GetTile(cellPosition);
+        if (clickedTile == chinjuTile) // 檢查是否為 Chinju Tile
+        {
+            Debug.Log("Chinju Tile clicked at: " + cellPosition);
+            // 在這裡執行點擊後的邏輯
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // 禁用並清理 InputSystem_Actions
+        inputActions.UI.Click.performed -= OnClickPerformed;
+        inputActions.Disable();
+        inputActions.Dispose();
     }
 
     public void SaveGame(GameData data)

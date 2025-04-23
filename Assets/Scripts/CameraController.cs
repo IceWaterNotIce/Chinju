@@ -73,7 +73,7 @@ public class CameraBound2D : MonoBehaviour
         camOrthoSize = cam.orthographicSize;
         camRatio = (float)Screen.width / Screen.height;
 
-        Debug.Log($"Map Bounds: {mapBounds.min} to {mapBounds.max}");
+        // Debug.Log($"Map Bounds: {mapBounds.min} to {mapBounds.max}");
     }
 
     void Update()

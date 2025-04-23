@@ -28,7 +28,7 @@ public class IslandGenerator : MonoBehaviour
         }
         Random.InitState(seed); // 初始化隨機數生成器
         
-        Debug.Log("Current Map Seed: " + seed); // 輸出種子供調試
+        // Debug.Log("Current Map Seed: " + seed); // 輸出種子供調試
 
         GenerateMap();
     }
