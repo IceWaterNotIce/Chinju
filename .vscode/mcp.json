@@ -1,0 +1,8 @@
+{
+    "servers": {
+        "my-mcp-server-b07b3a27": {
+            "type": "sse",
+            "url": "127.0.0.1:8090"
+        }
+    }
+}
