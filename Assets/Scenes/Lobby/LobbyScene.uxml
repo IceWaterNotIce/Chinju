@@ -1,0 +1,53 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/Lobby/LobbySceneUIStyleSheet.uss?fileID=7433441132597879392&amp;guid=c8b31614e6808454eabea8d5b9f00c4c&amp;type=3#LobbySceneUIStyleSheet" />
+    <engine:VisualElement style="flex-grow: 1; flex-direction: column; justify-content: flex-start; align-items: stretch; align-self: auto; align-content: flex-start; display: flex;">
+        <engine:GroupBox name="LobbyMenu" style="top: auto; bottom: auto; align-self: stretch; visibility: visible;">
+            <engine:Button text="GraphView" name="BtnGoToGraphView" />
+            <engine:Button text="GameRoom" name="BtnGoToGameRoom" />
+            <engine:Button text="WordView" name="BtnGoToWordView" />
+        </engine:GroupBox>
+        <engine:Button text="Auth" name="BtnAuth" style="position: absolute; right: 10px; bottom: 10px; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; width: 10%; height: auto;" />
+    </engine:VisualElement>
+    <engine:VisualElement name="AuthPanel" enabled="true" class="panel_container" style="flex-grow: 1; display: none;">
+        <engine:VisualElement class="panel" style="flex-grow: 1;">
+            <engine:Button text="Sign In" name="BtnGoToSignIn" class="button" style="align-self: center;" />
+            <engine:Button text="Sign Up" name="BtnGoToSignUp" class="button" style="align-self: center;" />
+            <engine:Button text="Sign In Anonymously" name="BtnSignInWithAnonymously" class="button" style="align-self: center;" />
+            <engine:Button text="X" class="button_close" style="display: flex; margin-right: 2px; margin-left: 2px; padding-right: 10px; padding-left: 10px;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+    <engine:VisualElement name="SignInPanel" enabled="true" class="panel_container" style="flex-grow: 1; display: none;">
+        <engine:VisualElement class="panel" style="flex-grow: 1;">
+            <engine:TextField label="UserName" name="SignInUsernameInput" />
+            <engine:TextField label="Password" name="SignInPasswordInput" />
+            <engine:Button text="Sign Out" name="BtnSignIn" class="button" style="align-self: center;" />
+            <engine:Button text="X" class="button_close" style="display: flex; margin-right: 2px; margin-left: 2px; padding-right: 10px; padding-left: 10px;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+    <engine:VisualElement name="SignUpPanel" enabled="true" class="panel_container" style="flex-grow: 1; display: none;">
+        <engine:VisualElement class="panel" style="flex-grow: 1;">
+            <engine:TextField label="UserName" name="SignUpUsernameInput" />
+            <engine:TextField label="Password" name="SignUpPasswordInput" />
+            <engine:Button text="Sign Up" name="BtnSignUp" class="button" style="align-self: center;" />
+            <engine:Button text="X" class="button_close" style="display: flex; margin-right: 2px; margin-left: 2px; padding-right: 10px; padding-left: 10px;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+    <engine:VisualElement name="UserProfilePanel" enabled="true" class="panel_container" style="flex-grow: 1; display: none;">
+        <engine:VisualElement class="panel" style="flex-grow: 1;">
+            <engine:VisualElement style="flex-grow: 1; flex-direction: row; justify-content: flex-start; align-items: stretch; align-self: auto; align-content: flex-start;">
+                <engine:Label text="UID :" style="width: 200px;" />
+                <engine:Label text="Label" name="UIDLabel" />
+            </engine:VisualElement>
+            <engine:VisualElement style="flex-grow: 1; flex-direction: row; justify-content: flex-start; align-items: stretch; align-self: auto; align-content: flex-start;">
+                <engine:Label text="Username :" style="width: 200px;" />
+                <engine:Label text="Label" name="UsernameLabel" />
+            </engine:VisualElement>
+            <engine:VisualElement style="flex-grow: 1; flex-direction: row; justify-content: flex-start; align-items: stretch; align-self: auto; align-content: flex-start;">
+                <engine:Label text="Last Password Updated :" style="width: 200px;" />
+                <engine:Label text="Label" name="LastPasswordChangeLabel" />
+            </engine:VisualElement>
+            <engine:Button text="Sign Out" name="BtnSignOut" class="button" style="align-self: center;" />
+            <engine:Button text="X" class="button_close" style="display: flex; margin-right: 2px; margin-left: 2px; padding-right: 10px; padding-left: 10px;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>
