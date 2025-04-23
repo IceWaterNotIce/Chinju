@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<engine:UXML
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:engine="UnityEngine.UIElements"
-    xmlns:editor="UnityEditor.UIElements"
-    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
->
-    <engine:VisualElement style="flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 100%; background-color: #000000AA;">
-        <engine:Button name="saveGameButton" text="Save Game" style="margin: 10px; width: 200px; height: 50px;" />
-        <engine:Button name="continueButton" text="Continue" style="margin: 10px; width: 200px; height: 50px;" />
-        <engine:Button name="loadGameButton" text="Load Game" style="margin: 10px; width: 200px; height: 50px;" />
-        <engine:Button name="exitGameButton" text="Exit Game" style="margin: 10px; width: 200px; height: 50px;" />
-    </engine:VisualElement>
-</engine:UXML>
+<UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
+    <ui:VisualElement name="root" class="menu-container">
+        <ui:VisualElement name="menu-panel" class="menu-panel">
+            <ui:Label text="遊戲選單" class="menu-title" />
+            <ui:Button text="繼續遊戲" name="continueButton" class="menu-button" />
+            <ui:Button text="儲存遊戲" name="saveGameButton" class="menu-button" />
+            <ui:Button text="載入遊戲" name="loadGameButton" class="menu-button" />
+            <ui:Button text="退出遊戲" name="exitGameButton" class="menu-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</UXML> 
