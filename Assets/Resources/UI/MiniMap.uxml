@@ -1,0 +1,11 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="minimap-container" class="minimap-container">
+        <engine:VisualElement name="minimap-frame" class="minimap-frame" style="width: 250px; height: 250px; top: auto; left: auto; right: auto; bottom: auto; background-color: rgba(255, 255, 255, 0);">
+            <engine:VisualElement name="minimap-view" class="minimap-view" style="top: 0; left: 0; right: 0; bottom: 0; position: absolute; border-top-width: 8px; border-left-width: 8px; border-right-width: 8px; border-bottom-width: 8px; background-color: rgb(255, 255, 255); background-image: url(&quot;project://database/Assets/MiniMapRenderTexture.renderTexture?fileID=8400000&amp;guid=5aacc66e35b5e0d47aa56426bbf062a8&amp;type=2#MiniMapRenderTexture&quot;); -unity-background-image-tint-color: rgb(255, 255, 255);" />
+        </engine:VisualElement>
+        <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+            <engine:Button name="minimap-zoom-in" text="+" class="minimap-button" style="background-size: 50px 50px; width: 30px; height: 30px;" />
+            <engine:Button name="minimap-zoom-out" text="-" class="minimap-button" style="width: 30px; height: 30px;" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>

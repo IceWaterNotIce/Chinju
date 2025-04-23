@@ -1,14 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?>
-<UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements">
-    <ui:VisualElement name="root" class="root">
-        <!-- 資源顯示區域 -->
-        <ui:VisualElement name="resourcePanel" class="resource-panel">
+<UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="root" data-source="project://database/Assets/Resources/UI/CommonStyles.uss?fileID=7433441132597879392&amp;guid=2beea2869bd0f584dbd1d916e073903b&amp;type=3#CommonStyles" class="root">
+        <ui:VisualElement name="resourcePanel" class="resource-panel" style="flex-direction: row-reverse;">
             <ui:Label name="goldLabel" text="金幣: 0" class="resource-label" />
             <ui:Label name="oilLabel" text="石油: 0" class="resource-label" />
             <ui:Label name="cubeLabel" text="方塊: 0" class="resource-label" />
         </ui:VisualElement>
-
-        <!-- 訊息顯示區域 -->
         <ui:VisualElement name="messageContainer" class="message-container" />
     </ui:VisualElement>
-</UXML> 
+</UXML>

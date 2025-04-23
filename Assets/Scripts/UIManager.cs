@@ -10,10 +10,19 @@ public class UIManager : Singleton<UIManager>
     private Label goldLabel;
     private Label oilLabel;
     private Label cubeLabel;
+    
+    /// <summary>
+    /// 小地圖管理器引用
+    /// </summary>
+    private MiniMapManager miniMapManager;
 
     protected override void Awake()
     {
         base.Awake();
+    }
+
+    private void Start()
+    {
         InitializeUI();
     }
 
@@ -45,15 +54,37 @@ public class UIManager : Singleton<UIManager>
                 return;
             }
 
+            // 載入小地圖 UI
+            var minimapTree = Resources.Load<VisualTreeAsset>("UI/MiniMap");
+            if (minimapTree == null)
+            {
+                Debug.LogError("[UIManager] 無法載入 UI/MiniMap.uxml");
+                return;
+            }
+
+            var minimapStyle = Resources.Load<StyleSheet>("UI/MiniMap");
+            if (minimapStyle == null)
+            {
+                Debug.LogError("[UIManager] 無法載入 UI/MiniMap.uss");
+                return;
+            }
+
             // 設置 UI Document
             mainUIDocument.visualTreeAsset = visualTree;
             root = mainUIDocument.rootVisualElement;
-            root.styleSheets.Add(styleSheet);
+
+
+            // 添加小地圖到主UI
+            var minimapContainer = minimapTree.Instantiate();
+            root.Add(minimapContainer);
             
             // 獲取資源顯示標籤
             goldLabel = root.Q<Label>("goldLabel");
             oilLabel = root.Q<Label>("oilLabel");
             cubeLabel = root.Q<Label>("cubeLabel");
+
+            // 初始化小地圖
+            InitializeMiniMap();
 
             Debug.Log("[UIManager] UI初始化成功");
         }
@@ -61,6 +92,22 @@ public class UIManager : Singleton<UIManager>
         {
             Debug.LogError($"[UIManager] UI初始化失敗: {e.Message}\n{e.StackTrace}");
         }
+    }
+
+    /// <summary>
+    /// 初始化小地圖
+    /// </summary>
+    private void InitializeMiniMap()
+    {
+        // 獲取或添加小地圖管理器組件
+        miniMapManager = GetComponent<MiniMapManager>();
+        if (miniMapManager == null)
+        {
+            miniMapManager = gameObject.AddComponent<MiniMapManager>();
+        }
+
+        // 初始化小地圖
+        miniMapManager.Initialize(root);
     }
 
     /// <summary>
@@ -95,6 +142,14 @@ public class UIManager : Singleton<UIManager>
         messageElement.schedule.Execute(() => {
             messageContainer.Remove(messageElement);
         }).StartingIn(3000);
+    }
+
+    /// <summary>
+    /// 更新小地圖
+    /// </summary>
+    public void UpdateMiniMap()
+    {
+        miniMapManager?.UpdateMapObjects();
     }
 }
 
