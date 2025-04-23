@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class IslandGenerator : MonoBehaviour 
+public class MapController : MonoBehaviour 
 {
     public Tilemap tilemap;
     public TileBase oceanTile, grassTile;
