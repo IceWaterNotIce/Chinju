@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 // 遊戲資料控制器，集中管理 GameData 實例
@@ -5,6 +6,7 @@ public class GameDataController : MonoBehaviour
 {
     public static GameDataController Instance { get; private set; }
 
+    [SerializeField]
     private GameData currentGameData;
     public GameData CurrentGameData
     {

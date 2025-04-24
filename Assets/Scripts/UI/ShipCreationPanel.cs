@@ -294,6 +294,29 @@ public class ShipCreationPanel : MonoBehaviour
         if (battleShip != null)
         {
             Debug.Log("戰艦實例化成功！");
+
+            // 儲存船隻資料到 GameData
+            var gameData = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
+            if (gameData != null && gameData.PlayerDatad != null)
+            {
+                var shipData = new GameData.ShipData
+                {
+                    Name = "戰艦",
+                    Health = 100,
+                    AttackPower = 20,
+                    Defense = 10,
+                    Position = spawnPosition,
+                    Fuel = 100,
+                    Speed = 5,
+                    Rotation = 0
+                };
+                gameData.PlayerDatad.Ships.Add(shipData);
+                Debug.Log("已將新戰艦資料存入 GameData");
+            }
+            else
+            {
+                Debug.LogWarning("無法儲存船隻資料到 GameData，PlayerDatad 為 null");
+            }
         }
         else
         {
