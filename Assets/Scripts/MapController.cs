@@ -42,6 +42,16 @@ public class MapController : MonoBehaviour
         
         GenerateMap();
 
+        // 新增：自動掛載 VisibilityManager
+        var visMgr = FindFirstObjectByType<VisibilityManager>();
+        if (visMgr == null)
+        {
+            var go = new GameObject("VisibilityManager");
+            visMgr = go.AddComponent<VisibilityManager>();
+        }
+        visMgr.tilemap = tilemap;
+        visMgr.chinjuTile = chinjuTile;
+        // 你需要在 Inspector 指定 maskMaterial
     }
 
     void GenerateMap()
