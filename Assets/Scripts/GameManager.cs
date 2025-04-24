@@ -23,6 +23,12 @@ public class GameManager : Singleton<GameManager>
 
     void Start()
     {
+        // 確保 GameDataController 已初始化
+        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData == null)
+        {
+            GameDataController.Instance.CurrentGameData = new GameData();
+        }
+
         Debug.Log("[GameManager] 初始化開始");
         saveFilePath = Path.Combine(Application.persistentDataPath, "savegame.json");
 
@@ -39,6 +45,9 @@ public class GameManager : Singleton<GameManager>
         }
 
         Debug.Log("[GameManager] 初始化完成");
+
+        // 載入遊戲數據
+        LoadGame();
     }
 
    
