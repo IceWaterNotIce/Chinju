@@ -1,31 +1,73 @@
 using UnityEngine;
-using TMPro;
+using UnityEngine.UIElements;
 
-public class StatusBar : MonoBehaviour
+/// <summary>
+/// 處理玩家資源狀態的UI顯示
+/// </summary>
+public class PlayerStatsUI : MonoBehaviour
 {
-    public TMP_Text goldText;
-    public TMP_Text oilsText;
-    public TMP_Text cubeText;
+    private UIDocument uiDocument;
+    private Label goldLabel;
+    private Label oilLabel;
+    private Label cubeLabel;
 
-    private GameData.PlayerData playerData;
-
-    void Start()
+    void OnEnable()
     {
-        // Initialize player data (replace with actual data source)
-        playerData = new GameData.PlayerData
-        {
-            Gold = 1000,
-            Oils = 500,
-            Cube = 10
-        };
-
-        UpdateUI();
+        uiDocument = GetComponent<UIDocument>();
+        var root = uiDocument.rootVisualElement;
+        
+        // 獲取資源標籤引用
+        goldLabel = root.Q<Label>("GoldLabel");
+        oilLabel = root.Q<Label>("OilLabel");
+        cubeLabel = root.Q<Label>("CubeLabel");
     }
 
-    public void UpdateUI()
+    /// <summary>
+    /// 更新所有資源顯示
+    /// </summary>
+    /// <param name="gold">金幣數量</param>
+    /// <param name="oil">石油數量</param>
+    /// <param name="cube">方塊數量</param>
+    public void UpdateResourceDisplay(int gold, int oil, int cube)
     {
-        goldText.text = $"Gold: {playerData.Gold}";
-        oilsText.text = $"Oils: {playerData.Oils}";
-        cubeText.text = $"Cube: {playerData.Cube}";
+        UpdateGoldAmount(gold);
+        UpdateOilAmount(oil);
+        UpdateCubeAmount(cube);
+    }
+
+    /// <summary>
+    /// 更新金幣數量顯示
+    /// </summary>
+    /// <param name="amount">金幣數量</param>
+    public void UpdateGoldAmount(int amount)
+    {
+        if (goldLabel != null)
+        {
+            goldLabel.text = $"金幣: {amount}";
+        }
+    }
+
+    /// <summary>
+    /// 更新石油數量顯示
+    /// </summary>
+    /// <param name="amount">石油數量</param>
+    public void UpdateOilAmount(int amount)
+    {
+        if (oilLabel != null)
+        {
+            oilLabel.text = $"石油: {amount}";
+        }
+    }
+
+    /// <summary>
+    /// 更新方塊數量顯示
+    /// </summary>
+    /// <param name="amount">方塊數量</param>
+    public void UpdateCubeAmount(int amount)
+    {
+        if (cubeLabel != null)
+        {
+            cubeLabel.text = $"方塊: {amount}";
+        }
     }
 }

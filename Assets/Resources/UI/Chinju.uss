@@ -1,0 +1,92 @@
+.ship-panel {
+    width: 300px;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 10px;
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}
+
+.panel-title {
+    font-size: 20px;
+    color: white;
+    -unity-text-align: middle-center;
+    margin-bottom: 15px;
+}
+
+.ship-type-container {
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.ship-type-btn {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-width: 2px;
+    border-color: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    color: white;
+}
+
+.ship-type-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.ship-type-btn:active {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.ship-type-btn.selected {
+    background-color: rgba(0, 255, 255, 0.2);
+    border-color: rgb(0, 255, 255);
+}
+
+.resource-container {
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+.cost-title {
+    color: white;
+    margin-bottom: 5px;
+}
+
+.resource-item {
+    flex-direction: row;
+    justify-content: flex-start;
+    margin: 2px 0;
+}
+
+.resource-item Label {
+    color: white;
+    font-size: 14px;
+}
+
+.create-btn {
+    height: 40px;
+    background-color: rgb(0, 150, 255);
+    border-width: 0;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    -unity-font-style: bold;
+}
+
+.create-btn:hover {
+    background-color: rgb(0, 170, 255);
+}
+
+.create-btn:active {
+    background-color: rgb(0, 130, 255);
+}
+
+.create-btn:disabled {
+    background-color: rgb(100, 100, 100);
+    opacity: 0.5;
+} 

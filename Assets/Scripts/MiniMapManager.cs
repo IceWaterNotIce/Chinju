@@ -143,10 +143,10 @@ public class MiniMapManager : MonoBehaviour
         }
 
         // 註冊拖動事件
-        minimapContainer.RegisterCallback<MouseDownEvent>(OnStartDrag);
-        minimapContainer.RegisterCallback<MouseMoveEvent>(OnDrag);
-        minimapContainer.RegisterCallback<MouseUpEvent>(OnEndDrag);
-        minimapContainer.RegisterCallback<MouseLeaveEvent>(OnEndDrag);
+        minimapView.RegisterCallback<MouseDownEvent>(OnStartDrag);
+        minimapView.RegisterCallback<MouseMoveEvent>(OnDrag);
+        minimapView.RegisterCallback<MouseUpEvent>(OnEndDrag);
+        minimapView.RegisterCallback<MouseLeaveEvent>(OnEndDrag);
 
         // 設置初始縮放
         UpdateZoom();

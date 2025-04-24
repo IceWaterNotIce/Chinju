@@ -18,6 +18,9 @@ public class MapController : MonoBehaviour
     public Camera mainCamera; // 新增主攝影機引用
     public CameraBound2D cameraController; // 新增 CameraController 引用
 
+    [Header("UI References")]
+    [SerializeField] private ShipCreationPanel shipCreationPanel;
+
     private GameManager gameManager;
 
     void Start() 
@@ -185,6 +188,11 @@ public class MapController : MonoBehaviour
                 else if (tile == chinjuTile)
                 {
                     Debug.Log("這是神獸 Tile");
+                    // 切換船隻建造面板的顯示
+                    if (shipCreationPanel != null)
+                    {
+                        shipCreationPanel.Toggle();
+                    }
                 }
             }
         }
