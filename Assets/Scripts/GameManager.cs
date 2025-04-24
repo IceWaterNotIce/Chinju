@@ -111,6 +111,13 @@ public class GameManager : Singleton<GameManager>
             // 新增：根據存檔自動生成所有船艦
             if (data != null && data.PlayerDatad != null && data.PlayerDatad.Ships != null)
             {
+                // 先刪除場景中所有現有 Ship 物件，避免重複
+                var existingShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
+                foreach (var ship in existingShips)
+                {
+                    GameObject.Destroy(ship.gameObject);
+                }
+
                 // 可根據實際需求指定船艦Prefab路徑
                 var shipPrefab = Resources.Load<GameObject>("Prefabs/Ship");
                 if (shipPrefab != null)
