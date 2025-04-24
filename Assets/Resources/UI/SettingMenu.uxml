@@ -1,6 +1,6 @@
 <UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:VisualElement name="root" class="menu-container" style="visibility: visible; display: flex; position: absolute; top: 50%; align-items: stretch; justify-content: center; align-self: center; align-content: flex-start; flex-direction: column;">
-        <ui:VisualElement name="menu-panel" class="menu-panel">
+    <ui:VisualElement name="root" class="menu-container" style="visibility: visible; display: none; position: absolute; top: 50%; align-items: stretch; justify-content: center; align-self: center; align-content: flex-start; flex-direction: column;">
+        <ui:VisualElement name="menu-panel" class="menu-panel" style="display: flex;">
             <ui:Label text="遊戲選單" class="menu-title" />
             <ui:Button text="繼續遊戲" name="continueButton" class="menu-button" />
             <ui:Button text="開始新遊戲" name="newGameButton" class="menu-button" />

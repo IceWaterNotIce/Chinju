@@ -5,10 +5,6 @@ using UnityEngine.InputSystem; // 新增：使用新輸入系統
 public class SettingMenu : MonoBehaviour
 {
     private VisualElement root;
-    private VisualElement settingsPanel;
-    private StyleSheet styleSheet;
-    private Button closeButton;
-    private VisualElement menuPanel;
     private Button continueButton;
     private Button saveGameButton;
     private Button loadGameButton;
@@ -46,7 +42,6 @@ public class SettingMenu : MonoBehaviour
                 return;
             }
 
-            menuPanel = root.Q<VisualElement>("menu-panel");
             continueButton = root.Q<Button>("continueButton");
             saveGameButton = root.Q<Button>("saveGameButton");
             loadGameButton = root.Q<Button>("loadGameButton");
@@ -74,9 +69,9 @@ public class SettingMenu : MonoBehaviour
 
     private void ToggleMenu()
     {
-        if (menuPanel == null)
+        if (root == null)
         {
-            Debug.LogError("[SettingMenu] menuPanel 未初始化");
+            Debug.LogError("[SettingMenu] root 未初始化");
             return;
         }
 
@@ -92,7 +87,7 @@ public class SettingMenu : MonoBehaviour
 
     public void ShowGameMenu()
     {
-        if (menuPanel == null)
+        if (root == null)
         {
             Debug.LogError("[SettingMenu] 無法顯示選單：選單引用丟失");
             return;
@@ -104,7 +99,7 @@ public class SettingMenu : MonoBehaviour
 
     public void HideGameMenu()
     {
-        if (menuPanel == null)
+        if (root == null)
         {
             Debug.LogError("[SettingMenu] 無法隱藏選單：選單引用丟失");
             return;
@@ -163,25 +158,25 @@ public class SettingMenu : MonoBehaviour
 
     public void ShowSettingsMenu()
     {
-        if (settingsPanel == null)
+        if (root == null)
         {
             Debug.LogError("[SettingMenu] 無法顯示設定選單：選單引用丟失");
             return;
         }
 
-        settingsPanel.style.display = DisplayStyle.Flex;
+        root.style.display = DisplayStyle.Flex;
         Debug.Log("[SettingMenu] 顯示設定選單");
     }
 
     public void HideSettingsMenu()
     {
-        if (settingsPanel == null)
+        if (root == null)
         {
             Debug.LogError("[SettingMenu] 無法隱藏設定選單：選單引用丟失");
             return;
         }
 
-        settingsPanel.style.display = DisplayStyle.None;
+        root.style.display = DisplayStyle.None;
         Debug.Log("[SettingMenu] 隱藏設定選單");
     }
 
