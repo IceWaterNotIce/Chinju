@@ -37,12 +37,7 @@ public class TimeControlBar : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // 測試用按鍵控制
-        if (Input.GetKeyDown(KeyCode.Alpha1)) SetTimeScale(0); // 暫停
-        if (Input.GetKeyDown(KeyCode.Alpha2)) SetTimeScale(1); // 減速
-        if (Input.GetKeyDown(KeyCode.Alpha3)) SetTimeScale(2); // 正常速度
-        if (Input.GetKeyDown(KeyCode.Alpha4)) SetTimeScale(3); // 加速
-        if (Input.GetKeyDown(KeyCode.Alpha5)) SetTimeScale(4); // 超加速
+        
     }
 
     /// <summary>
