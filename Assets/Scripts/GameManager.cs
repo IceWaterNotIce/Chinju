@@ -107,6 +107,30 @@ public class GameManager : Singleton<GameManager>
             // 新增：主動觸發資源事件，讓 UI 立即刷新
             if (data != null && data.PlayerDatad != null && data.PlayerDatad.OnResourceChanged != null)
                 data.PlayerDatad.OnResourceChanged.Invoke();
+
+            // 新增：根據存檔自動生成所有船艦
+            if (data != null && data.PlayerDatad != null && data.PlayerDatad.Ships != null)
+            {
+                // 可根據實際需求指定船艦Prefab路徑
+                var shipPrefab = Resources.Load<GameObject>("Prefabs/Ship");
+                if (shipPrefab != null)
+                {
+                    foreach (var shipData in data.PlayerDatad.Ships)
+                    {
+                        var shipObj = GameObject.Instantiate(shipPrefab, shipData.Position, Quaternion.Euler(0, 0, shipData.Rotation));
+                        var shipComp = shipObj.GetComponent<Ship>();
+                        if (shipComp != null)
+                        {
+                            shipComp.LoadShipData(shipData);
+                        }
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("找不到 Resources/Ship 預製物，無法自動生成船艦！");
+                }
+            }
+
             return data;
         }
         else
