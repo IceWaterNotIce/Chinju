@@ -306,6 +306,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3e7ecf3f0abab840968ac56f0f0856c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentGameData:
+    PlayerDatad:
+      Oils: 0
+      Gold: 0
+      Cube: 0
+      Ships: []
+    MapDatad:
+      Seed: 0
+      Width: 0
+      Height: 0
+      IslandDensity: 0
+      ChinjuTiles: []
 --- !u!1 &586510287
 GameObject:
   m_ObjectHideFlags: 0
@@ -509,6 +521,54 @@ MonoBehaviour:
   m_WorldSpaceSizeMode: 1
   m_WorldSpaceWidth: 1920
   m_WorldSpaceHeight: 1080
+--- !u!1 &937809615
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 937809616}
+  - component: {fileID: 937809617}
+  m_Layer: 0
+  m_Name: EnemyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &937809616
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937809615}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 49.43474, y: 49.263447, z: 144.34088}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &937809617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 937809615}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa39d874f648aae4ca6d05d3007d8557, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyShipPrefab: {fileID: 4572884418056175630, guid: b739a16e81daf8d4c9daf5b176d5caca, type: 3}
+  spawnInterval: 2
+  spawnAreaMin: {x: -8, y: 5}
+  spawnAreaMax: {x: 8, y: 8}
 --- !u!1 &1028576058
 GameObject:
   m_ObjectHideFlags: 0
@@ -1205,3 +1265,4 @@ SceneRoots:
   - {fileID: 2019224609}
   - {fileID: 708504591}
   - {fileID: 1028576060}
+  - {fileID: 937809616}
