@@ -17,7 +17,7 @@ public class GameData
         // 玩家擁有的船隻數據
         public List<ShipData> Ships = new List<ShipData>();
 
-        // 事件不需序列化
+        // 新增：資源變動事件
         [System.NonSerialized]
         public System.Action OnResourceChanged;
     }

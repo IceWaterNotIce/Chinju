@@ -30,6 +30,12 @@ public class GameManager : Singleton<GameManager>
         if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData == null)
         {
             GameDataController.Instance.CurrentGameData = new GameData();
+            // 新增：主動觸發資源事件，讓 UI 立即刷新
+            var playerData = GameDataController.Instance.CurrentGameData.PlayerDatad;
+            if (playerData != null && playerData.OnResourceChanged != null){
+                playerData.OnResourceChanged.Invoke();
+                Debug.Log("[GameManager] 資源事件已觸發，UI 更新完成");
+            }
         }
 
         Debug.Log("[GameManager] 初始化完成");
@@ -46,10 +52,13 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
 
 
-  
+
 
     public void SaveGame(GameData data)
     {
+        // 儲存時，確保是 GameDataController 的資料
+        if (GameDataController.Instance != null)
+            data = GameDataController.Instance.CurrentGameData;
         string json = JsonUtility.ToJson(data);
         File.WriteAllText(saveFilePath, json);
         Debug.Log("[GameManager] 遊戲已保存至 " + saveFilePath);
@@ -64,7 +73,13 @@ public class GameManager : Singleton<GameManager>
             Debug.Log("[GameManager] 遊戲已從 " + saveFilePath + " 載入");
             // 載入後設置到 GameDataController
             if (GameDataController.Instance != null)
+            {
                 GameDataController.Instance.CurrentGameData = data;
+                Debug.Log("[GameManager] 遊戲數據已設置到 GameDataController");
+            }
+            // 新增：主動觸發資源事件，讓 UI 立即刷新
+            if (data != null && data.PlayerDatad != null && data.PlayerDatad.OnResourceChanged != null)
+                data.PlayerDatad.OnResourceChanged.Invoke();
             return data;
         }
         else
@@ -76,6 +91,9 @@ public class GameManager : Singleton<GameManager>
 
     public void SaveMapData(Tilemap tilemap, GameData.MapData mapData)
     {
+        // 儲存地圖時，直接操作 GameDataController 的 MapDatad
+        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData != null)
+            mapData = GameDataController.Instance.CurrentGameData.MapDatad;
         mapData.ChinjuTiles.Clear();
         foreach (var position in tilemap.cellBounds.allPositionsWithin)
         {
@@ -89,6 +107,9 @@ public class GameManager : Singleton<GameManager>
 
     public void LoadMapData(Tilemap tilemap, GameData.MapData mapData, TileBase chinjuTile)
     {
+        // 載入地圖時，直接操作 GameDataController 的 MapDatad
+        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData != null)
+            mapData = GameDataController.Instance.CurrentGameData.MapDatad;
         tilemap.ClearAllTiles();
         foreach (var position in mapData.ChinjuTiles)
         {
@@ -122,6 +143,10 @@ public class GameManager : Singleton<GameManager>
         // 設定到 GameDataController
         if (GameDataController.Instance != null)
             GameDataController.Instance.CurrentGameData = newGameData;
+
+        // 新增：主動觸發資源事件，讓 UI 立即刷新
+        if (newGameData.PlayerDatad != null && newGameData.PlayerDatad.OnResourceChanged != null)
+            newGameData.PlayerDatad.OnResourceChanged.Invoke();
 
         // 保存新遊戲狀態
         SaveGame(newGameData);

@@ -306,18 +306,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e3e7ecf3f0abab840968ac56f0f0856c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  CurrentGameData:
-    PlayerDatad:
-      Oils: 0
-      Gold: 0
-      Cube: 0
-      Ships: []
-    MapDatad:
-      Seed: 0
-      Width: 0
-      Height: 0
-      IslandDensity: 0
-      ChinjuTiles: []
 --- !u!1 &586510287
 GameObject:
   m_ObjectHideFlags: 0
@@ -1210,10 +1198,10 @@ MonoBehaviour:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 572011471}
   - {fileID: 586510289}
   - {fileID: 794751195}
   - {fileID: 318057346}
   - {fileID: 2019224609}
   - {fileID: 708504591}
   - {fileID: 1028576060}
-  - {fileID: 572011471}

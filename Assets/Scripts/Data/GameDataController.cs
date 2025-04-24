@@ -16,6 +16,9 @@ public class GameDataController : MonoBehaviour
                 currentGameData = value;
                 if (OnGameDataChanged != null)
                     OnGameDataChanged.Invoke(currentGameData);
+                // 新增：主動觸發資源事件，讓 UI 立即刷新
+                if (currentGameData != null && currentGameData.PlayerDatad != null && currentGameData.PlayerDatad.OnResourceChanged != null)
+                    currentGameData.PlayerDatad.OnResourceChanged.Invoke();
             }
         }
     }
