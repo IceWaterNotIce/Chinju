@@ -4,40 +4,46 @@ using UnityEngine;
 [System.Serializable]
 public class GameData
 {
-    public PlayerData PlayerDatad { get; set; } // 修正名稱
-    public MapData MapDatad { get; set; } // 修正名稱
+    public PlayerData PlayerDatad; // 改為 public field
+    public MapData MapDatad;       // 改為 public field
 
-    public class PlayerData 
+    [System.Serializable]
+    public class PlayerData
     {
-        public float Oils { get; set; }
-        public float Gold { get; set; }
-        public int Cube { get; set; }
+        public float Oils;
+        public float Gold;
+        public int Cube;
 
         // 玩家擁有的船隻數據
-        public List<ShipData> Ships { get; set; } = new List<ShipData>();
+        public List<ShipData> Ships = new List<ShipData>();
+
+        // 事件不需序列化
+        [System.NonSerialized]
+        public System.Action OnResourceChanged;
     }
 
+    [System.Serializable]
     public class MapData
     {
-        public int Seed { get; set; }
-        public int Width { get; set; }
-        public int Height { get; set; }
-        public float IslandDensity { get; set; }
+        public int Seed;
+        public int Width;
+        public int Height;
+        public float IslandDensity;
 
         // chinjuTile的座標
-        public List<Vector3Int> ChinjuTiles { get; set; } = new List<Vector3Int>();
+        public List<Vector3Int> ChinjuTiles = new List<Vector3Int>();
     }
 
     [System.Serializable]
     public class ShipData
     {
-        public string Name { get; set; }
-        public int Health { get; set; }
-        public int AttackPower { get; set; }
-        public int Defense { get; set; }
-        public Vector3 Position { get; set; }
-        public float Fuel { get; set; } // Add Fuel
-        public float Speed { get; set; } // Add Speed
-        public float Rotation { get; set; } // Add Rotation
+        public string Name;
+        public int Health;
+        public int AttackPower;
+        public int Defense;
+        public Vector3 Position;
+        public float Fuel;
+        public float Speed;
+        public float Rotation;
     }
 }

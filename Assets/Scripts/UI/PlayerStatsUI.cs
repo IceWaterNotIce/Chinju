@@ -11,6 +11,9 @@ public class PlayerStatsUI : MonoBehaviour
     private Label oilLabel;
     private Label cubeLabel;
 
+    // 新增 GameData 參考
+    public GameData gameData;
+
     void OnEnable()
     {
         uiDocument = GetComponent<UIDocument>();
@@ -20,6 +23,21 @@ public class PlayerStatsUI : MonoBehaviour
         goldLabel = root.Q<Label>("GoldLabel");
         oilLabel = root.Q<Label>("OilLabel");
         cubeLabel = root.Q<Label>("CubeLabel");
+
+        // 假設 gameData 已經被指派
+        if (gameData != null && gameData.PlayerDatad != null)
+        {
+            gameData.PlayerDatad.OnResourceChanged += UpdateAllResourcesFromData;
+            UpdateAllResourcesFromData();
+        }
+    }
+
+    void OnDisable()
+    {
+        if (gameData != null && gameData.PlayerDatad != null)
+        {
+            gameData.PlayerDatad.OnResourceChanged -= UpdateAllResourcesFromData;
+        }
     }
 
     /// <summary>
@@ -68,6 +86,19 @@ public class PlayerStatsUI : MonoBehaviour
         if (cubeLabel != null)
         {
             cubeLabel.text = $"方塊: {amount}";
+        }
+    }
+
+    // 新增：從 GameData 更新 UI
+    private void UpdateAllResourcesFromData()
+    {
+        if (gameData != null && gameData.PlayerDatad != null)
+        {
+            UpdateResourceDisplay(
+                (int)gameData.PlayerDatad.Gold,
+                (int)gameData.PlayerDatad.Oils,
+                gameData.PlayerDatad.Cube
+            );
         }
     }
 }
