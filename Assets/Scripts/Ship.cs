@@ -117,6 +117,9 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     [SerializeField] private float m_detectionDistance = 50f;
     [SerializeField] private bool m_combatMode = false;
 
+    [Header("Visible Area")]
+    [SerializeField] private float m_visibleRadius = 10f; // 玩家可見半徑
+
     public float DetectionDistance
     {
         get => m_detectionDistance;
@@ -127,6 +130,12 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     {
         get => m_combatMode;
         set => m_combatMode = value;
+    }
+
+    public float VisibleRadius
+    {
+        get => m_visibleRadius;
+        set => m_visibleRadius = Mathf.Max(0, value);
     }
     #endregion
 
@@ -239,6 +248,14 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         Health = m_health;
         TargetSpeed = m_targetSpeed;
         TargetRotationSpeed = m_targetRotationSpeed;
+        m_visibleRadius = Mathf.Max(0, m_visibleRadius);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        // 在 Scene 視窗中繪製可見半徑
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, m_visibleRadius);
     }
     #endregion
 }
