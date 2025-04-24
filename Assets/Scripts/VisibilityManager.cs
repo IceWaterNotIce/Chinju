@@ -94,17 +94,17 @@ public class VisibilityManager : MonoBehaviour
         if (visibleCenters.Count == 0)
             return;
 
-        // 產生一個大矩形，z 設為 1
-        float camSize = mainCamera.orthographicSize * 2f;
-        float aspect = mainCamera.aspect;
+        // 產生一個 100x100 的大矩形，z 設為 1
+        float width = 100f;
+        float height = 100f;
         Vector3 camPos = mainCamera.transform.position;
         float z = 1f;
         Vector3[] verts = new Vector3[4]
         {
-            new Vector3(camPos.x - camSize*aspect, camPos.y - camSize, z),
-            new Vector3(camPos.x + camSize*aspect, camPos.y - camSize, z),
-            new Vector3(camPos.x + camSize*aspect, camPos.y + camSize, z),
-            new Vector3(camPos.x - camSize*aspect, camPos.y + camSize, z)
+            new Vector3(camPos.x - width/2f, camPos.y - height/2f, z),
+            new Vector3(camPos.x + width/2f, camPos.y - height/2f, z),
+            new Vector3(camPos.x + width/2f, camPos.y + height/2f, z),
+            new Vector3(camPos.x - width/2f, camPos.y + height/2f, z)
         };
         int[] tris = new int[] { 0, 1, 2, 2, 3, 0 };
         maskMesh.Clear();

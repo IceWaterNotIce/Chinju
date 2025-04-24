@@ -393,7 +393,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   tilemap: {fileID: 1920876237}
   chinjuTile: {fileID: 11400000, guid: dd2b4b2c1d45e6743a8978e499247e12, type: 2}
-  maskMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  maskMaterial: {fileID: 2100000, guid: c5d6f8b01b5ed0144aa25f0db30c9f57, type: 2}
   chinjuRadius: 10
 --- !u!4 &641728230
 Transform:
