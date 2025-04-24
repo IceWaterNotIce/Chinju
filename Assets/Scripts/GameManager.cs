@@ -125,9 +125,9 @@ public class GameManager : Singleton<GameManager>
         {
             PlayerDatad = new GameData.PlayerData
             {
-                Oils = 100,
+                Oils = 200,
                 Gold = 500,
-                Cube = 50,
+                Cube = 100,
                 Ships = new List<GameData.ShipData>()
             },
             MapDatad = new GameData.MapData

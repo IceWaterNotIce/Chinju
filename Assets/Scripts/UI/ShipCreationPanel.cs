@@ -21,11 +21,21 @@ public class ShipCreationPanel : MonoBehaviour
 
     void Awake()
     {
+          // 確保 GameDataController 已初始化
+        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData == null)
+        {
+            GameDataController.Instance.CurrentGameData = new GameData();
+        }
         InitializeUI();
     }
 
     void OnEnable()
     {
+         // 確保 GameDataController 已初始化
+        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData == null)
+        {
+            GameDataController.Instance.CurrentGameData = new GameData();
+        }
         if (panel == null)
         {
             InitializeUI();
@@ -198,8 +208,38 @@ public class ShipCreationPanel : MonoBehaviour
         int oilCost = shipCosts[1];
         int cubeCost = shipCosts[2];
 
-        // TODO: 檢查資源是否足夠
-        // TODO: 扣除資源
+        // 檢查資源是否足夠
+        var gameData = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
+        if (GameDataController.Instance == null)
+        {
+            Debug.LogError("GameDataController.Instance 為 null，無法建造船隻！");
+            return;
+        }
+        if (gameData == null)
+        {
+            Debug.LogWarning("CurrentGameData 為 null，自動初始化新遊戲資料。");
+            GameDataController.Instance.CurrentGameData = new GameData();
+            gameData = GameDataController.Instance.CurrentGameData;
+        }
+        if (gameData.PlayerDatad == null)
+        {
+            Debug.LogWarning("PlayerDatad 為 null，自動初始化 PlayerDatad。");
+            gameData.PlayerDatad = new GameData.PlayerData();
+        }
+        if (gameData.PlayerDatad.Gold < goldCost ||
+            gameData.PlayerDatad.Oils < oilCost ||
+            gameData.PlayerDatad.Cube < cubeCost)
+        {
+            Debug.LogWarning("資源不足，無法建造戰艦！");
+            return;
+        }
+
+        // 扣除資源
+        gameData.PlayerDatad.Gold -= goldCost;
+        gameData.PlayerDatad.Oils -= oilCost;
+        gameData.PlayerDatad.Cube -= cubeCost;
+        // 觸發資源變動事件
+        gameData.PlayerDatad.OnResourceChanged?.Invoke();
 
         // 創建戰艦實例
         InstantiateShip();
