@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.InputSystem;
 
 public class MapController : MonoBehaviour 
 {
-    public Tilemap tilemap;
+    [SerializeField] private Tilemap tilemap;  // 通過 Inspector 引用
     public TileBase oceanTile, grassTile;
     public TileBase chinjuTile; // 新增Chinju Tile
     public int width = 100;
@@ -136,6 +137,56 @@ public class MapController : MonoBehaviour
         if (gameManager != null)
         {
             gameManager.LoadMapData(tilemap, mapData, chinjuTile);
+        }
+    }
+
+    void Update()
+    {
+        // 檢測滑鼠左鍵點擊
+        if (Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            HandleMouseClick();
+        }
+    }
+
+    /// <summary>
+    /// 處理滑鼠點擊事件
+    /// </summary>
+    private void HandleMouseClick()
+    {
+        // 獲取滑鼠位置並轉換為世界座標
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        Vector3 worldPoint = mainCamera.ScreenToWorldPoint(mousePosition);
+        
+        // 執行 Raycast
+        RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.down);
+
+        if (hit.collider != null)
+        {
+            Debug.Log("點擊在 " + hit.collider.name);
+            Debug.Log("點擊位置: " + hit.point);
+
+            // 將世界座標轉換為 tilemap 的網格座標
+            Vector3Int tilePosition = tilemap.WorldToCell(hit.point);
+
+            // 嘗試獲取該位置的 tile
+            TileBase tile = tilemap.GetTile(tilePosition);
+
+            if (tile != null)
+            {
+                if (tile == oceanTile)
+                {
+                    Debug.Log("這是海洋 Tile");
+                }
+                else if (tile == grassTile)
+                {
+                    Debug.Log("這是草地 Tile");
+                }
+                else if (tile == chinjuTile)
+                {
+                    Debug.Log("這是神獸 Tile");
+                }
+            }
         }
     }
 }
