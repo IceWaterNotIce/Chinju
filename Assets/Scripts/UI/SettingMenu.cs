@@ -24,6 +24,11 @@ public class SettingMenu : MonoBehaviour
         InitializeUI();
     }
 
+    void OnDestroy()
+    {
+        UnregisterButtonCallbacks();
+    }
+
     private void InitializeUI()
     {
         try
@@ -48,6 +53,9 @@ public class SettingMenu : MonoBehaviour
             exitGameButton = root.Q<Button>("exitGameButton");
             newGameButton = root.Q<Button>("newGameButton"); // 新增
 
+            // 初始化面板狀態
+            root.style.display = DisplayStyle.None;
+
             RegisterButtonCallbacks();
             HideGameMenu();
             Debug.Log("[SettingMenu] UI初始化成功");
@@ -55,16 +63,32 @@ public class SettingMenu : MonoBehaviour
         catch (System.Exception e)
         {
             Debug.LogError($"[SettingMenu] UI初始化失敗: {e.Message}\n{e.StackTrace}");
+            return; // 新增：初始化失敗直接 return
         }
     }
 
     private void RegisterButtonCallbacks()
     {
-        continueButton.clicked += OnContinueButtonClicked;
-        saveGameButton.clicked += OnSaveGameButtonClicked;
-        loadGameButton.clicked += OnLoadGameButtonClicked;
-        exitGameButton.clicked += OnExitGameButtonClicked;
-        if (newGameButton != null) newGameButton.clicked += OnNewGameButtonClicked; // 新增
+        if (continueButton != null) continueButton.clicked += OnContinueButtonClicked;
+        if (saveGameButton != null) saveGameButton.clicked += OnSaveGameButtonClicked;
+        if (loadGameButton != null) loadGameButton.clicked += OnLoadGameButtonClicked;
+        if (exitGameButton != null) exitGameButton.clicked += OnExitGameButtonClicked;
+        if (newGameButton != null) newGameButton.clicked += OnNewGameButtonClicked;
+        // 若有 closeButton，這裡也註冊
+        // var closeButton = root.Q<Button>("closeButton");
+        // if (closeButton != null) closeButton.clicked += OnCloseButtonClicked;
+    }
+
+    private void UnregisterButtonCallbacks()
+    {
+        if (continueButton != null) continueButton.clicked -= OnContinueButtonClicked;
+        if (saveGameButton != null) saveGameButton.clicked -= OnSaveGameButtonClicked;
+        if (loadGameButton != null) loadGameButton.clicked -= OnLoadGameButtonClicked;
+        if (exitGameButton != null) exitGameButton.clicked -= OnExitGameButtonClicked;
+        if (newGameButton != null) newGameButton.clicked -= OnNewGameButtonClicked;
+        // 若有 closeButton，這裡也解除
+        // var closeButton = root.Q<Button>("closeButton");
+        // if (closeButton != null) closeButton.clicked -= OnCloseButtonClicked;
     }
 
     private void ToggleMenu()
