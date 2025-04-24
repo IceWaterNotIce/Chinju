@@ -180,12 +180,12 @@ public class MiniMapManager : MonoBehaviour
     private Vector3 ConvertMinimapToWorldPosition(Vector2 minimapPosition)
     {
         // 獲取小地圖容器的尺寸
-        Vector2 containerSize = minimapContainer.worldBound.size;
+        Vector2 containerSize = minimapView.worldBound.size;
         
         // 計算點擊位置相對於小地圖容器的比例
         Vector2 normalizedPosition = new Vector2(
-            (minimapPosition.x - minimapContainer.worldBound.x) / containerSize.x,
-            (minimapPosition.y - minimapContainer.worldBound.y) / containerSize.y
+            (minimapPosition.x - minimapView.worldBound.x) / containerSize.x,
+            (minimapPosition.y - minimapView.worldBound.y) / containerSize.y
         );
 
         // 計算小地圖相機視野範圍
@@ -196,8 +196,8 @@ public class MiniMapManager : MonoBehaviour
         Vector3 cameraPosition = minimapCamera.transform.position;
         Vector3 worldPosition = new Vector3(
             cameraPosition.x - (cameraWidth / 2) + (cameraWidth * normalizedPosition.x),
-            mainCamera.transform.position.y, // 保持當前高度
-            cameraPosition.z - (cameraHeight / 2) + (cameraHeight * normalizedPosition.y)
+            cameraPosition.y - (cameraHeight / 2) + (cameraHeight * normalizedPosition.y),
+            mainCamera.transform.position.z  // 只保持 Z 軸不變
         );
 
         return worldPosition;
@@ -216,7 +216,7 @@ public class MiniMapManager : MonoBehaviour
             if (mainCamera != null)
             {
                 Vector3 targetPosition = ConvertMinimapToWorldPosition(evt.mousePosition);
-                mainCamera.transform.position = new Vector3(targetPosition.x, mainCamera.transform.position.y, targetPosition.z);
+                mainCamera.transform.position = targetPosition; // 使用轉換後的位置，保持 Z 軸不變
             }
             evt.StopPropagation();
         }
@@ -231,7 +231,7 @@ public class MiniMapManager : MonoBehaviour
         {
             // 直接更新到當前鼠標位置
             Vector3 targetPosition = ConvertMinimapToWorldPosition(evt.mousePosition);
-            mainCamera.transform.position = new Vector3(targetPosition.x, mainCamera.transform.position.y, targetPosition.z);
+            mainCamera.transform.position = targetPosition; // 使用轉換後的位置，保持 Z 軸不變
             evt.StopPropagation();
         }
     }
