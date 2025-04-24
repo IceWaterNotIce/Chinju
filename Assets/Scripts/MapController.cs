@@ -213,4 +213,58 @@ public class MapController : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// 找到最近的海洋格子
+    /// </summary>
+    public Vector3 FindNearestOceanTile(Vector3 referencePoint)
+    {
+        Vector3Int[] directions = new Vector3Int[]
+        {
+            new Vector3Int(0, 1, 0),  // 上
+            new Vector3Int(0, -1, 0), // 下
+            new Vector3Int(-1, 0, 0), // 左
+            new Vector3Int(1, 0, 0)   // 右
+        };
+
+        Vector3Int referenceTile = tilemap.WorldToCell(referencePoint);
+
+        foreach (var direction in directions)
+        {
+            Vector3Int neighborTile = referenceTile + direction;
+            if (IsOceanTile(neighborTile))
+            {
+                return tilemap.GetCellCenterWorld(neighborTile);
+            }
+        }
+
+        return Vector3.zero; // 找不到海洋格子
+    }
+
+    /// <summary>
+    /// 檢查某個位置是否是海洋格子
+    /// </summary>
+    private bool IsOceanTile(Vector3Int tilePosition)
+    {
+        TileBase tile = tilemap.GetTile(tilePosition);
+        return tile == oceanTile;
+    }
+
+    /// <summary>
+    /// 獲取 Chinju Tile 的世界位置
+    /// </summary>
+    public Vector3 GetChinjuTileWorldPosition()
+    {
+        BoundsInt bounds = tilemap.cellBounds;
+        foreach (Vector3Int position in bounds.allPositionsWithin)
+        {
+            TileBase tile = tilemap.GetTile(position);
+            if (tile == chinjuTile)
+            {
+                return tilemap.GetCellCenterWorld(position);
+            }
+        }
+
+        return Vector3.zero; // 找不到 Chinju Tile
+    }
 }

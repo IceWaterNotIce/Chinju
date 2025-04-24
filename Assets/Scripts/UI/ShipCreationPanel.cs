@@ -17,6 +17,8 @@ public class ShipCreationPanel : MonoBehaviour
     // 戰艦建造成本
     private readonly int[] shipCosts = { 500, 200, 100 }; // 金幣, 石油, 方塊
 
+    [SerializeField] private MapController mapController; // 新增 MapController 引用
+
     void Awake()
     {
         InitializeUI();
@@ -198,13 +200,64 @@ public class ShipCreationPanel : MonoBehaviour
 
         // TODO: 檢查資源是否足夠
         // TODO: 扣除資源
-        // TODO: 創建戰艦實例
-        
+
+        // 創建戰艦實例
+        InstantiateShip();
+
         Debug.Log("開始建造戰艦");
-        
+
         // 重置選擇狀態
         battleShipBtn.RemoveFromClassList("selected");
         createShipBtn.SetEnabled(false);
         UpdateCostDisplay(0, 0, 0);
     }
-} 
+
+    /// <summary>
+    /// 實例化戰艦
+    /// </summary>
+    private void InstantiateShip()
+    {
+        // 假設有一個戰艦的預製件
+        GameObject battleShipPrefab = Resources.Load<GameObject>("Prefabs/Ship");
+        if (battleShipPrefab == null)
+        {
+            Debug.LogError("找不到戰艦預製件！");
+            return;
+        }
+
+        // 使用 MapController 找到 Chinju Tile 附近的最近海洋格子
+        if (mapController == null)
+        {
+            Debug.LogError("MapController 未設置！");
+            return;
+        }
+
+        Vector3 chinjuTilePosition = mapController.GetChinjuTileWorldPosition();
+        if (chinjuTilePosition == Vector3.zero)
+        {
+            Debug.LogError("找不到 Chinju Tile 的位置！");
+            return;
+        }
+
+        Vector3 spawnPosition = mapController.FindNearestOceanTile(chinjuTilePosition);
+        if (spawnPosition == Vector3.zero)
+        {
+            Debug.LogError("找不到 Chinju Tile 附近的最近海洋格子！");
+            return;
+        }
+
+        // 固定 z 座標為 -1
+        spawnPosition.z = -1;
+
+        // 在場景中生成戰艦
+        GameObject battleShip = Instantiate(battleShipPrefab, spawnPosition, Quaternion.identity);
+        if (battleShip != null)
+        {
+            Debug.Log("戰艦實例化成功！");
+        }
+        else
+        {
+            Debug.LogError("戰艦實例化失敗！");
+        }
+    }
+}

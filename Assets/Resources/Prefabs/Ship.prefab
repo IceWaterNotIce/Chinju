@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 4572884418056175630}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.15, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -137,3 +137,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3cea577cb8604c45936364f4eb7685f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_maxHealth: 100
+  m_health: 100
+  m_fuelConsumption: 0.1
+  m_maxSpeed: 10
+  m_acceleration: 2
+  m_targetSpeed: 0
+  m_speed: 0
+  m_maxRotationSpeed: 90
+  m_rotationAcceleration: 45
+  m_targetRotation: 0
+  m_targetRotationSpeed: 0
+  m_rotationSpeed: 0
+  m_detectionDistance: 50
+  m_combatMode: 0
