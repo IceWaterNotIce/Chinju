@@ -41,6 +41,7 @@ public class MapController : MonoBehaviour
         }
         
         GenerateMap();
+
     }
 
     void GenerateMap()

@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Tilemaps;
 using System;
 using System.Collections.Generic;
 
@@ -152,9 +153,24 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     }
     #endregion
 
+    [SerializeField] public Tilemap tilemap; // 引用地圖的 Tilemap，改為 public
+    [SerializeField] public TileBase oceanTile; // 引用海洋 Tile，改為 public
 
     void Start()
     {
+        tilemap = FindFirstObjectByType<Tilemap>();
+        if (tilemap == null)
+        {
+            Debug.LogError("Tilemap not found in the scene!", this);
+            return;
+        }
+        // Resource/Tilemap/OceanTile
+        oceanTile = Resources.Load<TileBase>("Tilemap/OceanTile");
+        if (oceanTile == null)
+        {
+            Debug.LogError("Ocean Tile not found in Resources!", this);
+            return;
+        }
     }
 
     // Update is called once per frame
@@ -173,7 +189,18 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     void Move()
     {
         m_speed = Mathf.MoveTowards(m_speed, m_targetSpeed, m_acceleration * Time.deltaTime);
-        transform.position += transform.right * Speed * Time.deltaTime;
+        Vector3 newPosition = transform.position + transform.right * Speed * Time.deltaTime;
+
+        // 檢查新位置是否為海洋 Tile
+        Vector3Int tilePosition = tilemap.WorldToCell(newPosition);
+        if (tilemap.GetTile(tilePosition) == oceanTile)
+        {
+            transform.position = newPosition;
+        }
+        else
+        {
+            Debug.LogWarning("無法移動到非海洋 Tile 的位置！");
+        }
     }
 
     public GameData.ShipData SaveShipData()
