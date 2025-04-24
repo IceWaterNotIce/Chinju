@@ -34,6 +34,12 @@ public class MapController : MonoBehaviour
         
         // Debug.Log("Current Map Seed: " + seed); // 輸出種子供調試
 
+        // 檢查必要組件
+        if (shipCreationPanel == null)
+        {
+            Debug.LogError("ShipCreationPanel 未設置！請在 Inspector 中設置引用。");
+        }
+        
         GenerateMap();
     }
 
@@ -146,7 +152,7 @@ public class MapController : MonoBehaviour
     void Update()
     {
         // 檢測滑鼠左鍵點擊
-        if (Mouse.current.leftButton.wasPressedThisFrame)
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             HandleMouseClick();
         }
@@ -157,6 +163,12 @@ public class MapController : MonoBehaviour
     /// </summary>
     private void HandleMouseClick()
     {
+        if (mainCamera == null)
+        {
+            Debug.LogError("主攝影機未設置！");
+            return;
+        }
+
         // 獲取滑鼠位置並轉換為世界座標
         Vector2 mousePosition = Mouse.current.position.ReadValue();
         Vector3 worldPoint = mainCamera.ScreenToWorldPoint(mousePosition);
@@ -188,10 +200,14 @@ public class MapController : MonoBehaviour
                 else if (tile == chinjuTile)
                 {
                     Debug.Log("這是神獸 Tile");
-                    // 切換船隻建造面板的顯示
                     if (shipCreationPanel != null)
                     {
+                        Debug.Log("正在切換船隻建造面板...");
                         shipCreationPanel.Toggle();
+                    }
+                    else
+                    {
+                        Debug.LogError("ShipCreationPanel 是 null！");
                     }
                 }
             }

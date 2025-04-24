@@ -7,7 +7,6 @@ using UnityEngine.UIElements;
 public class ShipCreationPanel : MonoBehaviour
 {
     private UIDocument uiDocument;
-    private VisualElement root;
     private VisualElement panel;
     private Button battleShipBtn;
     private Button createShipBtn;
@@ -18,16 +17,45 @@ public class ShipCreationPanel : MonoBehaviour
     // 戰艦建造成本
     private readonly int[] shipCosts = { 500, 200, 100 }; // 金幣, 石油, 方塊
 
+    void Awake()
+    {
+        InitializeUI();
+    }
+
     void OnEnable()
     {
-        uiDocument = GetComponent<UIDocument>();
-        root = uiDocument.rootVisualElement;
+        if (panel == null)
+        {
+            InitializeUI();
+        }
+    }
+
+    private void InitializeUI()
+    {
+        Debug.Log("初始化船隻建造面板...");
         
+        // 獲取 UIDocument
+        uiDocument = GetComponent<UIDocument>();
+        if (uiDocument == null)
+        {
+            Debug.LogError("找不到 UIDocument 組件！");
+            return;
+        }
+
+        // 獲取根元素
+        var root = uiDocument.rootVisualElement;
+        if (root == null)
+        {
+            Debug.LogError("無法獲取 UI 根元素！");
+            return;
+        }
+
         // 獲取面板根元素
         panel = root.Q<VisualElement>("ship-creation-panel");
-        if (panel != null)
+        if (panel == null)
         {
-            panel.style.display = DisplayStyle.None; // 初始時隱藏面板
+            Debug.LogError("找不到 ship-creation-panel 元素！");
+            return;
         }
 
         // 獲取UI元素引用
@@ -37,13 +65,29 @@ public class ShipCreationPanel : MonoBehaviour
         oilCostLabel = root.Q<Label>("oil-cost");
         cubeCostLabel = root.Q<Label>("cube-cost");
 
-        // 註冊按鈕點擊事件
-        battleShipBtn.clicked += SelectBattleShip;
-        createShipBtn.clicked += CreateShip;
+        // 檢查必要元素
+        if (battleShipBtn == null) Debug.LogError("找不到 battle-ship-btn！");
+        if (createShipBtn == null) Debug.LogError("找不到 create-ship-btn！");
+        if (goldCostLabel == null) Debug.LogError("找不到 gold-cost 標籤！");
+        if (oilCostLabel == null) Debug.LogError("找不到 oil-cost 標籤！");
+        if (cubeCostLabel == null) Debug.LogError("找不到 cube-cost 標籤！");
 
-        // 初始化UI
-        createShipBtn.SetEnabled(false);
+        // 註冊按鈕點擊事件
+        if (battleShipBtn != null)
+        {
+            battleShipBtn.clicked += SelectBattleShip;
+        }
+        if (createShipBtn != null)
+        {
+            createShipBtn.clicked += CreateShip;
+            createShipBtn.SetEnabled(false);
+        }
+
+        // 初始化面板狀態
+        panel.style.display = DisplayStyle.None;
         UpdateCostDisplay(0, 0, 0);
+
+        Debug.Log("船隻建造面板初始化完成");
     }
 
     /// <summary>
@@ -51,9 +95,14 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     public void Show()
     {
+        Debug.Log("顯示船隻建造面板");
         if (panel != null)
         {
             panel.style.display = DisplayStyle.Flex;
+        }
+        else
+        {
+            Debug.LogError("無法顯示面板：panel 是 null");
         }
     }
 
@@ -62,11 +111,15 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     public void Hide()
     {
+        Debug.Log("隱藏船隻建造面板");
         if (panel != null)
         {
             panel.style.display = DisplayStyle.None;
-            // 重置面板狀態
             ResetPanel();
+        }
+        else
+        {
+            Debug.LogError("無法隱藏面板：panel 是 null");
         }
     }
 
@@ -75,16 +128,21 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     public void Toggle()
     {
+        Debug.Log("切換船隻建造面板顯示狀態");
         if (panel != null)
         {
             bool isVisible = panel.style.display == DisplayStyle.Flex;
+            Debug.Log($"當前面板狀態：{(isVisible ? "顯示" : "隱藏")}");
             panel.style.display = isVisible ? DisplayStyle.None : DisplayStyle.Flex;
             
-            // 如果隱藏面板，重置狀態
-            if (!isVisible)
+            if (isVisible)
             {
                 ResetPanel();
             }
+        }
+        else
+        {
+            Debug.LogError("無法切換面板：panel 是 null");
         }
     }
 
