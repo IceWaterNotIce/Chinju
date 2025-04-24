@@ -80,7 +80,7 @@ public class SettingMenu : MonoBehaviour
             return;
         }
 
-        if (menuPanel.style.display == DisplayStyle.Flex)
+        if (root.style.display == DisplayStyle.Flex)
         {
             HideGameMenu();
         }
@@ -98,7 +98,7 @@ public class SettingMenu : MonoBehaviour
             return;
         }
 
-        menuPanel.style.display = DisplayStyle.Flex;
+        root.style.display = DisplayStyle.Flex;
         Debug.Log("[SettingMenu] 顯示遊戲選單");
     }
 
@@ -110,7 +110,7 @@ public class SettingMenu : MonoBehaviour
             return;
         }
 
-        menuPanel.style.display = DisplayStyle.None;
+        root.style.display = DisplayStyle.None;
         Debug.Log("[SettingMenu] 隱藏遊戲選單");
     }
 
