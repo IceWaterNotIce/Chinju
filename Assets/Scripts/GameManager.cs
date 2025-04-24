@@ -15,7 +15,6 @@ public class GameManager : Singleton<GameManager>
     public const string githubUrl = "https://raw.githubusercontent.com/IceWaterNotIce/Word-Curse/main/";
 
     private string saveFilePath;
-    public GameData currentGameData = new GameData();
 
     protected override void Awake()
     {
@@ -26,8 +25,13 @@ public class GameManager : Singleton<GameManager>
     {
         Debug.Log("[GameManager] 初始化開始");
         saveFilePath = Path.Combine(Application.persistentDataPath, "savegame.json");
-        
-        
+
+        // 初始化 GameDataController
+        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData == null)
+        {
+            GameDataController.Instance.CurrentGameData = new GameData();
+        }
+
         Debug.Log("[GameManager] 初始化完成");
     }
 
@@ -58,6 +62,9 @@ public class GameManager : Singleton<GameManager>
             string json = File.ReadAllText(saveFilePath);
             GameData data = JsonUtility.FromJson<GameData>(json);
             Debug.Log("[GameManager] 遊戲已從 " + saveFilePath + " 載入");
+            // 載入後設置到 GameDataController
+            if (GameDataController.Instance != null)
+                GameDataController.Instance.CurrentGameData = data;
             return data;
         }
         else
@@ -93,7 +100,7 @@ public class GameManager : Singleton<GameManager>
     public void StartNewGame()
     {
         // 重置遊戲數據
-        currentGameData = new GameData
+        var newGameData = new GameData
         {
             PlayerDatad = new GameData.PlayerData
             {
@@ -112,8 +119,12 @@ public class GameManager : Singleton<GameManager>
             }
         };
 
+        // 設定到 GameDataController
+        if (GameDataController.Instance != null)
+            GameDataController.Instance.CurrentGameData = newGameData;
+
         // 保存新遊戲狀態
-        SaveGame(currentGameData);
+        SaveGame(newGameData);
 
         // 載入新遊戲場景
         LoadGame();
@@ -123,7 +134,8 @@ public class GameManager : Singleton<GameManager>
 
     private void OnApplicationQuit()
     {
-        SaveGame(currentGameData);
+        if (GameDataController.Instance != null)
+            SaveGame(GameDataController.Instance.CurrentGameData);
         Debug.Log("[GameManager] 遊戲數據已在退出時保存");
     }
 }

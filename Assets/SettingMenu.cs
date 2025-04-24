@@ -123,7 +123,8 @@ public class SettingMenu : MonoBehaviour
     private void OnSaveGameButtonClicked()
     {
         Debug.Log("[SettingMenu] 儲存遊戲");
-        GameManager.Instance.SaveGame(GameManager.Instance.currentGameData);
+        if (GameDataController.Instance != null)
+            GameManager.Instance.SaveGame(GameDataController.Instance.CurrentGameData);
     }
 
     private void OnLoadGameButtonClicked()
@@ -132,7 +133,8 @@ public class SettingMenu : MonoBehaviour
         var loadedData = GameManager.Instance.LoadGame();
         if (loadedData != null)
         {
-            GameManager.Instance.currentGameData = loadedData;
+            if (GameDataController.Instance != null)
+                GameDataController.Instance.CurrentGameData = loadedData;
             Debug.Log("[SettingMenu] 遊戲載入成功");
             HideGameMenu();
         }

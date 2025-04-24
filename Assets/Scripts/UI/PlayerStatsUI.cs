@@ -11,32 +11,59 @@ public class PlayerStatsUI : MonoBehaviour
     private Label oilLabel;
     private Label cubeLabel;
 
-    // 新增 GameData 參考
-    public GameData gameData;
+    // 移除 public GameData gameData;
+    private GameData gameData;
 
     void OnEnable()
     {
         uiDocument = GetComponent<UIDocument>();
         var root = uiDocument.rootVisualElement;
         
-        // 獲取資源標籤引用
-        goldLabel = root.Q<Label>("GoldLabel");
-        oilLabel = root.Q<Label>("OilLabel");
-        cubeLabel = root.Q<Label>("CubeLabel");
+        // 修正：Label 名稱需與 UXML 一致（小寫）
+        goldLabel = root.Q<Label>("goldLabel");
+        oilLabel = root.Q<Label>("oilLabel");
+        cubeLabel = root.Q<Label>("cubeLabel");
 
-        // 假設 gameData 已經被指派
-        if (gameData != null && gameData.PlayerDatad != null)
-        {
-            gameData.PlayerDatad.OnResourceChanged += UpdateAllResourcesFromData;
-            UpdateAllResourcesFromData();
-        }
+        // 監聽 GameDataController 的資料變更
+        if (GameDataController.Instance != null)
+            GameDataController.Instance.OnGameDataChanged += OnGameDataChanged;
+
+        // 自動從 GameDataController 取得 GameData
+        SetGameDataFromController();
     }
 
     void OnDisable()
     {
+        if (GameDataController.Instance != null)
+            GameDataController.Instance.OnGameDataChanged -= OnGameDataChanged;
+
         if (gameData != null && gameData.PlayerDatad != null)
         {
             gameData.PlayerDatad.OnResourceChanged -= UpdateAllResourcesFromData;
+        }
+    }
+
+    // 當 GameDataController.CurrentGameData 被更換時呼叫
+    private void OnGameDataChanged(GameData newData)
+    {
+        SetGameDataFromController();
+    }
+
+    /// <summary>
+    /// 從 GameDataController 取得 GameData 並刷新 UI
+    /// </summary>
+    public void SetGameDataFromController()
+    {
+        var data = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
+        if (gameData != null && gameData.PlayerDatad != null)
+        {
+            gameData.PlayerDatad.OnResourceChanged -= UpdateAllResourcesFromData;
+        }
+        gameData = data;
+        if (gameData != null && gameData.PlayerDatad != null)
+        {
+            gameData.PlayerDatad.OnResourceChanged += UpdateAllResourcesFromData;
+            UpdateAllResourcesFromData();
         }
     }
 
@@ -95,8 +122,8 @@ public class PlayerStatsUI : MonoBehaviour
         if (gameData != null && gameData.PlayerDatad != null)
         {
             UpdateResourceDisplay(
-                (int)gameData.PlayerDatad.Gold,
-                (int)gameData.PlayerDatad.Oils,
+                Mathf.RoundToInt(gameData.PlayerDatad.Gold),
+                Mathf.RoundToInt(gameData.PlayerDatad.Oils),
                 gameData.PlayerDatad.Cube
             );
         }
