@@ -63,14 +63,32 @@ public class GameManager : Singleton<GameManager>
 
 
 
-    public void SaveGame(GameData data)
+    public void SaveGame()
     {
         // 儲存時，確保是 GameDataController 的資料
         if (GameDataController.Instance != null)
-            data = GameDataController.Instance.CurrentGameData;
-        string json = JsonUtility.ToJson(data);
-        File.WriteAllText(saveFilePath, json);
-        Debug.Log("[GameManager] 遊戲已保存至 " + saveFilePath);
+        {
+            var data = GameDataController.Instance.CurrentGameData;
+
+            // 儲存前，先更新所有玩家船艦資料
+            if (data != null && data.PlayerDatad != null && data.PlayerDatad.Ships != null)
+            {
+                // 取得場景中所有 Ship 物件
+                var shipsInScene = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
+                for (int i = 0; i < data.PlayerDatad.Ships.Count; i++)
+                {
+                    // 根據索引對應（假設順序一致），將場景 Ship 狀態存回 ShipData
+                    if (i < shipsInScene.Length && shipsInScene[i] != null)
+                    {
+                        data.PlayerDatad.Ships[i] = shipsInScene[i].SaveShipData();
+                    }
+                }
+            }
+
+            string json = JsonUtility.ToJson(data);
+            File.WriteAllText(saveFilePath, json);
+            Debug.Log("[GameManager] 遊戲已保存至 " + saveFilePath);
+        }
     }
 
     public GameData LoadGame()
@@ -158,7 +176,7 @@ public class GameManager : Singleton<GameManager>
             newGameData.PlayerDatad.OnResourceChanged.Invoke();
 
         // 保存新遊戲狀態
-        SaveGame(newGameData);
+        SaveGame();
 
         // 載入新遊戲場景
         LoadGame();
@@ -169,7 +187,7 @@ public class GameManager : Singleton<GameManager>
     private void OnApplicationQuit()
     {
         if (GameDataController.Instance != null)
-            SaveGame(GameDataController.Instance.CurrentGameData);
+            SaveGame();
         Debug.Log("[GameManager] 遊戲數據已在退出時保存");
     }
 }

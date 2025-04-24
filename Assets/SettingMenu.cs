@@ -124,7 +124,7 @@ public class SettingMenu : MonoBehaviour
     {
         Debug.Log("[SettingMenu] 儲存遊戲");
         if (GameDataController.Instance != null)
-            GameManager.Instance.SaveGame(GameDataController.Instance.CurrentGameData);
+            GameManager.Instance.SaveGame(); // Adjusted to match the method signature
     }
 
     private void OnLoadGameButtonClicked()
