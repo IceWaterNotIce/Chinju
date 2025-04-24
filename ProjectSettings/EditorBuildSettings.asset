@@ -20,16 +20,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Labs/Base.unity
     guid: 7d68d41b573b4a746923ae66ea5b448f
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Labs/LabCamera.unity
     guid: dcc3ad07c9227414a82cb51f42a3452a
   - enabled: 1
     path: Assets/Scenes/Labs/LabEnemyShip.unity
     guid: 7340dc8cddeb7394db8ddbacf013dab1
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Labs/LabIslandGenerator.unity
     guid: f05c248632510364cafedc13b12b2439
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Labs/LabMiniMap.unity
     guid: 505d2e91825d93d47bbb2301c9cad883
   - enabled: 1
