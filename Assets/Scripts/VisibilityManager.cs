@@ -120,7 +120,8 @@ public class VisibilityManager : MonoBehaviour
                 radius = ships[i-1].VisibleRadius;
             circles[i] = new Vector4(visibleCenters[i].x, visibleCenters[i].y, radius, 0);
         }
+        // 臨時修正：只傳 1 個元素，避免 Unity 報錯
         maskMaterial.SetInt("_CircleCount", count);
-        maskMaterial.SetVectorArray("_Circles", circles);
+        maskMaterial.SetVectorArray("_Circles", circles.Length > 1 ? new Vector4[] { circles[0] } : circles);
     }
 }
