@@ -18,20 +18,33 @@ public class EnemyShip : Ship
     }
     #endregion
 
+    // 隨機移動參數
+    private float randomMoveDistance = 0f;
+    private float movedDistance = 0f;
+    private float randomSpeed = 0f;
+    private float randomAngle = 0f;
+    private Vector2 lastPosition;
+
+   new void Start()
+    {
+        base.Start();
+        PickNewRandomMove();
+        lastPosition = transform.position;
+    }
+
     // 覆寫父類 Update 加入敵艦邏輯
     new void Update()
     {
         base.Update();  // 呼叫父類的 Update 方法
-        if (PlayerTarget != null)
-        {
-            HandleAIBehavior();
-        }
+        HandleAIBehavior();
     }
 
     private void HandleAIBehavior()
     {
         // 計算與玩家的距離
-        float distanceToPlayer = Vector3.Distance(transform.position, PlayerTarget.position);
+        float distanceToPlayer = PlayerTarget != null 
+            ? Vector3.Distance(transform.position, PlayerTarget.position) 
+            : Mathf.Infinity;
 
         // 行為決策樹
         if (distanceToPlayer <= AttackRange)
@@ -41,6 +54,10 @@ public class EnemyShip : Ship
         else if (distanceToPlayer <= DetectionDistance)
         {
             ChasePlayer();
+        }
+        else if (distanceToPlayer > DetectionDistance)
+        {
+            RandomMove();
         }
     }
 
@@ -78,6 +95,37 @@ public class EnemyShip : Ship
         2. 播放攻擊動畫
         3. 觸發音效
         */
+    }
+
+    private void RandomMove()
+    {
+        // 計算移動距離
+        float delta = Vector2.Distance(transform.position, lastPosition);
+        movedDistance += delta;
+        lastPosition = transform.position;
+
+        // 設定隨機方向與速度，讓 Ship 的 Move/Rotate 控制移動
+        TargetRotation = randomAngle;
+        TargetSpeed = randomSpeed;
+        Debug.Log($"Moving randomly: Angle {randomAngle}, Speed {randomSpeed}");
+
+
+        // 不再直接設定 transform.rotation
+
+        // 若已移動超過隨機距離，則重新選擇方向與速度
+        if (movedDistance >= randomMoveDistance)
+        {
+            PickNewRandomMove();
+        }
+    }
+
+    private void PickNewRandomMove()
+    {
+        randomMoveDistance = Random.Range(3f, 10f); // 每次隨機移動距離
+        randomSpeed = MaxSpeed * Random.Range(0.1f, 0.2f); // 隨機速度
+        randomAngle = Random.Range(0f, 360f); // 隨機方向
+        movedDistance = 0f;
+        lastPosition = transform.position;
     }
 
     // 強化被擊中效果

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1037511632294473799}
   - component: {fileID: 7838669616361516043}
   - component: {fileID: 864345131621097761}
-  - component: {fileID: 9051932347744978766}
+  - component: {fileID: -6630114623167957052}
   m_Layer: 0
   m_Name: Battleship
   m_TagString: Untagged
@@ -125,7 +125,7 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.325
---- !u!114 &9051932347744978766
+--- !u!114 &-6630114623167957052
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -134,7 +134,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2993792429627521981}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3cea577cb8604c45936364f4eb7685f, type: 3}
+  m_Script: {fileID: 11500000, guid: 5a47bc4d2f7ad0e4b95435130cb80719, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_maxHealth: 100
@@ -151,5 +151,10 @@ MonoBehaviour:
   m_rotationSpeed: 0
   m_detectionDistance: 50
   m_combatMode: 0
+  m_visibleRadius: 10
   tilemap: {fileID: 0}
   oceanTile: {fileID: 0}
+  attackRange: 5
+  attackCooldown: 2
+  damage: 10
+  playerTarget: {fileID: 0}

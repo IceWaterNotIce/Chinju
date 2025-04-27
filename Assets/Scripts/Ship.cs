@@ -165,7 +165,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     [SerializeField] public Tilemap tilemap; // 引用地圖的 Tilemap，改為 public
     [SerializeField] public TileBase oceanTile; // 引用海洋 Tile，改為 public
 
-    void Start()
+    public void Start()
     {
         tilemap = FindFirstObjectByType<Tilemap>();
         if (tilemap == null)
@@ -191,8 +191,31 @@ public class Ship : MonoBehaviour, IPointerClickHandler
 
     void Rotate()
     {
-        m_rotationSpeed = Mathf.MoveTowards(m_rotationSpeed, m_targetRotationSpeed, m_rotationAcceleration * Time.deltaTime);
-        transform.rotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z + m_rotationSpeed * Time.deltaTime);
+        if (Mathf.Abs(m_targetRotationSpeed) > 0.01f)
+        {
+            // 以速度控制旋轉
+            m_rotationSpeed = Mathf.MoveTowards(m_rotationSpeed, m_targetRotationSpeed, m_rotationAcceleration * Time.deltaTime);
+            transform.rotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z + m_rotationSpeed * Time.deltaTime);
+        }
+        else
+        {
+            // 自動補間到 TargetRotation
+            float currentZ = transform.rotation.eulerAngles.z;
+            float delta = Mathf.DeltaAngle(currentZ, m_targetRotation);
+
+            if (Mathf.Abs(delta) < 0.1f)
+            {
+                transform.rotation = Quaternion.Euler(0, 0, m_targetRotation);
+                m_rotationSpeed = 0f;
+            }
+            else
+            {
+                float maxStep = m_maxRotationSpeed * Time.deltaTime;
+                float step = Mathf.Clamp(delta, -maxStep, maxStep);
+                transform.rotation = Quaternion.Euler(0, 0, currentZ + step);
+                m_rotationSpeed = step / Time.deltaTime;
+            }
+        }
     }
 
     void Move()
