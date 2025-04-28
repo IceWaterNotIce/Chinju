@@ -11,9 +11,6 @@ public class WeaponCreatePanelController : MonoBehaviour
         public int cost;
     }
 
-    // 假設玩家資源
-    public int userResource = 100;
-
     public List<WeaponRecipe> weaponRecipes = new List<WeaponRecipe>
     {
         new WeaponRecipe { name = "長劍", cost = 30 },
@@ -21,12 +18,12 @@ public class WeaponCreatePanelController : MonoBehaviour
         new WeaponRecipe { name = "斧頭", cost = 40 }
     };
 
-    private VisualElement root; // 修改為 root
+    private VisualElement root;
     private ChinjuUIController chinjuUIController;
 
     void Awake()
     {
-        root = GetComponent<UIDocument>().rootVisualElement; // 修改為 root
+        root = GetComponent<UIDocument>().rootVisualElement;
 
         var dropdown = root.Q<DropdownField>("weapon-dropdown");
         var resourceLabel = root.Q<Label>("resource-label");
@@ -41,44 +38,72 @@ public class WeaponCreatePanelController : MonoBehaviour
 
         void UpdateResourceLabel()
         {
-            resourceLabel.text = $"目前資源：{userResource}";
+            var playerData = GameDataController.Instance?.CurrentGameData?.PlayerDatad;
+            if (playerData != null)
+            {
+                resourceLabel.text = $"目前金幣：{playerData.Gold}";
+            }
+            else
+            {
+                resourceLabel.text = "無法取得玩家資料";
+            }
         }
 
         UpdateResourceLabel();
 
         createButton.clicked += () =>
         {
+            var playerData = GameDataController.Instance?.CurrentGameData?.PlayerDatad;
+            if (playerData == null)
+            {
+                Debug.LogError("[WeaponCreatePanelController] 無法取得玩家資料，無法創建武器。");
+                return;
+            }
+
             int idx = dropdown.index;
             if (idx < 0 || idx >= weaponRecipes.Count) return;
             var recipe = weaponRecipes[idx];
-            if (userResource >= recipe.cost)
+            if (playerData.Gold >= recipe.cost)
             {
-                userResource -= recipe.cost;
+                playerData.Gold -= recipe.cost;
+                playerData.OnResourceChanged?.Invoke();
                 UpdateResourceLabel();
+
+                // 新增武器數據到玩家資料
+                var newWeapon = new GameData.WeaponData
+                {
+                    Name = recipe.name,
+                    Damage = Random.Range(10, 20), // 假設隨機生成傷害值
+                    Range = Random.Range(1.0f, 3.0f), // 假設隨機生成範圍值
+                    AttackSpeed = Random.Range(0.5f, 1.5f), // 假設隨機生成攻擊速度
+                    CooldownTime = Random.Range(1.0f, 2.0f) // 假設隨機生成冷卻時間
+                };
+                playerData.Weapons.Add(newWeapon);
+
                 resultLabel.text = $"成功創建：{recipe.name}！";
-                Debug.Log($"[WeaponCreatePanelController] 成功創建：{recipe.name}，剩餘資源：{userResource}");
+                Debug.Log($"[WeaponCreatePanelController] 成功創建：{recipe.name}，剩餘金幣：{playerData.Gold}");
+                Debug.Log($"[WeaponCreatePanelController] 新增武器數據：{newWeapon.Name}，傷害：{newWeapon.Damage}，範圍：{newWeapon.Range}，攻擊速度：{newWeapon.AttackSpeed}，冷卻時間：{newWeapon.CooldownTime}");
+
                 Hide();
             }
             else
             {
-                resultLabel.text = "資源不足，無法創建武器。";
-                Debug.LogWarning("[WeaponCreatePanelController] 資源不足，無法創建武器。");
+                resultLabel.text = "金幣不足，無法創建武器。";
+                Debug.LogWarning("[WeaponCreatePanelController] 金幣不足，無法創建武器。");
             }
         };
 
-        closeBtn.clicked += Hide; // 綁定關閉按鈕的點擊事件
+        closeBtn.clicked += Hide;
 
-        // 自動尋找 ChinjuUIController
         if (chinjuUIController == null)
             chinjuUIController = FindFirstObjectByType<ChinjuUIController>();
 
-        root.style.display = DisplayStyle.None; // 修改為控制 root
+        root.style.display = DisplayStyle.None;
         Debug.Log("[WeaponCreatePanelController] 面板初始化完成並預設隱藏");
     }
 
     void OnEnable()
     {
-        // 僅控制顯示狀態，不再 clone panel
         Hide();
     }
 
