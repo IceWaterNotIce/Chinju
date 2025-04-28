@@ -33,8 +33,8 @@ public class ChinjuUIController : MonoBehaviour
         shipCreatePanelObj = transform.Find("ShipCreatePanel")?.gameObject;
 
         // 預設隱藏子面板（用 display 控制）
-        SetPanelDisplay(weaponCreatePanelObj, false);
-        SetPanelDisplay(shipCreatePanelObj, false);
+        weaponCreatePanelObj.GetComponent<WeaponCreatePanelController>().Hide();
+        shipCreatePanelObj.GetComponent<ShipCreationPanel>().Hide();
 
         // 預設隱藏主面板
         Debug.Log("[ChinjuUIController] Hide Chinju UI Panel at Start");
@@ -71,7 +71,7 @@ public class ChinjuUIController : MonoBehaviour
     {
         Debug.Log("[ChinjuUIController] Open Weapon Create Panel");
         CloseCurrentPanel();
-        SetPanelDisplay(weaponCreatePanelObj, true);
+
         var ctrl = weaponCreatePanelObj?.GetComponent<WeaponCreatePanelController>();
         ctrl?.Show();
         // 隱藏主面板
@@ -83,7 +83,7 @@ public class ChinjuUIController : MonoBehaviour
     {
         Debug.Log("[ChinjuUIController] Open Ship Create Panel");
         CloseCurrentPanel();
-        SetPanelDisplay(shipCreatePanelObj, true);
+
         var ctrl = shipCreatePanelObj?.GetComponent<ShipCreationPanel>();
         ctrl?.Show();
         // 隱藏主面板
@@ -94,23 +94,13 @@ public class ChinjuUIController : MonoBehaviour
     public void CloseCurrentPanel()
     {
         Debug.Log("[ChinjuUIController] Close All Sub Panels");
-        SetPanelDisplay(weaponCreatePanelObj, false);
+
         var weaponCtrl = weaponCreatePanelObj?.GetComponent<WeaponCreatePanelController>();
         weaponCtrl?.Hide();
 
-        SetPanelDisplay(shipCreatePanelObj, false);
+
         var shipCtrl = shipCreatePanelObj?.GetComponent<ShipCreationPanel>();
         shipCtrl?.Hide();
     }
 
-    // 用 display 控制子面板顯示/隱藏
-    private void SetPanelDisplay(GameObject panelObj, bool show)
-    {
-        if (panelObj == null) return;
-        var doc = panelObj.GetComponent<UIDocument>();
-        if (doc != null && doc.rootVisualElement != null)
-        {
-            doc.rootVisualElement.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
-        }
-    }
 }
