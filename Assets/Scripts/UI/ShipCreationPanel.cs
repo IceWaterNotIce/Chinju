@@ -13,6 +13,9 @@ public class ShipCreationPanel : MonoBehaviour
     private Label goldCostLabel;
     private Label oilCostLabel;
     private Label cubeCostLabel;
+    private IntegerField goldInputField;
+    private IntegerField oilInputField;
+    private IntegerField cubeInputField;
 
     // 戰艦建造成本
     private readonly int[] shipCosts = { 500, 200, 100 }; // 金幣, 石油, 方塊
@@ -77,6 +80,36 @@ public class ShipCreationPanel : MonoBehaviour
         oilCostLabel = root.Q<Label>("oil-cost");
         cubeCostLabel = root.Q<Label>("cube-cost");
 
+        // 新增：取得輸入欄位
+        goldInputField = root.Q<IntegerField>("gold-input");
+        oilInputField = root.Q<IntegerField>("oil-input");
+        cubeInputField = root.Q<IntegerField>("cube-input");
+
+        // 若找不到則自動建立（方便測試）
+        if (goldInputField == null)
+        {
+            goldInputField = new IntegerField("金幣") { value = 10 };
+            goldInputField.name = "gold-input";
+            panel.Add(goldInputField);
+        }
+        if (oilInputField == null)
+        {
+            oilInputField = new IntegerField("石油") { value = 10 };
+            oilInputField.name = "oil-input";
+            panel.Add(oilInputField);
+        }
+        if (cubeInputField == null)
+        {
+            cubeInputField = new IntegerField("方塊") { value = 1 };
+            cubeInputField.name = "cube-input";
+            panel.Add(cubeInputField);
+        }
+
+        // 註冊輸入變更事件
+        goldInputField.RegisterValueChangedCallback(evt => OnResourceInputChanged());
+        oilInputField.RegisterValueChangedCallback(evt => OnResourceInputChanged());
+        cubeInputField.RegisterValueChangedCallback(evt => OnResourceInputChanged());
+
         // 檢查必要元素
         if (battleShipBtn == null) Debug.LogError("找不到 battle-ship-btn！");
         if (createShipBtn == null) Debug.LogError("找不到 create-ship-btn！");
@@ -100,6 +133,20 @@ public class ShipCreationPanel : MonoBehaviour
         UpdateCostDisplay(0, 0, 0);
 
         Debug.Log("船隻建造面板初始化完成");
+    }
+
+    private void OnResourceInputChanged()
+    {
+        int gold = Mathf.Max(0, goldInputField.value);
+        int oil = Mathf.Max(0, oilInputField.value);
+        int cube = Mathf.Max(0, cubeInputField.value);
+        UpdateCostDisplay(gold, oil, cube);
+
+        // 若有選擇船型才啟用建造按鈕
+        if (battleShipBtn.ClassListContains("selected"))
+        {
+            createShipBtn.SetEnabled(gold > 0 && oil > 0 && cube > 0);
+        }
     }
 
     /// <summary>
@@ -174,12 +221,13 @@ public class ShipCreationPanel : MonoBehaviour
     private void SelectBattleShip()
     {
         battleShipBtn.ToggleInClassList("selected");
-        createShipBtn.SetEnabled(battleShipBtn.ClassListContains("selected"));
+        bool selected = battleShipBtn.ClassListContains("selected");
+        createShipBtn.SetEnabled(selected);
 
         // 更新資源消耗顯示
-        if (battleShipBtn.ClassListContains("selected"))
+        if (selected)
         {
-            UpdateCostDisplay(shipCosts[0], shipCosts[1], shipCosts[2]);
+            OnResourceInputChanged();
         }
         else
         {
@@ -204,9 +252,9 @@ public class ShipCreationPanel : MonoBehaviour
     {
         if (!battleShipBtn.ClassListContains("selected")) return;
 
-        int goldCost = shipCosts[0];
-        int oilCost = shipCosts[1];
-        int cubeCost = shipCosts[2];
+        int goldCost = Mathf.Max(0, goldInputField.value);
+        int oilCost = Mathf.Max(0, oilInputField.value);
+        int cubeCost = Mathf.Max(0, cubeInputField.value);
 
         // 檢查資源是否足夠
         var gameData = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
