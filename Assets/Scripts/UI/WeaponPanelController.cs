@@ -4,37 +4,33 @@ using System.Collections.Generic;
 
 public class WeaponPanelController : MonoBehaviour
 {
-    [System.Serializable]
-    public class Weapon
-    {
-        public string name;
-        public int attack;
-    }
-
-    public List<Weapon> weapons = new List<Weapon>
-    {
-        new Weapon { name = "長劍", attack = 15 },
-        new Weapon { name = "弓箭", attack = 10 },
-        new Weapon { name = "斧頭", attack = 20 }
-    };
-
-    public VisualTreeAsset weaponPanelUXML;
-    public StyleSheet weaponPanelUSS;
-
     void OnEnable()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
-        var panel = weaponPanelUXML.CloneTree();
-        panel.styleSheets.Add(weaponPanelUSS);
 
-        var weaponList = panel.Q<ScrollView>("weapon-list");
-        foreach (var weapon in weapons)
+        var weaponList = root.Q<ScrollView>("weapon-list");
+        if (weaponList == null)
         {
-            var item = new Label($"{weapon.name} (攻擊力: {weapon.attack})");
-            item.AddToClassList("weapon-item");
-            weaponList.Add(item);
+            Debug.LogError("[WeaponPanelController] 找不到 'weapon-list' 元素。");
+            return;
         }
 
-        root.Add(panel);
+        weaponList.Clear(); // 清空清單
+
+        // 從玩家資料中獲取武器清單
+        var playerData = GameDataController.Instance?.CurrentGameData?.playerData;
+        if (playerData != null)
+        {
+            foreach (var weapon in playerData.Weapons)
+            {
+                var item = new Label($"{weapon.Name} (傷害: {weapon.Damage}, 範圍: {weapon.Range}, 攻擊速度: {weapon.AttackSpeed}, 冷卻時間: {weapon.CooldownTime})");
+                item.AddToClassList("weapon-item");
+                weaponList.Add(item);
+            }
+        }
+        else
+        {
+            Debug.LogError("[WeaponPanelController] 無法取得玩家資料，無法顯示武器清單。");
+        }
     }
 }

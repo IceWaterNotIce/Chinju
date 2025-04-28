@@ -191,13 +191,13 @@ public class ShipCreationPanel : MonoBehaviour
             {
                 // 檢查有沒有可負擭的船型
                 var gameData = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
-                if (gameData != null && gameData.PlayerDatad != null)
+                if (gameData != null && gameData.playerData != null)
                 {
                     for (int i = 0; i < 5; i++)
                     {
-                        if (gameData.PlayerDatad.Gold >= shipCosts[i, 0] &&
-                            gameData.PlayerDatad.Oils >= shipCosts[i, 1] &&
-                            gameData.PlayerDatad.Cube >= shipCosts[i, 2])
+                        if (gameData.playerData.Gold >= shipCosts[i, 0] &&
+                            gameData.playerData.Oils >= shipCosts[i, 1] &&
+                            gameData.playerData.Cube >= shipCosts[i, 2])
                         {
                             enable = true;
                             break;

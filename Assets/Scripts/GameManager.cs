@@ -37,7 +37,7 @@ public class GameManager : Singleton<GameManager>
         {
             GameDataController.Instance.CurrentGameData = new GameData();
             // 新增：主動觸發資源事件，讓 UI 立即刷新
-            var playerData = GameDataController.Instance.CurrentGameData.PlayerDatad;
+            var playerData = GameDataController.Instance.CurrentGameData.playerData;
             if (playerData != null && playerData.OnResourceChanged != null){
                 playerData.OnResourceChanged.Invoke();
                 Debug.Log("[GameManager] 資源事件已觸發，UI 更新完成");
@@ -71,16 +71,16 @@ public class GameManager : Singleton<GameManager>
             var data = GameDataController.Instance.CurrentGameData;
 
             // 儲存前，先更新所有玩家船艦資料
-            if (data != null && data.PlayerDatad != null && data.PlayerDatad.Ships != null)
+            if (data != null && data.playerData != null && data.playerData.Ships != null)
             {
                 // 取得場景中所有 Ship 物件
                 var shipsInScene = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
-                for (int i = 0; i < data.PlayerDatad.Ships.Count; i++)
+                for (int i = 0; i < data.playerData.Ships.Count; i++)
                 {
                     // 根據索引對應（假設順序一致），將場景 Ship 狀態存回 ShipData
                     if (i < shipsInScene.Length && shipsInScene[i] != null)
                     {
-                        data.PlayerDatad.Ships[i] = shipsInScene[i].SaveShipData();
+                        data.playerData.Ships[i] = shipsInScene[i].SaveShipData();
                     }
                 }
             }
@@ -105,11 +105,11 @@ public class GameManager : Singleton<GameManager>
                 Debug.Log("[GameManager] 遊戲數據已設置到 GameDataController");
             }
             // 新增：主動觸發資源事件，讓 UI 立即刷新
-            if (data != null && data.PlayerDatad != null && data.PlayerDatad.OnResourceChanged != null)
-                data.PlayerDatad.OnResourceChanged.Invoke();
+            if (data != null && data.playerData != null && data.playerData.OnResourceChanged != null)
+                data.playerData.OnResourceChanged.Invoke();
 
             // 新增：根據存檔自動生成所有船艦
-            if (data != null && data.PlayerDatad != null && data.PlayerDatad.Ships != null)
+            if (data != null && data.playerData != null && data.playerData.Ships != null)
             {
                 // 先刪除場景中所有現有 Ship 物件，避免重複
                 var existingShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
@@ -122,7 +122,7 @@ public class GameManager : Singleton<GameManager>
                 var shipPrefab = Resources.Load<GameObject>("Prefabs/Ship");
                 if (shipPrefab != null)
                 {
-                    foreach (var shipData in data.PlayerDatad.Ships)
+                    foreach (var shipData in data.playerData.Ships)
                     {
                         var shipObj = GameObject.Instantiate(shipPrefab, shipData.Position, Quaternion.Euler(0, 0, shipData.Rotation));
                         var shipComp = shipObj.GetComponent<Ship>();
@@ -149,9 +149,9 @@ public class GameManager : Singleton<GameManager>
 
     public void SaveMapData(Tilemap tilemap, GameData.MapData mapData)
     {
-        // 儲存地圖時，直接操作 GameDataController 的 MapDatad
+        // 儲存地圖時，直接操作 GameDataController 的 mapData
         if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData != null)
-            mapData = GameDataController.Instance.CurrentGameData.MapDatad;
+            mapData = GameDataController.Instance.CurrentGameData.mapData;
         mapData.ChinjuTiles.Clear();
         foreach (var position in tilemap.cellBounds.allPositionsWithin)
         {
@@ -165,9 +165,9 @@ public class GameManager : Singleton<GameManager>
 
     public void LoadMapData(Tilemap tilemap, GameData.MapData mapData, TileBase chinjuTile)
     {
-        // 載入地圖時，直接操作 GameDataController 的 MapDatad
+        // 載入地圖時，直接操作 GameDataController 的 mapData
         if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData != null)
-            mapData = GameDataController.Instance.CurrentGameData.MapDatad;
+            mapData = GameDataController.Instance.CurrentGameData.mapData;
         tilemap.ClearAllTiles();
         foreach (var position in mapData.ChinjuTiles)
         {
@@ -181,14 +181,14 @@ public class GameManager : Singleton<GameManager>
         // 重置遊戲數據
         var newGameData = new GameData
         {
-            PlayerDatad = new GameData.PlayerData
+            playerData = new GameData.PlayerData
             {
                 Oils = 200,
                 Gold = 500,
                 Cube = 100,
                 Ships = new List<GameData.ShipData>()
             },
-            MapDatad = new GameData.MapData
+            mapData = new GameData.MapData
             {
                 Seed = Random.Range(0, int.MaxValue),
                 Width = 100,
@@ -203,8 +203,8 @@ public class GameManager : Singleton<GameManager>
             GameDataController.Instance.CurrentGameData = newGameData;
 
         // 新增：主動觸發資源事件，讓 UI 立即刷新
-        if (newGameData.PlayerDatad != null && newGameData.PlayerDatad.OnResourceChanged != null)
-            newGameData.PlayerDatad.OnResourceChanged.Invoke();
+        if (newGameData.playerData != null && newGameData.playerData.OnResourceChanged != null)
+            newGameData.playerData.OnResourceChanged.Invoke();
 
         // 保存新遊戲狀態
         SaveGame();

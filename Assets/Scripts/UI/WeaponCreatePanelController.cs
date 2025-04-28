@@ -38,7 +38,7 @@ public class WeaponCreatePanelController : MonoBehaviour
 
         void UpdateResourceLabel()
         {
-            var playerData = GameDataController.Instance?.CurrentGameData?.PlayerDatad;
+            var playerData = GameDataController.Instance?.CurrentGameData?.playerData;
             if (playerData != null)
             {
                 resourceLabel.text = $"目前金幣：{playerData.Gold}";
@@ -53,7 +53,7 @@ public class WeaponCreatePanelController : MonoBehaviour
 
         createButton.clicked += () =>
         {
-            var playerData = GameDataController.Instance?.CurrentGameData?.PlayerDatad;
+            var playerData = GameDataController.Instance?.CurrentGameData?.playerData;
             if (playerData == null)
             {
                 Debug.LogError("[WeaponCreatePanelController] 無法取得玩家資料，無法創建武器。");

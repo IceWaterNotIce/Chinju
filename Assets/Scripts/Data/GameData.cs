@@ -4,8 +4,8 @@ using UnityEngine;
 [System.Serializable]
 public class GameData
 {
-    public PlayerData PlayerDatad; // 改為 public field
-    public MapData MapDatad;       // 改為 public field
+    public PlayerData playerData; // 修正命名
+    public MapData mapData;       // 修正命名
 
     [System.Serializable]
     public class PlayerData
@@ -19,9 +19,9 @@ public class GameData
 
         public List<WeaponData> Weapons = new List<WeaponData>();
 
-        // 新增：資源變動事件
+        // 初始化資源變動事件
         [System.NonSerialized]
-        public System.Action OnResourceChanged;
+        public System.Action OnResourceChanged = delegate { };
     }
 
     [System.Serializable]
