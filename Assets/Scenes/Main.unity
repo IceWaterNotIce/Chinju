@@ -513,8 +513,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 933149503}
-  - component: {fileID: 933149505}
-  - component: {fileID: 933149504}
+  - component: {fileID: 933149506}
+  - component: {fileID: 933149507}
   m_Layer: 0
   m_Name: Chinju
   m_TagString: Untagged
@@ -534,10 +534,12 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 2133639859}
+  - {fileID: 2001442111}
   m_Father: {fileID: 794751195}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &933149504
+--- !u!114 &933149506
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -546,11 +548,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 933149502}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9cfa59687f8f4e7438014b84530bfd06, type: 3}
+  m_Script: {fileID: 11500000, guid: ece5b98a9acd02146a94dbca302d1a24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapController: {fileID: 1920876238}
---- !u!114 &933149505
+--- !u!114 &933149507
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -564,7 +565,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_PanelSettings: {fileID: 11400000, guid: ac71c643c6ce8854eaf6524fb127defa, type: 2}
   m_ParentUI: {fileID: 0}
-  sourceAsset: {fileID: 9197481963319205126, guid: dd0595682fd5f2146b3440bdcbd34336, type: 3}
+  sourceAsset: {fileID: 9197481963319205126, guid: d609a92e598436444a7c70053c1c1013, type: 3}
   m_SortingOrder: 0
   m_WorldSpaceSizeMode: 1
   m_WorldSpaceWidth: 1920
@@ -988,7 +989,7 @@ MonoBehaviour:
   useRandomSeed: 0
   mainCamera: {fileID: 2019224608}
   cameraController: {fileID: 2019224605}
-  shipCreationPanel: {fileID: 933149504}
+  chinjuUIController: {fileID: 933149506}
 --- !u!483693784 &1920876239
 TilemapRenderer:
   m_ObjectHideFlags: 0
@@ -1094,6 +1095,80 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
+--- !u!1 &2001442110
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2001442111}
+  - component: {fileID: 2001442113}
+  - component: {fileID: 2001442112}
+  m_Layer: 0
+  m_Name: WeaponCreatePanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2001442111
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001442110}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 933149503}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2001442112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001442110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: ac71c643c6ce8854eaf6524fb127defa, type: 2}
+  m_ParentUI: {fileID: 933149507}
+  sourceAsset: {fileID: 9197481963319205126, guid: 7d8d6b786f15595469a73c8748ab9e4b, type: 3}
+  m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+--- !u!114 &2001442113
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001442110}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c45be66b559d0784e8e579f40b0e5ee6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  userResource: 100
+  weaponRecipes:
+  - name: "\u9577\u528D"
+    cost: 30
+  - name: "\u5F13\u7BAD"
+    cost: 20
+  - name: "\u65A7\u982D"
+    cost: 40
+  weaponCreatePanelUXML: {fileID: 9197481963319205126, guid: 7d8d6b786f15595469a73c8748ab9e4b, type: 3}
+  weaponCreatePanelUSS: {fileID: 7433441132597879392, guid: 4134c9774341aa746b3f76f4b2a5ffdc, type: 3}
 --- !u!1 &2019224603
 GameObject:
   m_ObjectHideFlags: 0
@@ -1300,6 +1375,71 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   m_MaxRayIntersections: 0
+--- !u!1 &2133639858
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2133639859}
+  - component: {fileID: 2133639861}
+  - component: {fileID: 2133639860}
+  m_Layer: 0
+  m_Name: ShipCreatePanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2133639859
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2133639858}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 933149503}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2133639860
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2133639858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: ac71c643c6ce8854eaf6524fb127defa, type: 2}
+  m_ParentUI: {fileID: 933149507}
+  sourceAsset: {fileID: 9197481963319205126, guid: dd0595682fd5f2146b3440bdcbd34336, type: 3}
+  m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+--- !u!114 &2133639861
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2133639858}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cfa59687f8f4e7438014b84530bfd06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapController: {fileID: 1920876238}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

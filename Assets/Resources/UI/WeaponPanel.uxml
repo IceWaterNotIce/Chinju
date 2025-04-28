@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+  <ui:VisualElement class="weapon-panel">
+    <ui:Label text="武器列表" class="weapon-title"/>
+    <ui:ScrollView name="weapon-list" class="weapon-list"/>
+  </ui:VisualElement>
+</ui:UXML>

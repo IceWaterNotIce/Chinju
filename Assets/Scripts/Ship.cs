@@ -165,6 +165,18 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     [SerializeField] public Tilemap tilemap; // 引用地圖的 Tilemap，改為 public
     [SerializeField] public TileBase oceanTile; // 引用海洋 Tile，改為 public
 
+    // 新增：武器數量上限
+    [Header("Weapon Settings")]
+    [SerializeField] private int intWeaponLimit = 2;
+    public int IntWeaponLimit
+    {
+        get => intWeaponLimit;
+        set => intWeaponLimit = Mathf.Max(0, value);
+    }
+
+    // public Weapon weapon;
+    public List<Weapon> weapons = new List<Weapon>();
+
     public void Start()
     {
         tilemap = FindFirstObjectByType<Tilemap>();
@@ -232,6 +244,28 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         else
         {
             Debug.LogWarning("無法移動到非海洋 Tile 的位置！");
+        }
+    }
+
+    public void AttackTarget(GameObject target)
+    {
+        foreach (var weapon in weapons)
+        {
+            if (weapon != null)
+            {
+                weapon.StartAttack(target);
+            }
+        }
+    }
+
+    public void StopAttack()
+    {
+        foreach (var weapon in weapons)
+        {
+            if (weapon != null)
+            {
+                weapon.StopAttack();
+            }
         }
     }
 

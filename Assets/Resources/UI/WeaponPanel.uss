@@ -1,0 +1,23 @@
+.weapon-panel {
+    width: 400px;
+    height: 600px;
+    background-color: #222;
+    padding: 16px;
+    border-radius: 8px;
+}
+.weapon-title {
+    font-size: 24px;
+    color: #fff;
+    margin-bottom: 12px;
+}
+.weapon-list {
+    flex-grow: 1;
+    background-color: #333;
+    border-radius: 4px;
+    padding: 8px;
+}
+.weapon-item {
+    color: #fff;
+    margin-bottom: 8px;
+    font-size: 18px;
+}

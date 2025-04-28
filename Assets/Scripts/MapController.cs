@@ -19,7 +19,7 @@ public class MapController : MonoBehaviour
     public CameraBound2D cameraController; // 新增 CameraController 引用
 
     [Header("UI References")]
-    [SerializeField] private ShipCreationPanel shipCreationPanel;
+    [SerializeField] private ChinjuUIController chinjuUIController;
 
     private GameManager gameManager;
 
@@ -32,12 +32,20 @@ public class MapController : MonoBehaviour
         }
         Random.InitState(seed); // 初始化隨機數生成器
         
-        // Debug.Log("Current Map Seed: " + seed); // 輸出種子供調試
+        // 自動尋找 ChinjuUIController
+        if (chinjuUIController == null)
+        {
+            chinjuUIController = FindFirstObjectByType<ChinjuUIController>();
+            if (chinjuUIController == null)
+            {
+                Debug.LogError("ChinjuUIController 未設置且場景中找不到 ChinjuUIController！");
+            }
+        }
 
         // 檢查必要組件
-        if (shipCreationPanel == null)
+        if (chinjuUIController == null)
         {
-            Debug.LogError("ShipCreationPanel 未設置！請在 Inspector 中設置引用。");
+            Debug.LogError("ChinjuUIController 未設置！請在 Inspector 中設置引用。");
         }
         
         GenerateMap();
@@ -211,14 +219,14 @@ public class MapController : MonoBehaviour
                 else if (tile == chinjuTile)
                 {
                     Debug.Log("這是神獸 Tile");
-                    if (shipCreationPanel != null)
+                    if (chinjuUIController != null)
                     {
-                        Debug.Log("正在切換船隻建造面板...");
-                        shipCreationPanel.Toggle();
+                        Debug.Log("正在開啟 Chinju UI 面板...");
+                        chinjuUIController.Show();
                     }
                     else
                     {
-                        Debug.LogError("ShipCreationPanel 是 null！");
+                        Debug.LogError("ChinjuUIController 是 null！");
                     }
                 }
             }

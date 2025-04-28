@@ -45,5 +45,19 @@ public class GameData
         public float Fuel;
         public float Speed;
         public float Rotation;
+
+        public int WeaponLimit;
+
+        public List<WeaponData> Weapons = new List<WeaponData>();
+    }
+
+    [System.Serializable]
+    public class WeaponData
+    {
+        public string Name;
+        public int Damage;
+        public float Range;
+        public float AttackSpeed;
+        public float CooldownTime;
     }
 }
