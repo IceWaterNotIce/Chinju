@@ -27,6 +27,7 @@ public class ShipCreationPanel : MonoBehaviour
     };
 
     [SerializeField] private MapController mapController;
+    [SerializeField] private ChinjuUIController chinjuUIController; // 新增
 
     private int selectedShipTypeIndex = -1; // -1 表示未選擇
 
@@ -55,7 +56,7 @@ public class ShipCreationPanel : MonoBehaviour
 
     private void InitializeUI()
     {
-        Debug.Log("初始化船隻建造面板...");
+        Debug.Log("[ShipCreationPanel] 初始化船隻建造面板...");
         
         // 獲取 UIDocument
         uiDocument = GetComponent<UIDocument>();
@@ -143,11 +144,32 @@ public class ShipCreationPanel : MonoBehaviour
             createShipBtn.SetEnabled(false);
         }
 
+        // 新增：關閉按鈕
+        var closeBtn = root.Q<Button>("close-ship-panel-btn");
+        if (closeBtn == null)
+        {
+            closeBtn = new Button(() => Hide()) { text = "關閉" };
+            closeBtn.name = "close-ship-panel-btn";
+            closeBtn.style.marginTop = 8;
+            panel.Add(closeBtn);
+        }
+        else
+        {
+            closeBtn.clicked += Hide;
+        }
+
         // 初始化面板狀態
         panel.style.display = DisplayStyle.None;
         UpdateCostDisplay(0, 0, 0);
 
-        Debug.Log("船隻建造面板初始化完成");
+        Debug.Log("[ShipCreationPanel] 船隻建造面板初始化完成");
+    }
+
+    void Start()
+    {
+        // 自動尋找 ChinjuUIController
+        if (chinjuUIController == null)
+            chinjuUIController = FindFirstObjectByType<ChinjuUIController>();
     }
 
     private void OnResourceInputChanged()
@@ -167,7 +189,7 @@ public class ShipCreationPanel : MonoBehaviour
         {
             if (gold >= 10 && oil >= 10 && cube >= 1)
             {
-                // 檢查有沒有可負擔的船型
+                // 檢查有沒有可負擭的船型
                 var gameData = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
                 if (gameData != null && gameData.PlayerDatad != null)
                 {
@@ -211,14 +233,14 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     public void Show()
     {
-        Debug.Log("顯示船隻建造面板");
+        Debug.Log("[ShipCreationPanel] 顯示船隻建造面板");
         if (panel != null)
         {
             panel.style.display = DisplayStyle.Flex;
         }
         else
         {
-            Debug.LogError("無法顯示面板：panel 是 null");
+            Debug.LogError("[ShipCreationPanel] 無法顯示面板：panel 是 null");
         }
     }
 
@@ -227,7 +249,7 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     public void Hide()
     {
-        Debug.Log("隱藏船隻建造面板");
+        Debug.Log("[ShipCreationPanel] 隱藏船隻建造面板");
         if (panel != null)
         {
             panel.style.display = DisplayStyle.None;
@@ -235,7 +257,12 @@ public class ShipCreationPanel : MonoBehaviour
         }
         else
         {
-            Debug.LogError("無法隱藏面板：panel 是 null");
+            Debug.LogError("[ShipCreationPanel] 無法隱藏面板：panel 是 null");
+        }
+        // 新增：顯示主面板
+        if (chinjuUIController != null)
+        {
+            chinjuUIController.Show();
         }
     }
 
@@ -244,11 +271,11 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     public void Toggle()
     {
-        Debug.Log("切換船隻建造面板顯示狀態");
+        Debug.Log("[ShipCreationPanel] 切換船隻建造面板顯示狀態");
         if (panel != null)
         {
             bool isVisible = panel.style.display == DisplayStyle.Flex;
-            Debug.Log($"當前面板狀態：{(isVisible ? "顯示" : "隱藏")}");
+            Debug.Log($"[ShipCreationPanel] 當前面板狀態：{(isVisible ? "顯示" : "隱藏")}");
             panel.style.display = isVisible ? DisplayStyle.None : DisplayStyle.Flex;
             
             if (isVisible)
@@ -258,7 +285,7 @@ public class ShipCreationPanel : MonoBehaviour
         }
         else
         {
-            Debug.LogError("無法切換面板：panel 是 null");
+            Debug.LogError("[ShipCreationPanel] 無法切換面板：panel 是 null");
         }
     }
 
@@ -289,6 +316,7 @@ public class ShipCreationPanel : MonoBehaviour
 
     private void OnBuildButtonClicked()
     {
+        Debug.Log("[ShipCreationPanel] 點擊建造按鈕");
         if (selectedShipTypeIndex >= 0)
         {
             CreateShip();
@@ -376,7 +404,7 @@ public class ShipCreationPanel : MonoBehaviour
         int inputOil = Mathf.Max(0, oilInputField.value);
         int inputCube = Mathf.Max(0, cubeInputField.value);
 
-        // 計算每個可負擔船型的權重（距離越小權重越高）
+        // 計算每個可負擭船型的權重（距離越小權重越高）
         System.Collections.Generic.List<int> candidates = new System.Collections.Generic.List<int>();
         System.Collections.Generic.List<int> weights = new System.Collections.Generic.List<int>();
         for (int i = 0; i < 5; i++)
@@ -474,7 +502,7 @@ public class ShipCreationPanel : MonoBehaviour
         GameObject battleShip = Instantiate(shipPrefab, spawnPosition, Quaternion.identity);
         if (battleShip != null)
         {
-            Debug.Log("戰艦實例化成功！");
+            Debug.Log("[ShipCreationPanel] 戰艦實例化成功！");
 
             // 儲存船隻資料到 GameData
             var gameData = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
@@ -492,7 +520,7 @@ public class ShipCreationPanel : MonoBehaviour
                     Rotation = 0
                 };
                 gameData.PlayerDatad.Ships.Add(shipData);
-                Debug.Log("已將新戰艦資料存入 GameData");
+                Debug.Log("[ShipCreationPanel] 已將新戰艦資料存入 GameData");
             }
             else
             {
@@ -501,7 +529,7 @@ public class ShipCreationPanel : MonoBehaviour
         }
         else
         {
-            Debug.LogError("戰艦實例化失敗！");
+            Debug.LogError("[ShipCreationPanel] 戰艦實例化失敗！");
         }
     }
 }
