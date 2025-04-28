@@ -21,19 +21,18 @@ public class WeaponCreatePanelController : MonoBehaviour
         new WeaponRecipe { name = "斧頭", cost = 40 }
     };
 
-    private VisualElement panel;
+    private VisualElement root; // 修改為 root
     private ChinjuUIController chinjuUIController;
 
     void Awake()
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
-        panel = root; // 將 panel 設為 root 元素
+        root = GetComponent<UIDocument>().rootVisualElement; // 修改為 root
 
-        var dropdown = panel.Q<DropdownField>("weapon-dropdown");
-        var resourceLabel = panel.Q<Label>("resource-label");
-        var createButton = panel.Q<Button>("create-button");
-        var resultLabel = panel.Q<Label>("result-label");
-        var closeBtn = panel.Q<Button>("close-button"); // 從 UXML 中取得關閉按鈕
+        var dropdown = root.Q<DropdownField>("weapon-dropdown");
+        var resourceLabel = root.Q<Label>("resource-label");
+        var createButton = root.Q<Button>("create-button");
+        var resultLabel = root.Q<Label>("result-label");
+        var closeBtn = root.Q<Button>("close-button");
 
         dropdown.choices = new List<string>();
         foreach (var recipe in weaponRecipes)
@@ -73,7 +72,7 @@ public class WeaponCreatePanelController : MonoBehaviour
         if (chinjuUIController == null)
             chinjuUIController = FindFirstObjectByType<ChinjuUIController>();
 
-        panel.style.display = DisplayStyle.None; // 預設隱藏
+        root.style.display = DisplayStyle.None; // 修改為控制 root
         Debug.Log("[WeaponCreatePanelController] 面板初始化完成並預設隱藏");
     }
 
@@ -85,27 +84,27 @@ public class WeaponCreatePanelController : MonoBehaviour
 
     public void Show()
     {
-        if (panel != null)
+        if (root != null)
         {
-            panel.style.display = DisplayStyle.Flex;
-            Debug.Log($"[WeaponCreatePanelController] 顯示武器創建面板，panel.style.display = {panel.style.display}");
+            root.style.display = DisplayStyle.Flex;
+            Debug.Log($"[WeaponCreatePanelController] 顯示武器創建面板，root.style.display = {root.style.display}");
         }
         else
         {
-            Debug.LogError("[WeaponCreatePanelController] 無法顯示武器創建面板，panel 為 null");
+            Debug.LogError("[WeaponCreatePanelController] 無法顯示武器創建面板，root 為 null");
         }
     }
 
     public void Hide()
     {
-        if (panel != null)
+        if (root != null)
         {
-            panel.style.display = DisplayStyle.None;
+            root.style.display = DisplayStyle.None;
             Debug.Log("[WeaponCreatePanelController] 隱藏武器創建面板");
         }
         else
         {
-            Debug.LogError("[WeaponCreatePanelController] 無法隱藏武器創建面板，panel 為 null");
+            Debug.LogError("[WeaponCreatePanelController] 無法隱藏武器創建面板，root 為 null");
         }
 
         if (chinjuUIController != null)

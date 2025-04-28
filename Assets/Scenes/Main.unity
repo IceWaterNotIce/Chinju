@@ -602,8 +602,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ece5b98a9acd02146a94dbca302d1a24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponCreatePanelObj: {fileID: 2001442110}
-  shipCreatePanelObj: {fileID: 2133639858}
+  weaponCreatePanelController: {fileID: 2001442113}
+  shipCreationPanel: {fileID: 2133639861}
 --- !u!114 &933149507
 MonoBehaviour:
   m_ObjectHideFlags: 0

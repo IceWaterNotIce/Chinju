@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 public class ShipCreationPanel : MonoBehaviour
 {
     private UIDocument uiDocument;
-    private VisualElement panel;
+    private VisualElement root; // 修改為 root
     private Button[] shipTypeBtns = new Button[5]; // 五種船型按鈕
     private Button createShipBtn;
     private Label goldCostLabel;
@@ -48,7 +48,7 @@ public class ShipCreationPanel : MonoBehaviour
         {
             GameDataController.Instance.CurrentGameData = new GameData();
         }
-        if (panel == null)
+        if (root == null)
         {
             InitializeUI();
         }
@@ -67,7 +67,7 @@ public class ShipCreationPanel : MonoBehaviour
         }
 
         // 獲取根元素
-        var root = uiDocument.rootVisualElement;
+        root = uiDocument.rootVisualElement;
         if (root == null)
         {
             Debug.LogError("無法獲取 UI 根元素！");
@@ -75,7 +75,7 @@ public class ShipCreationPanel : MonoBehaviour
         }
 
         // 獲取面板根元素
-        panel = root.Q<VisualElement>("ship-creation-panel");
+        var panel = root.Q<VisualElement>("ship-creation-panel");
         if (panel == null)
         {
             Debug.LogError("找不到 ship-creation-panel 元素！");
@@ -151,7 +151,7 @@ public class ShipCreationPanel : MonoBehaviour
             closeBtn = new Button(() => Hide()) { text = "關閉" };
             closeBtn.name = "close-ship-panel-btn";
             closeBtn.style.marginTop = 8;
-            panel.Add(closeBtn);
+            root.Add(closeBtn);
         }
         else
         {
@@ -159,7 +159,7 @@ public class ShipCreationPanel : MonoBehaviour
         }
 
         // 初始化面板狀態
-        panel.style.display = DisplayStyle.None;
+        root.style.display = DisplayStyle.None; // 修改為控制 root
         UpdateCostDisplay(0, 0, 0);
 
         Debug.Log("[ShipCreationPanel] 船隻建造面板初始化完成");
@@ -233,17 +233,14 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     public void Show()
     {
-        if (panel != null)
+         if (root != null)
         {
-            var root = uiDocument.rootVisualElement; // 獲取根元素
-            root.style.display = DisplayStyle.Flex; // 修改為控制根元素
-            root.style.visibility = Visibility.Visible; // 確保可見性
-            root.style.opacity = 1.0f; // 確保不透明
-            Debug.Log($"[ShipCreationPanel] 顯示船隻建造面板，root.style.display = {root.style.display}, visibility = {root.style.visibility}, opacity = {root.style.opacity}");
+            root.style.display = DisplayStyle.Flex;
+            Debug.Log($"[WeaponCreatePanelController] 顯示武器創建面板，root.style.display = {root.style.display}");
         }
         else
         {
-            Debug.LogError("[ShipCreationPanel] 無法顯示面板：panel 是 null");
+            Debug.LogError("[WeaponCreatePanelController] 無法顯示武器創建面板，root 為 null");
         }
     }
 
@@ -252,19 +249,15 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     public void Hide()
     {
-        if (panel != null)
+         if (root != null)
         {
-            panel.style.display = DisplayStyle.None;
-            ResetPanel();
-            Debug.Log("[ShipCreationPanel] 隱藏船隻建造面板");
+            root.style.display = DisplayStyle.None;
+            Debug.Log("[WeaponCreatePanelController] 隱藏武器創建面板, root.style.display = " + root.style.display);
+           
         }
         else
         {
-            Debug.LogError("[ShipCreationPanel] 無法隱藏面板：panel 是 null");
-        }
-        if (chinjuUIController != null)
-        {
-            chinjuUIController.Show();
+            Debug.LogError("[WeaponCreatePanelController] 無法隱藏武器創建面板，root 為 null");
         }
     }
 
@@ -274,9 +267,8 @@ public class ShipCreationPanel : MonoBehaviour
     public void Toggle()
     {
         Debug.Log("[ShipCreationPanel] 切換船隻建造面板顯示狀態");
-        if (panel != null)
+        if (root != null)
         {
-            var root = uiDocument.rootVisualElement; // 獲取根元素
             bool isVisible = root.style.display == DisplayStyle.Flex; // 修改為檢查根元素
             Debug.Log($"[ShipCreationPanel] 當前面板狀態：{(isVisible ? "顯示" : "隱藏")}");
             root.style.display = isVisible ? DisplayStyle.None : DisplayStyle.Flex; // 修改為控制根元素
@@ -287,7 +279,7 @@ public class ShipCreationPanel : MonoBehaviour
         }
         else
         {
-            Debug.LogError("[ShipCreationPanel] 無法切換面板：panel 是 null");
+            Debug.LogError("[ShipCreationPanel] 無法切換面板：root 是 null");
         }
     }
 
