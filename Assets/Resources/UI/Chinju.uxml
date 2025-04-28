@@ -20,6 +20,6 @@
                 <engine:Label name="cube-cost" text="方塊: 0" />
             </engine:VisualElement>
         </engine:VisualElement>
-        <engine:Button name="create-ship-btn" text="開始建造" class="create-btn" />
+        <engine:Button name="create-ship-btn" text="建造" class="create-btn" />
     </engine:VisualElement>
 </engine:UXML>

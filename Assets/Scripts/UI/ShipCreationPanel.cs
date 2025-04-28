@@ -8,7 +8,7 @@ public class ShipCreationPanel : MonoBehaviour
 {
     private UIDocument uiDocument;
     private VisualElement panel;
-    private Button battleShipBtn;
+    private Button[] shipTypeBtns = new Button[5]; // 五種船型按鈕
     private Button createShipBtn;
     private Label goldCostLabel;
     private Label oilCostLabel;
@@ -17,14 +17,22 @@ public class ShipCreationPanel : MonoBehaviour
     private IntegerField oilInputField;
     private IntegerField cubeInputField;
 
-    // 戰艦建造成本
-    private readonly int[] shipCosts = { 500, 200, 100 }; // 金幣, 石油, 方塊
+    // 建議建造成本（用於提升相近資源輸入時的隨機機率）
+    private readonly int[,] shipCosts = {
+        { 800, 400, 200 }, // 航空母艦
+        { 500, 200, 100 }, // 戰艦
+        { 300, 120, 60 },  // 巡洋艦
+        { 200, 80, 40 },   // 驅逐艦
+        { 150, 60, 30 }    // 潛艦
+    };
 
-    [SerializeField] private MapController mapController; // 新增 MapController 引用
+    [SerializeField] private MapController mapController;
+
+    private int selectedShipTypeIndex = -1; // -1 表示未選擇
 
     void Awake()
     {
-          // 確保 GameDataController 已初始化
+        // 確保 GameDataController 已初始化
         if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData == null)
         {
             GameDataController.Instance.CurrentGameData = new GameData();
@@ -34,7 +42,7 @@ public class ShipCreationPanel : MonoBehaviour
 
     void OnEnable()
     {
-         // 確保 GameDataController 已初始化
+        // 確保 GameDataController 已初始化
         if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData == null)
         {
             GameDataController.Instance.CurrentGameData = new GameData();
@@ -73,8 +81,21 @@ public class ShipCreationPanel : MonoBehaviour
             return;
         }
 
-        // 獲取UI元素引用
-        battleShipBtn = root.Q<Button>("battle-ship-btn");
+        // 取得五個船型按鈕
+        for (int i = 0; i < 5; i++)
+        {
+            shipTypeBtns[i] = root.Q<Button>($"ship-type-btn-{i + 1}");
+            int idx = i;
+            if (shipTypeBtns[i] != null)
+            {
+                shipTypeBtns[i].clicked += () => SelectShipType(idx);
+            }
+            else
+            {
+                Debug.LogError($"找不到 ship-type-btn-{i + 1}！");
+            }
+        }
+
         createShipBtn = root.Q<Button>("create-ship-btn");
         goldCostLabel = root.Q<Label>("gold-cost");
         oilCostLabel = root.Q<Label>("oil-cost");
@@ -111,20 +132,14 @@ public class ShipCreationPanel : MonoBehaviour
         cubeInputField.RegisterValueChangedCallback(evt => OnResourceInputChanged());
 
         // 檢查必要元素
-        if (battleShipBtn == null) Debug.LogError("找不到 battle-ship-btn！");
         if (createShipBtn == null) Debug.LogError("找不到 create-ship-btn！");
         if (goldCostLabel == null) Debug.LogError("找不到 gold-cost 標籤！");
         if (oilCostLabel == null) Debug.LogError("找不到 oil-cost 標籤！");
         if (cubeCostLabel == null) Debug.LogError("找不到 cube-cost 標籤！");
 
-        // 註冊按鈕點擊事件
-        if (battleShipBtn != null)
-        {
-            battleShipBtn.clicked += SelectBattleShip;
-        }
         if (createShipBtn != null)
         {
-            createShipBtn.clicked += CreateShip;
+            createShipBtn.clicked += OnBuildButtonClicked;
             createShipBtn.SetEnabled(false);
         }
 
@@ -142,11 +157,53 @@ public class ShipCreationPanel : MonoBehaviour
         int cube = Mathf.Max(0, cubeInputField.value);
         UpdateCostDisplay(gold, oil, cube);
 
-        // 若有選擇船型才啟用建造按鈕
-        if (battleShipBtn.ClassListContains("selected"))
+        // 啟用條件：有選擇船型且資源大於0，或沒選擇船型但資源大於10/10/1且有可負擔船型
+        bool enable = false;
+        if (selectedShipTypeIndex >= 0)
         {
-            createShipBtn.SetEnabled(gold > 0 && oil > 0 && cube > 0);
+            enable = gold > 0 && oil > 0 && cube > 0;
         }
+        else
+        {
+            if (gold >= 10 && oil >= 10 && cube >= 1)
+            {
+                // 檢查有沒有可負擔的船型
+                var gameData = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
+                if (gameData != null && gameData.PlayerDatad != null)
+                {
+                    for (int i = 0; i < 5; i++)
+                    {
+                        if (gameData.PlayerDatad.Gold >= shipCosts[i, 0] &&
+                            gameData.PlayerDatad.Oils >= shipCosts[i, 1] &&
+                            gameData.PlayerDatad.Cube >= shipCosts[i, 2])
+                        {
+                            enable = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        createShipBtn.SetEnabled(enable);
+    }
+
+    private void SelectShipType(int idx)
+    {
+        // 取消所有選擇
+        for (int i = 0; i < shipTypeBtns.Length; i++)
+        {
+            shipTypeBtns[i].RemoveFromClassList("selected");
+        }
+        // 標記選擇
+        shipTypeBtns[idx].AddToClassList("selected");
+        selectedShipTypeIndex = idx;
+
+        // 根據船型自動填入建造成本
+        goldInputField.value = shipCosts[idx, 0];
+        oilInputField.value = shipCosts[idx, 1];
+        cubeInputField.value = shipCosts[idx, 2];
+
+        OnResourceInputChanged();
     }
 
     /// <summary>
@@ -210,29 +267,14 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     private void ResetPanel()
     {
-        battleShipBtn.RemoveFromClassList("selected");
+        // 取消所有選擇
+        for (int i = 0; i < shipTypeBtns.Length; i++)
+        {
+            shipTypeBtns[i].RemoveFromClassList("selected");
+        }
+        selectedShipTypeIndex = -1;
         createShipBtn.SetEnabled(false);
         UpdateCostDisplay(0, 0, 0);
-    }
-
-    /// <summary>
-    /// 選擇戰艦
-    /// </summary>
-    private void SelectBattleShip()
-    {
-        battleShipBtn.ToggleInClassList("selected");
-        bool selected = battleShipBtn.ClassListContains("selected");
-        createShipBtn.SetEnabled(selected);
-
-        // 更新資源消耗顯示
-        if (selected)
-        {
-            OnResourceInputChanged();
-        }
-        else
-        {
-            UpdateCostDisplay(0, 0, 0);
-        }
     }
 
     /// <summary>
@@ -245,12 +287,24 @@ public class ShipCreationPanel : MonoBehaviour
         cubeCostLabel.text = $"方塊: {cube}";
     }
 
+    private void OnBuildButtonClicked()
+    {
+        if (selectedShipTypeIndex >= 0)
+        {
+            CreateShip();
+        }
+        else
+        {
+            CreateRandomShip();
+        }
+    }
+
     /// <summary>
     /// 創建戰艦
     /// </summary>
     private void CreateShip()
     {
-        if (!battleShipBtn.ClassListContains("selected")) return;
+        if (selectedShipTypeIndex < 0) return;
 
         int goldCost = Mathf.Max(0, goldInputField.value);
         int oilCost = Mathf.Max(0, oilInputField.value);
@@ -290,26 +344,105 @@ public class ShipCreationPanel : MonoBehaviour
         gameData.PlayerDatad.OnResourceChanged?.Invoke();
 
         // 創建戰艦實例
-        InstantiateShip();
+        InstantiateShip(selectedShipTypeIndex);
 
-        Debug.Log("開始建造戰艦");
+        Debug.Log("開始建造船隻");
 
         // 重置選擇狀態
-        battleShipBtn.RemoveFromClassList("selected");
-        createShipBtn.SetEnabled(false);
-        UpdateCostDisplay(0, 0, 0);
+        ResetPanel();
+    }
+
+    /// <summary>
+    /// 隨機建造船隻
+    /// </summary>
+    private void CreateRandomShip()
+    {
+        var gameData = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
+        if (GameDataController.Instance == null || gameData == null || gameData.PlayerDatad == null)
+        {
+            Debug.LogError("GameDataController 或 PlayerDatad 為 null，無法隨機建造船隻！");
+            return;
+        }
+
+        // 檢查資源是否足夠最低門檻
+        if (gameData.PlayerDatad.Gold < 10 || gameData.PlayerDatad.Oils < 10 || gameData.PlayerDatad.Cube < 1)
+        {
+            Debug.LogWarning("資源不足，無法隨機建造船隻！");
+            return;
+        }
+
+        // 取得目前輸入資源
+        int inputGold = Mathf.Max(0, goldInputField.value);
+        int inputOil = Mathf.Max(0, oilInputField.value);
+        int inputCube = Mathf.Max(0, cubeInputField.value);
+
+        // 計算每個可負擔船型的權重（距離越小權重越高）
+        System.Collections.Generic.List<int> candidates = new System.Collections.Generic.List<int>();
+        System.Collections.Generic.List<int> weights = new System.Collections.Generic.List<int>();
+        for (int i = 0; i < 5; i++)
+        {
+            if (gameData.PlayerDatad.Gold >= shipCosts[i, 0] &&
+                gameData.PlayerDatad.Oils >= shipCosts[i, 1] &&
+                gameData.PlayerDatad.Cube >= shipCosts[i, 2])
+            {
+                // 距離 = 三種資源差值的總和
+                int dist = Mathf.Abs(inputGold - shipCosts[i, 0])
+                         + Mathf.Abs(inputOil - shipCosts[i, 1])
+                         + Mathf.Abs(inputCube - shipCosts[i, 2]);
+                // 權重 = 100 - 距離（最小為1）
+                int weight = Mathf.Max(1, 100 - dist);
+                candidates.Add(i);
+                weights.Add(weight);
+            }
+        }
+        if (candidates.Count == 0)
+        {
+            Debug.LogWarning("沒有任何船型可隨機建造！");
+            return;
+        }
+
+        // 加權隨機選擇
+        int totalWeight = 0;
+        foreach (var w in weights) totalWeight += w;
+        int rand = Random.Range(0, totalWeight);
+        int chosenIdx = 0;
+        for (int i = 0; i < weights.Count; i++)
+        {
+            if (rand < weights[i])
+            {
+                chosenIdx = i;
+                break;
+            }
+            rand -= weights[i];
+        }
+        int idx = candidates[chosenIdx];
+
+        // 扣除資源
+        gameData.PlayerDatad.Gold -= shipCosts[idx, 0];
+        gameData.PlayerDatad.Oils -= shipCosts[idx, 1];
+        gameData.PlayerDatad.Cube -= shipCosts[idx, 2];
+        gameData.PlayerDatad.OnResourceChanged?.Invoke();
+
+        // 建造
+        InstantiateShip(idx);
+
+        Debug.Log($"隨機建造船型 {idx + 1}");
+
+        // 重置面板
+        ResetPanel();
     }
 
     /// <summary>
     /// 實例化戰艦
     /// </summary>
-    private void InstantiateShip()
+    private void InstantiateShip(int shipTypeIdx)
     {
-        // 假設有一個戰艦的預製件
-        GameObject battleShipPrefab = Resources.Load<GameObject>("Prefabs/Ship");
-        if (battleShipPrefab == null)
+        // 根據 shipTypeIdx 載入不同預製件
+        string[] prefabNames = { "Prefabs/Carrier", "Prefabs/Ship", "Prefabs/Cruiser", "Prefabs/Destroyer", "Prefabs/Submarine" };
+        GameObject shipPrefab = Resources.Load<GameObject>(prefabNames[shipTypeIdx]);
+        if (shipPrefab == null)
         {
-            Debug.LogError("找不到戰艦預製件！");
+            Debug.LogError($"找不到船隻預製件：{prefabNames[shipTypeIdx]}！");
             return;
         }
 
@@ -338,7 +471,7 @@ public class ShipCreationPanel : MonoBehaviour
         spawnPosition.z = -1;
 
         // 在場景中生成戰艦
-        GameObject battleShip = Instantiate(battleShipPrefab, spawnPosition, Quaternion.identity);
+        GameObject battleShip = Instantiate(shipPrefab, spawnPosition, Quaternion.identity);
         if (battleShip != null)
         {
             Debug.Log("戰艦實例化成功！");
