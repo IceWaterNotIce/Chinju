@@ -3,8 +3,8 @@ using UnityEngine.UIElements;
 
 public class ChinjuUIController : MonoBehaviour
 {
-    private GameObject weaponCreatePanelObj;
-    private GameObject shipCreatePanelObj;
+    public GameObject weaponCreatePanelObj;
+    public GameObject shipCreatePanelObj;
     private VisualElement chinjuRoot;
 
     void Start()
@@ -28,13 +28,19 @@ public class ChinjuUIController : MonoBehaviour
                 btnShip.clicked += OpenShipCreatePanel;
         }
 
-        // 自動尋找子物件
-        weaponCreatePanelObj = transform.Find("WeaponCreatePanel")?.gameObject;
-        shipCreatePanelObj = transform.Find("ShipCreatePanel")?.gameObject;
+        // 檢查子面板是否找到
+        if (weaponCreatePanelObj == null)
+        {
+            Debug.LogError("[ChinjuUIController] 無法找到 WeaponCreatePanel 子物件！");
+        }
+        if (shipCreatePanelObj == null)
+        {
+            Debug.LogError("[ChinjuUIController] 無法找到 ShipCreatePanel 子物件！");
+        }
 
         // 預設隱藏子面板（用 display 控制）
-        weaponCreatePanelObj.GetComponent<WeaponCreatePanelController>().Hide();
-        shipCreatePanelObj.GetComponent<ShipCreationPanel>().Hide();
+        weaponCreatePanelObj?.GetComponent<WeaponCreatePanelController>()?.Hide();
+        shipCreatePanelObj?.GetComponent<ShipCreationPanel>()?.Hide();
 
         // 預設隱藏主面板
         Debug.Log("[ChinjuUIController] Hide Chinju UI Panel at Start");
@@ -56,14 +62,26 @@ public class ChinjuUIController : MonoBehaviour
         {
             chinjuRoot.style.display = DisplayStyle.None;
             Debug.Log("[ChinjuUIController] Hide Chinju UI Panel");
+            Debug.Log("[ChinjuUIController] " + chinjuRoot.style.display);
         }
     }
 
     // 只顯示主面板並關閉所有子面板
-    public void ShowMainPanelOnly()
+    public void ToggleMainPanelOnly()
     {
-        CloseCurrentPanel();
-        Show();
+        if (chinjuRoot != null)
+        {
+            if (chinjuRoot.style.display == DisplayStyle.None)
+            {
+                chinjuRoot.style.display = DisplayStyle.Flex;
+                Debug.Log("[ChinjuUIController] Show Main Panel Only");
+            }
+            else
+            {
+                chinjuRoot.style.display = DisplayStyle.None;
+                Debug.Log("[ChinjuUIController] Hide Main Panel Only");
+            }
+        }
     }
 
     // 開啟武器創建面板

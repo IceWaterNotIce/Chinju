@@ -103,6 +103,11 @@ public class WeaponCreatePanelController : MonoBehaviour
             panel.style.display = DisplayStyle.None;
             Debug.Log("[WeaponCreatePanelController] 隱藏武器創建面板");
         }
+        else
+        {
+            Debug.LogError("[WeaponCreatePanelController] 無法隱藏武器創建面板，panel 為 null");
+        }
+
         if (chinjuUIController != null)
         {
             chinjuUIController.Show();

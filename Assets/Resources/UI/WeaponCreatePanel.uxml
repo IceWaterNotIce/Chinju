@@ -5,6 +5,6 @@
         <ui:Label name="resource-label" class="resource-label" />
         <ui:Button name="create-button" text="創建武器" class="create-button" />
         <ui:Label name="result-label" class="result-label" />
-        <ui:Button name="close-button" text="關閉" /> <!-- 新增關閉按鈕 -->
+        <ui:Button name="close-button" text="關閉" />
     </ui:VisualElement>
 </ui:UXML>

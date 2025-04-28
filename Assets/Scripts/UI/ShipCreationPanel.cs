@@ -233,10 +233,13 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     public void Show()
     {
-        Debug.Log("[ShipCreationPanel] 顯示船隻建造面板");
         if (panel != null)
         {
-            panel.style.display = DisplayStyle.Flex;
+            var root = uiDocument.rootVisualElement; // 獲取根元素
+            root.style.display = DisplayStyle.Flex; // 修改為控制根元素
+            root.style.visibility = Visibility.Visible; // 確保可見性
+            root.style.opacity = 1.0f; // 確保不透明
+            Debug.Log($"[ShipCreationPanel] 顯示船隻建造面板，root.style.display = {root.style.display}, visibility = {root.style.visibility}, opacity = {root.style.opacity}");
         }
         else
         {
@@ -249,17 +252,16 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     public void Hide()
     {
-        Debug.Log("[ShipCreationPanel] 隱藏船隻建造面板");
         if (panel != null)
         {
             panel.style.display = DisplayStyle.None;
             ResetPanel();
+            Debug.Log("[ShipCreationPanel] 隱藏船隻建造面板");
         }
         else
         {
             Debug.LogError("[ShipCreationPanel] 無法隱藏面板：panel 是 null");
         }
-        // 新增：顯示主面板
         if (chinjuUIController != null)
         {
             chinjuUIController.Show();
@@ -274,10 +276,10 @@ public class ShipCreationPanel : MonoBehaviour
         Debug.Log("[ShipCreationPanel] 切換船隻建造面板顯示狀態");
         if (panel != null)
         {
-            bool isVisible = panel.style.display == DisplayStyle.Flex;
+            var root = uiDocument.rootVisualElement; // 獲取根元素
+            bool isVisible = root.style.display == DisplayStyle.Flex; // 修改為檢查根元素
             Debug.Log($"[ShipCreationPanel] 當前面板狀態：{(isVisible ? "顯示" : "隱藏")}");
-            panel.style.display = isVisible ? DisplayStyle.None : DisplayStyle.Flex;
-            
+            root.style.display = isVisible ? DisplayStyle.None : DisplayStyle.Flex; // 修改為控制根元素
             if (isVisible)
             {
                 ResetPanel();
@@ -317,6 +319,14 @@ public class ShipCreationPanel : MonoBehaviour
     private void OnBuildButtonClicked()
     {
         Debug.Log("[ShipCreationPanel] 點擊建造按鈕");
+
+        // 新增檢查 ShipCreationManager.Instance 是否為 null
+        if (ShipCreationManager.Instance == null)
+        {
+            Debug.LogError("[ShipCreationPanel] ShipCreationManager.Instance 為 null，無法建造船隻");
+            return;
+        }
+
         if (selectedShipTypeIndex >= 0)
         {
             ShipCreationManager.Instance.TryCreateShip(selectedShipTypeIndex, goldInputField.value, oilInputField.value, cubeInputField.value);

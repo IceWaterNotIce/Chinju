@@ -222,7 +222,7 @@ public class MapController : MonoBehaviour
                     if (chinjuUIController != null)
                     {
                         Debug.Log("[MapController] 正在開啟 Chinju UI 面板...");
-                        chinjuUIController.ShowMainPanelOnly(); // 修改這裡
+                        chinjuUIController.ToggleMainPanelOnly();
                     }
                     else
                     {
