@@ -279,7 +279,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &436570985
 Transform:
   m_ObjectHideFlags: 0
@@ -326,15 +326,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1991ac0ca7026c94b83433e713a92275, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapons:
-  - name: "\u9577\u528D"
-    attack: 15
-  - name: "\u5F13\u7BAD"
-    attack: 10
-  - name: "\u65A7\u982D"
-    attack: 20
-  weaponPanelUXML: {fileID: 9197481963319205126, guid: f158b9c700ac16b4b820e2263206b09f, type: 3}
-  weaponPanelUSS: {fileID: 7433441132597879392, guid: 7b19d209af45017468a9ec309f42b8f9, type: 3}
 --- !u!1 &572011470
 GameObject:
   m_ObjectHideFlags: 0
@@ -380,13 +371,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   currentGameData:
-    PlayerDatad:
+    playerData:
       Oils: 0
       Gold: 0
       Cube: 0
       Ships: []
       Weapons: []
-    MapDatad:
+    mapData:
       Seed: 0
       Width: 0
       Height: 0
@@ -566,6 +557,7 @@ Transform:
   - {fileID: 2001442111}
   - {fileID: 2133639859}
   - {fileID: 436570985}
+  - {fileID: 1949994462}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &794751197
@@ -1223,6 +1215,71 @@ TilemapCollider2D:
   m_MaximumTileChangeCount: 1000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
+--- !u!1 &1949994461
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1949994462}
+  - component: {fileID: 1949994464}
+  - component: {fileID: 1949994463}
+  m_Layer: 0
+  m_Name: BottomNavBar
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1949994462
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1949994461}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 794751195}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1949994463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1949994461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: c40b9c23258200645b26f1b0c0ae963d, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 7f516c9f89f158341ae559da2e098f0c, type: 3}
+  m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+--- !u!114 &1949994464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1949994461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cb270a7eb2e9bc45927b91918f3b73e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  weaponPanel: {fileID: 436570984}
 --- !u!1 &2001442110
 GameObject:
   m_ObjectHideFlags: 0

@@ -28,6 +28,8 @@ public class GameDataController : MonoBehaviour
 
     private void Awake()
     {
+        Debug.Log("[GameDataController] Awake 方法執行。");
+
         if (Instance != null && Instance != this)
         {
             Destroy(this);
@@ -35,5 +37,19 @@ public class GameDataController : MonoBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
+        // 確保 currentGameData 初始化
+        if (currentGameData == null)
+        {
+            Debug.Log("[GameDataController] 初始化 currentGameData。");
+            currentGameData = new GameData
+            {
+                playerData = new GameData.PlayerData()
+            };
+        }
+        else
+        {
+            Debug.Log("[GameDataController] currentGameData 已存在。");
+        }
     }
 }

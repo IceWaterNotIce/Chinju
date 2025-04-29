@@ -17,7 +17,7 @@ public class GameData
         // 玩家擁有的船隻數據
         public List<ShipData> Ships = new List<ShipData>();
 
-        public List<WeaponData> Weapons = new List<WeaponData>();
+        public List<WeaponData> Weapons = new List<WeaponData>(); // 確保初始化
 
         // 初始化資源變動事件
         [System.NonSerialized]
