@@ -133,6 +133,8 @@ public class ShipUI : Singleton<ShipUI>
             {
                 weaponIcon.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.3f); // 空槽顏色
                 weaponIcon.tooltip = $"空武器槽{i+1}";
+                int weaponIndex = i; // 避免閉包問題
+                weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponSelectionPanel(weaponIndex));
             }
             weaponListContainer.Add(weaponIcon);
         }
@@ -303,5 +305,107 @@ public class ShipUI : Singleton<ShipUI>
         weaponsPanel.Add(closeBtn);
 
         Panel.Add(weaponsPanel);
+    }
+
+    // 新增：顯示武器選擇面板
+    private void ShowWeaponSelectionPanel(int slotIndex)
+    {
+        if (weaponDetailPopup != null)
+        {
+            weaponDetailPopup.RemoveFromHierarchy();
+        }
+
+        weaponDetailPopup = new VisualElement();
+        weaponDetailPopup.style.position = Position.Absolute;
+        weaponDetailPopup.style.left = 100;
+        weaponDetailPopup.style.top = 100;
+        weaponDetailPopup.style.width = 300;
+        weaponDetailPopup.style.backgroundColor = new Color(0, 0, 0, 0.85f);
+        weaponDetailPopup.style.paddingLeft = 10;
+        weaponDetailPopup.style.paddingRight = 10;
+        weaponDetailPopup.style.paddingTop = 10;
+        weaponDetailPopup.style.paddingBottom = 10;
+        weaponDetailPopup.style.borderTopLeftRadius = 8;
+        weaponDetailPopup.style.borderTopRightRadius = 8;
+        weaponDetailPopup.style.borderBottomLeftRadius = 8;
+        weaponDetailPopup.style.borderBottomRightRadius = 8;
+
+        Label title = new Label("選擇武器");
+        title.style.unityFontStyleAndWeight = FontStyle.Bold;
+        weaponDetailPopup.Add(title);
+
+        // 從玩家資料中獲取武器清單
+        var playerData = GameDataController.Instance.CurrentGameData.playerData;
+        if (playerData != null && playerData.Weapons != null)
+        {
+            foreach (var weaponData in playerData.Weapons)
+            {
+                Button weaponButton = new Button(() =>
+                {
+                    // 將 GameData.WeaponData 轉換為 Weapon
+                    Weapon weapon = new Weapon
+                    {
+                        Name = weaponData.Name,
+                        Damage = weaponData.Damage,
+                        Range = weaponData.Range,
+                        AttackSpeed = weaponData.AttackSpeed,
+                        CooldownTime = weaponData.CooldownTime
+                    };
+
+                    ship.weapons[slotIndex] = weapon; // 插入武器到指定槽位
+                    weaponDetailPopup.RemoveFromHierarchy(); // 關閉選擇面板
+                    RefreshWeaponList(); // 更新武器列表
+                })
+                {
+                    text = weaponData.Name
+                };
+                weaponButton.style.marginTop = 5;
+                weaponDetailPopup.Add(weaponButton);
+            }
+        }
+        else
+        {
+            Label noWeaponLabel = new Label("目前沒有可用的武器。");
+            noWeaponLabel.style.marginTop = 10;
+            weaponDetailPopup.Add(noWeaponLabel);
+        }
+
+        Button closeBtn = new Button(() => weaponDetailPopup.RemoveFromHierarchy()) { text = "關閉" };
+        closeBtn.style.marginTop = 10;
+        weaponDetailPopup.Add(closeBtn);
+
+        Panel.Add(weaponDetailPopup);
+    }
+
+    // 新增：刷新武器列表的方法
+    private void RefreshWeaponList()
+    {
+        weaponListContainer.Clear();
+
+        int weaponSlotCount = ship.IntWeaponLimit;
+        for (int i = 0; i < weaponSlotCount; i++)
+        {
+            Weapon weapon = (ship.weapons != null && i < ship.weapons.Count) ? ship.weapons[i] : null;
+            VisualElement weaponIcon = new VisualElement();
+            weaponIcon.style.width = 32;
+            weaponIcon.style.height = 32;
+            weaponIcon.style.marginRight = 8;
+
+            if (weapon != null)
+            {
+                weaponIcon.style.backgroundColor = new Color(0.8f, 0.8f, 0.2f, 1f);
+                weaponIcon.tooltip = $"武器{i+1}";
+                int weaponIndex = i; // 避免閉包問題
+                weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponDetail(ship.weapons[weaponIndex]));
+            }
+            else
+            {
+                weaponIcon.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.3f); // 空槽顏色
+                weaponIcon.tooltip = $"空武器槽{i+1}";
+                int weaponIndex = i; // 避免閉包問題
+                weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponSelectionPanel(weaponIndex));
+            }
+            weaponListContainer.Add(weaponIcon);
+        }
     }
 }

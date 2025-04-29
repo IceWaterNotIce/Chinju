@@ -3,6 +3,12 @@ using System.Collections;
 
 public class Weapon : MonoBehaviour
 {
+    public string Name { get; set; }
+    public float Damage { get; set; }
+    public float Range { get; set; }
+    public float AttackSpeed { get; set; }
+    public float CooldownTime { get; set; }
+
     public float MaxAttackDistance = 10f;
     public float MinAttackDistance = 1f;
     public GameObject AmmoPrefab;
