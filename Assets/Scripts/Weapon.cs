@@ -4,6 +4,7 @@ using System.Collections;
 public class Weapon : MonoBehaviour
 {
     public string Name { get; set; }
+    public int Cost { get; set; } // 新增：武器的花費
     public float Damage { get; set; }
     public float Range { get; set; }
     public float AttackSpeed { get; set; }
@@ -56,5 +57,17 @@ public class Weapon : MonoBehaviour
             }
             yield return new WaitForSeconds(AttackCooldown);
         }
+    }
+
+    public GameData.WeaponData ToWeaponData()
+    {
+        return new GameData.WeaponData
+        {
+            Name = this.Name,
+            Damage = (int)this.Damage,
+            Range = this.Range,
+            AttackSpeed = this.AttackSpeed,
+            CooldownTime = this.CooldownTime
+        };
     }
 }

@@ -4,19 +4,7 @@ using System.Collections.Generic;
 
 public class WeaponCreatePanelController : MonoBehaviour
 {
-    [System.Serializable]
-    public class WeaponRecipe
-    {
-        public string name;
-        public int cost;
-    }
-
-    public List<WeaponRecipe> weaponRecipes = new List<WeaponRecipe>
-    {
-        new WeaponRecipe { name = "長劍", cost = 30 },
-        new WeaponRecipe { name = "弓箭", cost = 20 },
-        new WeaponRecipe { name = "斧頭", cost = 40 }
-    };
+    public List<Weapon> weaponPrefabs = new List<Weapon>(); // 修改為直接存儲 Weapon 預製體
 
     private VisualElement root;
     private ChinjuUIController chinjuUIController;
@@ -31,9 +19,11 @@ public class WeaponCreatePanelController : MonoBehaviour
         var resultLabel = root.Q<Label>("result-label");
         var closeBtn = root.Q<Button>("close-button");
 
+        LoadWeaponPrefabs(); // 動態加載武器預製體
+
         dropdown.choices = new List<string>();
-        foreach (var recipe in weaponRecipes)
-            dropdown.choices.Add($"{recipe.name} (花費: {recipe.cost})");
+        foreach (var weapon in weaponPrefabs)
+            dropdown.choices.Add($"{weapon.Name} (花費: {weapon.Cost})");
         dropdown.index = 0;
 
         void UpdateResourceLabel()
@@ -61,28 +51,22 @@ public class WeaponCreatePanelController : MonoBehaviour
             }
 
             int idx = dropdown.index;
-            if (idx < 0 || idx >= weaponRecipes.Count) return;
-            var recipe = weaponRecipes[idx];
-            if (playerData.Gold >= recipe.cost)
+            if (idx < 0 || idx >= weaponPrefabs.Count) return;
+            var selectedWeapon = weaponPrefabs[idx];
+            if (playerData.Gold >= selectedWeapon.Cost)
             {
-                playerData.Gold -= recipe.cost;
+                playerData.Gold -= selectedWeapon.Cost;
                 playerData.OnResourceChanged?.Invoke();
                 UpdateResourceLabel();
 
-                // 新增武器數據到玩家資料
-                var newWeapon = new GameData.WeaponData
+                // 實例化武器並添加到玩家資料
+                var newWeapon = Instantiate(selectedWeapon);
+                if (newWeapon != null)
                 {
-                    Name = recipe.name,
-                    Damage = Random.Range(10, 20), // 假設隨機生成傷害值
-                    Range = Random.Range(1.0f, 3.0f), // 假設隨機生成範圍值
-                    AttackSpeed = Random.Range(0.5f, 1.5f), // 假設隨機生成攻擊速度
-                    CooldownTime = Random.Range(1.0f, 2.0f) // 假設隨機生成冷卻時間
-                };
-                playerData.Weapons.Add(newWeapon);
-
-                resultLabel.text = $"成功創建：{recipe.name}！";
-                Debug.Log($"[WeaponCreatePanelController] 成功創建：{recipe.name}，剩餘金幣：{playerData.Gold}");
-                Debug.Log($"[WeaponCreatePanelController] 新增武器數據：{newWeapon.Name}，傷害：{newWeapon.Damage}，範圍：{newWeapon.Range}，攻擊速度：{newWeapon.AttackSpeed}，冷卻時間：{newWeapon.CooldownTime}");
+                    playerData.Weapons.Add(newWeapon.ToWeaponData()); // 使用 ToWeaponData 方法
+                    resultLabel.text = $"成功創建：{selectedWeapon.Name}！";
+                    Debug.Log($"[WeaponCreatePanelController] 成功創建：{selectedWeapon.Name}，剩餘金幣：{playerData.Gold}");
+                }
 
                 Hide();
             }
@@ -100,6 +84,13 @@ public class WeaponCreatePanelController : MonoBehaviour
 
         root.style.display = DisplayStyle.None;
         Debug.Log("[WeaponCreatePanelController] 面板初始化完成並預設隱藏");
+    }
+
+    void LoadWeaponPrefabs()
+    {
+        weaponPrefabs.Clear();
+        var loadedPrefabs = Resources.LoadAll<Weapon>("Prefabs/Weapon");
+        weaponPrefabs.AddRange(loadedPrefabs);
     }
 
     void OnEnable()
