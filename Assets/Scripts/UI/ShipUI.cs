@@ -43,14 +43,48 @@ public class ShipUI : Singleton<ShipUI>
     {
         ship = s;
 
-        // Add UI Document component
-        UIDocument uiDoc = gameObject.AddComponent<UIDocument>();
+        // 檢查是否已存在 UIDocument 組件
+        UIDocument uiDoc = GetComponent<UIDocument>();
+        if (uiDoc == null)
+        {
+            uiDoc = gameObject.AddComponent<UIDocument>();
+            if (uiDoc == null)
+            {
+                Debug.LogError("[ShipUI] UIDocument 無法初始化！");
+                return;
+            }
+        }
+
         // load panel settings
         uiDoc.panelSettings = Resources.Load<PanelSettings>("UI/PanelSettings");
+        if (uiDoc.panelSettings == null)
+        {
+            Debug.LogError("[ShipUI] 無法加載 PanelSettings 資源！");
+            return;
+        }
+
         // load the UXML file
         uiDoc.visualTreeAsset = Resources.Load<VisualTreeAsset>("UI/ShipUI");
+        if (uiDoc.visualTreeAsset == null)
+        {
+            Debug.LogError("[ShipUI] 無法加載 ShipUI 資源！");
+            return;
+        }
+
         VisualElement root = uiDoc.rootVisualElement;
+        if (root == null)
+        {
+            Debug.LogError("[ShipUI] UIDocument 的 rootVisualElement 為 null！");
+            return;
+        }
+
         Panel = root.Q<VisualElement>("Panel");
+        if (Panel == null)
+        {
+            Debug.LogError("[ShipUI] 找不到名為 'Panel' 的 VisualElement！");
+            return;
+        }
+
         root.RegisterCallback<ClickEvent>(ev => Destroy(gameObject));
 
         lblSpeedFrontFull = Panel.Q<Label>("lblSpeedFrontFull");

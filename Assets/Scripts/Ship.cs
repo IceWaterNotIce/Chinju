@@ -154,7 +154,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         
         if (UI == null)
         {
-            Debug.LogError("ShipUI instance not found!", this);
+            Debug.LogError("[Ship] ShipUI.Instance 為 null，無法初始化 UI！");
             return;
         }
 
