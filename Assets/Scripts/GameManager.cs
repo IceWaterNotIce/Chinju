@@ -65,20 +65,32 @@ public class GameManager : Singleton<GameManager>
                 if (data.playerData != null && data.playerData.Ships != null)
                 {
                     var shipsInScene = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
-                    for (int i = 0; i < shipsInScene.Length; i++)
+                    data.playerData.Ships.Clear();
+                    foreach (var ship in shipsInScene)
                     {
-                        var shipData = shipsInScene[i].SaveShipData();
-                        shipData.PrefabName = shipsInScene[i].gameObject.name.Replace("(Clone)", "").Trim(); // 修正保存的 PrefabName
-                        shipData.Name = shipsInScene[i].name; // 保存船隻名稱
-                        if (i < data.playerData.Ships.Count)
+                        // 確保只保存玩家船隻，排除敵方船隻
+                        if (ship.IsPlayerShip && !(ship is EnemyShip))
                         {
-                            data.playerData.Ships[i] = shipData;
-                        }
-                        else
-                        {
+                            var shipData = ship.SaveShipData();
+                            shipData.PrefabName = ship.gameObject.name.Replace("(Clone)", "").Trim();
+                            shipData.Name = ship.name;
                             data.playerData.Ships.Add(shipData);
                         }
                     }
+                }
+
+                // 更新敵方船艦數據
+                if (data.enemyShips == null)
+                    data.enemyShips = new List<GameData.ShipData>();
+
+                var enemyShipsInScene = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None); // 過濾為 EnemyShip 類型
+                data.enemyShips.Clear();
+                foreach (var enemyShip in enemyShipsInScene)
+                {
+                    var shipData = enemyShip.SaveShipData();
+                    shipData.PrefabName = enemyShip.gameObject.name.Replace("(Clone)", "").Trim();
+                    shipData.Name = enemyShip.name;
+                    data.enemyShips.Add(shipData);
                 }
 
                 try
@@ -121,7 +133,19 @@ public class GameManager : Singleton<GameManager>
                     }
 
                     GameDataController.Instance.TriggerResourceChanged();
-                    LoadShips(data.playerData?.Ships);
+
+                    // 清除現有玩家船隻和敵方船隻
+                    var existingShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
+                    foreach (var ship in existingShips)
+                    {
+                        GameObject.Destroy(ship.gameObject);
+                    }
+
+                    // 載入玩家船隻
+                    LoadShips(data.playerData?.Ships, true);
+
+                    // 載入敵方船隻
+                    LoadShips(data.enemyShips, false);
                 }
                 else
                 {
@@ -147,33 +171,33 @@ public class GameManager : Singleton<GameManager>
         return null;
     }
 
-    private void LoadShips(List<GameData.ShipData> shipsData)
+    private void LoadShips(List<GameData.ShipData> shipsData, bool isPlayerShip)
     {
         if (shipsData == null) return;
 
-        var existingShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
-        foreach (var ship in existingShips)
-        {
-            GameObject.Destroy(ship.gameObject);
-        }
-
         foreach (var shipData in shipsData)
         {
-            var shipPrefab = Resources.Load<GameObject>($"Prefabs/{shipData.PrefabName}");
+            // 根據船隻類型選擇加載路徑
+            string prefabPath = isPlayerShip ? $"Prefabs/{shipData.PrefabName}" : $"Prefabs/Enemy/{shipData.PrefabName}";
+            var shipPrefab = Resources.Load<GameObject>(prefabPath);
             if (shipPrefab != null)
             {
                 var shipObj = GameObject.Instantiate(shipPrefab, shipData.Position, Quaternion.Euler(0, 0, shipData.Rotation));
-                shipObj.name = shipData.Name; // 確保名稱正確設置
+                shipObj.name = shipData.Name;
                 var shipComp = shipObj.GetComponent<Ship>();
                 if (shipComp != null)
                 {
+                    shipComp.IsPlayerShip = isPlayerShip; // 設置是否為玩家船隻
                     shipComp.LoadShipData(shipData);
-                    LoadWeapons(shipComp, shipData.Weapons);
+                    if (isPlayerShip)
+                    {
+                        LoadWeapons(shipComp, shipData.Weapons);
+                    }
                 }
             }
             else
             {
-                Debug.LogWarning($"[GameManager] 找不到船隻預製物: {shipData.PrefabName}");
+                Debug.LogWarning($"[GameManager] 找不到船隻預製物: {prefabPath}");
             }
         }
     }

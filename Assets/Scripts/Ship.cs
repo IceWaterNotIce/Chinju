@@ -178,6 +178,9 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     // public Weapon weapon;
     public List<Weapon> weapons = new List<Weapon>();
 
+    [Header("Ship Type")]
+    public bool IsPlayerShip = true; // 新增：標記是否為玩家船隻
+
     public void Start()
     {
         tilemap = FindFirstObjectByType<Tilemap>();

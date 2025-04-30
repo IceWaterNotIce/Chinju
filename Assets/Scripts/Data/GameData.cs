@@ -7,6 +7,9 @@ public class GameData
     public PlayerData playerData; // 修正命名
     public MapData mapData;       // 修正命名
 
+    // 新增：敵方船隻數據
+    public List<ShipData> enemyShips = new List<ShipData>();
+
     [System.Serializable]
     public class PlayerData
     {
