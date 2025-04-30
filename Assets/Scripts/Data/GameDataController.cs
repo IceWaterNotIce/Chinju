@@ -52,4 +52,13 @@ public class GameDataController : MonoBehaviour
             Debug.Log("[GameDataController] currentGameData 已存在。");
         }
     }
+
+    public void TriggerResourceChanged()
+    {
+        if (currentGameData?.playerData?.OnResourceChanged != null)
+        {
+            currentGameData.playerData.OnResourceChanged.Invoke();
+            Debug.Log("[GameDataController] 資源事件已觸發，UI 更新完成");
+        }
+    }
 }

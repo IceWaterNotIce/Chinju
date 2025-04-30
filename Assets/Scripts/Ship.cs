@@ -274,6 +274,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     {
         GameData.ShipData shipData = new GameData.ShipData
         {
+            Name = this.name, // 保存船隻名稱
             Position = transform.position,
             Health = (int)Health,
             Fuel = (int)FuelConsumption, // Explicitly cast float to int
@@ -293,7 +294,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     public void LoadShipData(GameData.ShipData shipData)
     {
         // 根據 shipData 初始化船隻屬性
-        this.name = shipData.Name;
+        this.name = shipData.Name; // 載入船隻名稱
         this.transform.position = shipData.Position;
         this.transform.rotation = Quaternion.Euler(0, 0, shipData.Rotation);
         // 初始化其他屬性，例如 Health, AttackPower 等

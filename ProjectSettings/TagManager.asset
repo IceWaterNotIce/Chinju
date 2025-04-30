@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - Ammo
+  - Ship
   layers:
   - Default
   - TransparentFX
