@@ -22,13 +22,13 @@ public class ShipCreationManager : MonoBehaviour
     }
 
     // 嘗試建造船隻，回傳是否成功
-    public bool TryCreateShip(int shipType, int goldCost, int oilCost, int cubeCost)
+    public Ship TryCreateShip(int shipType, int goldCost, int oilCost, int cubeCost)
     {
         var data = GameDataController.Instance.CurrentGameData;
         if (data.playerData.Gold < goldCost || data.playerData.Oils < oilCost || data.playerData.Cube < cubeCost)
         {
             Debug.LogWarning("資源不足，無法建造戰艦！");
-            return false;
+            return null;
         }
 
         // 扣除資源
@@ -38,17 +38,16 @@ public class ShipCreationManager : MonoBehaviour
         data.playerData.OnResourceChanged?.Invoke();
 
         // 實例化船隻
-        InstantiateShip(shipType);
-        return true;
+        return InstantiateShip(shipType);
     }
 
-    public bool TryCreateRandomShip(int inputGold, int inputOil, int inputCube)
+    public Ship TryCreateRandomShip(int inputGold, int inputOil, int inputCube)
     {
         var data = GameDataController.Instance.CurrentGameData;
         if (data.playerData.Gold < 10 || data.playerData.Oils < 10 || data.playerData.Cube < 1)
         {
             Debug.LogWarning("資源不足，無法隨機建造船隻！");
-            return false;
+            return null;
         }
 
         System.Collections.Generic.List<int> candidates = new System.Collections.Generic.List<int>();
@@ -70,7 +69,7 @@ public class ShipCreationManager : MonoBehaviour
         if (candidates.Count == 0)
         {
             Debug.LogWarning("沒有任何船型可隨機建造！");
-            return false;
+            return null;
         }
 
         int totalWeight = 0;
@@ -91,39 +90,39 @@ public class ShipCreationManager : MonoBehaviour
         return TryCreateShip(shipType, shipCosts[shipType, 0], shipCosts[shipType, 1], shipCosts[shipType, 2]);
     }
 
-    private void InstantiateShip(int shipTypeIdx)
+    private Ship InstantiateShip(int shipTypeIdx)
     {
         if (shipTypeIdx < 0 || shipTypeIdx >= shipPrefabs.Length)
         {
             Debug.LogError($"無效的船型索引：{shipTypeIdx}");
-            return;
+            return null;
         }
 
         GameObject shipPrefab = shipPrefabs[shipTypeIdx];
         if (shipPrefab == null)
         {
             Debug.LogError($"找不到船隻預製件：索引 {shipTypeIdx}");
-            return;
+            return null;
         }
 
         if (mapController == null)
         {
             Debug.LogError("MapController 未設置！");
-            return;
+            return null;
         }
 
         Vector3 chinjuTilePosition = mapController.GetChinjuTileWorldPosition();
         if (chinjuTilePosition == Vector3.zero)
         {
             Debug.LogError("找不到 Chinju Tile 的位置！");
-            return;
+            return null;
         }
 
         Vector3 spawnPosition = mapController.FindNearestOceanTile(chinjuTilePosition);
         if (spawnPosition == Vector3.zero)
         {
             Debug.LogError("找不到 Chinju Tile 附近的最近海洋格子！");
-            return;
+            return null;
         }
 
         spawnPosition.z = -1;
@@ -133,10 +132,12 @@ public class ShipCreationManager : MonoBehaviour
         {
             Debug.Log("[ShipCreationManager] 戰艦實例化成功！");
             SaveShipData(spawnPosition);
+            return battleShip.GetComponent<Ship>();
         }
         else
         {
             Debug.LogError("[ShipCreationManager] 戰艦實例化失敗！");
+            return null;
         }
     }
 

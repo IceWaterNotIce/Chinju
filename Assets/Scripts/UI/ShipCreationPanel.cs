@@ -312,21 +312,31 @@ public class ShipCreationPanel : MonoBehaviour
     {
         Debug.Log("[ShipCreationPanel] 點擊建造按鈕");
 
-        // 新增檢查 ShipCreationManager.Instance 是否為 null
         if (ShipCreationManager.Instance == null)
         {
             Debug.LogError("[ShipCreationPanel] ShipCreationManager.Instance 為 null，無法建造船隻");
             return;
         }
 
+        Ship newShip = null;
         if (selectedShipTypeIndex >= 0)
         {
-            ShipCreationManager.Instance.TryCreateShip(selectedShipTypeIndex, goldInputField.value, oilInputField.value, cubeInputField.value);
+            newShip = ShipCreationManager.Instance.TryCreateShip(selectedShipTypeIndex, goldInputField.value, oilInputField.value, cubeInputField.value);
         }
         else
         {
-            ShipCreationManager.Instance.TryCreateRandomShip(goldInputField.value, oilInputField.value, cubeInputField.value);
+            newShip = ShipCreationManager.Instance.TryCreateRandomShip(goldInputField.value, oilInputField.value, cubeInputField.value);
         }
+
+        if (newShip != null)
+        {
+            newShip.AddRandomWeapon(); // 隨機生成武器並分配給新船隻
+        }
+        else
+        {
+            Debug.LogError("[ShipCreationPanel] 無法創建船隻，請檢查資源或其他條件");
+        }
+
         ResetPanel();
     }
 }

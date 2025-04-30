@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
 using System;
 using System.Collections.Generic;
+using System.Linq; // 新增引用
 
 public class Ship : MonoBehaviour, IPointerClickHandler
 {
@@ -296,6 +297,28 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         FuelConsumption = data.Fuel;
         Speed = data.Speed;
         TargetRotation = data.Rotation;
+    }
+
+    public void AddRandomWeapon()
+    {
+        if (weapons.Count >= IntWeaponLimit)
+        {
+            Debug.LogWarning("[Ship] 武器數量已達上限，無法添加新武器！");
+            return;
+        }
+
+        var weaponPrefabs = Resources.LoadAll<Weapon>("Prefabs/Weapon");
+        if (weaponPrefabs.Length == 0)
+        {
+            Debug.LogError("[Ship] 無法找到任何武器預製體！");
+            return;
+        }
+
+        var randomWeaponPrefab = weaponPrefabs[UnityEngine.Random.Range(0, weaponPrefabs.Length)]; // 明確使用 UnityEngine.Random
+        var newWeapon = Instantiate(randomWeaponPrefab, transform);
+        weapons.Add(newWeapon);
+
+        Debug.Log($"[Ship] 隨機生成武器：{newWeapon.Name}");
     }
 
     #region Debug
