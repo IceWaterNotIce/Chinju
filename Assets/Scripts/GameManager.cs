@@ -65,29 +65,50 @@ public class GameManager : Singleton<GameManager>
 
     public void SaveGame()
     {
-        // 儲存時，確保是 GameDataController 的資料
         if (GameDataController.Instance != null)
         {
             var data = GameDataController.Instance.CurrentGameData;
 
-            // 儲存前，先更新所有玩家船艦資料
-            if (data != null && data.playerData != null && data.playerData.Ships != null)
+            if (data != null)
             {
-                // 取得場景中所有 Ship 物件
-                var shipsInScene = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
-                for (int i = 0; i < data.playerData.Ships.Count; i++)
+                // 更新玩家船艦數據
+                if (data.playerData != null && data.playerData.Ships != null)
                 {
-                    // 根據索引對應（假設順序一致），將場景 Ship 狀態存回 ShipData
-                    if (i < shipsInScene.Length && shipsInScene[i] != null)
+                    var shipsInScene = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
+                    for (int i = 0; i < shipsInScene.Length; i++)
                     {
-                        data.playerData.Ships[i] = shipsInScene[i].SaveShipData();
+                        var shipData = shipsInScene[i].SaveShipData();
+                        shipData.PrefabName = shipsInScene[i].gameObject.name.Replace("(Clone)", "").Trim(); // 修正保存的 PrefabName
+                        if (i < data.playerData.Ships.Count)
+                        {
+                            data.playerData.Ships[i] = shipData;
+                        }
+                        else
+                        {
+                            data.playerData.Ships.Add(shipData);
+                        }
                     }
                 }
-            }
 
-            string json = JsonUtility.ToJson(data);
-            File.WriteAllText(saveFilePath, json);
-            Debug.Log("[GameManager] 遊戲已保存至 " + saveFilePath);
+                try
+                {
+                    string json = JsonUtility.ToJson(data, true); // 格式化輸出
+                    File.WriteAllText(saveFilePath, json);
+                    Debug.Log($"[GameManager] 遊戲已保存至 {saveFilePath}");
+                }
+                catch (IOException ex)
+                {
+                    Debug.LogError($"[GameManager] 儲存遊戲時發生錯誤: {ex.Message}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[GameManager] 無法保存遊戲，GameData 為 null");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] 無法保存遊戲，GameDataController 未初始化");
         }
     }
 
@@ -95,54 +116,79 @@ public class GameManager : Singleton<GameManager>
     {
         if (File.Exists(saveFilePath))
         {
-            string json = File.ReadAllText(saveFilePath);
-            GameData data = JsonUtility.FromJson<GameData>(json);
-            Debug.Log("[GameManager] 遊戲已從 " + saveFilePath + " 載入");
-            // 載入後設置到 GameDataController
-            if (GameDataController.Instance != null)
+            try
             {
-                GameDataController.Instance.CurrentGameData = data;
-                Debug.Log("[GameManager] 遊戲數據已設置到 GameDataController");
-            }
-            // 新增：主動觸發資源事件，讓 UI 立即刷新
-            if (data != null && data.playerData != null && data.playerData.OnResourceChanged != null)
-                data.playerData.OnResourceChanged.Invoke();
+                string json = File.ReadAllText(saveFilePath);
+                GameData data = JsonUtility.FromJson<GameData>(json);
 
-            // 新增：根據存檔自動生成所有船艦
-            if (data != null && data.playerData != null && data.playerData.Ships != null)
-            {
-                // 先刪除場景中所有現有 Ship 物件，避免重複
-                var existingShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
-                foreach (var ship in existingShips)
+                if (data != null)
                 {
-                    GameObject.Destroy(ship.gameObject);
-                }
-
-                // 可根據實際需求指定船艦Prefab路徑
-                var shipPrefab = Resources.Load<GameObject>("Prefabs/Ship");
-                if (shipPrefab != null)
-                {
-                    foreach (var shipData in data.playerData.Ships)
+                    if (GameDataController.Instance != null)
                     {
-                        var shipObj = GameObject.Instantiate(shipPrefab, shipData.Position, Quaternion.Euler(0, 0, shipData.Rotation));
-                        var shipComp = shipObj.GetComponent<Ship>();
-                        if (shipComp != null)
+                        GameDataController.Instance.CurrentGameData = data;
+                        Debug.Log("[GameManager] 遊戲數據已設置到 GameDataController");
+                    }
+
+                    data.playerData?.OnResourceChanged?.Invoke();
+
+                    if (data.playerData?.Ships != null)
+                    {
+                        var existingShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
+                        foreach (var ship in existingShips)
                         {
-                            shipComp.LoadShipData(shipData);
+                            GameObject.Destroy(ship.gameObject);
+                        }
+
+                        foreach (var shipData in data.playerData.Ships)
+                        {
+                            var shipPrefab = Resources.Load<GameObject>($"Prefabs/{shipData.PrefabName}");
+                            if (shipPrefab != null)
+                            {
+                                var shipObj = GameObject.Instantiate(shipPrefab, shipData.Position, Quaternion.Euler(0, 0, shipData.Rotation));
+                                var shipComp = shipObj.GetComponent<Ship>();
+                                if (shipComp != null)
+                                {
+                                    shipComp.LoadShipData(shipData); // 確保唯一的 LoadShipData 方法被調用
+                                    foreach (var weaponData in shipData.Weapons)
+                                    {
+                                        var weaponPrefab = Resources.Load<GameObject>($"Prefabs/{weaponData.PrefabName}");
+                                        if (weaponPrefab != null)
+                                        {
+                                            var weaponObj = GameObject.Instantiate(weaponPrefab);
+                                            var weaponComp = weaponObj.GetComponent<Weapon>();
+                                            weaponComp?.LoadWeaponData(weaponData);
+                                            shipComp.AddWeapon(weaponComp);
+                                        }
+                                        else
+                                        {
+                                            Debug.LogWarning($"[GameManager] 找不到武器預製物: {weaponData.PrefabName}");
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Debug.LogWarning($"[GameManager] 找不到船隻預製物: {shipData.PrefabName}");
+                            }
                         }
                     }
                 }
                 else
                 {
-                    Debug.LogWarning("找不到 Resources/Ship 預製物，無法自動生成船艦！");
+                    Debug.LogWarning("[GameManager] 載入的遊戲數據為 null");
                 }
-            }
 
-            return data;
+                return data;
+            }
+            catch (IOException ex)
+            {
+                Debug.LogError($"[GameManager] 載入遊戲時發生錯誤: {ex.Message}");
+                return null;
+            }
         }
         else
         {
-            Debug.LogWarning("[GameManager] 找不到存檔文件: " + saveFilePath);
+            Debug.LogWarning($"[GameManager] 找不到存檔文件: {saveFilePath}");
             return null;
         }
     }

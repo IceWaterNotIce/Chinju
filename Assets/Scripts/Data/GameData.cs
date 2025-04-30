@@ -51,6 +51,9 @@ public class GameData
         public int WeaponLimit;
 
         public List<WeaponData> Weapons = new List<WeaponData>();
+
+        // 新增：保存船隻的預製物名稱
+        public string PrefabName;
     }
 
     [System.Serializable]
@@ -62,5 +65,8 @@ public class GameData
         public float MinAttackDistance; // 新增
         public float AttackSpeed;
         public float CooldownTime;
+
+        // 新增：保存武器的預製物名稱
+        public string PrefabName;
     }
 }

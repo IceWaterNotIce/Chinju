@@ -290,13 +290,14 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         return shipData;
     }
 
-    public void LoadShipData(GameData.ShipData data)
+    public void LoadShipData(GameData.ShipData shipData)
     {
-        transform.position = data.Position;
-        Health = data.Health;
-        FuelConsumption = data.Fuel;
-        Speed = data.Speed;
-        TargetRotation = data.Rotation;
+        // 根據 shipData 初始化船隻屬性
+        this.name = shipData.Name;
+        this.transform.position = shipData.Position;
+        this.transform.rotation = Quaternion.Euler(0, 0, shipData.Rotation);
+        // 初始化其他屬性，例如 Health, AttackPower 等
+        Debug.Log($"[Ship] 已載入船隻數據: {shipData.Name}");
     }
 
     public void AddRandomWeapon()
@@ -319,6 +320,12 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         weapons.Add(newWeapon);
 
         Debug.Log($"[Ship] 隨機生成武器：{newWeapon.Name}");
+    }
+
+    public void AddWeapon(Weapon weapon)
+    {
+        // 將武器添加到船隻的武器列表或其他結構中
+        Debug.Log($"[Ship] 添加武器: {weapon.name}");
     }
 
     #region Debug

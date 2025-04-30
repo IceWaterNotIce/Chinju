@@ -68,4 +68,15 @@ public class Weapon : MonoBehaviour
             CooldownTime = this.CooldownTime
         };
     }
+
+    public void LoadWeaponData(GameData.WeaponData weaponData)
+    {
+        // 根據 weaponData 初始化武器屬性
+        this.name = weaponData.Name;
+        this.Damage = weaponData.Damage;
+        this.AttackSpeed = weaponData.AttackSpeed;
+        this.CooldownTime = weaponData.CooldownTime;
+        this.MaxAttackDistance = weaponData.MaxAttackDistance;
+        this.MinAttackDistance = weaponData.MinAttackDistance;
+    }
 }

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -6630114623167957052}
   m_Layer: 0
   m_Name: Battleship
-  m_TagString: Untagged
+  m_TagString: Ship
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -154,6 +154,8 @@ MonoBehaviour:
   m_visibleRadius: 10
   tilemap: {fileID: 0}
   oceanTile: {fileID: 0}
+  intWeaponLimit: 2
+  weapons: []
   attackRange: 5
   attackCooldown: 2
   damage: 10
