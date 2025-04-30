@@ -279,13 +279,26 @@ public class Ship : MonoBehaviour, IPointerClickHandler
             Health = (int)Health,
             Fuel = (int)FuelConsumption, // Explicitly cast float to int
             Speed = Speed,
-            Rotation = transform.rotation.eulerAngles.z
+            Rotation = transform.rotation.eulerAngles.z,
+            WeaponLimit = IntWeaponLimit, // 保存武器數量上限
+            Weapons = new List<GameData.WeaponData>() // 保存武器數據
         };
 
-        if (shipData.Fuel > 0)
+        foreach (var weapon in weapons)
         {
-            shipData.Speed += Acceleration;
-            shipData.Rotation = TargetRotation;
+            if (weapon != null)
+            {
+                shipData.Weapons.Add(new GameData.WeaponData
+                {
+                    Name = weapon.name,
+                    Damage = (int)weapon.Damage, // 顯式轉換 Damage 為 int
+                    MaxAttackDistance = weapon.MaxAttackDistance,
+                    MinAttackDistance = weapon.MinAttackDistance,
+                    AttackSpeed = weapon.AttackSpeed,
+                    CooldownTime = weapon.CooldownTime,
+                    PrefabName = weapon.gameObject.name.Replace("(Clone)", "").Trim() // 保存武器的預製物名稱
+                });
+            }
         }
 
         return shipData;
@@ -297,7 +310,43 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         this.name = shipData.Name; // 載入船隻名稱
         this.transform.position = shipData.Position;
         this.transform.rotation = Quaternion.Euler(0, 0, shipData.Rotation);
-        // 初始化其他屬性，例如 Health, AttackPower 等
+        this.IntWeaponLimit = shipData.WeaponLimit; // 載入武器數量上限
+
+        // 清空現有武器
+        foreach (var weapon in weapons)
+        {
+            if (weapon != null)
+            {
+                Destroy(weapon.gameObject);
+            }
+        }
+        weapons.Clear();
+
+        // 載入武器數據
+        foreach (var weaponData in shipData.Weapons)
+        {
+            var weaponPrefab = Resources.Load<GameObject>($"Prefabs/{weaponData.PrefabName}");
+            if (weaponPrefab != null)
+            {
+                var weaponObj = Instantiate(weaponPrefab, transform);
+                var weaponComp = weaponObj.GetComponent<Weapon>();
+                if (weaponComp != null)
+                {
+                    weaponComp.name = weaponData.Name;
+                    weaponComp.Damage = weaponData.Damage;
+                    weaponComp.MaxAttackDistance = weaponData.MaxAttackDistance;
+                    weaponComp.MinAttackDistance = weaponData.MinAttackDistance;
+                    weaponComp.AttackSpeed = weaponData.AttackSpeed;
+                    weaponComp.CooldownTime = weaponData.CooldownTime;
+                    weapons.Add(weaponComp);
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"[Ship] 找不到武器預製物: {weaponData.PrefabName}");
+            }
+        }
+
         Debug.Log($"[Ship] 已載入船隻數據: {shipData.Name}");
     }
 

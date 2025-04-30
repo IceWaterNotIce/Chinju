@@ -228,6 +228,13 @@ public class GameManager : Singleton<GameManager>
 
     public void StartNewGame()
     {
+        // 清除現有船隻
+        var existingShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
+        foreach (var ship in existingShips)
+        {
+            GameObject.Destroy(ship.gameObject);
+        }
+
         // 重置遊戲數據
         var newGameData = new GameData
         {
@@ -254,12 +261,6 @@ public class GameManager : Singleton<GameManager>
 
         // 改用 GameDataController.TriggerResourceChanged
         GameDataController.Instance.TriggerResourceChanged();
-
-        // 保存新遊戲狀態
-        SaveGame();
-
-        // 載入新遊戲場景
-        LoadGame();
         
         Debug.Log("[GameManager] 新遊戲已開始");
     }
