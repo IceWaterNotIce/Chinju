@@ -3,17 +3,16 @@ using System.Collections;
 
 public class Weapon : MonoBehaviour
 {
-    public string Name { get; set; }
-    public int Cost { get; set; } // 新增：武器的花費
-    public float Damage { get; set; }
-    public float Range { get; set; }
-    public float AttackSpeed { get; set; }
-    public float CooldownTime { get; set; }
+    public string Name; // 改為字段，允許在檢查器中編輯
+    public int Cost; // 新增：武器的花費
+    public float Damage;
+    public float Range;
+    public float AttackSpeed =1f;
+    public float CooldownTime = 1f; // 統一命名
 
     public float MaxAttackDistance = 10f;
     public float MinAttackDistance = 1f;
     public GameObject AmmoPrefab;
-    public float AttackCooldown = 1f;
 
     private bool isAttacking = false;
     private GameObject currentTarget;
@@ -22,12 +21,13 @@ public class Weapon : MonoBehaviour
     public void Attack(GameObject target)
     {
         if (AmmoPrefab == null || target == null) return;
-        Vector3 dir = (target.transform.position - transform.position).normalized;
+
+        Vector3 direction = (target.transform.position - transform.position).normalized;
         GameObject ammoObj = Instantiate(AmmoPrefab, transform.position, Quaternion.identity);
         Ammo ammo = ammoObj.GetComponent<Ammo>();
         if (ammo != null)
         {
-            ammo.SetDirection(dir);
+            ammo.SetDirection(direction);
         }
     }
 
@@ -50,12 +50,12 @@ public class Weapon : MonoBehaviour
     {
         while (isAttacking && currentTarget != null)
         {
-            float dist = Vector3.Distance(transform.position, currentTarget.transform.position);
-            if (dist <= MaxAttackDistance && dist >= MinAttackDistance)
+            float distance = Vector3.Distance(transform.position, currentTarget.transform.position);
+            if (distance <= MaxAttackDistance && distance >= MinAttackDistance)
             {
                 Attack(currentTarget);
             }
-            yield return new WaitForSeconds(AttackCooldown);
+            yield return new WaitForSeconds(CooldownTime); // 使用統一的 CooldownTime
         }
     }
 
