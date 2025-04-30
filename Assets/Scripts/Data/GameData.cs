@@ -58,7 +58,8 @@ public class GameData
     {
         public string Name;
         public int Damage;
-        public float Range;
+        public float MaxAttackDistance; // 新增
+        public float MinAttackDistance; // 新增
         public float AttackSpeed;
         public float CooldownTime;
     }

@@ -6,8 +6,7 @@ public class Weapon : MonoBehaviour
     public string Name; // 改為字段，允許在檢查器中編輯
     public int Cost; // 新增：武器的花費
     public float Damage;
-    public float Range;
-    public float AttackSpeed =1f;
+    public float AttackSpeed = 1f;
     public float CooldownTime = 1f; // 統一命名
 
     public float MaxAttackDistance = 10f;
@@ -65,7 +64,6 @@ public class Weapon : MonoBehaviour
         {
             Name = this.Name,
             Damage = (int)this.Damage,
-            Range = this.Range,
             AttackSpeed = this.AttackSpeed,
             CooldownTime = this.CooldownTime
         };

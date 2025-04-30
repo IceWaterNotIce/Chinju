@@ -49,7 +49,7 @@ public class WeaponPanelController : MonoBehaviour
                 foreach (var weapon in playerData.Weapons)
                 {
                     Debug.Log($"[WeaponPanelController] 武器: {weapon.Name}, 傷害: {weapon.Damage}");
-                    var item = new Label($"{weapon.Name} (傷害: {weapon.Damage}, 範圍: {weapon.Range}, 攻擊速度: {weapon.AttackSpeed}, 冷卻時間: {weapon.CooldownTime})");
+                    var item = new Label($"{weapon.Name} (傷害: {weapon.Damage}, 最大範圍: {weapon.MaxAttackDistance}, 最小範圍: {weapon.MinAttackDistance}, 攻擊速度: {weapon.AttackSpeed}, 冷卻時間: {weapon.CooldownTime})");
                     item.AddToClassList("weapon-item");
                     weaponList.Add(item);
                 }
