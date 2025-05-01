@@ -383,6 +383,7 @@ MonoBehaviour:
       Height: 0
       IslandDensity: 0
       ChinjuTiles: []
+    enemyShips: []
 --- !u!1 &586510287
 GameObject:
   m_ObjectHideFlags: 0
@@ -584,7 +585,7 @@ GameObject:
   - component: {fileID: 856271947}
   - component: {fileID: 856271946}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: ShipManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -736,6 +737,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyShipPrefab: {fileID: 4572884418056175630, guid: b739a16e81daf8d4c9daf5b176d5caca, type: 3}
   spawnInterval: 2
+  maxEnemyShips: 10
 --- !u!1 &1028576058
 GameObject:
   m_ObjectHideFlags: 0

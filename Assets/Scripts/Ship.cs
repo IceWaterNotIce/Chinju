@@ -198,11 +198,53 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    // Update is called once per frame
     public void Update()
     {
         Rotate();
         Move();
+        DetectAndAttackTarget();
+    }
+
+    private void DetectAndAttackTarget()
+    {
+        // 獲取所有船隻
+        var allShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
+
+        foreach (var ship in allShips)
+        {
+            // 忽略自己和同類型的船隻
+            if (ship == this || ship.IsPlayerShip == this.IsPlayerShip) continue;
+
+            // 計算與目標船隻的距離
+            float distance = Vector3.Distance(transform.position, ship.transform.position);
+
+            // 如果進入偵測範圍
+            if (distance <= DetectionDistance)
+            {
+                Debug.Log($"[Ship] 偵測到目標船隻: {ship.name}，距離: {distance}");
+
+                // 如果進入武器最大攻擊距離，開始攻擊
+                if (distance <= MaxWeaponAttackDistance())
+                {
+                    AttackTarget(ship.gameObject);
+                    break; // 一次只攻擊一個目標
+                }
+            }
+        }
+    }
+
+    private float MaxWeaponAttackDistance()
+    {
+        // 返回當前武器的最大攻擊距離
+        float maxDistance = 0f;
+        foreach (var weapon in weapons)
+        {
+            if (weapon != null)
+            {
+                maxDistance = Mathf.Max(maxDistance, weapon.MaxAttackDistance);
+            }
+        }
+        return maxDistance;
     }
 
     void Rotate()

@@ -19,14 +19,29 @@ public class Weapon : MonoBehaviour
 
     public void Attack(GameObject target)
     {
-        if (AmmoPrefab == null || target == null) return;
+        if (AmmoPrefab == null)
+        {
+            Debug.LogError("[Weapon] AmmoPrefab 未設置，無法生成彈藥！");
+            return;
+        }
+
+        if (target == null) return;
 
         Vector3 direction = (target.transform.position - transform.position).normalized;
         GameObject ammoObj = Instantiate(AmmoPrefab, transform.position, Quaternion.identity);
-        Ammo ammo = ammoObj.GetComponent<Ammo>();
-        if (ammo != null)
+
+        if (ammoObj != null)
         {
-            ammo.SetDirection(direction);
+            ammoObj.transform.SetParent(null); // 確保彈藥生成在場景的根層級
+            Ammo ammo = ammoObj.GetComponent<Ammo>();
+            if (ammo != null)
+            {
+                ammo.SetDirection(direction);
+            }
+        }
+        else
+        {
+            Debug.LogError("[Weapon] 無法生成 AmmoPrefab，請檢查資源是否正確設置！");
         }
     }
 
