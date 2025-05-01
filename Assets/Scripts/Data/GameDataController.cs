@@ -55,10 +55,7 @@ public class GameDataController : MonoBehaviour
 
     public void TriggerResourceChanged()
     {
-        if (currentGameData?.playerData?.OnResourceChanged != null)
-        {
-            currentGameData.playerData.OnResourceChanged.Invoke();
-            Debug.Log("[GameDataController] 資源事件已觸發，UI 更新完成");
-        }
+        currentGameData?.playerData?.OnResourceChanged?.Invoke();
+        Debug.Log("[GameDataController] 資源事件已觸發，UI 更新完成");
     }
 }

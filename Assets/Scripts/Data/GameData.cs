@@ -25,6 +25,11 @@ public class GameData
         // 初始化資源變動事件
         [System.NonSerialized]
         public System.Action OnResourceChanged = delegate { };
+
+        public PlayerData()
+        {
+            OnResourceChanged = delegate { };
+        }
     }
 
     [System.Serializable]
