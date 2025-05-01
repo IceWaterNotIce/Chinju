@@ -42,6 +42,17 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     {
         Debug.Log($"[Ship] {name} 被摧毀！");
         
+        // 獲得經驗值給擊殺者
+        if (!IsPlayerShip)
+        {
+            var playerShip = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None)
+                .FirstOrDefault(ship => ship.IsPlayerShip);
+            if (playerShip != null)
+            {
+                playerShip.AddExperience(10f); // 擊殺敵方船隻獲得固定經驗值
+            }
+        }
+
         // 從 GameData 中移除該船隻數據
         if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData != null)
         {
@@ -167,6 +178,39 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     {
         get => m_visibleRadius;
         set => m_visibleRadius = Mathf.Max(0, value);
+    }
+    #endregion
+
+    #region Experience
+    [Header("Experience Settings")]
+    [SerializeField] private int level = 1;
+    [SerializeField] private float experience = 0f;
+
+    public int Level
+    {
+        get => level;
+        private set => level = Mathf.Max(1, value);
+    }
+
+    public float Experience
+    {
+        get => experience;
+        private set => experience = Mathf.Max(0, value);
+    }
+
+    public void AddExperience(float exp)
+    {
+        Experience += exp;
+        Debug.Log($"[Ship] 獲得經驗值: {exp}，當前經驗值: {Experience}");
+
+        float upgradeNeed = Level * 10f;
+        while (Experience >= upgradeNeed)
+        {
+            Experience -= upgradeNeed;
+            Level += 1;
+            Debug.Log($"[Ship] 升級！當前等級: {Level}");
+            upgradeNeed = Level * 10f;
+        }
     }
     #endregion
 
@@ -360,6 +404,8 @@ public class Ship : MonoBehaviour, IPointerClickHandler
             Speed = Speed,
             Rotation = transform.rotation.eulerAngles.z,
             WeaponLimit = IntWeaponLimit, // 保存武器數量上限
+            Level = Level, // 保存等級
+            Experience = Experience, // 保存經驗值
             Weapons = new List<GameData.WeaponData>() // 保存武器數據
         };
 
@@ -381,6 +427,8 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         this.transform.position = shipData.Position;
         this.transform.rotation = Quaternion.Euler(0, 0, shipData.Rotation);
         this.IntWeaponLimit = shipData.WeaponLimit; // 載入武器數量上限
+        this.Level = shipData.Level; // 載入等級
+        this.Experience = shipData.Experience; // 載入經驗值
 
         // 清空現有武器
         foreach (var weapon in weapons)

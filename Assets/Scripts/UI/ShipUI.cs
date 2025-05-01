@@ -28,6 +28,9 @@ public class ShipUI : Singleton<ShipUI>
     // 新增：武器總覽面板
     private VisualElement weaponsPanel;
 
+    private Label lblLevel; // 新增：顯示等級的 Label
+    private Label lblExperience; // 新增：顯示經驗值的 Label
+
     void TiggerMap()
     {
         //Enable the Line renderer
@@ -139,6 +142,28 @@ public class ShipUI : Singleton<ShipUI>
             weaponListContainer.Add(weaponIcon);
         }
 
+        lblLevel = Panel.Q<Label>("lblLevel");
+        if (lblLevel == null)
+        {
+            lblLevel = new Label();
+            lblLevel.name = "lblLevel";
+            lblLevel.style.marginTop = 10;
+            lblLevel.style.unityTextAlign = TextAnchor.MiddleLeft;
+            Panel.Add(lblLevel);
+        }
+
+        lblExperience = Panel.Q<Label>("lblExperience");
+        if (lblExperience == null)
+        {
+            lblExperience = new Label();
+            lblExperience.name = "lblExperience";
+            lblExperience.style.marginTop = 5;
+            lblExperience.style.unityTextAlign = TextAnchor.MiddleLeft;
+            Panel.Add(lblExperience);
+        }
+
+        UpdateLevelAndExperienceUI(); // 更新等級和經驗值的顯示
+
         // set the ui position
         Vector2 shipScreenPosition = Camera.main.WorldToScreenPoint(ship.transform.position);
         Debug.Log("Ship Screen Position: " + shipScreenPosition);
@@ -164,7 +189,7 @@ public class ShipUI : Singleton<ShipUI>
     // Update is called once per frame
     void Update()
     {
-
+        UpdateLevelAndExperienceUI(); // 每幀更新等級和經驗值的顯示
     }
 
     void SpeedControll(float percentage)
@@ -407,6 +432,15 @@ public class ShipUI : Singleton<ShipUI>
                 weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponSelectionPanel(weaponIndex));
             }
             weaponListContainer.Add(weaponIcon);
+        }
+    }
+
+    private void UpdateLevelAndExperienceUI()
+    {
+        if (ship != null)
+        {
+            lblLevel.text = $"等級: {ship.Level}";
+            lblExperience.text = $"經驗值: {ship.Experience}/{ship.Level * 10}";
         }
     }
 }

@@ -53,6 +53,9 @@ public class GameData
 
         public int WeaponLimit;
 
+        public int Level; // 新增：保存船隻等級
+        public float Experience; // 新增：保存船隻經驗值
+
         public List<WeaponData> Weapons = new List<WeaponData>();
 
         // 新增：保存船隻的預製物名稱
