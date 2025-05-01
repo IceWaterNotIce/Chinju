@@ -118,7 +118,8 @@ public class SettingMenu : MonoBehaviour
         }
 
         root.style.display = DisplayStyle.Flex;
-        Debug.Log("[SettingMenu] 顯示遊戲選單");
+        Time.timeScale = 0f; // 暫停遊戲
+        Debug.Log("[SettingMenu] 顯示遊戲選單並暫停遊戲");
     }
 
     public void HideGameMenu()
@@ -130,7 +131,8 @@ public class SettingMenu : MonoBehaviour
         }
 
         root.style.display = DisplayStyle.None;
-        Debug.Log("[SettingMenu] 隱藏遊戲選單");
+        Time.timeScale = 1f; // 恢復遊戲
+        Debug.Log("[SettingMenu] 隱藏遊戲選單並恢復遊戲");
     }
 
     private void OnContinueButtonClicked()

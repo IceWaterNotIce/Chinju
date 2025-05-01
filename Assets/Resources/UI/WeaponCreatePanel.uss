@@ -1,0 +1,25 @@
+.weapon-create-panel {
+    width: 400px;
+    background-color: #232323;
+    padding: 20px;
+    border-radius: 8px;
+}
+.weapon-create-title {
+    font-size: 24px;
+    color: #fff;
+    margin-bottom: 16px;
+}
+.weapon-dropdown {
+    margin-bottom: 12px;
+}
+.resource-label {
+    color: #ccc;
+    margin-bottom: 12px;
+}
+.create-button {
+    margin-bottom: 12px;
+}
+.result-label {
+    color: #ffb300;
+    min-height: 24px;
+}

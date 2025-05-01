@@ -22,6 +22,12 @@
                 <engine:Label text="1/2" name="lblRotationRightHalf" style="font-size: 10px;" />
                 <engine:Label text="Full" name="lblRotationRightFull" style="font-size: 10px;" />
             </engine:VisualElement>
+            <engine:VisualElement name="weaponListContainer" style="flex-direction: row; margin-top: 10px;" />
+            <!-- 新增：顯示等級和經驗值 -->
+            <engine:VisualElement style="flex-direction: column; margin-top: 10px;">
+                <engine:Label name="lblLevel" text="等級: 1" style="font-size: 12px; margin-bottom: 5px;" />
+                <engine:Label name="lblExperience" text="經驗值: 0/10" style="font-size: 12px;" />
+            </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>

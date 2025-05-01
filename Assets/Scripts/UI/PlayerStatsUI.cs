@@ -37,9 +37,9 @@ public class PlayerStatsUI : MonoBehaviour
         if (GameDataController.Instance != null)
             GameDataController.Instance.OnGameDataChanged -= OnGameDataChanged;
 
-        if (gameData != null && gameData.PlayerDatad != null)
+        if (gameData != null && gameData.playerData != null)
         {
-            gameData.PlayerDatad.OnResourceChanged -= UpdateAllResourcesFromData;
+            gameData.playerData.OnResourceChanged -= UpdateAllResourcesFromData;
         }
     }
 
@@ -55,14 +55,16 @@ public class PlayerStatsUI : MonoBehaviour
     public void SetGameDataFromController()
     {
         var data = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
-        if (gameData != null && gameData.PlayerDatad != null)
+        if (gameData != null && gameData.playerData != null)
         {
-            gameData.PlayerDatad.OnResourceChanged -= UpdateAllResourcesFromData;
+            gameData.playerData.OnResourceChanged -= UpdateAllResourcesFromData;
         }
         gameData = data;
-        if (gameData != null && gameData.PlayerDatad != null)
+        if (gameData != null && gameData.playerData != null)
         {
-            gameData.PlayerDatad.OnResourceChanged += UpdateAllResourcesFromData;
+            gameData.playerData.OnResourceChanged += UpdateAllResourcesFromData;
+
+            // 新增：立即更新 UI
             UpdateAllResourcesFromData();
         }
     }
@@ -119,12 +121,12 @@ public class PlayerStatsUI : MonoBehaviour
     // 新增：從 GameData 更新 UI
     private void UpdateAllResourcesFromData()
     {
-        if (gameData != null && gameData.PlayerDatad != null)
+        if (gameData != null && gameData.playerData != null)
         {
             UpdateResourceDisplay(
-                Mathf.RoundToInt(gameData.PlayerDatad.Gold),
-                Mathf.RoundToInt(gameData.PlayerDatad.Oils),
-                gameData.PlayerDatad.Cube
+                Mathf.RoundToInt(gameData.playerData.Gold),
+                Mathf.RoundToInt(gameData.playerData.Oils),
+                gameData.playerData.Cube
             );
         }
     }
