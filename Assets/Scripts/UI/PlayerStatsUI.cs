@@ -63,6 +63,8 @@ public class PlayerStatsUI : MonoBehaviour
         if (gameData != null && gameData.playerData != null)
         {
             gameData.playerData.OnResourceChanged += UpdateAllResourcesFromData;
+
+            // 新增：立即更新 UI
             UpdateAllResourcesFromData();
         }
     }
