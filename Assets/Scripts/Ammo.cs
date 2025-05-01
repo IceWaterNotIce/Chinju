@@ -5,7 +5,7 @@ public class Ammo : MonoBehaviour
     public float Damage = 10f;
     public float Speed = 10f;
     private Vector3 direction;
-    private GameObject owner; // 新增：記錄發射彈藥的船隻
+    private GameObject owner; // 記錄發射彈藥的船隻
 
     public void SetDirection(Vector3 dir)
     {
@@ -34,13 +34,14 @@ public class Ammo : MonoBehaviour
         if (ship != null)
         {
             // 確保彈藥不會對發射它的船隻造成傷害
-            if (ship.gameObject == owner)
+            if (owner != null && ship.gameObject == owner)
             {
-                Debug.Log("[Ammo] 彈藥撞擊到發射它的船隻，忽略傷害。");
-                return;
+                Debug.Log("[Ammo] 彈藥穿過發射它的船隻，忽略碰撞。");
+                return; 
             }
 
             ship.Health -= Damage;
+            Debug.Log($"[Ammo] 彈藥命中 {ship.name}，造成 {Damage} 傷害。");
         }
         Destroy(gameObject);
     }

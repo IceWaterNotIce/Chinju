@@ -103,9 +103,8 @@ MonoBehaviour:
   Name: Turret
   Cost: 20
   Damage: 50
-  Range: 5
   AttackSpeed: 1
   CooldownTime: 1
-  MaxAttackDistance: 10
+  MaxAttackDistance: 30
   MinAttackDistance: 1
   AmmoPrefab: {fileID: 4738637386504094231, guid: 3b14219417392fd42aff884981ad45d1, type: 3}

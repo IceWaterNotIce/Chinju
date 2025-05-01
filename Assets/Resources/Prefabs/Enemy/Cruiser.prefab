@@ -156,6 +156,7 @@ MonoBehaviour:
   oceanTile: {fileID: 0}
   intWeaponLimit: 2
   weapons: []
+  IsPlayerShip: 0
   attackRange: 5
   attackCooldown: 2
   damage: 10

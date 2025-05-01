@@ -28,7 +28,11 @@ public class Weapon : MonoBehaviour
         if (target == null) return;
 
         Vector3 direction = (target.transform.position - transform.position).normalized;
-        GameObject ammoObj = Instantiate(AmmoPrefab, transform.position, Quaternion.identity);
+
+        // 計算彈藥的生成位置，設置為船隻與目標之間的位置
+        Vector3 spawnPosition = transform.position + direction * 1.5f; // 1.5f 為偏移距離，可根據需求調整
+
+        GameObject ammoObj = Instantiate(AmmoPrefab, spawnPosition, Quaternion.identity);
 
         if (ammoObj != null)
         {
@@ -37,7 +41,22 @@ public class Weapon : MonoBehaviour
             if (ammo != null)
             {
                 ammo.SetDirection(direction);
-                ammo.SetOwner(gameObject); // 設置彈藥的擁有者
+
+                // 設置彈藥的擁有者為武器所屬的船隻
+                var ownerShip = GetComponentInParent<Ship>();
+                if (ownerShip != null)
+                {
+                    ammo.SetOwner(ownerShip.gameObject);
+                    Debug.Log($"[Weapon] 彈藥生成成功，設置擁有者為 {ownerShip.name}");
+                }
+                else
+                {
+                    Debug.LogWarning("[Weapon] 無法找到武器的擁有者船隻，請檢查武器的層級結構！");
+                }
+            }
+            else
+            {
+                Debug.LogError("[Weapon] 無法找到 Ammo 組件，請檢查 AmmoPrefab 是否正確設置！");
             }
         }
         else
