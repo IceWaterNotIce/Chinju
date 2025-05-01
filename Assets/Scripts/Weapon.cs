@@ -37,6 +37,7 @@ public class Weapon : MonoBehaviour
             if (ammo != null)
             {
                 ammo.SetDirection(direction);
+                ammo.SetOwner(gameObject); // 設置彈藥的擁有者
             }
         }
         else

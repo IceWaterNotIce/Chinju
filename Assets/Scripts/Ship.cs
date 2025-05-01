@@ -30,7 +30,37 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         {
             m_health = Mathf.Clamp(value, 0, m_maxHealth);
             OnHealthChanged?.Invoke(m_health);
+
+            if (m_health <= 0)
+            {
+                OnDeath();
+            }
         }
+    }
+
+    private void OnDeath()
+    {
+        Debug.Log($"[Ship] {name} 被摧毀！");
+        
+        // 從 GameData 中移除該船隻數據
+        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData != null)
+        {
+            var gameData = GameDataController.Instance.CurrentGameData;
+
+            if (IsPlayerShip)
+            {
+                gameData.playerData.Ships.RemoveAll(ship => ship.Name == name);
+                Debug.Log($"[Ship] 玩家船隻 {name} 已從 GameData 中移除。");
+            }
+            else
+            {
+                gameData.enemyShips.RemoveAll(ship => ship.Name == name);
+                Debug.Log($"[Ship] 敵方船隻 {name} 已從 GameData 中移除。");
+            }
+        }
+
+        // 銷毀遊戲物件
+        Destroy(gameObject);
     }
 
     public float FuelConsumption
@@ -207,6 +237,9 @@ public class Ship : MonoBehaviour, IPointerClickHandler
 
     private void DetectAndAttackTarget()
     {
+        Ship nearestTarget = null;
+        float nearestDistance = float.MaxValue;
+
         // 獲取所有船隻
         var allShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
 
@@ -218,18 +251,19 @@ public class Ship : MonoBehaviour, IPointerClickHandler
             // 計算與目標船隻的距離
             float distance = Vector3.Distance(transform.position, ship.transform.position);
 
-            // 如果進入偵測範圍
-            if (distance <= DetectionDistance)
+            // 如果進入偵測範圍，並且距離比當前最近的目標更近
+            if (distance <= DetectionDistance && distance < nearestDistance)
             {
-                Debug.Log($"[Ship] 偵測到目標船隻: {ship.name}，距離: {distance}");
-
-                // 如果進入武器最大攻擊距離，開始攻擊
-                if (distance <= MaxWeaponAttackDistance())
-                {
-                    AttackTarget(ship.gameObject);
-                    break; // 一次只攻擊一個目標
-                }
+                nearestTarget = ship;
+                nearestDistance = distance;
             }
+        }
+
+        // 如果找到最近的目標，並且進入武器最大攻擊距離，開始攻擊
+        if (nearestTarget != null && nearestDistance <= MaxWeaponAttackDistance())
+        {
+            Debug.Log($"[Ship] 更新目標為最近的船隻: {nearestTarget.name}，距離: {nearestDistance}");
+            AttackTarget(nearestTarget.gameObject);
         }
     }
 

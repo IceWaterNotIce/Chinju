@@ -132,16 +132,16 @@ public class EnemyShip : Ship
     public override float Health
     {
         get => base.Health;
-        set 
+        set
         {
             base.Health = value;
-            if (base.Health <= 0) 
+            if (base.Health <= 0)
             {
                 OnDeath();
             }
             else
             {
-                Debug.Log("Enemy ship damaged!");
+                Debug.Log($"[EnemyShip] {name} 受到傷害，當前生命值: {base.Health}");
             }
         }
     }
