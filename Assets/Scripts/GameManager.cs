@@ -68,10 +68,9 @@ public class GameManager : Singleton<GameManager>
                     data.playerData.Ships.Clear();
                     foreach (var ship in shipsInScene)
                     {
-                        // 確保只保存玩家船隻，排除敵方船隻
                         if (ship.IsPlayerShip && !(ship is EnemyShip))
                         {
-                            var shipData = ship.SaveShipData();
+                            var shipData = ship.SaveShipData(); // 保存船隻數據，包括武器
                             shipData.PrefabName = ship.gameObject.name.Replace("(Clone)", "").Trim();
                             shipData.Name = ship.name;
                             data.playerData.Ships.Add(shipData);
@@ -87,7 +86,7 @@ public class GameManager : Singleton<GameManager>
                 data.enemyShips.Clear();
                 foreach (var enemyShip in enemyShipsInScene)
                 {
-                    var shipData = enemyShip.SaveShipData();
+                    var shipData = enemyShip.SaveShipData(); // 保存敵方船隻數據，包括武器
                     shipData.PrefabName = enemyShip.gameObject.name.Replace("(Clone)", "").Trim();
                     shipData.Name = enemyShip.name;
                     data.enemyShips.Add(shipData);
@@ -206,7 +205,7 @@ public class GameManager : Singleton<GameManager>
     {
         foreach (var weaponData in weaponsData)
         {
-            var weaponPrefab = Resources.Load<GameObject>($"Prefabs/{weaponData.PrefabName}");
+            var weaponPrefab = Resources.Load<GameObject>($"Prefabs/Weapon/{weaponData.PrefabName}");
             if (weaponPrefab != null)
             {
                 var weaponObj = GameObject.Instantiate(weaponPrefab);

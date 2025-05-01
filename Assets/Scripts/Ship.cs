@@ -280,7 +280,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
             Name = this.name, // 保存船隻名稱
             Position = transform.position,
             Health = (int)Health,
-            Fuel = (int)FuelConsumption, // Explicitly cast float to int
+            Fuel = (int)FuelConsumption, // 顯式轉換
             Speed = Speed,
             Rotation = transform.rotation.eulerAngles.z,
             WeaponLimit = IntWeaponLimit, // 保存武器數量上限
@@ -291,16 +291,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         {
             if (weapon != null)
             {
-                shipData.Weapons.Add(new GameData.WeaponData
-                {
-                    Name = weapon.name,
-                    Damage = (int)weapon.Damage, // 顯式轉換 Damage 為 int
-                    MaxAttackDistance = weapon.MaxAttackDistance,
-                    MinAttackDistance = weapon.MinAttackDistance,
-                    AttackSpeed = weapon.AttackSpeed,
-                    CooldownTime = weapon.CooldownTime,
-                    PrefabName = weapon.gameObject.name.Replace("(Clone)", "").Trim() // 保存武器的預製物名稱
-                });
+                shipData.Weapons.Add(weapon.SaveWeaponData()); // 使用 SaveWeaponData 方法
             }
         }
 
@@ -328,7 +319,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         // 載入武器數據
         foreach (var weaponData in shipData.Weapons)
         {
-            var weaponPrefab = Resources.Load<GameObject>($"Prefabs/{weaponData.PrefabName}");
+            var weaponPrefab = Resources.Load<GameObject>($"Prefabs/Weapon/{weaponData.PrefabName}");
             if (weaponPrefab != null)
             {
                 var weaponObj = Instantiate(weaponPrefab, transform);

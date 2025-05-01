@@ -58,15 +58,23 @@ public class Weapon : MonoBehaviour
         }
     }
 
-    public GameData.WeaponData ToWeaponData()
+    public GameData.WeaponData SaveWeaponData()
     {
         return new GameData.WeaponData
         {
             Name = this.Name,
-            Damage = (int)this.Damage,
+            Damage = (int)this.Damage, // 顯式轉換 Damage 為 int
+            MaxAttackDistance = this.MaxAttackDistance,
+            MinAttackDistance = this.MinAttackDistance,
             AttackSpeed = this.AttackSpeed,
-            CooldownTime = this.CooldownTime
+            CooldownTime = this.CooldownTime,
+            PrefabName = this.gameObject.name.Replace("(Clone)", "").Trim() // 保存武器的預製物名稱
         };
+    }
+
+    public GameData.WeaponData ToWeaponData()
+    {
+        return SaveWeaponData(); // 使用 SaveWeaponData 方法
     }
 
     public void LoadWeaponData(GameData.WeaponData weaponData)
