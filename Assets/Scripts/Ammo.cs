@@ -30,19 +30,25 @@ public class Ammo : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
+        // 嘗試獲取 Ship 或 EnemyShip 類型的物件
         var ship = collision.gameObject.GetComponent<Ship>();
-        if (ship != null)
-        {
-            // 確保彈藥不會對發射它的船隻造成傷害
-            if (owner != null && ship.gameObject == owner)
-            {
-                Debug.Log("[Ammo] 彈藥穿過發射它的船隻，忽略碰撞。");
-                return; 
-            }
+        var enemyShip = collision.gameObject.GetComponent<EnemyShip>();
 
-            ship.Health -= Damage;
-            Debug.Log($"[Ammo] 彈藥命中 {ship.name}，造成 {Damage} 傷害。");
+        if (ship != null || enemyShip != null)
+        {
+            // 處理傷害
+            if (ship != null)
+            {
+                ship.Health -= Damage;
+                Debug.Log($"[Ammo] 彈藥命中玩家船隻 {ship.name}，造成 {Damage} 傷害。");
+            }
+            else if (enemyShip != null)
+            {
+                enemyShip.Health -= Damage;
+                Debug.Log($"[Ammo] 彈藥命中敵方船隻 {enemyShip.name}，造成 {Damage} 傷害。");
+            }
         }
+
         Destroy(gameObject);
     }
 }
