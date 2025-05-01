@@ -6,7 +6,7 @@ public class EnemyShipSpawner : MonoBehaviour
     [Header("Spawn Settings")]
     public GameObject enemyShipPrefab;
     public float spawnInterval = 2f;
-    public int maxEnemyShips = 10; // 新增：場景中敵方船隻的最大數量
+    public int maxEnemyShips = 100;
     private Vector2 spawnAreaMin = new Vector2(0, 0);
     private Vector2 spawnAreaMax = new Vector2(100, 100);
 
@@ -27,7 +27,6 @@ public class EnemyShipSpawner : MonoBehaviour
         {
             Debug.LogError("Ocean Tile not found in Resources!", this);
         }
-        // 不再自動計算 spawnAreaMin/max，直接使用 100x100
     }
 
     void Update()
@@ -42,7 +41,6 @@ public class EnemyShipSpawner : MonoBehaviour
 
     void SpawnEnemyShip()
     {
-        // 檢查當前場景中的敵方船隻數量
         int currentEnemyCount = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None).Length;
         if (currentEnemyCount >= maxEnemyShips)
         {
@@ -58,7 +56,9 @@ public class EnemyShipSpawner : MonoBehaviour
 
             if (IsOceanTile(spawnPos))
             {
-                Instantiate(enemyShipPrefab, spawnPos, Quaternion.identity);
+                var enemyShip = EnemyShipPool.Instance.GetEnemyShip();
+                enemyShip.transform.position = spawnPos;
+                enemyShip.transform.rotation = Quaternion.identity;
                 Debug.Log($"[EnemyShipSpawner] 成功生成敵方船隻於位置: {spawnPos}");
                 break;
             }
