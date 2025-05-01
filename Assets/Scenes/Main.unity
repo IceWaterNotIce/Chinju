@@ -1151,6 +1151,7 @@ MonoBehaviour:
   oceanTile: {fileID: 11400000, guid: bf72caf695ff12947b165e724fdb9748, type: 2}
   grassTile: {fileID: 11400000, guid: acd5b796bb9037e4ab5d82bcd02ff446, type: 2}
   chinjuTile: {fileID: 11400000, guid: dd2b4b2c1d45e6743a8978e499247e12, type: 2}
+  oilTile: {fileID: 11400000, guid: 6c79396beaa4f514a8997b471e435bab, type: 2}
   width: 100
   height: 100
   islandDensity: 0.2
@@ -1159,6 +1160,7 @@ MonoBehaviour:
   mainCamera: {fileID: 2019224608}
   cameraController: {fileID: 2019224605}
   chinjuUIController: {fileID: 933149506}
+  oilShipPrefab: {fileID: 0}
 --- !u!483693784 &1920876239
 TilemapRenderer:
   m_ObjectHideFlags: 0

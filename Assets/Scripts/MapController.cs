@@ -1,12 +1,15 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
+using System.Collections;
 
 public class MapController : MonoBehaviour 
 {
     [SerializeField] private Tilemap tilemap;  // 通過 Inspector 引用
     public TileBase oceanTile, grassTile;
     public TileBase chinjuTile; // 新增Chinju Tile
+    public TileBase oilTile; // 新增石油 Tile
     public int width = 100;
     public int height = 100;
     public float islandDensity = 0.1f;
@@ -22,6 +25,8 @@ public class MapController : MonoBehaviour
     [SerializeField] private ChinjuUIController chinjuUIController;
 
     private GameManager gameManager;
+    private List<Vector3Int> oilTilePositions = new List<Vector3Int>(); // 保存石油 Tile 的位置
+    public GameObject oilShipPrefab; // 新增：石油船的預製物
 
     void Start() 
     {
@@ -60,6 +65,16 @@ public class MapController : MonoBehaviour
         visMgr.tilemap = tilemap;
         visMgr.chinjuTile = chinjuTile;
         // 你需要在 Inspector 指定 maskMaterial
+
+        // 確保石油船預製物已設置
+        if (oilShipPrefab == null)
+        {
+            oilShipPrefab = Resources.Load<GameObject>("Prefabs/Ship"); // 加載石油船預製物
+            if (oilShipPrefab == null)
+            {
+                Debug.LogError("[MapController] 無法加載石油船預製物，請確保 'Prefabs/Ship' 存在！");
+            }
+        }
     }
 
     void GenerateMap()
@@ -146,6 +161,25 @@ public class MapController : MonoBehaviour
             }
         }
 
+        // 隨機生成石油圖塊
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                float noiseValue = Mathf.PerlinNoise((x + seed) * 0.2f, (y + seed) * 0.2f);
+                if (noiseValue > 0.7f) // 調整生成概率
+                {
+                    Vector3Int position = new Vector3Int(x, y, 0);
+                    if (tilemap.GetTile(position) == grassTile) // 確保石油圖塊生成在草地上
+                    {
+                        tilemap.SetTile(position, oilTile);
+                        oilTilePositions.Add(position);
+                        Debug.Log($"[MapController] 石油圖塊生成於位置: {position}");
+                    }
+                }
+            }
+        }
+
         // Save map data to GameManager
         if (gameManager != null)
         {
@@ -229,6 +263,95 @@ public class MapController : MonoBehaviour
                         Debug.LogError("[MapController] ChinjuUIController 是 null！");
                     }
                 }
+                else if (tile == oilTile)
+                {
+                    Debug.Log("[MapController] 這是石油 Tile");
+                    HandleOilTileClick(tilePosition);
+                }
+            }
+        }
+    }
+
+    private void HandleOilTileClick(Vector3Int tilePosition)
+    {
+        var gameData = GameDataController.Instance?.CurrentGameData;
+        if (gameData?.playerData == null)
+        {
+            Debug.LogError("[MapController] 無法處理石油 Tile 點擊，GameData 或 PlayerData 為 null！");
+            return;
+        }
+
+        if (gameData.playerData.Gold >= 50)
+        {
+            gameData.playerData.Gold -= 50;
+            gameData.playerData.OnResourceChanged?.Invoke();
+
+            Debug.Log("[MapController] 已解鎖石油 Tile，開始運輸石油！");
+            StartCoroutine(TransportOilToChinju(tilePosition));
+        }
+        else
+        {
+            Debug.Log("[MapController] 金幣不足，無法解鎖石油 Tile！");
+        }
+    }
+
+    private System.Collections.IEnumerator TransportOilToChinju(Vector3Int oilTilePosition)
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(120f); // 每 2 分鐘生成一次石油船
+
+            var gameData = GameDataController.Instance?.CurrentGameData;
+            if (gameData?.playerData != null)
+            {
+                // 在石油圖塊附近生成石油船
+                Vector3 oilTileWorldPosition = tilemap.GetCellCenterWorld(oilTilePosition);
+                Vector3 spawnPosition = FindNearestOceanTile(oilTileWorldPosition);
+
+                if (spawnPosition != Vector3.zero && oilShipPrefab != null)
+                {
+                    GameObject oilShip = Instantiate(oilShipPrefab, spawnPosition, Quaternion.identity);
+                    StartCoroutine(MoveOilShipToChinju(oilShip, oilTileWorldPosition));
+                    Debug.Log("[MapController] 石油船已生成並開始運輸石油！");
+                }
+                else
+                {
+                    Debug.LogWarning("[MapController] 無法生成石油船，可能是附近沒有海洋格子或未設置石油船預製物！");
+                }
+            }
+        }
+    }
+
+    private System.Collections.IEnumerator MoveOilShipToChinju(GameObject oilShip, Vector3 oilTileWorldPosition)
+    {
+        Vector3 chinjuTileWorldPosition = GetChinjuTileWorldPosition();
+        if (chinjuTileWorldPosition == Vector3.zero)
+        {
+            Debug.LogError("[MapController] 無法找到神獸 Tile 的位置！");
+            yield break;
+        }
+
+        float travelTime = 30f; // 石油船移動到神獸 Tile 的時間
+        float elapsedTime = 0f;
+
+        while (elapsedTime < travelTime)
+        {
+            if (oilShip == null) yield break; // 如果石油船被銷毀則停止
+            oilShip.transform.position = Vector3.Lerp(oilTileWorldPosition, chinjuTileWorldPosition, elapsedTime / travelTime);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
+        // 石油船到達神獸 Tile
+        if (oilShip != null)
+        {
+            Destroy(oilShip); // 銷毀石油船
+            var gameData = GameDataController.Instance?.CurrentGameData;
+            if (gameData?.playerData != null)
+            {
+                gameData.playerData.Oils += 20; // 每次運輸 20 單位石油
+                gameData.playerData.OnResourceChanged?.Invoke();
+                Debug.Log("[MapController] 石油船到達神獸 Tile，+20 石油！");
             }
         }
     }

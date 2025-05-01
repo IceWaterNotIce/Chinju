@@ -10,6 +10,7 @@ public class PlayerStatsUI : MonoBehaviour
     private Label goldLabel;
     private Label oilLabel;
     private Label cubeLabel;
+    private Label oilTransportLabel; // 新增石油運輸進度的 Label
 
     // 移除 public GameData gameData;
     private GameData gameData;
@@ -23,6 +24,7 @@ public class PlayerStatsUI : MonoBehaviour
         goldLabel = root.Q<Label>("goldLabel");
         oilLabel = root.Q<Label>("oilLabel");
         cubeLabel = root.Q<Label>("cubeLabel");
+        oilTransportLabel = root.Q<Label>("oilTransportLabel"); // 確保 UXML 中有對應的 Label
 
         // 監聽 GameDataController 的資料變更
         if (GameDataController.Instance != null)
@@ -128,6 +130,15 @@ public class PlayerStatsUI : MonoBehaviour
                 Mathf.RoundToInt(gameData.playerData.Oils),
                 gameData.playerData.Cube
             );
+        }
+    }
+
+    // 新增：更新石油運輸進度顯示
+    public void UpdateOilTransportProgress(string progress)
+    {
+        if (oilTransportLabel != null)
+        {
+            oilTransportLabel.text = progress;
         }
     }
 }
