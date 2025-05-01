@@ -19,7 +19,7 @@ public class MapController : MonoBehaviour
     public CameraBound2D cameraController; // 新增 CameraController 引用
 
     [Header("UI References")]
-    [SerializeField] private ShipCreationPanel shipCreationPanel;
+    [SerializeField] private ChinjuUIController chinjuUIController;
 
     private GameManager gameManager;
 
@@ -32,12 +32,20 @@ public class MapController : MonoBehaviour
         }
         Random.InitState(seed); // 初始化隨機數生成器
         
-        // Debug.Log("Current Map Seed: " + seed); // 輸出種子供調試
+        // 自動尋找 ChinjuUIController
+        if (chinjuUIController == null)
+        {
+            chinjuUIController = FindFirstObjectByType<ChinjuUIController>();
+            if (chinjuUIController == null)
+            {
+                Debug.LogError("[MapController] ChinjuUIController 未設置且場景中找不到 ChinjuUIController！");
+            }
+        }
 
         // 檢查必要組件
-        if (shipCreationPanel == null)
+        if (chinjuUIController == null)
         {
-            Debug.LogError("ShipCreationPanel 未設置！請在 Inspector 中設置引用。");
+            Debug.LogError("[MapController] ChinjuUIController 未設置！請在 Inspector 中設置引用。");
         }
         
         GenerateMap();
@@ -176,7 +184,7 @@ public class MapController : MonoBehaviour
     {
         if (mainCamera == null)
         {
-            Debug.LogError("主攝影機未設置！");
+            Debug.LogError("[MapController] 主攝影機未設置！");
             return;
         }
 
@@ -189,8 +197,8 @@ public class MapController : MonoBehaviour
 
         if (hit.collider != null)
         {
-            Debug.Log("點擊在 " + hit.collider.name);
-            Debug.Log("點擊位置: " + hit.point);
+            Debug.Log("[MapController] 點擊在 " + hit.collider.name);
+            Debug.Log("[MapController] 點擊位置: " + hit.point);
 
             // 將世界座標轉換為 tilemap 的網格座標
             Vector3Int tilePosition = tilemap.WorldToCell(hit.point);
@@ -202,23 +210,23 @@ public class MapController : MonoBehaviour
             {
                 if (tile == oceanTile)
                 {
-                    Debug.Log("這是海洋 Tile");
+                    Debug.Log("[MapController] 這是海洋 Tile");
                 }
                 else if (tile == grassTile)
                 {
-                    Debug.Log("這是草地 Tile");
+                    Debug.Log("[MapController] 這是草地 Tile");
                 }
                 else if (tile == chinjuTile)
                 {
-                    Debug.Log("這是神獸 Tile");
-                    if (shipCreationPanel != null)
+                    Debug.Log("[MapController] 這是神獸 Tile");
+                    if (chinjuUIController != null)
                     {
-                        Debug.Log("正在切換船隻建造面板...");
-                        shipCreationPanel.Toggle();
+                        Debug.Log("[MapController] 正在開啟 Chinju UI 面板...");
+                        chinjuUIController.ToggleMainPanelOnly();
                     }
                     else
                     {
-                        Debug.LogError("ShipCreationPanel 是 null！");
+                        Debug.LogError("[MapController] ChinjuUIController 是 null！");
                     }
                 }
             }

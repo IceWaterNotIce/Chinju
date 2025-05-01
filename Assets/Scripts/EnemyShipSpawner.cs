@@ -6,6 +6,7 @@ public class EnemyShipSpawner : MonoBehaviour
     [Header("Spawn Settings")]
     public GameObject enemyShipPrefab;
     public float spawnInterval = 2f;
+    public int maxEnemyShips = 10; // 新增：場景中敵方船隻的最大數量
     private Vector2 spawnAreaMin = new Vector2(0, 0);
     private Vector2 spawnAreaMax = new Vector2(100, 100);
 
@@ -41,6 +42,14 @@ public class EnemyShipSpawner : MonoBehaviour
 
     void SpawnEnemyShip()
     {
+        // 檢查當前場景中的敵方船隻數量
+        int currentEnemyCount = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None).Length;
+        if (currentEnemyCount >= maxEnemyShips)
+        {
+            Debug.Log($"[EnemyShipSpawner] 當前敵方船隻數量已達上限 ({maxEnemyShips})，停止生成。");
+            return;
+        }
+
         for (int attempt = 0; attempt < 10; attempt++)
         {
             float x = Random.Range(spawnAreaMin.x, spawnAreaMax.x);
@@ -50,6 +59,7 @@ public class EnemyShipSpawner : MonoBehaviour
             if (IsOceanTile(spawnPos))
             {
                 Instantiate(enemyShipPrefab, spawnPos, Quaternion.identity);
+                Debug.Log($"[EnemyShipSpawner] 成功生成敵方船隻於位置: {spawnPos}");
                 break;
             }
         }

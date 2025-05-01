@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:VisualElement class="weapon-panel" style="flex-direction: row-reverse; align-items: flex-start; justify-content: center; align-self: auto; top: 50%; translate: 0 -50%;">
+        <ui:Label text="武器列表" class="weapon-title" />
+        <ui:ScrollView name="weapon-list" class="weapon-list" />
+    </ui:VisualElement>
+</ui:UXML>

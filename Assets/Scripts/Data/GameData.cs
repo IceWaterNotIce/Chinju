@@ -4,8 +4,11 @@ using UnityEngine;
 [System.Serializable]
 public class GameData
 {
-    public PlayerData PlayerDatad; // 改為 public field
-    public MapData MapDatad;       // 改為 public field
+    public PlayerData playerData; // 修正命名
+    public MapData mapData;       // 修正命名
+
+    // 新增：敵方船隻數據
+    public List<ShipData> enemyShips = new List<ShipData>();
 
     [System.Serializable]
     public class PlayerData
@@ -17,9 +20,11 @@ public class GameData
         // 玩家擁有的船隻數據
         public List<ShipData> Ships = new List<ShipData>();
 
-        // 新增：資源變動事件
+        public List<WeaponData> Weapons = new List<WeaponData>(); // 確保初始化
+
+        // 初始化資源變動事件
         [System.NonSerialized]
-        public System.Action OnResourceChanged;
+        public System.Action OnResourceChanged = delegate { };
     }
 
     [System.Serializable]
@@ -45,5 +50,26 @@ public class GameData
         public float Fuel;
         public float Speed;
         public float Rotation;
+
+        public int WeaponLimit;
+
+        public List<WeaponData> Weapons = new List<WeaponData>();
+
+        // 新增：保存船隻的預製物名稱
+        public string PrefabName;
+    }
+
+    [System.Serializable]
+    public class WeaponData
+    {
+        public string Name;
+        public int Damage;
+        public float MaxAttackDistance; // 新增
+        public float MinAttackDistance; // 新增
+        public float AttackSpeed;
+        public float CooldownTime;
+
+        // 新增：保存武器的預製物名稱
+        public string PrefabName;
     }
 }

@@ -22,6 +22,7 @@
                 <engine:Label text="1/2" name="lblRotationRightHalf" style="font-size: 10px;" />
                 <engine:Label text="Full" name="lblRotationRightFull" style="font-size: 10px;" />
             </engine:VisualElement>
+            <engine:VisualElement name="weaponListContainer" style="flex-direction: row; margin-top: 10px;" />
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>
