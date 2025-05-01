@@ -29,6 +29,19 @@ public class Weapon : MonoBehaviour
 
         Vector3 direction = (target.transform.position - transform.position).normalized;
 
+        // 計算攻擊成功率
+        var ownerShip = GetComponentInParent<Ship>();
+        float successRate = 20f + (ownerShip != null ? Mathf.Min(ownerShip.Level / 2f, 79f) : 0f); // 最大 99%
+        bool isSuccessful = Random.Range(0f, 100f) <= successRate;
+
+        if (!isSuccessful)
+        {
+            // 如果攻擊不成功，添加一個小的隨機方向偏移
+            float randomAngle = Random.Range(-10f, 10f); // 隨機角度偏移
+            Quaternion rotation = Quaternion.Euler(0, 0, randomAngle);
+            direction = rotation * direction;
+        }
+
         // 計算彈藥的生成位置，設置為船隻與目標之間的位置
         Vector3 spawnPosition = transform.position + direction * 1.5f; // 1.5f 為偏移距離，可根據需求調整
 
@@ -43,7 +56,6 @@ public class Weapon : MonoBehaviour
                 ammo.SetDirection(direction);
 
                 // 設置彈藥的擁有者為武器所屬的船隻
-                var ownerShip = GetComponentInParent<Ship>();
                 if (ownerShip != null)
                 {
                     ammo.SetOwner(ownerShip.gameObject);
