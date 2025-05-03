@@ -48,9 +48,8 @@ public class ChinjuResourceCollector : MonoBehaviour
 
         timer += Time.deltaTime;
 
-        if (timer >= 1f) // 每 1 分鐘執行一次
+        if (timer >= 1f) // 每秒執行一次
         {
-            Debug.Log("[ChinjuResourceCollector] 嘗試收集資源...");
             CollectResources();
             timer = 0f;
         }
@@ -61,11 +60,12 @@ public class ChinjuResourceCollector : MonoBehaviour
         var gameData = GameDataController.Instance.CurrentGameData;
         if (gameData.playerData != null)
         {
+            // 合併資源更新邏輯
             gameData.playerData.Gold += GoldPerMinute;
             gameData.playerData.Oils += OilPerMinute;
             gameData.playerData.Cube += CubePerMinute;
 
-            // 新增：觸發資源變更事件
+            // 觸發資源變更事件
             gameData.playerData.OnResourceChanged?.Invoke();
 
             Debug.Log($"[ChinjuResourceCollector] 收集資源成功：金幣 +{GoldPerMinute}，石油 +{OilPerMinute}，方塊 +{CubePerMinute}");
