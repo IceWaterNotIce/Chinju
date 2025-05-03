@@ -86,6 +86,25 @@ public class MapController : MonoBehaviour
                 Debug.LogError("[MapController] 無法加載石油船預製物，請確保 'Prefabs/Ship' 存在！");
             }
         }
+
+        GameDataController.Instance.OnMapDataChanged += OnMapDataChanged; // 訂閱地圖數據變更事件
+    }
+
+    private void OnDestroy()
+    {
+        if (GameDataController.Instance != null)
+        {
+            GameDataController.Instance.OnMapDataChanged -= OnMapDataChanged; // 取消訂閱
+        }
+    }
+
+    private void OnMapDataChanged()
+    {
+        var mapData = GameDataController.Instance.CurrentGameData?.mapData;
+        if (mapData != null)
+        {
+            LoadMap(mapData);
+        }
     }
 
     private async void GenerateMapAsync()
@@ -256,26 +275,41 @@ public class MapController : MonoBehaviour
             }
         }
 
-        // Save map data to GameManager
-        if (gameManager != null)
+        // 使用 MapController 保存地圖數據
+        var mapData = new GameData.MapData
         {
-            GameData.MapData mapData = new GameData.MapData
-            {
-                Seed = seed,
-                Width = width,
-                Height = height,
-                IslandDensity = islandDensity
-            };
-            gameManager.SaveMapData(tilemap, mapData);
-        }
+            Seed = seed,
+            Width = width,
+            Height = height,
+            IslandDensity = islandDensity
+        };
+        SaveMapData(tilemap, mapData);
     }
 
     public void LoadMap(GameData.MapData mapData)
     {
-        if (gameManager != null)
+        tilemap.ClearAllTiles();
+        foreach (var position in mapData.ChinjuTiles)
         {
-            gameManager.LoadMapData(tilemap, mapData, chinjuTile);
+            tilemap.SetTile(position, chinjuTile);
         }
+        Debug.Log("[MapController] 地圖數據已載入");
+    }
+
+    public void SaveMapData(Tilemap tilemap, GameData.MapData mapData)
+    {
+        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData != null)
+            mapData = GameDataController.Instance.CurrentGameData.mapData;
+
+        mapData.ChinjuTiles.Clear();
+        foreach (var position in tilemap.cellBounds.allPositionsWithin)
+        {
+            if (tilemap.GetTile(position) != null)
+            {
+                mapData.ChinjuTiles.Add(position);
+            }
+        }
+        Debug.Log("[MapController] 地圖數據已保存");
     }
 
     void Update()

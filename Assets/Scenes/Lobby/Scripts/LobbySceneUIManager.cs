@@ -212,7 +212,6 @@ public class LobbySceneUIManager : MonoBehaviour
 
     public void OnStartNewGameBtnClick()
     {
-        GameManager.Instance.StartNewGame();
         UnityEngine.SceneManagement.SceneManager.LoadScene("Main"); // Load the main game scene
     }
 }

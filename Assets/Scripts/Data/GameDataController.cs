@@ -25,6 +25,7 @@ public class GameDataController : MonoBehaviour
     }
 
     public System.Action<GameData> OnGameDataChanged;
+    public System.Action OnMapDataChanged; // 新增：地圖數據變更事件
 
     private void Awake()
     {
@@ -57,6 +58,12 @@ public class GameDataController : MonoBehaviour
     {
         currentGameData?.playerData?.OnResourceChanged?.Invoke();
         Debug.Log("[GameDataController] 資源事件已觸發，UI 更新完成");
+    }
+
+    public void TriggerMapDataChanged()
+    {
+        OnMapDataChanged?.Invoke(); // 發送地圖數據變更事件
+        Debug.Log("[GameDataController] 地圖數據事件已觸發");
     }
 
     /// <summary>
