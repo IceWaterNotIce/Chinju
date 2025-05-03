@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 public class MapController : MonoBehaviour 
 {
-    private const string MapCacheFilePath = "map_cache.json";
+    private const string MapCacheFilePath = "map_cache"; // 不需要副檔名
 
     [SerializeField] private Tilemap tilemap;  // 通過 Inspector 引用
     public TileBase oceanTile, grassTile;
@@ -133,16 +133,24 @@ public class MapController : MonoBehaviour
     private void SaveMapToCache(MapData mapData)
     {
         string json = JsonUtility.ToJson(mapData);
-        File.WriteAllText(MapCacheFilePath, json);
-        Debug.Log("Map data cached to file.");
+        string path = Path.Combine(Application.dataPath, "Resources", "map_cache.json");
+        File.WriteAllText(path, json);
+        Debug.Log("Map data cached to Resources/map_cache.json.");
     }
 
     private void LoadMapFromCache()
     {
-        string json = File.ReadAllText(MapCacheFilePath);
-        MapData mapData = JsonUtility.FromJson<MapData>(json);
-        ApplyMapData(mapData);
-        Debug.Log("Map data loaded from cache.");
+        TextAsset mapCache = Resources.Load<TextAsset>(MapCacheFilePath);
+        if (mapCache != null)
+        {
+            MapData mapData = JsonUtility.FromJson<MapData>(mapCache.text);
+            ApplyMapData(mapData);
+            Debug.Log("Map data loaded from Resources/map_cache.json.");
+        }
+        else
+        {
+            Debug.LogError("Map cache not found in Resources/map_cache.json.");
+        }
     }
 
     void GenerateMap()
