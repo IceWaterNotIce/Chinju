@@ -53,17 +53,14 @@ public class WeaponCreatePanelController : MonoBehaviour
             int idx = dropdown.index;
             if (idx < 0 || idx >= weaponPrefabs.Count) return;
             var selectedWeapon = weaponPrefabs[idx];
-            if (playerData.Gold >= selectedWeapon.Cost)
-            {
-                playerData.Gold -= selectedWeapon.Cost;
-                playerData.OnResourceChanged?.Invoke();
-                UpdateResourceLabel();
 
+            if (GameDataController.Instance?.ConsumeResources(selectedWeapon.Cost, 0, 0) ?? false)
+            {
                 // 實例化武器並添加到玩家資料
                 var newWeapon = Instantiate(selectedWeapon);
                 if (newWeapon != null)
                 {
-                    playerData.Weapons.Add(newWeapon.ToWeaponData()); // 使用 ToWeaponData 方法
+                    playerData.Weapons.Add(newWeapon.ToWeaponData());
                     resultLabel.text = $"成功創建：{selectedWeapon.Name}！";
                     Debug.Log($"[WeaponCreatePanelController] 成功創建：{selectedWeapon.Name}，剩餘金幣：{playerData.Gold}");
                 }

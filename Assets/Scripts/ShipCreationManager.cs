@@ -24,39 +24,26 @@ public class ShipCreationManager : MonoBehaviour
     // 嘗試建造船隻，回傳是否成功
     public Ship TryCreateShip(int shipType, int goldCost, int oilCost, int cubeCost)
     {
-        var data = GameDataController.Instance.CurrentGameData;
-        if (data.playerData.Gold < goldCost || data.playerData.Oils < oilCost || data.playerData.Cube < cubeCost)
+        if (GameDataController.Instance?.ConsumeResources(goldCost, oilCost, cubeCost) ?? false)
         {
-            Debug.LogWarning("資源不足，無法建造戰艦！");
+            // 實例化船隻
+            return InstantiateShip(shipType);
+        }
+        else
+        {
+            Debug.LogWarning("[ShipCreationManager] 資源不足，無法建造戰艦！");
             return null;
         }
-
-        // 扣除資源
-        data.playerData.Gold -= goldCost;
-        data.playerData.Oils -= oilCost;
-        data.playerData.Cube -= cubeCost;
-        data.playerData.OnResourceChanged?.Invoke();
-
-        // 實例化船隻
-        return InstantiateShip(shipType);
     }
 
     public Ship TryCreateRandomShip(int inputGold, int inputOil, int inputCube)
     {
-        var data = GameDataController.Instance.CurrentGameData;
-        if (data.playerData.Gold < 10 || data.playerData.Oils < 10 || data.playerData.Cube < 1)
-        {
-            Debug.LogWarning("資源不足，無法隨機建造船隻！");
-            return null;
-        }
-
         System.Collections.Generic.List<int> candidates = new System.Collections.Generic.List<int>();
         System.Collections.Generic.List<int> weights = new System.Collections.Generic.List<int>();
+
         for (int i = 0; i < shipPrefabs.Length; i++)
         {
-            if (data.playerData.Gold >= shipCosts[i, 0] &&
-                data.playerData.Oils >= shipCosts[i, 1] &&
-                data.playerData.Cube >= shipCosts[i, 2])
+            if (GameDataController.Instance?.HasEnoughResources(shipCosts[i, 0], shipCosts[i, 1], shipCosts[i, 2]) ?? false)
             {
                 int dist = Mathf.Abs(inputGold - shipCosts[i, 0]) +
                            Mathf.Abs(inputOil - shipCosts[i, 1]) +
@@ -66,9 +53,10 @@ public class ShipCreationManager : MonoBehaviour
                 weights.Add(weight);
             }
         }
+
         if (candidates.Count == 0)
         {
-            Debug.LogWarning("沒有任何船型可隨機建造！");
+            Debug.LogWarning("[ShipCreationManager] 沒有任何船型可隨機建造！");
             return null;
         }
 
