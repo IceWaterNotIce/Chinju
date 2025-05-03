@@ -133,6 +133,27 @@ public class MapController : MonoBehaviour
                 }
             }
         }
+
+        // 設置神獸圖塊
+        Vector3Int centerIslandTile = new Vector3Int(width / 2, height / 2, 0);
+        mapData.Tiles[centerIslandTile.x, centerIslandTile.y] = TileType.Chinju;
+
+        // 隨機設置石油圖塊
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (mapData.Tiles[x, y] == TileType.Grass)
+                {
+                    float oilNoise = Mathf.PerlinNoise((x + seed) * 0.2f, (y + seed) * 0.2f);
+                    if (oilNoise > 0.7f)
+                    {
+                        mapData.Tiles[x, y] = TileType.Oil;
+                    }
+                }
+            }
+        }
+
         return mapData;
     }
 
@@ -143,8 +164,27 @@ public class MapController : MonoBehaviour
         {
             for (int y = 0; y < mapData.Height; y++)
             {
-                TileBase tile = mapData.Tiles[x, y] == TileType.Grass ? grassTile : oceanTile;
-                tilemap.SetTile(new Vector3Int(x, y, 0), tile);
+                TileBase tile = null;
+                switch (mapData.Tiles[x, y])
+                {
+                    case TileType.Ocean:
+                        tile = oceanTile;
+                        break;
+                    case TileType.Grass:
+                        tile = grassTile;
+                        break;
+                    case TileType.Oil:
+                        tile = oilTile;
+                        break;
+                    case TileType.Chinju:
+                        tile = chinjuTile;
+                        break;
+                }
+
+                if (tile != null)
+                {
+                    tilemap.SetTile(new Vector3Int(x, y, 0), tile);
+                }
             }
         }
     }
@@ -192,42 +232,16 @@ public class MapController : MonoBehaviour
         {
             for (int y = 0; y < height; y++) 
             {
-                // 使用 Perlin Noise 替代純隨機，使島嶼更自然
-                float noiseValue = Mathf.PerlinNoise(
-                    (x + seed) * 0.1f, 
-                    (y + seed) * 0.1f
-                );
-                
+                float noiseValue = Mathf.PerlinNoise((x + seed) * 0.1f, (y + seed) * 0.1f);
                 if (noiseValue > 1f - islandDensity) 
                 {
                     tilemap.SetTile(new Vector3Int(x, y, 0), grassTile);
 
-                    // 計算與地圖中心的距離
                     float distance = Vector2.Distance(new Vector2(x, y), new Vector2(width / 2, height / 2));
                     if (distance < closestDistance)
                     {
-                        // 確保該圖塊周圍有海洋圖塊
-                        bool hasOceanNeighbor = false;
-                        for (int dx = -1; dx <= 1; dx++)
-                        {
-                            for (int dy = -1; dy <= 1; dy++)
-                            {
-                                if (dx == 0 && dy == 0) continue;
-                                Vector3Int neighborPos = new Vector3Int(x + dx, y + dy, 0);
-                                if (tilemap.GetTile(neighborPos) == oceanTile)
-                                {
-                                    hasOceanNeighbor = true;
-                                    break;
-                                }
-                            }
-                            if (hasOceanNeighbor) break;
-                        }
-
-                        if (hasOceanNeighbor)
-                        {
-                            closestDistance = distance;
-                            centerIslandTile = new Vector3Int(x, y, 0);
-                        }
+                        closestDistance = distance;
+                        centerIslandTile = new Vector3Int(x, y, 0);
                     }
                 }
             }
@@ -237,23 +251,11 @@ public class MapController : MonoBehaviour
         if (centerIslandTile != Vector3Int.zero)
         {
             tilemap.SetTile(centerIslandTile, chinjuTile);
-
-            // 將主攝影機移動到中心島嶼圖塊的位置
-            Vector3 worldPosition = tilemap.GetCellCenterWorld(centerIslandTile); // 使用 GetCellCenterWorld 確保獲取中心點
-            if (mainCamera != null)
-            {
-                mainCamera.transform.position = new Vector3(worldPosition.x, worldPosition.y, mainCamera.transform.position.z);
-            }
-
-            // 通知 CameraController 更新邊界
-            if (cameraController != null)
-            {
-                if (cameraController.targetTilemap == null)
-                {
-                    cameraController.targetTilemap = tilemap; // 確保 CameraController 的 Tilemap 已設置
-                }
-                cameraController.RefreshBounds();
-            }
+            Debug.Log($"[MapController] 神獸圖塊生成於位置: {centerIslandTile}");
+        }
+        else
+        {
+            Debug.LogError("[MapController] 未能生成神獸圖塊！");
         }
 
         // 隨機生成石油圖塊
@@ -262,28 +264,19 @@ public class MapController : MonoBehaviour
             for (int y = 0; y < height; y++)
             {
                 float noiseValue = Mathf.PerlinNoise((x + seed) * 0.2f, (y + seed) * 0.2f);
-                if (noiseValue > 0.7f) // 調整生成概率
+                if (noiseValue > 0.7f)
                 {
                     Vector3Int position = new Vector3Int(x, y, 0);
-                    if (tilemap.GetTile(position) == grassTile) // 確保石油圖塊生成在草地上
+                    if (tilemap.GetTile(position) == grassTile)
                     {
                         tilemap.SetTile(position, oilTile);
                         oilTilePositions.Add(position);
-                        Debug.Log($"[MapController] 石油圖塊生成於位置: {position}");
                     }
                 }
             }
         }
 
-        // 使用 MapController 保存地圖數據
-        var mapData = new GameData.MapData
-        {
-            Seed = seed,
-            Width = width,
-            Height = height,
-            IslandDensity = islandDensity
-        };
-        SaveMapData(tilemap, mapData);
+        Debug.Log($"[MapController] 石油圖塊生成數量: {oilTilePositions.Count}");
     }
 
     public void LoadMap(GameData.MapData mapData)
