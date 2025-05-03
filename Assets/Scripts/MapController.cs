@@ -3,9 +3,13 @@ using UnityEngine.Tilemaps;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using System.Collections;
+using System.IO;
+using System.Threading.Tasks;
 
 public class MapController : MonoBehaviour 
 {
+    private const string MapCacheFilePath = "map_cache.json";
+
     [SerializeField] private Tilemap tilemap;  // 通過 Inspector 引用
     public TileBase oceanTile, grassTile;
     public TileBase chinjuTile; // 新增Chinju Tile
@@ -53,7 +57,14 @@ public class MapController : MonoBehaviour
             Debug.LogError("[MapController] ChinjuUIController 未設置！請在 Inspector 中設置引用。");
         }
         
-        GenerateMap();
+        if (File.Exists(MapCacheFilePath))
+        {
+            LoadMapFromCache();
+        }
+        else
+        {
+            GenerateMapAsync();
+        }
 
         // 新增：自動掛載 VisibilityManager
         var visMgr = FindFirstObjectByType<VisibilityManager>();
@@ -75,6 +86,63 @@ public class MapController : MonoBehaviour
                 Debug.LogError("[MapController] 無法加載石油船預製物，請確保 'Prefabs/Ship' 存在！");
             }
         }
+    }
+
+    private async void GenerateMapAsync()
+    {
+        Debug.Log("Generating map asynchronously...");
+        var mapData = await Task.Run(() => GenerateMapData());
+        ApplyMapData(mapData);
+        SaveMapToCache(mapData);
+    }
+
+    private MapData GenerateMapData()
+    {
+        MapData mapData = new MapData(width, height);
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                float noiseValue = Mathf.PerlinNoise((x + seed) * 0.1f, (y + seed) * 0.1f);
+                if (noiseValue > 1f - islandDensity)
+                {
+                    mapData.Tiles[x, y] = TileType.Grass;
+                }
+                else
+                {
+                    mapData.Tiles[x, y] = TileType.Ocean;
+                }
+            }
+        }
+        return mapData;
+    }
+
+    private void ApplyMapData(MapData mapData)
+    {
+        tilemap.ClearAllTiles();
+        for (int x = 0; x < mapData.Width; x++)
+        {
+            for (int y = 0; y < mapData.Height; y++)
+            {
+                TileBase tile = mapData.Tiles[x, y] == TileType.Grass ? grassTile : oceanTile;
+                tilemap.SetTile(new Vector3Int(x, y, 0), tile);
+            }
+        }
+    }
+
+    private void SaveMapToCache(MapData mapData)
+    {
+        string json = JsonUtility.ToJson(mapData);
+        File.WriteAllText(MapCacheFilePath, json);
+        Debug.Log("Map data cached to file.");
+    }
+
+    private void LoadMapFromCache()
+    {
+        string json = File.ReadAllText(MapCacheFilePath);
+        MapData mapData = JsonUtility.FromJson<MapData>(json);
+        ApplyMapData(mapData);
+        Debug.Log("Map data loaded from cache.");
     }
 
     void GenerateMap()
@@ -408,5 +476,20 @@ public class MapController : MonoBehaviour
         }
 
         return Vector3.zero; // 找不到 Chinju Tile
+    }
+}
+
+[System.Serializable]
+public class MapData
+{
+    public int Width;
+    public int Height;
+    public TileType[,] Tiles;
+
+    public MapData(int width, int height)
+    {
+        Width = width;
+        Height = height;
+        Tiles = new TileType[width, height];
     }
 }
