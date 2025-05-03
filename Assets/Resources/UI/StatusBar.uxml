@@ -1,5 +1,5 @@
-<UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:VisualElement name="root" data-source="project://database/Assets/Resources/UI/CommonStyles.uss?fileID=7433441132597879392&amp;guid=2beea2869bd0f584dbd1d916e073903b&amp;type=3#CommonStyles" class="root">
+<UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False" style="Assets/Resources/UI/CommonStyles.uss">
+    <ui:VisualElement name="root" data-source="Assets/Resources/UI/CommonStyles.uss?fileID=7433441132597879392&amp;guid=2beea2869bd0f584dbd1d916e073903b&amp;type=3#CommonStyles" class="root">
         <ui:VisualElement name="resourcePanel" class="resource-panel" style="flex-direction: row-reverse;">
             <!-- 金幣顯示 -->
             <ui:Label name="goldLabel" text="金幣: 0" class="resource-label" />

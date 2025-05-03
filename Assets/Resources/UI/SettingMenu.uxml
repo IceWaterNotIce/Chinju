@@ -1,4 +1,4 @@
-<UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+<UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False" style="Assets/Resources/UI/SettingMenu.uss">
     <ui:VisualElement name="root" class="menu-container" style="position: absolute; top: 50%; align-items: stretch; justify-content: center; align-self: center; align-content: flex-start; flex-direction: column;">
         <ui:VisualElement name="menu-panel" class="menu-panel">
             <ui:Label text="遊戲選單" class="menu-title" />

@@ -1,10 +1,10 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
-    <ui:VisualElement class="weapon-create-panel" style="display: flex;">
-        <ui:Label text="武器製造" class="weapon-create-title" />
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False" style="Assets/Resources/UI/WeaponCreatePanel.uss">
+    <ui:VisualElement class="weapon-create-panel" style="display: flex; flex-direction: column; align-items: center;">
+        <ui:Label text="武器製造" class="weapon-create-title" style="margin-bottom: 20px;" />
         <ui:DropdownField name="weapon-dropdown" class="weapon-dropdown" />
         <ui:Label name="resource-label" class="resource-label" />
-        <ui:Button name="create-button" text="創建武器" class="create-button" />
+        <ui:Button name="create-button" text="創建武器" class="create-button" style="align-self: center;" />
         <ui:Label name="result-label" class="result-label" />
-        <ui:Button name="close-button" text="關閉" />
+        <ui:Button name="close-button" text="關閉" style="align-self: center;" />
     </ui:VisualElement>
 </ui:UXML>

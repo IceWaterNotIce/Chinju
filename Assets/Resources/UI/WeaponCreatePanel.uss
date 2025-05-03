@@ -3,6 +3,7 @@
     background-color: #232323;
     padding: 20px;
     border-radius: 8px;
+    align-items: center;
 }
 .weapon-create-title {
     font-size: 24px;
@@ -18,6 +19,7 @@
 }
 .create-button {
     margin-bottom: 12px;
+    margin-top: 10px;
 }
 .result-label {
     color: #ffb300;

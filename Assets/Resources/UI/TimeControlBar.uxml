@@ -1,5 +1,5 @@
-<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <engine:VisualElement name="time-control-bar" style="flex-direction: row-reverse; top: 50px;">
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" style="Assets/Resources/UI/TimeControlBar.uss">
+    <engine:VisualElement name="time-control-bar" style="flex-direction: row; gap: 10px; top: 50px;">
         <engine:Button name="pause-btn" text="暫停" style="width: 35px; height: 35px;" />
         <engine:Button name="slow-btn" text="減速" style="width: 35px; height: 35px;" />
         <engine:Button name="normal-btn" text="正常" style="width: 35px; height: 35px;" />

@@ -1,14 +1,14 @@
-<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <engine:VisualElement name="ship-creation-panel" class="ship-panel" style="visibility: visible; display: flex; justify-content: center; align-items: center; position: absolute; top: 50%; left: 50%; transform: ; z-index: 10;">
-        <engine:Label text="建造船隻" class="panel-title" />
-        <engine:VisualElement name="ship-type-container" class="ship-type-container">
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" style="Assets/Resources/UI/ShipCreatePanel.uss">
+    <engine:VisualElement name="ship-creation-panel" class="ship-panel" style="display: flex; flex-direction: column; align-items: center;">
+        <engine:Label text="建造船隻" class="panel-title" style="margin-bottom: 20px;" />
+        <engine:VisualElement name="ship-type-container" class="ship-type-container" style="margin-bottom: 20px;">
             <engine:Button name="ship-type-btn-1" text="航空母艦" class="ship-type-btn" />
             <engine:Button name="ship-type-btn-2" text="戰艦" class="ship-type-btn" />
             <engine:Button name="ship-type-btn-3" text="巡洋艦" class="ship-type-btn" />
             <engine:Button name="ship-type-btn-4" text="驅逐艦" class="ship-type-btn" />
             <engine:Button name="ship-type-btn-5" text="潛艦" class="ship-type-btn" />
         </engine:VisualElement>
-        <engine:VisualElement name="resource-cost-container" class="resource-container">
+        <engine:VisualElement name="resource-cost-container" class="resource-container" style="margin-bottom: 20px;">
             <engine:Label text="建造消耗：" class="cost-title" />
             <engine:VisualElement class="resource-item">
                 <engine:Label name="gold-cost" text="金幣: 0" />
@@ -20,6 +20,6 @@
                 <engine:Label name="cube-cost" text="方塊: 0" />
             </engine:VisualElement>
         </engine:VisualElement>
-        <engine:Button name="create-ship-btn" text="建造" class="create-btn" />
+        <engine:Button name="create-ship-btn" text="建造" class="create-btn" style="align-self: center;" />
     </engine:VisualElement>
 </engine:UXML>

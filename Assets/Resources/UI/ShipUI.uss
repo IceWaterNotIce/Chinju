@@ -1,0 +1,29 @@
+#PanelBG {
+    flex-grow: 1;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    position: relative;
+}
+
+#Panel {
+    flex-grow: 1;
+    position: absolute;
+    flex-direction: row;
+}
+
+#Panel > .label {
+    font-size: 10px;
+    color: white;
+}
+
+#weaponListContainer {
+    flex-direction: row;
+    margin-top: 10px;
+}
+
+#lblLevel, #lblExperience {
+    font-size: 12px;
+    color: white;
+    margin-bottom: 5px;
+}
