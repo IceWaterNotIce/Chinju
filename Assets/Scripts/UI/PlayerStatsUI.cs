@@ -20,11 +20,11 @@ public class PlayerStatsUI : MonoBehaviour
         uiDocument = GetComponent<UIDocument>();
         var root = uiDocument.rootVisualElement;
         
-        // 修正：Label 名稱需與 UXML 一致（小寫）
-        goldLabel = root.Q<Label>("goldLabel");
-        oilLabel = root.Q<Label>("oilLabel");
-        cubeLabel = root.Q<Label>("cubeLabel");
-        oilTransportLabel = root.Q<Label>("oilTransportLabel"); // 確保 UXML 中有對應的 Label
+        // 使用 UIHelper 簡化 UI 初始化邏輯
+        goldLabel = UIHelper.InitializeElement<Label>(root, "goldLabel");
+        oilLabel = UIHelper.InitializeElement<Label>(root, "oilLabel");
+        cubeLabel = UIHelper.InitializeElement<Label>(root, "cubeLabel");
+        oilTransportLabel = UIHelper.InitializeElement<Label>(root, "oilTransportLabel"); // 確保 UXML 中有對應的 Label
 
         // 監聽 GameDataController 的資料變更
         if (GameDataController.Instance != null)

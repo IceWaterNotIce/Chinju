@@ -58,4 +58,48 @@ public class GameDataController : MonoBehaviour
         currentGameData?.playerData?.OnResourceChanged?.Invoke();
         Debug.Log("[GameDataController] 資源事件已觸發，UI 更新完成");
     }
+
+    /// <summary>
+    /// 檢查玩家是否擁有足夠的資源
+    /// </summary>
+    /// <param name="gold">所需金幣</param>
+    /// <param name="oil">所需石油</param>
+    /// <param name="cube">所需方塊</param>
+    /// <returns>是否擁有足夠資源</returns>
+    public bool HasEnoughResources(int gold, int oil, int cube)
+    {
+        if (currentGameData?.playerData == null)
+        {
+            Debug.LogWarning("[GameDataController] 無法檢查資源，PlayerData 為 null！");
+            return false;
+        }
+
+        var playerData = currentGameData.playerData;
+        return playerData.Gold >= gold && playerData.Oils >= oil && playerData.Cube >= cube;
+    }
+
+    /// <summary>
+    /// 消耗玩家資源
+    /// </summary>
+    /// <param name="gold">消耗金幣</param>
+    /// <param name="oil">消耗石油</param>
+    /// <param name="cube">消耗方塊</param>
+    /// <returns>是否成功消耗資源</returns>
+    public bool ConsumeResources(int gold, int oil, int cube)
+    {
+        if (!HasEnoughResources(gold, oil, cube))
+        {
+            Debug.LogWarning("[GameDataController] 資源不足，無法消耗！");
+            return false;
+        }
+
+        var playerData = currentGameData.playerData;
+        playerData.Gold -= gold;
+        playerData.Oils -= oil;
+        playerData.Cube -= cube;
+
+        TriggerResourceChanged();
+        Debug.Log($"[GameDataController] 成功消耗資源：金幣-{gold}，石油-{oil}，方塊-{cube}");
+        return true;
+    }
 }
