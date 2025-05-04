@@ -71,12 +71,14 @@ public class ChinjuUIController : MonoBehaviour
     {
         weaponCreatePanelController.Show();
         Debug.Log("[ChinjuUIController] Open Weapon Create Panel");
+        Hide();
     }
 
     public void OpenShipCreatePanel()
     {
         shipCreationPanel.Show();
         Debug.Log("[ChinjuUIController] Open Ship Create Panel");
+        Hide();
     }
 
 
