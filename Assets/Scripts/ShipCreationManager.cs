@@ -5,7 +5,7 @@ public class ShipCreationManager : MonoBehaviour
     public static ShipCreationManager Instance { get; private set; }
 
     [SerializeField] private GameObject[] shipPrefabs = new GameObject[5];
-    [SerializeField] private int[,] shipCosts = {
+    [SerializeField] public int[,] shipCosts = {
         { 800, 400, 200 }, // 航空母艦
         { 500, 200, 100 }, // 戰艦
         { 300, 120, 60 },  // 巡洋艦

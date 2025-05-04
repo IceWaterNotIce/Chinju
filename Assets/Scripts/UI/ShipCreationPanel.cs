@@ -18,13 +18,7 @@ public class ShipCreationPanel : MonoBehaviour
     private IntegerField cubeInputField;
 
     // 建議建造成本（用於提升相近資源輸入時的隨機機率）
-    private readonly int[,] shipCosts = {
-        { 800, 400, 200 }, // 航空母艦
-        { 500, 200, 100 }, // 戰艦
-        { 300, 120, 60 },  // 巡洋艦
-        { 200, 80, 40 },   // 驅逐艦
-        { 150, 60, 30 }    // 潛艦
-    };
+
 
     [SerializeField] private MapController mapController;
     [SerializeField] private ChinjuUIController chinjuUIController; // 新增
@@ -190,9 +184,9 @@ public class ShipCreationPanel : MonoBehaviour
                 {
                     for (int i = 0; i < 5; i++)
                     {
-                        if (gameData.playerData.Gold >= shipCosts[i, 0] &&
-                            gameData.playerData.Oils >= shipCosts[i, 1] &&
-                            gameData.playerData.Cube >= shipCosts[i, 2])
+                        if (gameData.playerData.Gold >= ShipCreationManager.Instance.shipCosts[i, 0] &&
+                            gameData.playerData.Oils >= ShipCreationManager.Instance.shipCosts[i, 1] &&
+                            gameData.playerData.Cube >= ShipCreationManager.Instance.shipCosts[i, 2])
                         {
                             enable = true;
                             break;
@@ -216,9 +210,9 @@ public class ShipCreationPanel : MonoBehaviour
         selectedShipTypeIndex = idx;
 
         // 根據船型自動填入建造成本
-        goldInputField.value = shipCosts[idx, 0];
-        oilInputField.value = shipCosts[idx, 1];
-        cubeInputField.value = shipCosts[idx, 2];
+        goldInputField.value = ShipCreationManager.Instance.shipCosts[idx, 0];
+        oilInputField.value = ShipCreationManager.Instance.shipCosts[idx, 1];
+        cubeInputField.value = ShipCreationManager.Instance.shipCosts[idx, 2];
 
         OnResourceInputChanged();
     }
