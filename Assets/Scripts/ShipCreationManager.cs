@@ -5,7 +5,8 @@ public class ShipCreationManager : MonoBehaviour
     public static ShipCreationManager Instance { get; private set; }
 
     [SerializeField] private GameObject[] shipPrefabs = new GameObject[5];
-    [SerializeField] public int[,] shipCosts = {
+    [SerializeField]
+    public int[,] shipCosts = {
         { 800, 400, 200 }, // 航空母艦
         { 500, 200, 100 }, // 戰艦
         { 300, 120, 60 },  // 巡洋艦
@@ -19,21 +20,6 @@ public class ShipCreationManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
-    }
-
-    // 嘗試建造船隻，回傳是否成功
-    public Ship TryCreateShip(int shipType, int goldCost, int oilCost, int cubeCost)
-    {
-        if (GameDataController.Instance?.ConsumeResources(goldCost, oilCost, cubeCost) ?? false)
-        {
-            // 實例化船隻
-            return InstantiateShip(shipType);
-        }
-        else
-        {
-            Debug.LogWarning("[ShipCreationManager] 資源不足，無法建造戰艦！");
-            return null;
-        }
     }
 
     public Ship TryCreateRandomShip(int inputGold, int inputOil, int inputCube)
@@ -75,7 +61,17 @@ public class ShipCreationManager : MonoBehaviour
         }
         int shipType = candidates[chosenIdx];
 
-        return TryCreateShip(shipType, shipCosts[shipType, 0], shipCosts[shipType, 1], shipCosts[shipType, 2]);
+        if (GameDataController.Instance?.ConsumeResources(shipCosts[shipType, 0], shipCosts[shipType, 1], shipCosts[shipType, 2]) ?? false)
+        {
+            // 實例化船隻
+            return InstantiateShip(shipType);
+        }
+        else
+        {
+            Debug.LogWarning("[ShipCreationManager] 資源不足，無法建造戰艦！");
+            return null;
+        }
+
     }
 
     private Ship InstantiateShip(int shipTypeIdx)

@@ -23,8 +23,6 @@ public class ShipCreationPanel : MonoBehaviour
     [SerializeField] private MapController mapController;
     [SerializeField] private ChinjuUIController chinjuUIController; // 新增
 
-    private int selectedShipTypeIndex = -1; // -1 表示未選擇
-
     void Awake()
     {
         // 確保 GameDataController 已初始化
@@ -51,7 +49,7 @@ public class ShipCreationPanel : MonoBehaviour
     private void InitializeUI()
     {
         Debug.Log("[ShipCreationPanel] 初始化船隻建造面板...");
-        
+
         // 獲取 UIDocument
         uiDocument = GetComponent<UIDocument>();
         if (uiDocument == null)
@@ -168,33 +166,28 @@ public class ShipCreationPanel : MonoBehaviour
         int cube = Mathf.Max(0, cubeInputField.value);
         UpdateCostDisplay(gold, oil, cube);
 
-        // 啟用條件：有選擇船型且資源大於0，或沒選擇船型但資源大於10/10/1且有可負擔船型
+        // 啟用條件：資源大於10/10/1
         bool enable = false;
-        if (selectedShipTypeIndex >= 0)
+
+        if (gold >= 10 && oil >= 10 && cube >= 1)
         {
-            enable = gold > 0 && oil > 0 && cube > 0;
-        }
-        else
-        {
-            if (gold >= 10 && oil >= 10 && cube >= 1)
+            // 檢查有沒有可負擭的船型
+            var gameData = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
+            if (gameData != null && gameData.playerData != null)
             {
-                // 檢查有沒有可負擭的船型
-                var gameData = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
-                if (gameData != null && gameData.playerData != null)
+                for (int i = 0; i < 5; i++)
                 {
-                    for (int i = 0; i < 5; i++)
+                    if (gameData.playerData.Gold >= ShipCreationManager.Instance.shipCosts[i, 0] &&
+                        gameData.playerData.Oils >= ShipCreationManager.Instance.shipCosts[i, 1] &&
+                        gameData.playerData.Cube >= ShipCreationManager.Instance.shipCosts[i, 2])
                     {
-                        if (gameData.playerData.Gold >= ShipCreationManager.Instance.shipCosts[i, 0] &&
-                            gameData.playerData.Oils >= ShipCreationManager.Instance.shipCosts[i, 1] &&
-                            gameData.playerData.Cube >= ShipCreationManager.Instance.shipCosts[i, 2])
-                        {
-                            enable = true;
-                            break;
-                        }
+                        enable = true;
+                        break;
                     }
                 }
             }
         }
+
         createShipBtn.SetEnabled(enable);
     }
 
@@ -207,7 +200,6 @@ public class ShipCreationPanel : MonoBehaviour
         }
         // 標記選擇
         shipTypeBtns[idx].AddToClassList("selected");
-        selectedShipTypeIndex = idx;
 
         // 根據船型自動填入建造成本
         goldInputField.value = ShipCreationManager.Instance.shipCosts[idx, 0];
@@ -222,7 +214,7 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     public void Show()
     {
-         if (root != null)
+        if (root != null)
         {
             root.style.display = DisplayStyle.Flex;
             Debug.Log($"[WeaponCreatePanelController] 顯示武器創建面板，root.style.display = {root.style.display}");
@@ -238,11 +230,11 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     public void Hide()
     {
-         if (root != null)
+        if (root != null)
         {
             root.style.display = DisplayStyle.None;
             Debug.Log("[WeaponCreatePanelController] 隱藏武器創建面板, root.style.display = " + root.style.display);
-           
+
         }
         else
         {
@@ -282,7 +274,6 @@ public class ShipCreationPanel : MonoBehaviour
         {
             shipTypeBtns[i].RemoveFromClassList("selected");
         }
-        selectedShipTypeIndex = -1;
         createShipBtn.SetEnabled(false);
         UpdateCostDisplay(0, 0, 0);
     }
@@ -308,14 +299,10 @@ public class ShipCreationPanel : MonoBehaviour
         }
 
         Ship newShip = null;
-        if (selectedShipTypeIndex >= 0)
-        {
-            newShip = ShipCreationManager.Instance.TryCreateShip(selectedShipTypeIndex, goldInputField.value, oilInputField.value, cubeInputField.value);
-        }
-        else
-        {
-            newShip = ShipCreationManager.Instance.TryCreateRandomShip(goldInputField.value, oilInputField.value, cubeInputField.value);
-        }
+
+
+        newShip = ShipCreationManager.Instance.TryCreateRandomShip(goldInputField.value, oilInputField.value, cubeInputField.value);
+
 
         if (newShip != null)
         {
