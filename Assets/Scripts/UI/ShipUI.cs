@@ -45,180 +45,78 @@ public class ShipUI : Singleton<ShipUI>
         var uiDoc = GetComponent<UIDocument>();
         if (uiDoc == null)
         {
-            Debug.LogError("[ShipUI] 無法找到 UIDocument 組件！");
+            LogError("無法找到 UIDocument 組件！");
             return;
         }
 
         var root = uiDoc.rootVisualElement;
         if (root == null)
         {
-            Debug.LogError("[ShipUI] 無法初始化 root 元素！");
+            LogError("無法初始化 root 元素！");
             return;
         }
 
         Panel = UIHelper.InitializeElement<VisualElement>(root, "Panel");
-        lblSpeedFrontFull = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontFull");
-        lblSpeedFrontThreeQuarters = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontThreeQuarters");
-        lblSpeedFrontHalf = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontHalf");
-        lblSpeedFrontQuarter = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontQuarter");
-        lblSpeedStop = UIHelper.InitializeElement<Label>(Panel, "lblSpeedStop");
-        lblSpeedBackFull = UIHelper.InitializeElement<Label>(Panel, "lblSpeedBackFull");
-
-        lblRotationLeftFull = UIHelper.InitializeElement<Label>(Panel, "lblRotationLeftFull");
-        lblRotationLeftHalf = UIHelper.InitializeElement<Label>(Panel, "lblRotationLeftHalf");
-        lblRotationStop = UIHelper.InitializeElement<Label>(Panel, "lblRotationStop");
-        lblRotationRightHalf = UIHelper.InitializeElement<Label>(Panel, "lblRotationRightHalf");
-        lblRotationRightFull = UIHelper.InitializeElement<Label>(Panel, "lblRotationRightFull");
-
-        weaponListContainer = UIHelper.InitializeElement<VisualElement>(Panel, "weaponListContainer");
-        if (weaponListContainer != null)
+        if (Panel == null)
         {
-            weaponListContainer.Clear();
+            LogError("找不到名為 'Panel' 的 VisualElement！");
+            return;
         }
+
+        InitializeSpeedLabels();
+        InitializeRotationLabels();
+        InitializeWeaponListContainer();
+        InitializeLevelAndExperienceLabels();
     }
 
     public void Initial(Ship s)
     {
         ship = s;
 
-        // 檢查是否已存在 UIDocument 組件
-        UIDocument uiDoc = GetComponent<UIDocument>();
+        var uiDoc = GetComponent<UIDocument>() ?? gameObject.AddComponent<UIDocument>();
         if (uiDoc == null)
         {
-            uiDoc = gameObject.AddComponent<UIDocument>();
-            if (uiDoc == null)
-            {
-                Debug.LogError("[ShipUI] UIDocument 無法初始化！");
-                return;
-            }
+            LogError("UIDocument 無法初始化！");
+            return;
         }
 
-        // load panel settings
         uiDoc.panelSettings = Resources.Load<PanelSettings>("UI/PanelSettings");
         if (uiDoc.panelSettings == null)
         {
-            Debug.LogError("[ShipUI] 無法加載 PanelSettings 資源！");
+            LogError("無法加載 PanelSettings 資源！");
             return;
         }
 
-        // load the UXML file
         uiDoc.visualTreeAsset = Resources.Load<VisualTreeAsset>("UI/ShipUI");
         if (uiDoc.visualTreeAsset == null)
         {
-            Debug.LogError("[ShipUI] 無法加載 ShipUI 資源！");
+            LogError("無法加載 ShipUI 資源！");
             return;
         }
 
-        VisualElement root = uiDoc.rootVisualElement;
+        var root = uiDoc.rootVisualElement;
         if (root == null)
         {
-            Debug.LogError("[ShipUI] UIDocument 的 rootVisualElement 為 null！");
+            LogError("UIDocument 的 rootVisualElement 為 null！");
             return;
         }
 
         Panel = root.Q<VisualElement>("Panel");
         if (Panel == null)
         {
-            Debug.LogError("[ShipUI] 找不到名為 'Panel' 的 VisualElement！");
+            LogError("找不到名為 'Panel' 的 VisualElement！");
             return;
         }
 
         root.RegisterCallback<ClickEvent>(ev => Destroy(gameObject));
 
-        lblSpeedFrontFull = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontFull");
-        lblSpeedFrontThreeQuarters = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontThreeQuarters");
-        lblSpeedFrontHalf = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontHalf");
-        lblSpeedFrontQuarter = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontQuarter");
-        lblSpeedStop = UIHelper.InitializeElement<Label>(Panel, "lblSpeedStop");
-        lblSpeedBackFull = UIHelper.InitializeElement<Label>(Panel, "lblSpeedBackFull");
+        InitializeSpeedLabels();
+        InitializeRotationLabels();
+        InitializeWeaponListContainer();
+        InitializeLevelAndExperienceLabels();
+        UpdateLevelAndExperienceUI();
 
-        lblRotationLeftFull = UIHelper.InitializeElement<Label>(Panel, "lblRotationLeftFull");
-        lblRotationLeftHalf = UIHelper.InitializeElement<Label>(Panel, "lblRotationLeftHalf");
-        lblRotationStop = UIHelper.InitializeElement<Label>(Panel, "lblRotationStop");
-        lblRotationRightHalf = UIHelper.InitializeElement<Label>(Panel, "lblRotationRightHalf");
-        lblRotationRightFull = UIHelper.InitializeElement<Label>(Panel, "lblRotationRightFull");
-
-        // 新增：武器列表容器
-        weaponListContainer = Panel.Q<VisualElement>("weaponListContainer");
-        if (weaponListContainer == null)
-        {
-            weaponListContainer = new VisualElement();
-            weaponListContainer.name = "weaponListContainer";
-            weaponListContainer.style.flexDirection = FlexDirection.Row;
-            weaponListContainer.style.marginTop = 10;
-            Panel.Add(weaponListContainer);
-        }
-        weaponListContainer.Clear();
-
-        // 依照 intWeaponLimit 顯示武器欄位
-        int weaponSlotCount = ship.IntWeaponLimit;
-        for (int i = 0; i < weaponSlotCount; i++)
-        {
-            Weapon weapon = (ship.weapons != null && i < ship.weapons.Count) ? ship.weapons[i] : null;
-            VisualElement weaponIcon = new VisualElement();
-            weaponIcon.style.width = 32;
-            weaponIcon.style.height = 32;
-            weaponIcon.style.marginRight = 8;
-
-            if (weapon != null)
-            {
-                weaponIcon.style.backgroundColor = new Color(0.8f, 0.8f, 0.2f, 1f);
-                weaponIcon.tooltip = $"武器{i+1}";
-                int weaponIndex = i; // 避免閉包問題
-                weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponDetail(ship.weapons[weaponIndex]));
-            }
-            else
-            {
-                weaponIcon.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.3f); // 空槽顏色
-                weaponIcon.tooltip = $"空武器槽{i+1}";
-                int weaponIndex = i; // 避免閉包問題
-                weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponSelectionPanel(weaponIndex));
-            }
-            weaponListContainer.Add(weaponIcon);
-        }
-
-        lblLevel = Panel.Q<Label>("lblLevel");
-        if (lblLevel == null)
-        {
-            lblLevel = new Label();
-            lblLevel.name = "lblLevel";
-            lblLevel.style.marginTop = 10;
-            lblLevel.style.unityTextAlign = TextAnchor.MiddleLeft;
-            Panel.Add(lblLevel);
-        }
-
-        lblExperience = Panel.Q<Label>("lblExperience");
-        if (lblExperience == null)
-        {
-            lblExperience = new Label();
-            lblExperience.name = "lblExperience";
-            lblExperience.style.marginTop = 5;
-            lblExperience.style.unityTextAlign = TextAnchor.MiddleLeft;
-            Panel.Add(lblExperience);
-        }
-
-        UpdateLevelAndExperienceUI(); // 更新等級和經驗值的顯示
-
-        // set the ui position
-        Vector2 shipScreenPosition = Camera.main.WorldToScreenPoint(ship.transform.position);
-        Debug.Log("Ship Screen Position: " + shipScreenPosition);
-        Panel.style.left = shipScreenPosition.x;
-        Panel.style.top = shipScreenPosition.y;
-
-        // Set the speed labels
-        lblSpeedFrontFull.RegisterCallback<ClickEvent>(ev => SpeedControll(1.0f));
-        lblSpeedFrontThreeQuarters.RegisterCallback<ClickEvent>(ev => SpeedControll(0.75f));
-        lblSpeedFrontHalf.RegisterCallback<ClickEvent>(ev => SpeedControll(0.5f));
-        lblSpeedFrontQuarter.RegisterCallback<ClickEvent>(ev => SpeedControll(0.25f));
-        lblSpeedStop.RegisterCallback<ClickEvent>(ev => SpeedControll(0.0f));
-        lblSpeedBackFull.RegisterCallback<ClickEvent>(ev => SpeedControll(-0.25f));
-
-        // Set the rotation labels
-        lblRotationLeftFull.RegisterCallback<ClickEvent>(ev => RotationControll(1.0f));
-        lblRotationLeftHalf.RegisterCallback<ClickEvent>(ev => RotationControll(0.5f));
-        lblRotationStop.RegisterCallback<ClickEvent>(ev => RotationControll(0.0f));
-        lblRotationRightHalf.RegisterCallback<ClickEvent>(ev => RotationControll(-0.5f));
-        lblRotationRightFull.RegisterCallback<ClickEvent>(ev => RotationControll(-1.0f));
+        SetUIPosition();
     }
 
     // Update is called once per frame
@@ -231,7 +129,7 @@ public class ShipUI : Singleton<ShipUI>
     {
         if (ship == null)
         {
-            Debug.LogError("ship speed control fail. Ship is not set.");
+            LogError("ship speed control fail. Ship is not set.");
             return;
         }
         float MaxSpeed = ship.MaxSpeed;
@@ -247,7 +145,7 @@ public class ShipUI : Singleton<ShipUI>
     {
         if (ship == null)
         {
-            Debug.LogError("ship rotation control fail. Ship is not set.");
+            LogError("ship rotation control fail. Ship is not set.");
             return;
         }
         float MaxRotationSpeed = ship.MaxRotationSpeed;
@@ -453,5 +351,87 @@ public class ShipUI : Singleton<ShipUI>
             lblLevel.text = $"等級: {ship.Level}";
             lblExperience.text = $"經驗值: {ship.Experience}/{ship.Level * 10}";
         }
+    }
+
+    private void InitializeSpeedLabels()
+    {
+        lblSpeedFrontFull = InitializeSpeedLabel("lblSpeedFrontFull", 1.0f);
+        lblSpeedFrontThreeQuarters = InitializeSpeedLabel("lblSpeedFrontThreeQuarters", 0.75f);
+        lblSpeedFrontHalf = InitializeSpeedLabel("lblSpeedFrontHalf", 0.5f);
+        lblSpeedFrontQuarter = InitializeSpeedLabel("lblSpeedFrontQuarter", 0.25f);
+        lblSpeedStop = InitializeSpeedLabel("lblSpeedStop", 0.0f);
+        lblSpeedBackFull = InitializeSpeedLabel("lblSpeedBackFull", -0.25f);
+    }
+
+    private Label InitializeSpeedLabel(string name, float speedPercentage)
+    {
+        var label = UIHelper.InitializeElement<Label>(Panel, name);
+        label.RegisterCallback<ClickEvent>(ev => SpeedControll(speedPercentage));
+        return label;
+    }
+
+    private void InitializeRotationLabels()
+    {
+        lblRotationLeftFull = InitializeRotationLabel("lblRotationLeftFull", 1.0f);
+        lblRotationLeftHalf = InitializeRotationLabel("lblRotationLeftHalf", 0.5f);
+        lblRotationStop = InitializeRotationLabel("lblRotationStop", 0.0f);
+        lblRotationRightHalf = InitializeRotationLabel("lblRotationRightHalf", -0.5f);
+        lblRotationRightFull = InitializeRotationLabel("lblRotationRightFull", -1.0f);
+    }
+
+    private Label InitializeRotationLabel(string name, float rotationPercentage)
+    {
+        var label = UIHelper.InitializeElement<Label>(Panel, name);
+        label.RegisterCallback<ClickEvent>(ev => RotationControll(rotationPercentage));
+        return label;
+    }
+
+    private void InitializeLevelAndExperienceLabels()
+    {
+        lblLevel = InitializeLabel("lblLevel", 10);
+        lblExperience = InitializeLabel("lblExperience", 5);
+    }
+
+    private Label InitializeLabel(string name, int marginTop)
+    {
+        var label = Panel.Q<Label>(name);
+        if (label == null)
+        {
+            label = new Label();
+            label.name = name;
+            label.style.marginTop = marginTop;
+            label.style.unityTextAlign = TextAnchor.MiddleLeft;
+            Panel.Add(label);
+        }
+        return label;
+    }
+
+    private void InitializeWeaponListContainer()
+    {
+        weaponListContainer = Panel.Q<VisualElement>("weaponListContainer") ?? new VisualElement
+        {
+            name = "weaponListContainer",
+            style =
+            {
+                flexDirection = FlexDirection.Row,
+                marginTop = 10
+            }
+        };
+        Panel.Add(weaponListContainer);
+        weaponListContainer.Clear();
+    }
+
+    private void SetUIPosition()
+    {
+        if (Camera.main == null)
+        {
+            LogError("Camera.main 為 null，無法設定 UI 位置！");
+            return;
+        }
+
+        Vector2 shipScreenPosition = Camera.main.WorldToScreenPoint(ship.transform.position);
+        Debug.Log("Ship Screen Position: " + shipScreenPosition);
+        Panel.style.left = shipScreenPosition.x;
+        Panel.style.top = shipScreenPosition.y;
     }
 }
