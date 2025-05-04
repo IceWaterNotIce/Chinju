@@ -112,6 +112,7 @@ public class ShipCreationManager : MonoBehaviour
         spawnPosition.z = -1;
 
         GameObject battleShip = Instantiate(shipPrefab, spawnPosition, Quaternion.identity);
+        battleShip.transform.SetParent(this.transform); // 設置為 ShipCreationManager 的子物件
         if (battleShip != null)
         {
             Debug.Log("[ShipCreationManager] 戰艦實例化成功！");
