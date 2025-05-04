@@ -85,27 +85,22 @@ public class ShipCreationPanel : MonoBehaviour
         // 取得五個船型按鈕
         for (int i = 0; i < 5; i++)
         {
-            shipTypeBtns[i] = root.Q<Button>($"ship-type-btn-{i + 1}");
+            shipTypeBtns[i] = UIHelper.InitializeElement<Button>(root, $"ship-type-btn-{i + 1}");
             int idx = i;
             if (shipTypeBtns[i] != null)
             {
                 shipTypeBtns[i].clicked += () => SelectShipType(idx);
             }
-            else
-            {
-                Debug.LogError($"找不到 ship-type-btn-{i + 1}！");
-            }
         }
 
-        createShipBtn = root.Q<Button>("create-ship-btn");
-        goldCostLabel = root.Q<Label>("gold-cost");
-        oilCostLabel = root.Q<Label>("oil-cost");
-        cubeCostLabel = root.Q<Label>("cube-cost");
+        createShipBtn = UIHelper.InitializeElement<Button>(root, "create-ship-btn");
+        goldCostLabel = UIHelper.InitializeElement<Label>(root, "gold-cost");
+        oilCostLabel = UIHelper.InitializeElement<Label>(root, "oil-cost");
+        cubeCostLabel = UIHelper.InitializeElement<Label>(root, "cube-cost");
 
-        // 新增：取得輸入欄位
-        goldInputField = root.Q<IntegerField>("gold-input");
-        oilInputField = root.Q<IntegerField>("oil-input");
-        cubeInputField = root.Q<IntegerField>("cube-input");
+        goldInputField = UIHelper.InitializeElement<IntegerField>(root, "gold-input");
+        oilInputField = UIHelper.InitializeElement<IntegerField>(root, "oil-input");
+        cubeInputField = UIHelper.InitializeElement<IntegerField>(root, "cube-input");
 
         // 若找不到則自動建立（方便測試）
         if (goldInputField == null)

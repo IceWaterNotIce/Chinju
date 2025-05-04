@@ -26,4 +26,53 @@
     font-size: 12px;
     color: white;
     margin-bottom: 5px;
+    margin-top: 10px;
+    text-align: left;
+}
+
+/* 新增：武器圖示樣式 */
+.weapon-icon {
+    width: 32px;
+    height: 32px;
+    margin-right: 8px;
+}
+
+/* 新增：武器總覽面板樣式 */
+.weapons-panel {
+    position: absolute;
+    left: 200px;
+    top: 100px;
+    width: 300px;
+    background-color: rgba(25, 25, 25, 0.95);
+    padding: 16px;
+    border-radius: 10px;
+}
+
+/* 新增：武器詳細資訊彈出視窗樣式 */
+.weapon-detail-popup {
+    position: absolute;
+    left: 100px;
+    top: 100px;
+    width: 220px;
+    background-color: rgba(0, 0, 0, 0.85);
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* 新增：標題樣式 */
+.title {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+/* 新增：武器選擇面板樣式 */
+.weapon-selection-popup {
+    position: absolute;
+    left: 100px;
+    top: 100px;
+    width: 300px;
+    background-color: rgba(0, 0, 0, 0.85);
+    padding: 10px;
+    border-radius: 8px;
 }

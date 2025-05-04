@@ -31,6 +31,9 @@ public class ShipUI : Singleton<ShipUI>
     private Label lblLevel; // 新增：顯示等級的 Label
     private Label lblExperience; // 新增：顯示經驗值的 Label
 
+    private const float PopupWidth = 300f; // Constant for popup width
+    private const float PopupPadding = 10f; // Constant for popup padding
+
     void TiggerMap()
     {
         //Enable the Line renderer
@@ -39,7 +42,39 @@ public class ShipUI : Singleton<ShipUI>
 
     void Start()
     {
+        var uiDoc = GetComponent<UIDocument>();
+        if (uiDoc == null)
+        {
+            Debug.LogError("[ShipUI] 無法找到 UIDocument 組件！");
+            return;
+        }
 
+        var root = uiDoc.rootVisualElement;
+        if (root == null)
+        {
+            Debug.LogError("[ShipUI] 無法初始化 root 元素！");
+            return;
+        }
+
+        Panel = UIHelper.InitializeElement<VisualElement>(root, "Panel");
+        lblSpeedFrontFull = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontFull");
+        lblSpeedFrontThreeQuarters = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontThreeQuarters");
+        lblSpeedFrontHalf = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontHalf");
+        lblSpeedFrontQuarter = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontQuarter");
+        lblSpeedStop = UIHelper.InitializeElement<Label>(Panel, "lblSpeedStop");
+        lblSpeedBackFull = UIHelper.InitializeElement<Label>(Panel, "lblSpeedBackFull");
+
+        lblRotationLeftFull = UIHelper.InitializeElement<Label>(Panel, "lblRotationLeftFull");
+        lblRotationLeftHalf = UIHelper.InitializeElement<Label>(Panel, "lblRotationLeftHalf");
+        lblRotationStop = UIHelper.InitializeElement<Label>(Panel, "lblRotationStop");
+        lblRotationRightHalf = UIHelper.InitializeElement<Label>(Panel, "lblRotationRightHalf");
+        lblRotationRightFull = UIHelper.InitializeElement<Label>(Panel, "lblRotationRightFull");
+
+        weaponListContainer = UIHelper.InitializeElement<VisualElement>(Panel, "weaponListContainer");
+        if (weaponListContainer != null)
+        {
+            weaponListContainer.Clear();
+        }
     }
 
     public void Initial(Ship s)
@@ -90,18 +125,18 @@ public class ShipUI : Singleton<ShipUI>
 
         root.RegisterCallback<ClickEvent>(ev => Destroy(gameObject));
 
-        lblSpeedFrontFull = Panel.Q<Label>("lblSpeedFrontFull");
-        lblSpeedFrontThreeQuarters = root.Q<Label>("lblSpeedFrontThreeQuarters");
-        lblSpeedFrontHalf = Panel.Q<Label>("lblSpeedFrontHalf");
-        lblSpeedFrontQuarter = root.Q<Label>("lblSpeedFrontQuarter");
-        lblSpeedStop = Panel.Q<Label>("lblSpeedStop");
-        lblSpeedBackFull = Panel.Q<Label>("lblSpeedBackFull");
+        lblSpeedFrontFull = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontFull");
+        lblSpeedFrontThreeQuarters = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontThreeQuarters");
+        lblSpeedFrontHalf = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontHalf");
+        lblSpeedFrontQuarter = UIHelper.InitializeElement<Label>(Panel, "lblSpeedFrontQuarter");
+        lblSpeedStop = UIHelper.InitializeElement<Label>(Panel, "lblSpeedStop");
+        lblSpeedBackFull = UIHelper.InitializeElement<Label>(Panel, "lblSpeedBackFull");
 
-        lblRotationLeftFull = root.Q<Label>("lblRotationLeftFull");
-        lblRotationLeftHalf = root.Q<Label>("lblRotationLeftHalf");
-        lblRotationStop = root.Q<Label>("lblRotationStop");
-        lblRotationRightHalf = root.Q<Label>("lblRotationRightHalf");
-        lblRotationRightFull = root.Q<Label>("lblRotationRightFull");
+        lblRotationLeftFull = UIHelper.InitializeElement<Label>(Panel, "lblRotationLeftFull");
+        lblRotationLeftHalf = UIHelper.InitializeElement<Label>(Panel, "lblRotationLeftHalf");
+        lblRotationStop = UIHelper.InitializeElement<Label>(Panel, "lblRotationStop");
+        lblRotationRightHalf = UIHelper.InitializeElement<Label>(Panel, "lblRotationRightHalf");
+        lblRotationRightFull = UIHelper.InitializeElement<Label>(Panel, "lblRotationRightFull");
 
         // 新增：武器列表容器
         weaponListContainer = Panel.Q<VisualElement>("weaponListContainer");
@@ -232,22 +267,10 @@ public class ShipUI : Singleton<ShipUI>
             weaponDetailPopup.RemoveFromHierarchy();
         }
         weaponDetailPopup = new VisualElement();
-        weaponDetailPopup.style.position = Position.Absolute;
-        weaponDetailPopup.style.left = 100;
-        weaponDetailPopup.style.top = 100;
-        weaponDetailPopup.style.width = 220;
-        weaponDetailPopup.style.backgroundColor = new Color(0, 0, 0, 0.85f);
-        weaponDetailPopup.style.paddingLeft = 10;
-        weaponDetailPopup.style.paddingRight = 10;
-        weaponDetailPopup.style.paddingTop = 10;
-        weaponDetailPopup.style.paddingBottom = 10;
-        weaponDetailPopup.style.borderTopLeftRadius = 8;
-        weaponDetailPopup.style.borderTopRightRadius = 8;
-        weaponDetailPopup.style.borderBottomLeftRadius = 8;
-        weaponDetailPopup.style.borderBottomRightRadius = 8;
+        weaponDetailPopup.AddToClassList("weapon-detail-popup");
 
         Label title = new Label("武器資訊");
-        title.style.unityFontStyleAndWeight = FontStyle.Bold;
+        title.AddToClassList("title");
         weaponDetailPopup.Add(title);
 
         weaponDetailPopup.Add(new Label($"最大攻擊距離: {weapon.MaxAttackDistance}"));
@@ -256,7 +279,6 @@ public class ShipUI : Singleton<ShipUI>
         weaponDetailPopup.Add(new Label($"彈藥預製體: {(weapon.AmmoPrefab != null ? weapon.AmmoPrefab.name : "無")}"));
 
         Button closeBtn = new Button(() => weaponDetailPopup.RemoveFromHierarchy()) { text = "關閉" };
-        closeBtn.style.marginTop = 10;
         weaponDetailPopup.Add(closeBtn);
 
         Panel.Add(weaponDetailPopup);
@@ -271,23 +293,10 @@ public class ShipUI : Singleton<ShipUI>
         }
 
         weaponsPanel = new VisualElement();
-        weaponsPanel.style.position = Position.Absolute;
-        weaponsPanel.style.left = 200;
-        weaponsPanel.style.top = 100;
-        weaponsPanel.style.width = 300;
-        weaponsPanel.style.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.95f);
-        weaponsPanel.style.paddingLeft = 16;
-        weaponsPanel.style.paddingRight = 16;
-        weaponsPanel.style.paddingTop = 16;
-        weaponsPanel.style.paddingBottom = 16;
-        weaponsPanel.style.borderTopLeftRadius = 10;
-        weaponsPanel.style.borderTopRightRadius = 10;
-        weaponsPanel.style.borderBottomLeftRadius = 10;
-        weaponsPanel.style.borderBottomRightRadius = 10;
+        weaponsPanel.AddToClassList("weapons-panel");
 
         Label title = new Label("武器總覽");
-        title.style.unityFontStyleAndWeight = FontStyle.Bold;
-        title.style.fontSize = 16;
+        title.AddToClassList("title");
         weaponsPanel.Add(title);
 
         int weaponSlotCount = ship.IntWeaponLimit;
@@ -296,13 +305,9 @@ public class ShipUI : Singleton<ShipUI>
             Weapon weapon = (ship.weapons != null && i < ship.weapons.Count) ? ship.weapons[i] : null;
             VisualElement row = new VisualElement();
             row.style.flexDirection = FlexDirection.Row;
-            row.style.marginTop = 8;
-            row.style.alignItems = Align.Center;
 
             VisualElement icon = new VisualElement();
-            icon.style.width = 32;
-            icon.style.height = 32;
-            icon.style.marginRight = 8;
+            icon.AddToClassList("weapon-icon");
 
             if (weapon != null)
             {
@@ -319,14 +324,12 @@ public class ShipUI : Singleton<ShipUI>
             row.Add(icon);
 
             Label label = new Label(weapon != null ? $"武器{i+1}" : $"空武器槽{i+1}");
-            label.style.unityTextAlign = TextAnchor.MiddleLeft;
             row.Add(label);
 
             weaponsPanel.Add(row);
         }
 
         Button closeBtn = new Button(() => weaponsPanel.RemoveFromHierarchy()) { text = "關閉" };
-        closeBtn.style.marginTop = 16;
         weaponsPanel.Add(closeBtn);
 
         Panel.Add(weaponsPanel);
@@ -341,22 +344,15 @@ public class ShipUI : Singleton<ShipUI>
         }
 
         weaponDetailPopup = new VisualElement();
-        weaponDetailPopup.style.position = Position.Absolute;
-        weaponDetailPopup.style.left = 100;
-        weaponDetailPopup.style.top = 100;
-        weaponDetailPopup.style.width = 300;
-        weaponDetailPopup.style.backgroundColor = new Color(0, 0, 0, 0.85f);
-        weaponDetailPopup.style.paddingLeft = 10;
-        weaponDetailPopup.style.paddingRight = 10;
-        weaponDetailPopup.style.paddingTop = 10;
-        weaponDetailPopup.style.paddingBottom = 10;
-        weaponDetailPopup.style.borderTopLeftRadius = 8;
-        weaponDetailPopup.style.borderTopRightRadius = 8;
-        weaponDetailPopup.style.borderBottomLeftRadius = 8;
-        weaponDetailPopup.style.borderBottomRightRadius = 8;
+        weaponDetailPopup.AddToClassList("weapon-selection-popup");
+
+        // Dynamically calculate position
+        Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
+        weaponDetailPopup.style.left = screenCenter.x - PopupWidth / 2;
+        weaponDetailPopup.style.top = screenCenter.y - PopupWidth / 2;
 
         Label title = new Label("選擇武器");
-        title.style.unityFontStyleAndWeight = FontStyle.Bold;
+        title.AddToClassList("title");
         weaponDetailPopup.Add(title);
 
         // 從玩家資料中獲取武器清單
@@ -372,8 +368,8 @@ public class ShipUI : Singleton<ShipUI>
                     {
                         Name = weaponData.Name,
                         Damage = weaponData.Damage,
-                        MaxAttackDistance = weaponData.MaxAttackDistance, // 修改
-                        MinAttackDistance = weaponData.MinAttackDistance, // 修改
+                        MaxAttackDistance = weaponData.MaxAttackDistance,
+                        MinAttackDistance = weaponData.MinAttackDistance,
                         AttackSpeed = weaponData.AttackSpeed,
                         CooldownTime = weaponData.CooldownTime
                     };
@@ -397,7 +393,7 @@ public class ShipUI : Singleton<ShipUI>
         }
 
         Button closeBtn = new Button(() => weaponDetailPopup.RemoveFromHierarchy()) { text = "關閉" };
-        closeBtn.style.marginTop = 10;
+        closeBtn.style.marginTop = PopupPadding;
         weaponDetailPopup.Add(closeBtn);
 
         Panel.Add(weaponDetailPopup);
@@ -406,33 +402,48 @@ public class ShipUI : Singleton<ShipUI>
     // 新增：刷新武器列表的方法
     private void RefreshWeaponList()
     {
+        if (ship == null || ship.weapons == null)
+        {
+            LogError("Ship or weapons list is null. Cannot refresh weapon list.");
+            return;
+        }
+
         weaponListContainer.Clear();
 
         int weaponSlotCount = ship.IntWeaponLimit;
         for (int i = 0; i < weaponSlotCount; i++)
         {
-            Weapon weapon = (ship.weapons != null && i < ship.weapons.Count) ? ship.weapons[i] : null;
-            VisualElement weaponIcon = new VisualElement();
-            weaponIcon.style.width = 32;
-            weaponIcon.style.height = 32;
-            weaponIcon.style.marginRight = 8;
-
-            if (weapon != null)
-            {
-                weaponIcon.style.backgroundColor = new Color(0.8f, 0.8f, 0.2f, 1f);
-                weaponIcon.tooltip = $"武器{i+1}";
-                int weaponIndex = i; // 避免閉包問題
-                weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponDetail(ship.weapons[weaponIndex]));
-            }
-            else
-            {
-                weaponIcon.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.3f); // 空槽顏色
-                weaponIcon.tooltip = $"空武器槽{i+1}";
-                int weaponIndex = i; // 避免閉包問題
-                weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponSelectionPanel(weaponIndex));
-            }
+            Weapon weapon = (i < ship.weapons.Count) ? ship.weapons[i] : null;
+            VisualElement weaponIcon = CreateWeaponIcon(weapon, i);
             weaponListContainer.Add(weaponIcon);
         }
+    }
+
+    private VisualElement CreateWeaponIcon(Weapon weapon, int index)
+    {
+        VisualElement weaponIcon = new VisualElement();
+        weaponIcon.AddToClassList("weapon-icon");
+
+        if (weapon != null)
+        {
+            weaponIcon.style.backgroundColor = new Color(0.8f, 0.8f, 0.2f, 1f);
+            weaponIcon.tooltip = $"武器{index + 1}";
+            weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponDetail(weapon));
+        }
+        else
+        {
+            weaponIcon.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.3f);
+            weaponIcon.tooltip = $"空武器槽{index + 1}";
+            weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponSelectionPanel(index));
+        }
+
+        return weaponIcon;
+    }
+
+    private void LogError(string message)
+    {
+        // Replace Debug.LogError with centralized logging
+        Debug.LogError($"[ShipUI] {message}");
     }
 
     private void UpdateLevelAndExperienceUI()

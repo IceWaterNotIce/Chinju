@@ -9,24 +9,15 @@ public class WeaponPanelController : MonoBehaviour
 
         var root = GetComponent<UIDocument>().rootVisualElement;
 
-        var weaponList = root.Q<ScrollView>("weapon-list");
-        if (weaponList == null)
-        {
-            Debug.LogError("[WeaponPanelController] 找不到 'weapon-list' 元素。");
-            return;
-        }
+        var weaponList = UIHelper.InitializeElement<ScrollView>(root, "weapon-list");
+        if (weaponList == null) return;
 
         weaponList.Clear(); // 清空清單
 
-        // 檢查 GameDataController 和 CurrentGameData 是否正確初始化
         if (GameDataController.Instance == null)
         {
             Debug.LogError("[WeaponPanelController] GameDataController.Instance 為空。");
             return;
-        }
-        else
-        {
-            Debug.Log("[WeaponPanelController] GameDataController.Instance 已初始化。");
         }
 
         if (GameDataController.Instance.CurrentGameData == null)
@@ -34,12 +25,7 @@ public class WeaponPanelController : MonoBehaviour
             Debug.LogError("[WeaponPanelController] CurrentGameData 為空。");
             return;
         }
-        else
-        {
-            Debug.Log("[WeaponPanelController] CurrentGameData 已初始化。");
-        }
 
-        // 從玩家資料中獲取武器清單
         var playerData = GameDataController.Instance.CurrentGameData.playerData;
         if (playerData != null && playerData.Weapons != null)
         {

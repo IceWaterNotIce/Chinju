@@ -47,11 +47,11 @@ public class SettingMenu : MonoBehaviour
                 return;
             }
 
-            continueButton = root.Q<Button>("continueButton");
-            saveGameButton = root.Q<Button>("saveGameButton");
-            loadGameButton = root.Q<Button>("loadGameButton");
-            exitGameButton = root.Q<Button>("exitGameButton");
-            newGameButton = root.Q<Button>("newGameButton"); // 新增
+            continueButton = UIHelper.InitializeElement<Button>(root, "continueButton");
+            saveGameButton = UIHelper.InitializeElement<Button>(root, "saveGameButton");
+            loadGameButton = UIHelper.InitializeElement<Button>(root, "loadGameButton");
+            exitGameButton = UIHelper.InitializeElement<Button>(root, "exitGameButton");
+            newGameButton = UIHelper.InitializeElement<Button>(root, "newGameButton"); // 新增
 
             // 初始化面板狀態
             root.style.display = DisplayStyle.None;

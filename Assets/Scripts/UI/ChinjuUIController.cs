@@ -27,7 +27,7 @@ public class ChinjuUIController : MonoBehaviour
 
     private void BindButton(string buttonName, System.Action action)
     {
-        var button = chinjuRoot?.Q<Button>(buttonName);
+        var button = UIHelper.InitializeElement<Button>(chinjuRoot, buttonName);
         if (button != null) button.clicked += action;
     }
 

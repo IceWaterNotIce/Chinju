@@ -15,7 +15,8 @@ public static class UIHelper
         var element = root.Q<T>(name);
         if (element == null)
         {
-            Debug.LogError($"[UIHelper] 無法找到名為 '{name}' 的 UI 元素！");
+            var className = System.Reflection.MethodBase.GetCurrentMethod().DeclaringType.Name;
+            Debug.LogError($"[{className}] 無法找到名為 '{name}' 的 UI 元素！");
         }
         return element;
     }

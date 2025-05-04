@@ -13,11 +13,11 @@ public class WeaponCreatePanelController : MonoBehaviour
     {
         root = GetComponent<UIDocument>().rootVisualElement;
 
-        var dropdown = root.Q<DropdownField>("weapon-dropdown");
-        var resourceLabel = root.Q<Label>("resource-label");
-        var createButton = root.Q<Button>("create-button");
-        var resultLabel = root.Q<Label>("result-label");
-        var closeBtn = root.Q<Button>("close-button");
+        var dropdown = UIHelper.InitializeElement<DropdownField>(root, "weapon-dropdown");
+        var resourceLabel = UIHelper.InitializeElement<Label>(root, "resource-label");
+        var createButton = UIHelper.InitializeElement<Button>(root, "create-button");
+        var resultLabel = UIHelper.InitializeElement<Label>(root, "result-label");
+        var closeBtn = UIHelper.InitializeElement<Button>(root, "close-button");
 
         LoadWeaponPrefabs(); // 動態加載武器預製體
 

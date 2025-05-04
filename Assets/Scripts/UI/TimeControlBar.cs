@@ -7,7 +7,6 @@ public class TimeControlBar : MonoBehaviour
     private int currentScaleIndex = 2; // 預設為正常速度 (1x)
     private UIDocument uiDocument;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         uiDocument = GetComponent<UIDocument>();
@@ -24,26 +23,27 @@ public class TimeControlBar : MonoBehaviour
             return;
         }
 
-        // 綁定按鈕事件
-        root.Q<Button>("pause-btn").clicked += () => SetTimeScale(0);
-        root.Q<Button>("slow-btn").clicked += () => SetTimeScale(1);
-        root.Q<Button>("normal-btn").clicked += () => SetTimeScale(2);
-        root.Q<Button>("fast-btn").clicked += () => SetTimeScale(3);
-        root.Q<Button>("super-fast-btn").clicked += () => SetTimeScale(4);
+        BindButton(root, "pause-btn", () => SetTimeScale(0));
+        BindButton(root, "slow-btn", () => SetTimeScale(1));
+        BindButton(root, "normal-btn", () => SetTimeScale(2));
+        BindButton(root, "fast-btn", () => SetTimeScale(3));
+        BindButton(root, "super-fast-btn", () => SetTimeScale(4));
 
         UpdateTimeScale();
     }
 
-    // Update is called once per frame
-    void Update()
+    private void BindButton(VisualElement root, string buttonName, System.Action action)
     {
-        
+        var button = UIHelper.InitializeElement<Button>(root, buttonName);
+        if (button != null) button.clicked += action;
     }
 
-    /// <summary>
-    /// 設置時間倍率
-    /// </summary>
-    /// <param name="index">時間倍率索引</param>
+    private void UpdateTimeScale()
+    {
+        Time.timeScale = timeScales[currentScaleIndex];
+        Debug.Log($"時間倍率已更新為: {timeScales[currentScaleIndex]}x");
+    }
+
     public void SetTimeScale(int index)
     {
         if (index < 0 || index >= timeScales.Length)
@@ -54,14 +54,5 @@ public class TimeControlBar : MonoBehaviour
 
         currentScaleIndex = index;
         UpdateTimeScale();
-    }
-
-    /// <summary>
-    /// 更新遊戲時間倍率
-    /// </summary>
-    private void UpdateTimeScale()
-    {
-        Time.timeScale = timeScales[currentScaleIndex];
-        Debug.Log($"時間倍率已更新為: {timeScales[currentScaleIndex]}x");
     }
 }

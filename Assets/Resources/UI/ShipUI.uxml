@@ -1,32 +1,31 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" style="Assets/Resources/UI/ShipUI.uss">
-    <engine:VisualElement name="PanelBG" style="flex-grow: 1; flex-direction: row; align-self: auto; justify-content: space-between; width: auto; height: auto; align-items: stretch; position: relative;">
-        <engine:VisualElement name="Panel" style="flex-grow: 1; position: absolute; flex-direction: row; top: auto;">
-            <engine:VisualElement style="flex-grow: 1; align-self: center; align-items: center;">
-                <engine:Label text="Speed" style="font-size: 10px;" />
+    <engine:VisualElement name="PanelBG">
+        <engine:VisualElement name="Panel">
+            <engine:VisualElement>
+                <engine:Label text="Speed" />
             </engine:VisualElement>
-            <engine:VisualElement style="flex-grow: 1; align-self: center; justify-content: flex-start; align-items: center;">
-                <engine:Label text="Full" name="lblSpeedFrontFull" style="font-size: 10px;" />
-                <engine:Label text="3/4" name="lblSpeedFrontThreeQuarters" style="font-size: 10px;" />
-                <engine:Label text="1/2" name="lblSpeedFrontHalf" style="font-size: 10px;" />
-                <engine:Label text="1/4" name="lblSpeedFrontQuarter" style="font-size: 10px;" />
-                <engine:Label text="Stop" name="lblSpeedStop" style="font-size: 10px;" />
-                <engine:Label text="Full" name="lblSpeedBackFull" style="font-size: 10px;" />
+            <engine:VisualElement>
+                <engine:Label text="Full" name="lblSpeedFrontFull" />
+                <engine:Label text="3/4" name="lblSpeedFrontThreeQuarters" />
+                <engine:Label text="1/2" name="lblSpeedFrontHalf" />
+                <engine:Label text="1/4" name="lblSpeedFrontQuarter" />
+                <engine:Label text="Stop" name="lblSpeedStop" />
+                <engine:Label text="Full" name="lblSpeedBackFull" />
             </engine:VisualElement>
-            <engine:VisualElement style="flex-grow: 1; align-self: center; align-items: center;">
-                <engine:Label text="Rotation" style="font-size: 10px;" />
+            <engine:VisualElement>
+                <engine:Label text="Rotation" />
             </engine:VisualElement>
-            <engine:VisualElement style="flex-grow: 1; align-self: center; justify-content: flex-start; align-items: center;">
-                <engine:Label text="Full" name="lblRotationLeftFull" style="font-size: 10px;" />
-                <engine:Label text="1/2" name="lblRotationLeftHalf" style="font-size: 10px;" />
-                <engine:Label text="Stop" name="lblRotationStop" style="font-size: 10px;" />
-                <engine:Label text="1/2" name="lblRotationRightHalf" style="font-size: 10px;" />
-                <engine:Label text="Full" name="lblRotationRightFull" style="font-size: 10px;" />
+            <engine:VisualElement>
+                <engine:Label text="Full" name="lblRotationLeftFull" />
+                <engine:Label text="1/2" name="lblRotationLeftHalf" />
+                <engine:Label text="Stop" name="lblRotationStop" />
+                <engine:Label text="1/2" name="lblRotationRightHalf" />
+                <engine:Label text="Full" name="lblRotationRightFull" />
             </engine:VisualElement>
-            <engine:VisualElement name="weaponListContainer" style="flex-direction: row; margin-top: 10px;" />
-            <!-- 新增：顯示等級和經驗值 -->
-            <engine:VisualElement style="flex-direction: column; margin-top: 10px;">
-                <engine:Label name="lblLevel" text="等級: 1" style="font-size: 12px; margin-bottom: 5px;" />
-                <engine:Label name="lblExperience" text="經驗值: 0/10" style="font-size: 12px;" />
+            <engine:VisualElement name="weaponListContainer" />
+            <engine:VisualElement>
+                <engine:Label name="lblLevel" text="等級: 1" />
+                <engine:Label name="lblExperience" text="經驗值: 0/10" />
             </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>
