@@ -1,6 +1,4 @@
 using UnityEngine;
-using System.Collections.ObjectModel; // 新增引用
-using System.Collections.Generic; // For List<>
 
 public class ShipCreationManager : MonoBehaviour
 {
@@ -16,10 +14,6 @@ public class ShipCreationManager : MonoBehaviour
     };
 
     [SerializeField] private MapController mapController;
-
-    // 全域靜態列表管理所有船隻
-    private readonly List<Ship> allShips = new List<Ship>();
-    public ReadOnlyCollection<Ship> AllShips => allShips.AsReadOnly();
 
     private void Awake()
     {
@@ -126,29 +120,12 @@ public class ShipCreationManager : MonoBehaviour
         {
             Debug.Log("[ShipCreationManager] 戰艦實例化成功！");
             SaveShipData(spawnPosition);
-            RegisterShip(battleShip.GetComponent<Ship>());
             return battleShip.GetComponent<Ship>();
         }
         else
         {
             Debug.LogError("[ShipCreationManager] 戰艦實例化失敗！");
             return null;
-        }
-    }
-
-    public void RegisterShip(Ship ship)
-    {
-        if (!allShips.Contains(ship))
-        {
-            allShips.Add(ship);
-        }
-    }
-
-    public void UnregisterShip(Ship ship)
-    {
-        if (allShips.Contains(ship))
-        {
-            allShips.Remove(ship);
         }
     }
 

@@ -4,7 +4,6 @@ using UnityEngine.Tilemaps;
 using System;
 using System.Collections.Generic;
 using System.Linq; // 新增引用
-using System.Collections.ObjectModel; // 新增引用
 
 public class Ship : MonoBehaviour, IPointerClickHandler
 {
@@ -256,18 +255,6 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     [Header("Ship Type")]
     public bool IsPlayerShip = true; // 新增：標記是否為玩家船隻
 
-    private void OnEnable()
-    {
-        // 當船隻啟用時，加入 ShipCreationManager 的全域列表
-        ShipCreationManager.Instance?.RegisterShip(this);
-    }
-
-    private void OnDisable()
-    {
-        // 當船隻停用時，從 ShipCreationManager 的全域列表移除
-        ShipCreationManager.Instance?.UnregisterShip(this);
-    }
-
     public void Start()
     {
         tilemap = FindFirstObjectByType<Tilemap>();
@@ -297,8 +284,10 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         Ship nearestTarget = null;
         float nearestDistance = float.MaxValue;
 
-        // 使用全域靜態列表來獲取所有船隻
-        foreach (var ship in ShipCreationManager.Instance.AllShips)
+        // 獲取所有船隻
+        var allShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
+
+        foreach (var ship in allShips)
         {
             // 忽略自己和同類型的船隻
             if (ship == this || ship.IsPlayerShip == this.IsPlayerShip) continue;
