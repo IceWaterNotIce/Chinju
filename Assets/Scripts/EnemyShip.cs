@@ -55,7 +55,7 @@ public class EnemyShip : Ship
         {
             ChasePlayer();
         }
-        else if (distanceToPlayer > DetectionDistance)
+        else
         {
             RandomMove();
         }
@@ -87,14 +87,11 @@ public class EnemyShip : Ship
 
     private void Attack()
     {
-        // 實作攻擊邏輯（範例：發射投射物）
-        Debug.Log($"Enemy attacked! Damage: {Damage}");
-
-        /* 實際遊戲中可能包含：
-        1. 生成砲彈預製件
-        2. 播放攻擊動畫
-        3. 觸發音效
-        */
+        if (PlayerTarget != null)
+        {
+            Debug.Log($"[EnemyShip] {name} 開始攻擊玩家目標: {PlayerTarget.name}");
+            AttackTarget(PlayerTarget.gameObject);
+        }
     }
 
     private void RandomMove()

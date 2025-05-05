@@ -82,6 +82,7 @@ public class Weapon : MonoBehaviour
         if (isAttacking) return;
         isAttacking = true;
         currentTarget = target;
+        Debug.Log($"[Weapon] {name} 開始攻擊目標: {target.name}");
         attackCoroutine = StartCoroutine(AttackRoutine());
     }
 
@@ -89,7 +90,10 @@ public class Weapon : MonoBehaviour
     {
         isAttacking = false;
         if (attackCoroutine != null)
+        {
             StopCoroutine(attackCoroutine);
+            Debug.Log($"[Weapon] {name} 停止攻擊。");
+        }
     }
 
     private IEnumerator AttackRoutine()

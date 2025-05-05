@@ -316,6 +316,10 @@ public class Ship : MonoBehaviour, IPointerClickHandler
             Debug.Log($"[Ship] 更新目標為最近的船隻: {nearestTarget.name}，距離: {nearestDistance}");
             AttackTarget(nearestTarget.gameObject);
         }
+        else
+        {
+            StopAttack();
+        }
     }
 
     private float MaxWeaponAttackDistance()
@@ -382,9 +386,10 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     {
         foreach (var weapon in weapons)
         {
-            if (weapon != null)
+            if (weapon != null && target != null)
             {
                 weapon.StartAttack(target);
+                Debug.Log($"[Ship] {name} 開始攻擊目標: {target.name}");
             }
         }
     }
@@ -396,6 +401,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
             if (weapon != null)
             {
                 weapon.StopAttack();
+                Debug.Log($"[Ship] {name} 停止攻擊。");
             }
         }
     }
