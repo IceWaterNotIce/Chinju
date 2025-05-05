@@ -11,6 +11,7 @@ public class PlayerStatsUI : MonoBehaviour
     private Label oilLabel;
     private Label cubeLabel;
     private Label oilTransportLabel; // 新增石油運輸進度的 Label
+    private Label gameTimeLabel; // 新增遊戲時間的 Label
 
     // 移除 public GameData gameData;
     private GameData gameData;
@@ -25,6 +26,7 @@ public class PlayerStatsUI : MonoBehaviour
         oilLabel = UIHelper.InitializeElement<Label>(root, "oilLabel");
         cubeLabel = UIHelper.InitializeElement<Label>(root, "cubeLabel");
         oilTransportLabel = UIHelper.InitializeElement<Label>(root, "oilTransportLabel"); // 確保 UXML 中有對應的 Label
+        gameTimeLabel = UIHelper.InitializeElement<Label>(root, "gameTimeLabel"); // 確保 UXML 中有對應的 Label
 
         // 監聽 GameDataController 的資料變更
         if (GameDataController.Instance != null)
@@ -139,6 +141,14 @@ public class PlayerStatsUI : MonoBehaviour
         if (oilTransportLabel != null)
         {
             oilTransportLabel.text = progress;
+        }
+    }
+
+    void Update()
+    {
+        if (gameTimeLabel != null)
+        {
+            gameTimeLabel.text = $"遊戲時間: {GameManager.Instance.GetFormattedGameTime()}";
         }
     }
 }

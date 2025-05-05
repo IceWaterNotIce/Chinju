@@ -10,6 +10,7 @@ public class GameManager : Singleton<GameManager>
     public const string githubUrl = "https://raw.githubusercontent.com/IceWaterNotIce/Word-Curse/main/";
 
     private string saveFilePath;
+    private float gameTime; // 遊戲時間（秒）
 
     public delegate void GameEvent();
     public static event GameEvent OnGameSaved;
@@ -33,6 +34,11 @@ public class GameManager : Singleton<GameManager>
         Debug.Log("[GameManager] 初始化完成");
 
         LoadGame();
+    }
+
+    void Update()
+    {
+        gameTime += Time.deltaTime; // 累加遊戲時間
     }
 
     private void InitializeGameData()
@@ -151,6 +157,14 @@ public class GameManager : Singleton<GameManager>
 
         GameDataController.Instance.TriggerResourceChanged();
         Debug.Log("[GameManager] 新遊戲已開始");
+    }
+
+    public string GetFormattedGameTime()
+    {
+        int hours = Mathf.FloorToInt(gameTime / 3600);
+        int minutes = Mathf.FloorToInt((gameTime % 3600) / 60);
+        int seconds = Mathf.FloorToInt(gameTime % 60);
+        return $"{hours:D2}:{minutes:D2}:{seconds:D2}";
     }
 
     private void OnApplicationQuit()

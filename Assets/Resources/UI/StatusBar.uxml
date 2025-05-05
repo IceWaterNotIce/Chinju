@@ -9,6 +9,8 @@
             <ui:Label name="cubeLabel" text="方塊: 0" class="resource-label" />
             <!-- 石油運輸進度 -->
             <ui:Label name="oilTransportLabel" text="石油運輸: 未開始" class="resource-label" /> <!-- 新增 -->
+            <!-- 遊戲時間顯示 -->
+            <ui:Label name="gameTimeLabel" text="遊戲時間: 00:00:00" class="status-label" />
         </ui:VisualElement>
         <ui:VisualElement name="messageContainer" class="message-container" />
     </ui:VisualElement>
