@@ -126,6 +126,30 @@ public class ShipCreationManager : MonoBehaviour
         }
     }
 
+    public GameObject AssignRandomWeapon(GameObject ship)
+    {
+        if (shipPrefabs == null || shipPrefabs.Length == 0)
+        {
+            Debug.LogWarning("[ShipCreationManager] 沒有可用的武器預製件！");
+            return null;
+        }
+
+        int randomIndex = Random.Range(0, shipPrefabs.Length);
+        GameObject weaponPrefab = shipPrefabs[randomIndex];
+        if (weaponPrefab != null)
+        {
+            GameObject weapon = Instantiate(weaponPrefab, ship.transform);
+            weapon.transform.localPosition = Vector3.zero; // 將武器放置於船隻中心
+            Debug.Log($"[ShipCreationManager] 為船隻分配了武器: {weaponPrefab.name}");
+            return weapon;
+        }
+        else
+        {
+            Debug.LogWarning("[ShipCreationManager] 無法實例化武器預製件！");
+            return null;
+        }
+    }
+
     private void SaveShipData(Vector3 position)
     {
         var data = GameDataController.Instance.CurrentGameData;

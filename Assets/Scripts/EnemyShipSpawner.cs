@@ -10,6 +10,9 @@ public class EnemyShipSpawner : MonoBehaviour
     private Vector2 spawnAreaMin = new Vector2(0, 0);
     private Vector2 spawnAreaMax = new Vector2(100, 100);
 
+    [Header("Weapon Settings")]
+    [SerializeField] private GameObject[] weaponPrefabs; // 可用的武器預製件
+
     private float timer;
 
     private Tilemap tilemap;
@@ -63,9 +66,33 @@ public class EnemyShipSpawner : MonoBehaviour
                 // 設置為 EnemyShipSpawner 的子物件
                 enemyShip.transform.SetParent(this.transform);
 
+                AssignRandomWeapon(enemyShip); // 隨機分配武器
+
                 Debug.Log($"[EnemyShipSpawner] 成功生成敵方船隻於位置: {spawnPos}");
                 break;
             }
+        }
+    }
+
+    private void AssignRandomWeapon(GameObject enemyShip)
+    {
+        if (weaponPrefabs == null || weaponPrefabs.Length == 0)
+        {
+            Debug.LogWarning("[EnemyShipSpawner] 沒有可用的武器預製件！");
+            return;
+        }
+
+        int randomIndex = Random.Range(0, weaponPrefabs.Length);
+        GameObject weaponPrefab = weaponPrefabs[randomIndex];
+        if (weaponPrefab != null)
+        {
+            GameObject weapon = Instantiate(weaponPrefab, enemyShip.transform);
+            weapon.transform.localPosition = Vector3.zero; // 將武器放置於船隻中心
+            Debug.Log($"[EnemyShipSpawner] 為敵方船隻分配了武器: {weaponPrefab.name}");
+        }
+        else
+        {
+            Debug.LogWarning("[EnemyShipSpawner] 無法實例化武器預製件！");
         }
     }
 
