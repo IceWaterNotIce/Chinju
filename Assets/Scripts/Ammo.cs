@@ -9,11 +9,13 @@ public class Ammo : MonoBehaviour
 
     public void SetDirection(Vector3 dir)
     {
+        Debug.Log($"[Ammo] 設置彈藥方向: {dir}");
         direction = dir.normalized;
     }
 
     public void SetOwner(GameObject ownerShip)
     {
+        Debug.Log($"[Ammo] 設置彈藥擁有者: {ownerShip.name}");
         owner = ownerShip; // 設置發射彈藥的船隻
     }
 
@@ -33,7 +35,7 @@ public class Ammo : MonoBehaviour
         transform.position += direction * Speed * Time.deltaTime;
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D collision)
     {
         // 嘗試獲取 Ship 或 EnemyShip 類型的物件
         var ship = collision.gameObject.GetComponent<Ship>();
@@ -56,10 +58,11 @@ public class Ammo : MonoBehaviour
         }
         else
         {
-            Debug.Log($"[Ammo] 彈藥與 {collision.gameObject.name} 碰撞，但沒有造成傷害。");
+            Debug.Log($"[Ammo] 彈藥與 {collision.gameObject.name} 發生觸發碰撞，但沒有造成傷害。");
         }
         
     }
+
 
     void OnDestroy()
     {
