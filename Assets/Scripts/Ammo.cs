@@ -17,6 +17,11 @@ public class Ammo : MonoBehaviour
         owner = ownerShip; // 設置發射彈藥的船隻
     }
 
+    void Start()
+    {
+        Debug.Log($"[Ammo] 彈藥生成，方向: {direction}, 速度: {Speed}");
+    }
+
     void Update()
     {
         if (direction == Vector3.zero)
@@ -47,8 +52,19 @@ public class Ammo : MonoBehaviour
                 enemyShip.Health -= Damage;
                 Debug.Log($"[Ammo] 彈藥命中敵方船隻 {enemyShip.name}，造成 {Damage} 傷害。");
             }
+            Destroy(gameObject);
         }
+        else
+        {
+            Debug.Log($"[Ammo] 彈藥與 {collision.gameObject.name} 碰撞，但沒有造成傷害。");
+        }
+        
+    }
 
-        Destroy(gameObject);
+    void OnDestroy()
+    {
+        Debug.Log($"[Ammo] 彈藥 {gameObject.name} 被銷毀。");
+        // 在這裡可以添加其他銷毀後的邏輯，例如播放特效等
+    
     }
 }

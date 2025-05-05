@@ -43,7 +43,7 @@ public class Weapon : MonoBehaviour
         }
 
         // 計算彈藥的生成位置，設置為船隻與目標之間的位置
-        Vector3 spawnPosition = transform.position + direction * 1.5f; // 1.5f 為偏移距離，可根據需求調整
+        Vector3 spawnPosition = transform.position + direction * MinAttackDistance;
 
         GameObject ammoObj = Instantiate(AmmoPrefab, spawnPosition, Quaternion.identity);
 
@@ -65,6 +65,10 @@ public class Weapon : MonoBehaviour
                 {
                     Debug.LogWarning("[Weapon] 無法找到武器的擁有者船隻，請檢查武器的層級結構！");
                 }
+
+                // 確保彈藥初始化完成後才設置壽命
+                Debug.Log("[Weapon] 彈藥初始化完成，設置壽命為 5 秒。");
+                Destroy(ammoObj, 5f); // 5秒後自動銷毀彈藥
             }
             else
             {
