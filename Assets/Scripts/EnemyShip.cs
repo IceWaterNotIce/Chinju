@@ -13,7 +13,22 @@ public class EnemyShip : Ship
     public int Damage => damage;
     public Transform PlayerTarget
     {
-        get => playerTarget;
+        get
+        {
+            if (playerTarget == null)
+            {
+                Ship[] ships = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
+                foreach (Ship ship in ships)
+                {
+                    if (ship.IsPlayerShip) // 假設 Ship 類別有 IsPlayerShip 屬性
+                    {
+                        playerTarget = ship.transform;
+                        break;
+                    }
+                }
+            }
+            return playerTarget;
+        }
         set => playerTarget = value;
     }
     #endregion

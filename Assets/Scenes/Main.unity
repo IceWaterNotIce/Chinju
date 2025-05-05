@@ -739,6 +739,8 @@ MonoBehaviour:
   enemyShipPrefab: {fileID: 4572884418056175630, guid: b739a16e81daf8d4c9daf5b176d5caca, type: 3}
   spawnInterval: 2
   maxEnemyShips: 100
+  weaponPrefabs:
+  - {fileID: 1784742138039663330, guid: aea540dc861280a40b4ea64e42b9938d, type: 3}
 --- !u!114 &937809618
 MonoBehaviour:
   m_ObjectHideFlags: 0
