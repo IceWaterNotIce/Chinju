@@ -234,6 +234,13 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         }
 
         UI.Initial(this);
+
+        // 新增：通知攝影機跟隨該船隻
+        var cameraController = Camera.main?.GetComponent<CameraBound2D>();
+        if (cameraController != null)
+        {
+            cameraController.FollowTarget(this.transform);
+        }
     }
     #endregion
 

@@ -31,6 +31,8 @@ public class CameraBound2D : MonoBehaviour
     private Vector3 velocity = Vector3.zero; // 用於平滑移動
     private float zoomVelocity = 0f; // 用於平滑縮放
 
+    private Transform followTarget; // 新增：跟隨目標
+
     void Start()
     {
         cam = GetComponent<Camera>();
@@ -84,6 +86,14 @@ public class CameraBound2D : MonoBehaviour
 
     void LateUpdate()
     {
+        if (followTarget != null)
+        {
+            // 如果有跟隨目標，將攝影機平滑移動到目標位置
+            Vector3 targetPosition = new Vector3(followTarget.position.x, followTarget.position.y, transform.position.z);
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+            return;
+        }
+
         if (targetTilemap == null) return;
 
         // 計算攝影機視口實際覆蓋的世界空間範圍
@@ -153,5 +163,17 @@ public class CameraBound2D : MonoBehaviour
     public void OnZoom(InputValue value)
     {
         zoomInput = value.Get<Vector2>().y; // 取得縮放輸入
+    }
+
+    // 新增：設置跟隨目標的方法
+    public void FollowTarget(Transform target)
+    {
+        followTarget = target;
+    }
+
+    // 新增：停止跟隨的方法
+    public void StopFollowing()
+    {
+        followTarget = null;
     }
 }
