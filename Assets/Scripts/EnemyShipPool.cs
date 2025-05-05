@@ -28,6 +28,10 @@ public class EnemyShipPool : MonoBehaviour
         for (int i = 0; i < initialPoolSize; i++)
         {
             var enemyShip = Instantiate(enemyShipPrefab);
+
+            // 設置為 EnemyShipPool 的子物件
+            enemyShip.transform.SetParent(this.transform);
+
             enemyShip.SetActive(false);
             pool.Enqueue(enemyShip);
         }
@@ -39,11 +43,19 @@ public class EnemyShipPool : MonoBehaviour
         {
             var enemyShip = pool.Dequeue();
             enemyShip.SetActive(true);
+
+            // 設置為 EnemyShipPool 的子物件
+            enemyShip.transform.SetParent(this.transform);
+
             return enemyShip;
         }
         else
         {
             var enemyShip = Instantiate(enemyShipPrefab);
+
+            // 設置為 EnemyShipPool 的子物件
+            enemyShip.transform.SetParent(this.transform);
+
             return enemyShip;
         }
     }
@@ -51,6 +63,10 @@ public class EnemyShipPool : MonoBehaviour
     public void ReturnEnemyShip(GameObject enemyShip)
     {
         enemyShip.SetActive(false);
+
+        // 確保設置為 EnemyShipPool 的子物件
+        enemyShip.transform.SetParent(this.transform);
+
         pool.Enqueue(enemyShip);
     }
 }

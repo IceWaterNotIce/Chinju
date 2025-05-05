@@ -59,6 +59,10 @@ public class EnemyShipSpawner : MonoBehaviour
                 var enemyShip = EnemyShipPool.Instance.GetEnemyShip();
                 enemyShip.transform.position = spawnPos;
                 enemyShip.transform.rotation = Quaternion.identity;
+
+                // 設置為 EnemyShipSpawner 的子物件
+                enemyShip.transform.SetParent(this.transform);
+
                 Debug.Log($"[EnemyShipSpawner] 成功生成敵方船隻於位置: {spawnPos}");
                 break;
             }
