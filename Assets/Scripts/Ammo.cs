@@ -3,7 +3,7 @@ using UnityEngine;
 public class Ammo : MonoBehaviour
 {
     public float Damage = 10f;
-    public float Speed = 10f;
+    public float Speed = 1f;
     private Vector3 direction;
     private GameObject owner; // 記錄發射彈藥的船隻
 
