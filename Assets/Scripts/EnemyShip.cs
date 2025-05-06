@@ -119,7 +119,7 @@ public class EnemyShip : Ship
         // 設定隨機方向與速度，讓 Ship 的 Move/Rotate 控制移動
         TargetRotation = randomAngle;
         TargetSpeed = randomSpeed;
-        Debug.Log($"Moving randomly: Angle {randomAngle}, Speed {randomSpeed}");
+        Debug.Log($"[EnemyShip] Moving randomly: Angle {randomAngle}, Speed {randomSpeed}");
 
 
         // 不再直接設定 transform.rotation
@@ -160,7 +160,7 @@ public class EnemyShip : Ship
 
     private void OnDeath()
     {
-        Debug.Log("Enemy ship destroyed!");
+        Debug.Log("[EnemyShip] Enemy ship destroyed!");
         // 實作死亡效果（爆炸動畫、掉落物品等）
         Destroy(gameObject, 0.5f);  // 延遲0.5秒銷毀
     }
