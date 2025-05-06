@@ -11,7 +11,7 @@ public class MiniMapManager : MonoBehaviour
     /// <summary>
     /// 小地圖的縮放級別
     /// </summary>
-    private float zoomLevel = 25f;
+    private float zoomLevel = 50f;
     
     /// <summary>
     /// 最小縮放級別
