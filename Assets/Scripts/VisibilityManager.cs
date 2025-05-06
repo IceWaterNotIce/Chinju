@@ -17,7 +17,7 @@ public class VisibilityManager : MonoBehaviour
 
     private Camera mainCamera;
     private Mesh maskMesh;
-    private GameObject maskObj;
+    private MeshRenderer maskRenderer;
 
     void Start()
     {
@@ -27,7 +27,7 @@ public class VisibilityManager : MonoBehaviour
         if (chinjuTile == null)
             Debug.LogError("Chinju Tile 未設置！");
         UpdateShipList();
-        CreateMaskObject();
+        CreateMaskMesh();
     }
 
     void Update()
@@ -73,43 +73,50 @@ public class VisibilityManager : MonoBehaviour
         }
     }
 
-    void CreateMaskObject()
+    void CreateMaskMesh()
     {
-        if (maskObj == null)
+        if (maskMesh == null)
         {
-            maskObj = new GameObject("VisibilityMask");
-            maskObj.transform.SetParent(transform);
-            var meshFilter = maskObj.AddComponent<MeshFilter>();
-            maskObj.AddComponent<MeshRenderer>().material = maskMaterial;
             maskMesh = new Mesh();
-            meshFilter.mesh = maskMesh;
         }
+        if (maskRenderer == null)
+        {
+            maskRenderer = gameObject.AddComponent<MeshRenderer>();
+            maskRenderer.material = maskMaterial;
+        }
+        var meshFilter = gameObject.GetComponent<MeshFilter>();
+        if (meshFilter == null)
+        {
+            meshFilter = gameObject.AddComponent<MeshFilter>();
+        }
+        meshFilter.mesh = maskMesh;
     }
 
     void UpdateMaskMesh()
     {
         // 防呆：必要物件未設置時不執行
-        if (mainCamera == null || maskMesh == null || maskMaterial == null)
+        if (maskMesh == null || maskMaterial == null)
             return;
         if (visibleCenters.Count == 0)
             return;
 
-        // 產生一個 100x100 的大矩形，z 設為 1
+        // 產生一個 100x100 的大矩形，中心設置為 (50, 50, -1)
         float width = 100f;
         float height = 100f;
-        Vector3 camPos = mainCamera.transform.position;
-        float z = 1f;
+        Vector3 center = new Vector3(50f, 50f, -1f);
         Vector3[] verts = new Vector3[4]
         {
-            new Vector3(camPos.x - width/2f, camPos.y - height/2f, z),
-            new Vector3(camPos.x + width/2f, camPos.y - height/2f, z),
-            new Vector3(camPos.x + width/2f, camPos.y + height/2f, z),
-            new Vector3(camPos.x - width/2f, camPos.y + height/2f, z)
+            new Vector3(center.x - width/2f, center.y - height/2f, center.z),
+            new Vector3(center.x + width/2f, center.y - height/2f, center.z),
+            new Vector3(center.x + width/2f, center.y + height/2f, center.z),
+            new Vector3(center.x - width/2f, center.y + height/2f, center.z)
         };
-        int[] tris = new int[] { 0, 1, 2, 2, 3, 0 };
+        int[] tris = new int[] { 0, 2, 1, 0, 3, 2 }; // 調整三角形順序，使法線面向 -Z
         maskMesh.Clear();
         maskMesh.vertices = verts;
         maskMesh.triangles = tris;
+        maskMesh.RecalculateNormals(); // 確保法線正確計算
+
         // 將可見圓心與半徑傳給材質
         Vector4[] circles = new Vector4[8]; // 最多8個圓
         int count = Mathf.Min(visibleCenters.Count, 8);
