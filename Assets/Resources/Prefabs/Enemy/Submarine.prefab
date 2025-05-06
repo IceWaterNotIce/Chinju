@@ -149,9 +149,11 @@ MonoBehaviour:
   m_targetRotation: 0
   m_targetRotationSpeed: 0
   m_rotationSpeed: 0
-  m_detectionDistance: 50
+  m_detectionDistance: 10
   m_combatMode: 0
   m_visibleRadius: 10
+  level: 1
+  experience: 0
   tilemap: {fileID: 0}
   oceanTile: {fileID: 0}
   intWeaponLimit: 2
