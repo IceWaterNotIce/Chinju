@@ -419,7 +419,8 @@ public class Ship : MonoBehaviour, IPointerClickHandler
             WeaponLimit = IntWeaponLimit, // 保存武器數量上限
             Level = Level, // 保存等級
             Experience = Experience, // 保存經驗值
-            Weapons = new List<GameData.WeaponData>() // 保存武器數據
+            Weapons = new List<GameData.WeaponData>(), // 保存武器數據
+            PrefabName = gameObject.name.Replace("(Clone)", "").Trim()
         };
 
         foreach (var weapon in weapons)

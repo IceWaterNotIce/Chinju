@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
@@ -57,6 +58,17 @@ public class GameManager : Singleton<GameManager>
             {
                 try
                 {
+                    // 保存玩家船隻數據
+                    var playerShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None)
+                        .Where(ship => ship.IsPlayerShip)
+                        .ToList();
+
+                    data.playerData.Ships.Clear();
+                    foreach (var ship in playerShips)
+                    {
+                        data.playerData.Ships.Add(ship.SaveShipData());
+                    }
+
                     string json = JsonUtility.ToJson(data, true);
                     File.WriteAllText(saveFilePath, json);
                     Debug.Log($"[GameManager] 遊戲已保存至 {saveFilePath}");
@@ -93,6 +105,25 @@ public class GameManager : Singleton<GameManager>
                     {
                         GameDataController.Instance.CurrentGameData = data;
                         Debug.Log("[GameManager] 遊戲數據已設置到 GameDataController");
+                    }
+
+                    // 載入玩家船隻數據
+                    foreach (var shipData in data.playerData.Ships)
+                    {
+                        var shipPrefab = Resources.Load<GameObject>($"Prefabs/Ship/{shipData.PrefabName}");
+                        if (shipPrefab != null)
+                        {
+                            var shipObj = Instantiate(shipPrefab, shipData.Position, Quaternion.Euler(0, 0, shipData.Rotation));
+                            var shipComp = shipObj.GetComponent<Ship>();
+                            if (shipComp != null)
+                            {
+                                shipComp.LoadShipData(shipData);
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[GameManager] 找不到船隻預製物: {shipData.PrefabName}");
+                        }
                     }
 
                     GameDataController.Instance.TriggerResourceChanged();
