@@ -77,6 +77,34 @@ public class MapController : MonoBehaviour
         }
 
         GameDataController.Instance.OnMapDataChanged += OnMapDataChanged; // 訂閱地圖數據變更事件
+
+        // 確保攝影機控制器的 Tilemap 已初始化並刷新邊界
+        if (cameraController != null)
+        {
+            cameraController.targetTilemap = tilemap;
+            cameraController.RefreshBounds();
+        }
+
+        StartCoroutine(FocusOnChinjuTileAfterMapGeneration());
+    }
+
+    private IEnumerator FocusOnChinjuTileAfterMapGeneration()
+    {
+        // 等待地圖生成完成
+        yield return new WaitUntil(() => tilemap != null && tilemap.GetUsedTilesCount() > 0);
+
+        Vector3 chinjuTileWorldPosition = GetChinjuTileWorldPosition();
+        if (chinjuTileWorldPosition != Vector3.zero && cameraController != null)
+        {
+            cameraController.FollowTarget(null); // 停止任何目標跟隨
+            Debug.Log($"[MapController] 聚焦到神獸 Tile 位置: {chinjuTileWorldPosition}");
+            cameraController.transform.position = new Vector3(chinjuTileWorldPosition.x, chinjuTileWorldPosition.y, cameraController.transform.position.z);
+            cameraController.RefreshCameraPosition(); // 使用公開方法刷新攝影機位置
+        }
+        else
+        {
+            Debug.LogWarning("[MapController] 無法聚焦到神獸 Tile，可能是攝影機控制器未設置或神獸 Tile 不存在！");
+        }
     }
 
     private void OnDestroy()

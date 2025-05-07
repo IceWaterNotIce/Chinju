@@ -150,8 +150,11 @@ public class CameraBound2D : MonoBehaviour
     {
         CalculateTilemapBounds();
 
-        // 確保攝影機位置在更新邊界後仍然有效
-        LateUpdate();
+        // 確保攝影機位置在更新邊界後立即生效
+        if (followTarget == null)
+        {
+            LateUpdate();
+        }
     }
 
     // 新增 Input System 的輸入回調
@@ -175,5 +178,10 @@ public class CameraBound2D : MonoBehaviour
     public void StopFollowing()
     {
         followTarget = null;
+    }
+
+    public void RefreshCameraPosition()
+    {
+        LateUpdate(); // 調用 LateUpdate 以立即刷新攝影機位置
     }
 }
