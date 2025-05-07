@@ -260,7 +260,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     public List<Weapon> weapons = new List<Weapon>();
 
     [Header("Ship Type")]
-    public bool IsPlayerShip = true; // 新增：標記是否為玩家船隻
+    public bool IsPlayerShip = true; // 確保屬性名稱為 IsPlayerShip
 
     public void Start()
     {

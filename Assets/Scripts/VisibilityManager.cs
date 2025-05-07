@@ -43,10 +43,11 @@ public class VisibilityManager : MonoBehaviour
         var allShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
         foreach (var ship in allShips)
         {
-            // 假設敵方船艦有特殊標記，這裡只加入非敵方船
-            if (!ship.CombatMode)
+            // 僅加入玩家船艦
+            if (ship.IsPlayerShip) // 修改為正確的屬性名稱
                 ships.Add(ship);
         }
+        Debug.Log($"[VisibilityManager] 當前玩家船艦數量：{ships.Count}");
     }
 
     void UpdateVisibleCenters()
@@ -71,6 +72,7 @@ public class VisibilityManager : MonoBehaviour
         {
             visibleCenters.Add(ship.transform.position);
         }
+        Debug.Log($"[VisibilityManager] 可見圓心數量：{visibleCenters.Count}");
     }
 
     void CreateMaskMesh()
@@ -96,14 +98,20 @@ public class VisibilityManager : MonoBehaviour
     {
         // 防呆：必要物件未設置時不執行
         if (maskMesh == null || maskMaterial == null)
+        {
+            Debug.LogWarning("[VisibilityManager] 遮罩網格或材質未設置！");
             return;
+        }
         if (visibleCenters.Count == 0)
+        {
+            Debug.LogWarning("[VisibilityManager] 無可見圓心，跳過遮罩更新！");
             return;
+        }
 
         // 產生一個 100x100 的大矩形，中心設置為 (50, 50, -1)
         float width = 100f;
         float height = 100f;
-        Vector3 center = new Vector3(50f, 50f, -1f);
+        Vector3 center = new Vector3(50f, 50f, -1f); // 確保 Z 軸為負值，避免被其他物件遮擋
         Vector3[] verts = new Vector3[4]
         {
             new Vector3(center.x - width/2f, center.y - height/2f, center.z),
@@ -118,17 +126,20 @@ public class VisibilityManager : MonoBehaviour
         maskMesh.RecalculateNormals(); // 確保法線正確計算
 
         // 將可見圓心與半徑傳給材質
-        Vector4[] circles = new Vector4[8]; // 最多8個圓
-        int count = Mathf.Min(visibleCenters.Count, 8);
+        Vector4[] circles = new Vector4[50]; // 最多50個圓
+        int count = Mathf.Min(visibleCenters.Count, circles.Length); // 確保不超過陣列大小
         for (int i = 0; i < count; i++)
         {
             float radius = chinjuRadius;
             if (i > 0 && ships.Count >= i)
-                radius = ships[i-1].VisibleRadius;
+                radius = ships[i - 1].VisibleRadius; // 使用船艦的 VisibleRadius
             circles[i] = new Vector4(visibleCenters[i].x, visibleCenters[i].y, radius, 0);
         }
-        // 臨時修正：只傳 1 個元素，避免 Unity 報錯
+
+        // 確保材質的陣列大小正確
         maskMaterial.SetInt("_CircleCount", count);
-        maskMaterial.SetVectorArray("_Circles", circles.Length > 1 ? new Vector4[] { circles[0] } : circles);
+        maskMaterial.SetVectorArray("_Circles", circles); // 傳遞正確大小的陣列
+
+        Debug.Log($"[VisibilityManager] 更新遮罩網格，圓心數量：{count}");
     }
 }
