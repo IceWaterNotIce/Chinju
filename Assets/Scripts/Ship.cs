@@ -313,11 +313,20 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         // 如果找到最近的目標，並且進入武器最大攻擊距離，開始攻擊
         if (nearestTarget != null && nearestDistance <= MaxWeaponAttackDistance())
         {
-            Debug.Log($"[Ship] 更新目標為最近的船隻: {nearestTarget.name}，距離: {nearestDistance}");
-            AttackTarget(nearestTarget.gameObject);
+            if (weapons.Any(weapon => weapon.IsAttackingTarget(nearestTarget.gameObject)))
+            {
+                Debug.Log($"[Ship] 目標未改變，繼續攻擊: {nearestTarget.name}");
+            }
+            else
+            {
+                Debug.Log($"[Ship] 更新目標為最近的船隻: {nearestTarget.name}，距離: {nearestDistance}");
+                AttackTarget(nearestTarget.gameObject);
+            }
         }
         else
         {
+            // 修正：確保停止攻擊並清空目標
+            Debug.Log("[Ship] 未找到有效目標，停止攻擊。");
             StopAttack();
         }
     }

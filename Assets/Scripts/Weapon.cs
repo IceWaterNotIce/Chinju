@@ -83,7 +83,14 @@ public class Weapon : MonoBehaviour
 
     public void StartAttack(GameObject target)
     {
-        if (isAttacking) return;
+        if (isAttacking)
+        {
+            // 如果正在攻擊，更新目標為新目標
+            Debug.Log($"[Weapon] {name} 更新攻擊目標為: {target.name}");
+            currentTarget = target;
+            return;
+        }
+
         isAttacking = true;
         currentTarget = target;
         Debug.Log($"[Weapon] {name} 開始攻擊目標: {target.name}");
@@ -98,6 +105,11 @@ public class Weapon : MonoBehaviour
             StopCoroutine(attackCoroutine);
             Debug.Log($"[Weapon] {name} 停止攻擊。");
         }
+    }
+
+    public bool IsAttackingTarget(GameObject target)
+    {
+        return isAttacking && currentTarget == target;
     }
 
     private IEnumerator AttackRoutine()
