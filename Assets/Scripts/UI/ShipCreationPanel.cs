@@ -10,9 +10,6 @@ public class ShipCreationPanel : MonoBehaviour
     private VisualElement root; // 修改為 root
     private Button[] shipTypeBtns = new Button[5]; // 五種船型按鈕
     private Button createShipBtn;
-    private Label goldCostLabel;
-    private Label oilCostLabel;
-    private Label cubeCostLabel;
     private IntegerField goldInputField;
     private IntegerField oilInputField;
     private IntegerField cubeInputField;
@@ -86,10 +83,6 @@ public class ShipCreationPanel : MonoBehaviour
         }
 
         createShipBtn = UIHelper.InitializeElement<Button>(root, "create-ship-btn");
-        goldCostLabel = UIHelper.InitializeElement<Label>(root, "gold-cost");
-        oilCostLabel = UIHelper.InitializeElement<Label>(root, "oil-cost");
-        cubeCostLabel = UIHelper.InitializeElement<Label>(root, "cube-cost");
-
         goldInputField = UIHelper.InitializeElement<IntegerField>(root, "gold-input");
         oilInputField = UIHelper.InitializeElement<IntegerField>(root, "oil-input");
         cubeInputField = UIHelper.InitializeElement<IntegerField>(root, "cube-input");
@@ -121,9 +114,6 @@ public class ShipCreationPanel : MonoBehaviour
 
         // 檢查必要元素
         if (createShipBtn == null) Debug.LogError("找不到 create-ship-btn！");
-        if (goldCostLabel == null) Debug.LogError("找不到 gold-cost 標籤！");
-        if (oilCostLabel == null) Debug.LogError("找不到 oil-cost 標籤！");
-        if (cubeCostLabel == null) Debug.LogError("找不到 cube-cost 標籤！");
 
         if (createShipBtn != null)
         {
@@ -283,9 +273,10 @@ public class ShipCreationPanel : MonoBehaviour
     /// </summary>
     private void UpdateCostDisplay(int gold, int oil, int cube)
     {
-        goldCostLabel.text = $"金幣: {gold}";
-        oilCostLabel.text = $"石油: {oil}";
-        cubeCostLabel.text = $"方塊: {cube}";
+        // 更新輸入欄位的值
+        goldInputField.value = gold;
+        oilInputField.value = oil;
+        cubeInputField.value = cube;
     }
 
     private void OnBuildButtonClicked()

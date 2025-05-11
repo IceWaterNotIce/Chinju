@@ -12,15 +12,16 @@
         <engine:VisualElement name="resource-cost-container" class="resource-container" style="margin-bottom: 20px;">
             <engine:Label text="建造消耗：" class="cost-title" />
             <engine:VisualElement class="resource-item">
-                <engine:Label name="gold-cost" text="金幣: 0" />
+                <engine:IntegerField name="gold-input" label="金幣" />
             </engine:VisualElement>
             <engine:VisualElement class="resource-item">
-                <engine:Label name="oil-cost" text="石油: 0" />
+                <engine:IntegerField name="oil-input" label="石油" />
             </engine:VisualElement>
             <engine:VisualElement class="resource-item">
-                <engine:Label name="cube-cost" text="方塊: 0" />
+                <engine:IntegerField name="cube-input" label="方塊" />
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:Button name="create-ship-btn" text="建造" class="create-btn" style="align-self: center;" />
+        <engine:Button name="close-ship-panel-btn" text="關閉" class="close-btn" style="margin-top: 8px;" />
     </engine:VisualElement>
 </engine:UXML>
