@@ -1,4 +1,5 @@
 <UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False" style="Assets/Resources/UI/SettingMenu.uss">
+    <Style src="project://database/Assets/Resources/UI/SettingMenu.uss?fileID=7433441132597879392&amp;guid=b39bcf02e990c884c9116eeb898057ac&amp;type=3#SettingMenu" />
     <ui:VisualElement name="root" class="menu-container" style="position: absolute; top: 50%; align-items: stretch; justify-content: center; align-self: center; align-content: flex-start; flex-direction: column;">
         <ui:VisualElement name="menu-panel" class="menu-panel">
             <ui:Label text="遊戲選單" class="menu-title" />
