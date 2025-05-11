@@ -1,0 +1,8 @@
+.time-control-bar {
+    background-color: rgb(46, 46, 46);
+    padding: 10px;
+    border-radius: 5px;
+    align-items: auto;
+    flex-direction: row-reverse;
+    align-content: auto;
+}

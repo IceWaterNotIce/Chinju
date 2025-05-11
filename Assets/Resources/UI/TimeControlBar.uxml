@@ -1,9 +1,10 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" style="Assets/Resources/UI/TimeControlBar.uss">
-    <engine:VisualElement name="time-control-bar" style="flex-direction: row; gap: 10px; top: 50px;">
-        <engine:Button name="pause-btn" text="暫停" style="width: 35px; height: 35px;" />
-        <engine:Button name="slow-btn" text="減速" style="width: 35px; height: 35px;" />
-        <engine:Button name="normal-btn" text="正常" style="width: 35px; height: 35px;" />
-        <engine:Button name="fast-btn" text="加速" style="width: 35px; height: 35px;" />
-        <engine:Button name="super-fast-btn" text="超加速" style="width: 35px; height: 35px;" />
+    <Style src="project://database/Assets/Resources/UI/TimeControlBar.uss?fileID=7433441132597879392&amp;guid=574de732c3680c74fb439dff03f05f71&amp;type=3#TimeControlBar" />
+    <engine:VisualElement name="time-control-bar" class="time-control-bar" style="flex-direction: row-reverse; right: auto; align-items: auto; align-content: auto; flex-grow: 0;">
+        <engine:Button name="pause-btn" text="暫停" class="time-control-button" />
+        <engine:Button name="slow-btn" text="減速" class="time-control-button" />
+        <engine:Button name="normal-btn" text="正常" class="time-control-button" />
+        <engine:Button name="fast-btn" text="加速" class="time-control-button" />
+        <engine:Button name="super-fast-btn" text="超加速" class="time-control-button" />
     </engine:VisualElement>
 </engine:UXML>
