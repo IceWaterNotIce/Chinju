@@ -1,5 +1,6 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" style="Assets/Resources/UI/ShipCreatePanel.uss">
-    <engine:VisualElement name="ship-creation-panel" class="ship-panel" style="display: flex; flex-direction: column; align-items: center;">
+    <Style src="project://database/Assets/Resources/UI/ShipCreatePanel.uss?fileID=7433441132597879392&amp;guid=e13a3bf54814370479c74b8d2153df4f&amp;type=3#ShipCreatePanel" />
+    <engine:VisualElement name="ship-creation-panel" class="ship-panel" style="display: flex; flex-direction: column; align-items: center; width: auto;">
         <engine:Label text="建造船隻" class="panel-title" style="margin-bottom: 20px;" />
         <engine:VisualElement name="ship-type-container" class="ship-type-container" style="margin-bottom: 20px;">
             <engine:Button name="ship-type-btn-1" text="航空母艦" class="ship-type-btn" />

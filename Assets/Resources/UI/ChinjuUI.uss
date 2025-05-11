@@ -1,18 +1,20 @@
 .chinju-ui-root {
-    align-self: auto;
-    align-items: stretch;
+    align-self: flex-start;
+    align-items: center;
     justify-content: center;
     position: relative;
     flex-basis: auto;
     flex-direction: column;
     -unity-text-align: upper-left;
-    top: 70%;
+    top: 50%;
     left: 50%;
     align-content: flex-start;
     transform-origin: center;
     translate: -50% -50px;
+    background-color: rgb(0, 0, 0);
+    color: rgb(255, 255, 255);
 }
 
 .chinju-ui-btn {
-    // ...existing code...
+    width: 300px;
 }

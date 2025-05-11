@@ -1,5 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False" style="Assets/Resources/UI/ChinjuUI.uss">
-    <ui:VisualElement name="VisualElement" class="chinju-ui-root" style="align-self: auto; align-items: stretch; justify-content: center; position: relative; flex-basis: auto; flex-direction: column; -unity-text-align: upper-left; top: 70%; left: 50%; align-content: flex-start; transform-origin: center; translate: -50% -50px;">
+    <Style src="project://database/Assets/Resources/UI/ChinjuUI.uss?fileID=7433441132597879392&amp;guid=8adf045143048344e8362b391d1e1b82&amp;type=3#ChinjuUI" />
+    <ui:VisualElement name="VisualElement" class="chinju-ui-root">
         <ui:Button name="btnOpenWeaponCreatePanel" text="武器製造" class="chinju-ui-btn" />
         <ui:Button name="btnOpenShipCreatePanel" text="船艦製造" class="chinju-ui-btn" />
     </ui:VisualElement>

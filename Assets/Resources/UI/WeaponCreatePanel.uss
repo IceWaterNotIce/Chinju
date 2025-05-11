@@ -1,27 +1,35 @@
 .weapon-create-panel {
     width: 400px;
-    background-color: #232323;
+    background-color: rgb(35, 35, 35);
     padding: 20px;
     border-radius: 8px;
     align-items: center;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
 }
+
 .weapon-create-title {
     font-size: 24px;
-    color: #fff;
+    color: rgb(255, 255, 255);
     margin-bottom: 16px;
 }
+
 .weapon-dropdown {
     margin-bottom: 12px;
 }
+
 .resource-label {
-    color: #ccc;
+    color: rgb(204, 204, 204);
     margin-bottom: 12px;
 }
+
 .create-button {
     margin-bottom: 12px;
     margin-top: 10px;
 }
+
 .result-label {
-    color: #ffb300;
+    color: rgb(255, 179, 0);
     min-height: 24px;
 }
