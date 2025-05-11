@@ -1,15 +1,11 @@
 <UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False" style="Assets/Resources/UI/CommonStyles.uss">
-    <ui:VisualElement name="root" data-source="Assets/Resources/UI/CommonStyles.uss?fileID=7433441132597879392&amp;guid=2beea2869bd0f584dbd1d916e073903b&amp;type=3#CommonStyles" class="root">
-        <ui:VisualElement name="resourcePanel" class="resource-panel" style="flex-direction: row-reverse;">
-            <!-- 金幣顯示 -->
+    <Style src="project://database/Assets/Resources/UI/StatusBar.uss?fileID=7433441132597879392&amp;guid=cdb75c02d2ebd2a4bb5a082977505433&amp;type=3#StatusBar" />
+    <ui:VisualElement name="root" class="root">
+        <ui:VisualElement name="resourcePanel" class="resource-panel">
             <ui:Label name="goldLabel" text="金幣: 0" class="resource-label" />
-            <!-- 石油顯示 -->
             <ui:Label name="oilLabel" text="石油: 0" class="resource-label" />
-            <!-- 方塊顯示 -->
             <ui:Label name="cubeLabel" text="方塊: 0" class="resource-label" />
-            <!-- 石油運輸進度 -->
-            <ui:Label name="oilTransportLabel" text="石油運輸: 未開始" class="resource-label" /> <!-- 新增 -->
-            <!-- 遊戲時間顯示 -->
+            <ui:Label name="oilTransportLabel" text="石油運輸: 未開始" class="resource-label" />
             <ui:Label name="gameTimeLabel" text="遊戲時間: 00:00:00" class="status-label" />
         </ui:VisualElement>
         <ui:VisualElement name="messageContainer" class="message-container" />

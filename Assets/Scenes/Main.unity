@@ -503,14 +503,15 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 933149503}
   - {fileID: 1268124016}
   - {fileID: 1728044883}
+  - {fileID: 1028576060}
+  - {fileID: 1949994462}
+  - {fileID: 933149503}
   - {fileID: 80820162}
   - {fileID: 2001442111}
   - {fileID: 2133639859}
   - {fileID: 436570985}
-  - {fileID: 1949994462}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &794751197
@@ -742,7 +743,7 @@ MonoBehaviour:
   m_PanelSettings: {fileID: 11400000, guid: c40b9c23258200645b26f1b0c0ae963d, type: 2}
   m_ParentUI: {fileID: 0}
   sourceAsset: {fileID: 9197481963319205126, guid: c49f75e9130454c40874465491611e50, type: 3}
-  m_SortingOrder: 0
+  m_SortingOrder: 2
   m_WorldSpaceSizeMode: 1
   m_WorldSpaceWidth: 1920
   m_WorldSpaceHeight: 1080
@@ -754,12 +755,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1028576058}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 50, y: 50, z: -10}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.33610916, y: 1.3838043, z: -9.652451}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 794751195}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1028576061
 MonoBehaviour:
@@ -1042,7 +1043,7 @@ MonoBehaviour:
   m_PanelSettings: {fileID: 11400000, guid: c40b9c23258200645b26f1b0c0ae963d, type: 2}
   m_ParentUI: {fileID: 0}
   sourceAsset: {fileID: 9197481963319205126, guid: f4658da2bf8d7734a8d2b08a1bbb3d81, type: 3}
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_WorldSpaceSizeMode: 1
   m_WorldSpaceWidth: 1920
   m_WorldSpaceHeight: 1080
@@ -1283,7 +1284,7 @@ MonoBehaviour:
   m_PanelSettings: {fileID: 11400000, guid: c40b9c23258200645b26f1b0c0ae963d, type: 2}
   m_ParentUI: {fileID: 0}
   sourceAsset: {fileID: 9197481963319205126, guid: 7f516c9f89f158341ae559da2e098f0c, type: 3}
-  m_SortingOrder: 0
+  m_SortingOrder: 3
   m_WorldSpaceSizeMode: 1
   m_WorldSpaceWidth: 1920
   m_WorldSpaceHeight: 1080
@@ -1648,6 +1649,5 @@ SceneRoots:
   - {fileID: 794751195}
   - {fileID: 2019224609}
   - {fileID: 708504591}
-  - {fileID: 1028576060}
   - {fileID: 856271947}
   - {fileID: 1688887480}
