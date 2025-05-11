@@ -1,0 +1,13 @@
+.bottom-nav-bar {
+    flex-grow: 1;
+    flex-direction: row;
+    align-items: stretch;
+    align-self: auto;
+    align-content: auto;
+    justify-content: flex-start;
+    bottom: 0;
+    height: 200px;
+    max-height: 200px;
+    min-height: 200px;
+    position: absolute;
+}

@@ -1,0 +1,18 @@
+.chinju-ui-root {
+    align-self: auto;
+    align-items: stretch;
+    justify-content: center;
+    position: relative;
+    flex-basis: auto;
+    flex-direction: column;
+    -unity-text-align: upper-left;
+    top: 70%;
+    left: 50%;
+    align-content: flex-start;
+    transform-origin: center;
+    translate: -50% -50px;
+}
+
+.chinju-ui-btn {
+    // ...existing code...
+}

@@ -1,5 +1,6 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" style="Assets/Resources/UI/MiniMap.uss">
-    <engine:VisualElement name="minimap-container" class="minimap-container">
+    <Style src="project://database/Assets/Resources/UI/MiniMap.uss?fileID=7433441132597879392&amp;guid=94329299eb6951049bc3a6244885ed35&amp;type=3#MiniMap" />
+    <engine:VisualElement name="minimap-container" class="minimap-container" style="width: auto; height: auto;">
         <engine:VisualElement name="minimap" class="minimap-frame" style="width: 250px; height: 250px; top: auto; left: auto; right: auto; bottom: auto; background-color: rgba(255, 255, 255, 0); background-image: url(&quot;project://database/Assets/MiniMapRenderTexture.renderTexture?fileID=8400000&amp;guid=5aacc66e35b5e0d47aa56426bbf062a8&amp;type=2#MiniMapRenderTexture&quot;); border-left-color: rgb(255, 255, 255); border-right-color: rgb(255, 255, 255); border-top-color: rgb(255, 255, 255); border-bottom-color: rgb(255, 255, 255); border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px;" />
         <engine:VisualElement style="flex-direction: row; gap: 5px;">
             <engine:Button name="minimap-zoom-in" text="+" class="minimap-button" />

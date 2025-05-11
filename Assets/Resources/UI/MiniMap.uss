@@ -1,13 +1,14 @@
 .minimap-container {
     position: absolute;
-    width: 200px;
-    height: 200px;
-    right: 20px;
-    top: 20px;
+    width: 300px;
+    height: 300px;
+    right: auto;
+    top: 0;
     background-color: rgba(0, 0, 0, 0.7);
     border-radius: 5px;
     padding: 5px;
     gap: 5px;
+    left: 0;
 }
 
 .minimap-frame {
@@ -16,6 +17,22 @@
     border-width: 1px;
     border-color: rgb(100, 100, 100);
     margin-bottom: 5px;
+    width: 250px;
+    height: 250px;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    background-color: rgba(255, 255, 255, 0);
+    background-image: url("project://database/Assets/MiniMapRenderTexture.renderTexture?fileID=8400000&guid=5aacc66e35b5e0d47aa56426bbf062a8&type=2#MiniMapRenderTexture");
+    border-left-color: rgb(255, 255, 255);
+    border-right-color: rgb(255, 255, 255);
+    border-top-color: rgb(255, 255, 255);
+    border-bottom-color: rgb(255, 255, 255);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
 }
 
 .minimap-view {
