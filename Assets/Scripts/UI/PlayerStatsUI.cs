@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Collections;
 
 /// <summary>
 /// 處理玩家資源狀態的UI顯示
@@ -28,9 +29,19 @@ public class PlayerStatsUI : MonoBehaviour
         oilTransportLabel = UIHelper.InitializeElement<Label>(root, "oilTransportLabel"); // 確保 UXML 中有對應的 Label
         gameTimeLabel = UIHelper.InitializeElement<Label>(root, "gameTimeLabel"); // 確保 UXML 中有對應的 Label
 
+        // 等待 GameDataController 初始化完成
+        StartCoroutine(WaitForGameDataControllerInitialization());
+    }
+
+    private IEnumerator WaitForGameDataControllerInitialization()
+    {
+        while (GameDataController.Instance == null)
+        {
+            yield return null; // 等待下一幀
+        }
+
         // 監聽 GameDataController 的資料變更
-        if (GameDataController.Instance != null)
-            GameDataController.Instance.OnGameDataChanged += OnGameDataChanged;
+        GameDataController.Instance.OnGameDataChanged += OnGameDataChanged;
 
         // 自動從 GameDataController 取得 GameData
         SetGameDataFromController();
