@@ -1,10 +1,7 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" style="Assets/Resources/UI/ShipUI.uss">
     <Style src="project://database/Assets/Resources/UI/ShipUI.uss?fileID=7433441132597879392&amp;guid=b192e55ff0db9104ab631afda5fc0395&amp;type=3#ShipUI" />
     <engine:VisualElement name="PanelBG">
-        <engine:VisualElement name="Panel">
-            <engine:VisualElement>
-                <engine:Label text="Speed" />
-            </engine:VisualElement>
+        <engine:VisualElement name="Panel" style="width: 869px;">
             <engine:VisualElement>
                 <engine:Label text="Full" name="lblSpeedFrontFull" />
                 <engine:Label text="3/4" name="lblSpeedFrontThreeQuarters" />
@@ -12,9 +9,7 @@
                 <engine:Label text="1/4" name="lblSpeedFrontQuarter" />
                 <engine:Label text="Stop" name="lblSpeedStop" />
                 <engine:Label text="Full" name="lblSpeedBackFull" />
-            </engine:VisualElement>
-            <engine:VisualElement>
-                <engine:Label text="Rotation" />
+                <engine:Label text="Speed" />
             </engine:VisualElement>
             <engine:VisualElement>
                 <engine:Label text="Full" name="lblRotationLeftFull" />
@@ -22,23 +17,22 @@
                 <engine:Label text="Stop" name="lblRotationStop" />
                 <engine:Label text="1/2" name="lblRotationRightHalf" />
                 <engine:Label text="Full" name="lblRotationRightFull" />
-            </engine:VisualElement>
-            <engine:VisualElement>
-                <engine:Label text="Health" />
-                <engine:Label name="lblHealth" text="健康值: 100/100" />
+                <engine:Label text="Rotation" />
             </engine:VisualElement>
             <engine:VisualElement>
                 <engine:Label text="Fuel" />
                 <engine:Label name="lblFuel" text="燃料: 100/100" />
-            </engine:VisualElement>
-            <engine:VisualElement name="weaponListContainer" />
-            <engine:VisualElement>
+                <engine:Label text="Health" />
+                <engine:Label name="lblHealth" text="健康值: 100/100" />
                 <engine:Label name="lblLevel" text="等級: 1" />
                 <engine:Label name="lblExperience" text="經驗值: 0/10" />
             </engine:VisualElement>
-            <engine:Button name="btnCancelFollow" text="取消跟隨" class="cancel-follow-btn" />
-            <engine:Button name="StartDrawButton" text="Start Draw" class="draw-button" />
-            <engine:Button name="btnCloseUI" text="關閉 UI" class="close-ui-btn" />
+            <engine:VisualElement name="weaponListContainer" />
+            <engine:VisualElement style="flex-grow: 1; width: 225px;">
+                <engine:Button name="btnCancelFollow" text="取消跟隨" class="cancel-follow-btn" style="width: 130px;" />
+                <engine:Button name="StartDrawButton" text="Start Draw" class="draw-button" />
+                <engine:Button name="btnCloseUI" text="關閉 UI" class="close-ui-btn" />
+            </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>
