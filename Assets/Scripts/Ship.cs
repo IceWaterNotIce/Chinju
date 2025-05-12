@@ -48,7 +48,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     private void OnDeath()
     {
         Debug.Log($"[Ship] {name} 被摧毀！");
-        
+
         // 獲得經驗值給擊殺者
         if (!IsPlayerShip)
         {
@@ -339,12 +339,6 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         Rotate();
         Move();
         DetectAndAttackTarget();
-
-        // 新增：檢查是否有矩形區域數據，且沒有目標速度和目標旋轉
-        if (SavedRectArea != Rect.zero && TargetSpeed == 0 && TargetRotationSpeed == 0)
-        {
-            MoveWithinRect();
-        }
     }
 
     private void DetectAndAttackTarget()
@@ -439,19 +433,63 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     {
         if (CurrentFuel > 0)
         {
-            m_speed = Mathf.MoveTowards(m_speed, m_targetSpeed, m_acceleration * Time.deltaTime);
-            Vector3 newPosition = transform.position + transform.right * Speed * Time.deltaTime;
-
-            // 檢查新位置是否為海洋 Tile
-            Vector3Int tilePosition = tilemap.WorldToCell(newPosition);
-            if (tilemap.GetTile(tilePosition) == oceanTile)
+            if (TargetSpeed != 0 || TargetRotationSpeed != 0)
             {
-                transform.position = newPosition;
-                CurrentFuel -= FuelConsumptionRate * Speed * Time.deltaTime; // 消耗燃料
+                m_speed = Mathf.MoveTowards(m_speed, m_targetSpeed, m_acceleration * Time.deltaTime);
+                Vector3 newPosition = transform.position + transform.right * m_speed * Time.deltaTime;
+
+                // 檢查新位置是否為海洋 Tile
+                Vector3Int tilePosition = tilemap.WorldToCell(newPosition);
+                if (tilemap.GetTile(tilePosition) == oceanTile)
+                {
+                    transform.position = newPosition;
+                    CurrentFuel -= FuelConsumptionRate * m_speed * Time.deltaTime; // 消耗燃料
+                }
+                else
+                {
+                    Debug.LogWarning("無法移動到非海洋 Tile 的位置！");
+                }
+            }
+            else if (SavedRectArea != Rect.zero)
+            {
+                // if near the border of the rectangle than 0.5f, 反向旋轉
+                if (Mathf.Abs(transform.position.x - SavedRectArea.xMin) < 0.2f ||
+                    Mathf.Abs(transform.position.x - SavedRectArea.xMax) < 0.2f ||
+                    Mathf.Abs(transform.position.y - SavedRectArea.yMin) < 0.2f ||
+                    Mathf.Abs(transform.position.y - SavedRectArea.yMax) < 0.2f)
+                {
+                    transform.Rotate(0, 0, UnityEngine.Random.Range(-180f, 180f)); // 隨機旋轉
+                }
+                // 在矩形區域內隨機移動
+                // 設定移動速度為 2
+                float moveSpeed = 2f;
+                // 計算新的位置
+                Vector3 newPosition = transform.position + transform.right * moveSpeed * Time.deltaTime;
+
+                // 確保新位置在矩形區域內
+                if (SavedRectArea.Contains(new Vector2(newPosition.x, newPosition.y)))
+                {
+                    Vector3Int tilePosition = tilemap.WorldToCell(newPosition);
+                    if (tilemap.GetTile(tilePosition) == oceanTile)
+                    {
+                        transform.position = newPosition;
+                        CurrentFuel -= FuelConsumptionRate * moveSpeed * Time.deltaTime; // 消耗燃料
+                    }
+                    else
+                    {
+                        transform.Rotate(0, 0, UnityEngine.Random.Range(-180f, 180f)); // 隨機旋轉
+                        Debug.LogWarning("矩形區域內無法移動到非海洋 Tile 的位置！反向旋轉 ");
+                    }
+
+                }
+                else
+                {
+                    Debug.Log($"[Ship] {name} 嘗試移動超出矩形區域，停止移動。");
+                }
             }
             else
             {
-                Debug.LogWarning("無法移動到非海洋 Tile 的位置！");
+                Debug.LogWarning($"[Ship] {name} 沒有設定目標速度或矩形區域，無法移動！");
             }
         }
         else
@@ -460,27 +498,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    private void MoveWithinRect()
-    {
-        // 設定移動速度為 2
-        float moveSpeed = 2f;
 
-        // 隨機選擇一個方向
-        Vector2 randomDirection = UnityEngine.Random.insideUnitCircle.normalized;
-
-        // 計算新的位置
-        Vector3 newPosition = transform.position + (Vector3)(randomDirection * moveSpeed * Time.deltaTime);
-
-        // 確保新位置在矩形區域內
-        if (SavedRectArea.Contains(new Vector2(newPosition.x, newPosition.y)))
-        {
-            transform.position = newPosition;
-        }
-        else
-        {
-            Debug.Log($"[Ship] {name} 嘗試移動超出矩形區域，停止移動。");
-        }
-    }
 
     public void AttackTarget(GameObject target)
     {
