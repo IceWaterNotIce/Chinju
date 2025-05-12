@@ -81,6 +81,7 @@ public class ShipUI : Singleton<ShipUI>
         InitializeCancelFollowButton();
         InitializeDrawButton();
         InitializeCloseUIButton();
+        InitializeRectContainer(); // Initialize the rectContainer
         RegisterPointerEvents();
     }
 
@@ -559,16 +560,41 @@ public class ShipUI : Singleton<ShipUI>
         Debug.Log("[ShipUI] 繪製功能已啟用");
     }
 
+    private VisualElement rectContainer; // New container for rectangles
+
+    private void InitializeRectContainer()
+    {
+        rectContainer = Panel.Q<VisualElement>("rectContainer") ?? new VisualElement
+        {
+            name = "rectContainer",
+            style =
+            {
+                flexDirection = FlexDirection.Row,
+                position = Position.Absolute,
+                left = 0,
+                top = 0,
+                width = Panel.resolvedStyle.width,
+                height = Panel.resolvedStyle.height
+            }
+        };
+        Panel.Add(rectContainer);
+    }
+
     private void OnPointerDown(PointerDownEvent evt)
     {
         if (!canDraw || evt.button != 0) return; // 檢查是否允許繪製
         startPos = evt.localPosition;
+
+        // Adjust start position relative to the rectContainer
+        Vector2 containerPosition = rectContainer.worldBound.position;
+        startPos -= containerPosition;
+
         currentRect = new VisualElement();
         currentRect.AddToClassList("rect"); // 套用矩形樣式
         currentRect.style.position = Position.Absolute;
         currentRect.style.left = startPos.x;
         currentRect.style.top = startPos.y;
-        Panel.Add(currentRect);
+        rectContainer.Add(currentRect); // Add to rectContainer instead of Panel
         isDrawing = true;
         Debug.Log("[ShipUI] 開始繪製矩形");
     }
@@ -578,6 +604,11 @@ public class ShipUI : Singleton<ShipUI>
         if (isDrawing && currentRect != null)
         {
             Vector2 mousePos = evt.localPosition;
+
+            // Adjust mouse position relative to the rectContainer
+            Vector2 containerPosition = rectContainer.worldBound.position;
+            mousePos -= containerPosition;
+
             Vector2 size = mousePos - startPos;
 
             // 設定矩形大小和位置
