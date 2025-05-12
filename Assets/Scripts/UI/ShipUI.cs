@@ -39,11 +39,12 @@ public class ShipUI : Singleton<ShipUI>
 
     private Button btnCancelFollow; // 新增取消跟隨按鈕
 
-    void TiggerMap()
-    {
-        //Enable the Line renderer
+    private Button startDrawButton;
 
-    }
+    private bool canDraw = false;
+    private bool isDrawing = false;
+    private Vector2 startPos;
+    private VisualElement currentRect;
 
     void Start()
     {
@@ -74,6 +75,8 @@ public class ShipUI : Singleton<ShipUI>
         InitializeLevelAndExperienceLabels();
         InitializeHealthAndFuelLabels();
         InitializeCancelFollowButton();
+        InitializeDrawButton();
+        RegisterPointerEvents();
     }
 
     public void Initial(Ship s)
@@ -127,8 +130,6 @@ public class ShipUI : Singleton<ShipUI>
             return;
         }
 
-        root.RegisterCallback<ClickEvent>(ev => Destroy(gameObject));
-
         InitializeSpeedLabels();
         InitializeRotationLabels();
         InitializeWeaponListContainer();
@@ -163,8 +164,7 @@ public class ShipUI : Singleton<ShipUI>
         ship.TargetSpeed = TargetSpeed;
         Debug.Log("Speed: " + TargetSpeed);
 
-        // Distory the UI
-        Destroy(gameObject);
+
     }
 
     void RotationControll(float percentage)
@@ -179,8 +179,6 @@ public class ShipUI : Singleton<ShipUI>
         ship.TargetRotationSpeed = TargetRotationSpeed;
         Debug.Log("Rotation Speed: " + TargetRotationSpeed);
 
-        // Distory the UI
-        Destroy(gameObject);
     }
 
     // 新增：顯示武器詳細資訊
@@ -486,6 +484,24 @@ public class ShipUI : Singleton<ShipUI>
         }
     }
 
+    private void InitializeDrawButton()
+    {
+        var root = GetComponent<UIDocument>().rootVisualElement;
+
+        startDrawButton = root.Q<Button>("StartDrawButton");
+        if (startDrawButton != null)
+        {
+            startDrawButton.clicked += () =>
+            {
+                EnableDrawing();
+            };
+        }
+        else
+        {
+            LogError("找不到名為 'StartDrawButton' 的按鈕！");
+        }
+    }
+
     private void SetUIPosition()
     {
         if (Camera.main == null)
@@ -498,5 +514,68 @@ public class ShipUI : Singleton<ShipUI>
         Debug.Log("Ship Screen Position: " + shipScreenPosition);
         Panel.style.left = shipScreenPosition.x;
         Panel.style.top = shipScreenPosition.y;
+    }
+
+    private void RegisterPointerEvents()
+    {
+        var root = GetComponent<UIDocument>().rootVisualElement;
+        root.RegisterCallback<PointerDownEvent>(OnPointerDown); // 修正為 PointerDownEvent
+        root.RegisterCallback<PointerMoveEvent>(OnPointerMove); // 修正為 PointerMoveEvent
+        root.RegisterCallback<PointerUpEvent>(OnPointerUp);     // 修正為 PointerUpEvent
+    }
+
+    private void EnableDrawing()
+    {
+        canDraw = true; // 啟用繪製功能
+        Debug.Log("[ShipUI] 繪製功能已啟用");
+    }
+
+    private void OnPointerDown(PointerDownEvent evt)
+    {
+        if (!canDraw || evt.button != 0) return; // 檢查是否允許繪製
+        startPos = evt.localPosition;
+        currentRect = new VisualElement();
+        currentRect.AddToClassList("rect"); // 套用矩形樣式
+        currentRect.style.position = Position.Absolute;
+        currentRect.style.left = startPos.x;
+        currentRect.style.top = startPos.y;
+        var root = GetComponent<UIDocument>().rootVisualElement;
+        root.Add(currentRect);
+        isDrawing = true;
+        Debug.Log("[ShipUI] 開始繪製矩形");
+    }
+
+    private void OnPointerMove(PointerMoveEvent evt)
+    {
+        if (isDrawing && currentRect != null)
+        {
+            Vector2 mousePos = evt.localPosition;
+            Vector2 size = mousePos - startPos;
+
+            // 設定矩形大小和位置
+            currentRect.style.width = Mathf.Abs(size.x);
+            currentRect.style.height = Mathf.Abs(size.y);
+            currentRect.style.left = Mathf.Min(startPos.x, mousePos.x);
+            currentRect.style.top = Mathf.Min(startPos.y, mousePos.y);
+        }
+    }
+
+    private void OnPointerUp(PointerUpEvent evt)
+    {
+        if (evt.button == 0 && isDrawing) // 左鍵
+        {
+            isDrawing = false;
+            currentRect = null; // 重置 currentRect 狀態
+            canDraw = false; // 繪製完成後禁用繪製功能
+            Debug.Log("[ShipUI] 繪製結束");
+            Debug.Log($"[ShipUI] 繪製的矩形位置: {startPos} 到 {evt.localPosition}");
+        }
+    }
+
+    private void OnDestroy()
+    {
+        Debug.Log("[ShipUI] 銷毀 ShipUI");
+        //Debug where call this destroy
+        Debug.Log(new System.Diagnostics.StackTrace().ToString());
     }
 }

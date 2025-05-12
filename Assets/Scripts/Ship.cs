@@ -258,7 +258,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     public void ClearWaypoints() => m_waypoints.Clear();
     #endregion
 
-    #region Unity Events
+    #region UI
     public void OnPointerClick(PointerEventData eventData)
     {
         Debug.Log("[Ship] Ship clicked", this);

@@ -76,3 +76,33 @@
     padding: 10px;
     border-radius: 8px;
 }
+
+/* 新增：矩形繪製按鈕樣式 */
+.draw-button {
+    width: 150px;
+    height: 40px;
+    margin: 10px;
+    background-color: rgb(76, 175, 80);
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    text-align: center;
+    cursor: pointer;
+}
+
+.draw-button:hover {
+    background-color: rgb(69, 160, 73);
+}
+
+.rect {
+    background-color: rgba(0, 255, 0, 0.5);
+    border-top-width: 10px;
+    border-left-width: 10px;
+    border-right-width: 10px;
+    border-bottom-width: 10px;
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+}
