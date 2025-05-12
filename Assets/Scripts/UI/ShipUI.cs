@@ -48,6 +48,8 @@ public class ShipUI : Singleton<ShipUI>
 
     private Button btnCloseUI; // 新增關閉 UI 的按鈕
 
+    private VisualElement savedRectElement; // 保存的矩形 UI 元素
+
     void Start()
     {
         var uiDoc = GetComponent<UIDocument>();
@@ -566,8 +568,7 @@ public class ShipUI : Singleton<ShipUI>
         currentRect.style.position = Position.Absolute;
         currentRect.style.left = startPos.x;
         currentRect.style.top = startPos.y;
-        var root = GetComponent<UIDocument>().rootVisualElement;
-        root.Add(currentRect);
+        Panel.Add(currentRect);
         isDrawing = true;
         Debug.Log("[ShipUI] 開始繪製矩形");
     }
@@ -604,11 +605,22 @@ public class ShipUI : Singleton<ShipUI>
                     Mathf.Abs(evt.localPosition.y - startPos.y)
                 );
 
+                // 將屏幕坐標轉換為世界空間坐標
+                Vector3 screenToWorldMin = Camera.main.ScreenToWorldPoint(new Vector3(rect.xMin, Screen.height - rect.yMax, 0));
+                Vector3 screenToWorldMax = Camera.main.ScreenToWorldPoint(new Vector3(rect.xMax, Screen.height - rect.yMin, 0));
+
+                Rect worldRect = new Rect(
+                    screenToWorldMin.x,
+                    screenToWorldMin.y,
+                    screenToWorldMax.x - screenToWorldMin.x,
+                    screenToWorldMax.y - screenToWorldMin.y
+                );
+
                 // 保存矩形區域到船隻數據
                 if (ship != null)
                 {
-                    ship.SavedRectArea = rect;
-                    Debug.Log($"[ShipUI] 矩形區域已保存到船隻: {rect}");
+                    ship.SavedRectArea = worldRect;
+                    Debug.Log($"[ShipUI] 矩形區域已保存到船隻: {worldRect}");
                 }
 
                 currentRect = null; // 重置 currentRect 狀態
@@ -622,16 +634,32 @@ public class ShipUI : Singleton<ShipUI>
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
 
-        VisualElement savedRect = new VisualElement();
-        savedRect.AddToClassList("rect"); // 套用矩形樣式
-        savedRect.style.position = Position.Absolute;
-        savedRect.style.left = rect.xMin;
-        savedRect.style.top = rect.yMin;
-        savedRect.style.width = rect.width;
-        savedRect.style.height = rect.height;
+        if (savedRectElement != null)
+        {
+            savedRectElement.RemoveFromHierarchy();
+        }
 
-        root.Add(savedRect);
+        savedRectElement = new VisualElement();
+        savedRectElement.AddToClassList("rect"); // 套用矩形樣式
+        savedRectElement.style.position = Position.Absolute;
+
+        root.Add(savedRectElement);
+        UpdateSavedRectPosition(rect); // 初始化位置
         Debug.Log($"[ShipUI] 繪製保存的矩形區域: {rect}");
+    }
+
+    private void UpdateSavedRectPosition(Rect rect)
+    {
+        if (savedRectElement == null) return;
+
+        // 將矩形區域轉換為世界空間中的屏幕坐標
+        Vector2 worldToScreenMin = Camera.main.WorldToScreenPoint(new Vector3(rect.xMin, rect.yMin, 0));
+        Vector2 worldToScreenMax = Camera.main.WorldToScreenPoint(new Vector3(rect.xMax, rect.yMax, 0));
+
+        savedRectElement.style.left = worldToScreenMin.x;
+        savedRectElement.style.top = Screen.height - worldToScreenMax.y; // 修正為屏幕坐標系
+        savedRectElement.style.width = Mathf.Abs(worldToScreenMax.x - worldToScreenMin.x);
+        savedRectElement.style.height = Mathf.Abs(worldToScreenMax.y - worldToScreenMin.y);
     }
 
     private void OnDestroy()
