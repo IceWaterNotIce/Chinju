@@ -68,6 +68,8 @@ public class GameData
 
         // 新增：保存船隻的預製物名稱
         public string PrefabName;
+
+        public Rect SavedRectArea; // 新增：保存矩形區域
     }
 
     [System.Serializable]

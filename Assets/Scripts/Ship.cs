@@ -298,6 +298,14 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     [Header("Ship Type")]
     public bool IsPlayerShip = true; // 確保屬性名稱為 IsPlayerShip
 
+    [SerializeField] private Rect savedRectArea; // 新增變數保存矩形區域
+
+    public Rect SavedRectArea
+    {
+        get => savedRectArea;
+        set => savedRectArea = value;
+    }
+
     public void Start()
     {
         tilemap = FindFirstObjectByType<Tilemap>();
@@ -475,7 +483,8 @@ public class Ship : MonoBehaviour, IPointerClickHandler
             Weapons = new List<GameData.WeaponData>(), // 保存武器數據
             PrefabName = gameObject.name.Replace("(Clone)", "").Trim(),
             MaxFuel = MaxFuel, // 保存最大燃料
-            CurrentFuel = m_fuel // 保存當前燃料
+            CurrentFuel = m_fuel, // 保存當前燃料
+            SavedRectArea = SavedRectArea, // 保存矩形區域
         };
 
         foreach (var weapon in weapons)
@@ -500,6 +509,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         this.Experience = shipData.Experience; // 載入經驗值
         this.MaxFuel = shipData.MaxFuel; // 載入最大燃料
         this.CurrentFuel = shipData.CurrentFuel; // 載入當前燃料
+        this.SavedRectArea = shipData.SavedRectArea; // 載入矩形區域
 
         // 清空現有武器
         foreach (var weapon in weapons)

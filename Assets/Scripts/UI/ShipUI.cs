@@ -147,6 +147,12 @@ public class ShipUI : Singleton<ShipUI>
         ship.OnFuelChanged += fuel => UpdateFuel(fuel, ship.MaxFuel);
 
         SetUIPosition();
+
+        // 如果船隻有保存的矩形區域，繪製矩形 UI
+        if (ship.SavedRectArea.width > 0 && ship.SavedRectArea.height > 0)
+        {
+            DrawSavedRect(ship.SavedRectArea);
+        }
     }
 
     // Update is called once per frame
@@ -585,11 +591,46 @@ public class ShipUI : Singleton<ShipUI>
         if (evt.button == 0 && isDrawing) // 左鍵
         {
             isDrawing = false;
-            currentRect = null; // 重置 currentRect 狀態
             canDraw = false; // 繪製完成後禁用繪製功能
+
+            if (currentRect != null)
+            {
+                // 計算矩形區域
+                Rect rect = new Rect(
+                    Mathf.Min(startPos.x, evt.localPosition.x),
+                    Mathf.Min(startPos.y, evt.localPosition.y),
+                    Mathf.Abs(evt.localPosition.x - startPos.x),
+                    Mathf.Abs(evt.localPosition.y - startPos.y)
+                );
+
+                // 保存矩形區域到船隻數據
+                if (ship != null)
+                {
+                    ship.SavedRectArea = rect;
+                    Debug.Log($"[ShipUI] 矩形區域已保存到船隻: {rect}");
+                }
+
+                currentRect = null; // 重置 currentRect 狀態
+            }
+
             Debug.Log("[ShipUI] 繪製結束");
-            Debug.Log($"[ShipUI] 繪製的矩形位置: {startPos} 到 {evt.localPosition}");
         }
+    }
+
+    private void DrawSavedRect(Rect rect)
+    {
+        var root = GetComponent<UIDocument>().rootVisualElement;
+
+        VisualElement savedRect = new VisualElement();
+        savedRect.AddToClassList("rect"); // 套用矩形樣式
+        savedRect.style.position = Position.Absolute;
+        savedRect.style.left = rect.xMin;
+        savedRect.style.top = rect.yMin;
+        savedRect.style.width = rect.width;
+        savedRect.style.height = rect.height;
+
+        root.Add(savedRect);
+        Debug.Log($"[ShipUI] 繪製保存的矩形區域: {rect}");
     }
 
     private void OnDestroy()
