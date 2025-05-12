@@ -1,0 +1,6 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scenes/Labs/Lab1/Lab1Style.uss?fileID=7433441132597879392&amp;guid=06f136a89fb9f384583d7f52a897ff34&amp;type=3#Lab1Style" />
+    <engine:VisualElement style="flex-grow: 1;">
+        <engine:Button name="StartDrawButton" text="Start Draw" style="width: 150px; height: 40px; margin: 10px;" />
+    </engine:VisualElement>
+</engine:UXML>
