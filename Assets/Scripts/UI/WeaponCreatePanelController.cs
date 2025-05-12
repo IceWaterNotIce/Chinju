@@ -79,7 +79,8 @@ public class WeaponCreatePanelController : MonoBehaviour
         if (chinjuUIController == null)
             chinjuUIController = FindFirstObjectByType<ChinjuUIController>();
 
-        root.style.display = DisplayStyle.None;
+        // 註冊面板到 PopupManager
+        PopupManager.Instance.RegisterPopup("WeaponCreatePanel", root);
         Debug.Log("[WeaponCreatePanelController] 面板初始化完成並預設隱藏");
     }
 
@@ -99,7 +100,7 @@ public class WeaponCreatePanelController : MonoBehaviour
     {
         if (root != null)
         {
-            root.style.display = DisplayStyle.Flex;
+            PopupManager.Instance.ShowPopup("ShipCreationPanel");
             Debug.Log($"[WeaponCreatePanelController] 顯示武器創建面板，root.style.display = {root.style.display}");
         }
         else
@@ -112,7 +113,7 @@ public class WeaponCreatePanelController : MonoBehaviour
     {
         if (root != null)
         {
-            root.style.display = DisplayStyle.None;
+            PopupManager.Instance.HidePopup("ShipCreationPanel");
             Debug.Log("[WeaponCreatePanelController] 隱藏武器創建面板");
         }
         else

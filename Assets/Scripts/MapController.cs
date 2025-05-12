@@ -6,7 +6,7 @@ using System.Collections;
 using System.IO;
 using System.Threading.Tasks;
 
-public class MapController : MonoBehaviour 
+public class MapController : MonoBehaviour
 {
     private const string MapCacheFilePath = "map_cache"; // 不需要副檔名
 
@@ -17,7 +17,7 @@ public class MapController : MonoBehaviour
     public int width = 100;
     public int height = 100;
     public float islandDensity = 0.1f;
-    
+
     [Header("Random Seed")]
     public int seed = 12345; // 預設種子
     public bool useRandomSeed = true; // 是否每次隨機生成
@@ -32,7 +32,7 @@ public class MapController : MonoBehaviour
     private List<Vector3Int> oilTilePositions = new List<Vector3Int>(); // 保存石油 Tile 的位置
     public GameObject oilShipPrefab; // 新增：石油船的預製物
 
-    void Start() 
+    void Start()
     {
         gameManager = Object.FindFirstObjectByType<GameManager>(); // 使用 FindFirstObjectByType 替代 FindObjectOfType
         if (useRandomSeed)
@@ -40,7 +40,7 @@ public class MapController : MonoBehaviour
             seed = Random.Range(0, int.MaxValue);
         }
         Random.InitState(seed); // 初始化隨機數生成器
-        
+
         // 自動尋找 ChinjuUIController
         if (chinjuUIController == null)
         {
@@ -56,7 +56,7 @@ public class MapController : MonoBehaviour
         {
             Debug.LogError("[MapController] ChinjuUIController 未設置！請在 Inspector 中設置引用。");
         }
-        
+
         if (File.Exists(MapCacheFilePath))
         {
             LoadMapFromCache();
@@ -245,12 +245,12 @@ public class MapController : MonoBehaviour
         Vector3Int centerIslandTile = Vector3Int.zero;
         float closestDistance = float.MaxValue;
 
-        for (int x = 0; x < width; x++) 
+        for (int x = 0; x < width; x++)
         {
-            for (int y = 0; y < height; y++) 
+            for (int y = 0; y < height; y++)
             {
                 float noiseValue = Mathf.PerlinNoise((x + seed) * 0.1f, (y + seed) * 0.1f);
-                if (noiseValue > 1f - islandDensity) 
+                if (noiseValue > 1f - islandDensity)
                 {
                     tilemap.SetTile(new Vector3Int(x, y, 0), grassTile);
 
@@ -345,7 +345,7 @@ public class MapController : MonoBehaviour
         // 獲取滑鼠位置並轉換為世界座標
         Vector2 mousePosition = Mouse.current.position.ReadValue();
         Vector3 worldPoint = mainCamera.ScreenToWorldPoint(mousePosition);
-        
+
         // 執行 Raycast
         RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.down);
 
@@ -375,8 +375,16 @@ public class MapController : MonoBehaviour
                     Debug.Log("[MapController] 這是神獸 Tile");
                     if (chinjuUIController != null)
                     {
-                        Debug.Log("[MapController] 正在開啟 Chinju UI 面板...");
-                        chinjuUIController.ToggleMainPanelOnly();
+                        if (PopupManager.Instance.IsAllPopupsHidden())
+                        {
+                            Debug.Log("[MapController] 正在開啟 Chinju UI 面板...");
+                            chinjuUIController.ToggleMainPanelOnly();
+                        }
+                        else
+                        {
+                            chinjuUIController.Hide();
+                        }
+
                     }
                     else
                     {

@@ -136,7 +136,7 @@ public class ShipCreationPanel : MonoBehaviour
         }
 
         // 初始化面板狀態
-        root.style.display = DisplayStyle.None; // 修改為控制 root
+        PopupManager.Instance.RegisterPopup("ShipCreationPanel", root);
         UpdateCostDisplay(0, 0, 0);
 
         Debug.Log("[ShipCreationPanel] 船隻建造面板初始化完成");
@@ -206,7 +206,7 @@ public class ShipCreationPanel : MonoBehaviour
     {
         if (root != null)
         {
-            root.style.display = DisplayStyle.Flex;
+            PopupManager.Instance.ShowPopup("ShipCreationPanel");
             Debug.Log($"[WeaponCreatePanelController] 顯示武器創建面板，root.style.display = {root.style.display}");
         }
         else
@@ -222,7 +222,7 @@ public class ShipCreationPanel : MonoBehaviour
     {
         if (root != null)
         {
-            root.style.display = DisplayStyle.None;
+            PopupManager.Instance.HidePopup("ShipCreationPanel");
             Debug.Log("[WeaponCreatePanelController] 隱藏武器創建面板, root.style.display = " + root.style.display);
 
         }

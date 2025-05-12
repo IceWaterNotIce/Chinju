@@ -53,11 +53,8 @@ public class SettingMenu : MonoBehaviour
             exitGameButton = UIHelper.InitializeElement<Button>(root, "exitGameButton");
             newGameButton = UIHelper.InitializeElement<Button>(root, "newGameButton"); // 新增
 
-            // 初始化面板狀態
-            root.style.display = DisplayStyle.None;
-
             RegisterButtonCallbacks();
-            HideGameMenu();
+            PopupManager.Instance.RegisterPopup("SettingMenu", root);
             Debug.Log("[SettingMenu] UI初始化成功");
         }
         catch (System.Exception e)
@@ -117,7 +114,7 @@ public class SettingMenu : MonoBehaviour
             return;
         }
 
-        root.style.display = DisplayStyle.Flex;
+        PopupManager.Instance.ShowPopup("SettingMenu");
         Time.timeScale = 0f; // 暫停遊戲
         Debug.Log("[SettingMenu] 顯示遊戲選單並暫停遊戲");
     }
@@ -130,7 +127,7 @@ public class SettingMenu : MonoBehaviour
             return;
         }
 
-        root.style.display = DisplayStyle.None;
+        PopupManager.Instance.HidePopup("SettingMenu");
         Time.timeScale = 1f; // 恢復遊戲
         Debug.Log("[SettingMenu] 隱藏遊戲選單並恢復遊戲");
     }
@@ -190,7 +187,7 @@ public class SettingMenu : MonoBehaviour
             return;
         }
 
-        root.style.display = DisplayStyle.Flex;
+        PopupManager.Instance.ShowPopup("SettingMenu");
         Debug.Log("[SettingMenu] 顯示設定選單");
     }
 
@@ -202,7 +199,7 @@ public class SettingMenu : MonoBehaviour
             return;
         }
 
-        root.style.display = DisplayStyle.None;
+        PopupManager.Instance.HidePopup("SettingMenu");
         Debug.Log("[SettingMenu] 隱藏設定選單");
     }
 
