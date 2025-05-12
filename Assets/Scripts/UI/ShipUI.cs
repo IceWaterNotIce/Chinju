@@ -46,6 +46,8 @@ public class ShipUI : Singleton<ShipUI>
     private Vector2 startPos;
     private VisualElement currentRect;
 
+    private Button btnCloseUI; // 新增關閉 UI 的按鈕
+
     void Start()
     {
         var uiDoc = GetComponent<UIDocument>();
@@ -76,6 +78,7 @@ public class ShipUI : Singleton<ShipUI>
         InitializeHealthAndFuelLabels();
         InitializeCancelFollowButton();
         InitializeDrawButton();
+        InitializeCloseUIButton();
         RegisterPointerEvents();
     }
 
@@ -499,6 +502,23 @@ public class ShipUI : Singleton<ShipUI>
         else
         {
             LogError("找不到名為 'StartDrawButton' 的按鈕！");
+        }
+    }
+
+    private void InitializeCloseUIButton()
+    {
+        btnCloseUI = UIHelper.InitializeElement<Button>(Panel, "btnCloseUI");
+        if (btnCloseUI != null)
+        {
+            btnCloseUI.clicked += () =>
+            {
+                Destroy(gameObject); // 銷毀 ShipUI
+                Debug.Log("[ShipUI] Ship UI 已關閉。");
+            };
+        }
+        else
+        {
+            LogError("找不到名為 'btnCloseUI' 的按鈕！");
         }
     }
 

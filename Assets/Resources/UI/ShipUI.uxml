@@ -38,6 +38,7 @@
             </engine:VisualElement>
             <engine:Button name="btnCancelFollow" text="取消跟隨" class="cancel-follow-btn" />
             <engine:Button name="StartDrawButton" text="Start Draw" class="draw-button" />
+            <engine:Button name="btnCloseUI" text="關閉 UI" class="close-ui-btn" />
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>
