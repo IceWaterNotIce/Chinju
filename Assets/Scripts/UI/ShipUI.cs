@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 public class ShipUI : Singleton<ShipUI>
 {
     public Ship ship;
-    private VisualElement Panel;
+    private VisualElement UIPanel;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private Label lblSpeedFrontFull;
     private Label lblSpeedFrontThreeQuarters;
@@ -66,8 +66,8 @@ public class ShipUI : Singleton<ShipUI>
             return;
         }
 
-        Panel = UIHelper.InitializeElement<VisualElement>(root, "Panel");
-        if (Panel == null)
+        UIPanel = UIHelper.InitializeElement<VisualElement>(root, "UIPanel");
+        if (UIPanel == null)
         {
             LogError("找不到名為 'Panel' 的 VisualElement！");
             return;
@@ -81,7 +81,6 @@ public class ShipUI : Singleton<ShipUI>
         InitializeCancelFollowButton();
         InitializeDrawButton();
         InitializeCloseUIButton();
-        InitializeRectContainer(); // Initialize the rectContainer
         RegisterPointerEvents();
     }
 
@@ -129,8 +128,8 @@ public class ShipUI : Singleton<ShipUI>
             return;
         }
 
-        Panel = root.Q<VisualElement>("Panel");
-        if (Panel == null)
+        UIPanel = root.Q<VisualElement>("UIPanel");
+        if (UIPanel == null)
         {
             LogError("找不到名為 'Panel' 的 VisualElement！");
             return;
@@ -163,6 +162,11 @@ public class ShipUI : Singleton<ShipUI>
     {
         UpdateLevelAndExperienceUI(); // 每幀更新等級和經驗值的顯示
         SetUIPosition(); // 每幀更新 UI 位置
+        SetRectPosition(); // 每幀更新矩形位置
+    }
+    private void SetRectPosition()
+    {
+        DrawSavedRect(ship.SavedRectArea);
     }
 
     void SpeedControll(float percentage)
@@ -216,7 +220,7 @@ public class ShipUI : Singleton<ShipUI>
         Button closeBtn = new Button(() => weaponDetailPopup.RemoveFromHierarchy()) { text = "關閉" };
         weaponDetailPopup.Add(closeBtn);
 
-        Panel.Add(weaponDetailPopup);
+        UIPanel.Add(weaponDetailPopup);
     }
 
     // 新增：武器總覽面板
@@ -267,7 +271,7 @@ public class ShipUI : Singleton<ShipUI>
         Button closeBtn = new Button(() => weaponsPanel.RemoveFromHierarchy()) { text = "關閉" };
         weaponsPanel.Add(closeBtn);
 
-        Panel.Add(weaponsPanel);
+        UIPanel.Add(weaponsPanel);
     }
 
     // 新增：顯示武器選擇面板
@@ -331,7 +335,7 @@ public class ShipUI : Singleton<ShipUI>
         closeBtn.style.marginTop = PopupPadding;
         weaponDetailPopup.Add(closeBtn);
 
-        Panel.Add(weaponDetailPopup);
+        UIPanel.Add(weaponDetailPopup);
     }
 
     // 新增：刷新武器列表的方法
@@ -418,7 +422,7 @@ public class ShipUI : Singleton<ShipUI>
 
     private Label InitializeSpeedLabel(string name, float speedPercentage)
     {
-        var label = UIHelper.InitializeElement<Label>(Panel, name);
+        var label = UIHelper.InitializeElement<Label>(UIPanel, name);
         label.RegisterCallback<ClickEvent>(ev => SpeedControll(speedPercentage));
         return label;
     }
@@ -434,7 +438,7 @@ public class ShipUI : Singleton<ShipUI>
 
     private Label InitializeRotationLabel(string name, float rotationPercentage)
     {
-        var label = UIHelper.InitializeElement<Label>(Panel, name);
+        var label = UIHelper.InitializeElement<Label>(UIPanel, name);
         label.RegisterCallback<ClickEvent>(ev => RotationControll(rotationPercentage));
         return label;
     }
@@ -453,21 +457,21 @@ public class ShipUI : Singleton<ShipUI>
 
     private Label InitializeLabel(string name, int marginTop)
     {
-        var label = Panel.Q<Label>(name);
+        var label = UIPanel.Q<Label>(name);
         if (label == null)
         {
             label = new Label();
             label.name = name;
             label.style.marginTop = marginTop;
             label.style.unityTextAlign = TextAnchor.MiddleLeft;
-            Panel.Add(label);
+            UIPanel.Add(label);
         }
         return label;
     }
 
     private void InitializeWeaponListContainer()
     {
-        weaponListContainer = Panel.Q<VisualElement>("weaponListContainer") ?? new VisualElement
+        weaponListContainer = UIPanel.Q<VisualElement>("weaponListContainer") ?? new VisualElement
         {
             name = "weaponListContainer",
             style =
@@ -476,13 +480,13 @@ public class ShipUI : Singleton<ShipUI>
                 marginTop = 10
             }
         };
-        Panel.Add(weaponListContainer);
+        UIPanel.Add(weaponListContainer);
         weaponListContainer.Clear();
     }
 
     private void InitializeCancelFollowButton()
     {
-        btnCancelFollow = UIHelper.InitializeElement<Button>(Panel, "btnCancelFollow");
+        btnCancelFollow = UIHelper.InitializeElement<Button>(UIPanel, "btnCancelFollow");
         if (btnCancelFollow != null)
         {
             btnCancelFollow.clicked += () =>
@@ -517,7 +521,7 @@ public class ShipUI : Singleton<ShipUI>
 
     private void InitializeCloseUIButton()
     {
-        btnCloseUI = UIHelper.InitializeElement<Button>(Panel, "btnCloseUI");
+        btnCloseUI = UIHelper.InitializeElement<Button>(UIPanel, "btnCloseUI");
         if (btnCloseUI != null)
         {
             btnCloseUI.clicked += () =>
@@ -540,9 +544,10 @@ public class ShipUI : Singleton<ShipUI>
             return;
         }
 
+        // 根據船隻的位置更新 UI 的位置
         Vector2 shipScreenPosition = Camera.main.WorldToScreenPoint(ship.transform.position);
-        Panel.style.left = shipScreenPosition.x;
-        Panel.style.top = Screen.height - shipScreenPosition.y; // 修正為屏幕坐標系
+        UIPanel.style.left = shipScreenPosition.x;
+        UIPanel.style.top = Screen.height - shipScreenPosition.y; // 修正為屏幕坐標系
         Debug.Log($"[ShipUI] 設定 UI 位置為: {shipScreenPosition}");
     }
 
@@ -562,26 +567,19 @@ public class ShipUI : Singleton<ShipUI>
 
     private VisualElement rectContainer; // New container for rectangles
 
-    private void InitializeRectContainer()
-    {
-        rectContainer = Panel.Q<VisualElement>("rectContainer") ?? new VisualElement
-        {
-            name = "rectContainer",
-            style =
-            {
-                flexDirection = FlexDirection.Row,
-                position = Position.Absolute,
-                left = 0,
-                top = 0,
-                width = Panel.resolvedStyle.width,
-                height = Panel.resolvedStyle.height
-            }
-        };
-        Panel.Add(rectContainer);
-    }
 
     private void OnPointerDown(PointerDownEvent evt)
     {
+        Debug.Log("[ShipUI] PointerDownEvent");
+        if (rectContainer == null)
+        {
+            rectContainer = GetComponent<UIDocument>().rootVisualElement.Q<VisualElement>("rectContainer");
+            if (rectContainer == null)
+            {
+                Debug.LogError("[ShipUI] 找不到名為 'rectContainer' 的 VisualElement！");
+                return;
+            }
+        }
         if (!canDraw || evt.button != 0) return; // 檢查是否允許繪製
         startPos = evt.localPosition;
 
@@ -655,6 +653,8 @@ public class ShipUI : Singleton<ShipUI>
                 }
 
                 currentRect = null; // 重置 currentRect 狀態
+                //delete all rects
+                rectContainer.Clear();
             }
 
             Debug.Log("[ShipUI] 繪製結束");
@@ -663,7 +663,7 @@ public class ShipUI : Singleton<ShipUI>
 
     private void DrawSavedRect(Rect rect)
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
+        var rectContainer = GetComponent<UIDocument>().rootVisualElement.Q<VisualElement>("rectContainer");
 
         if (savedRectElement != null)
         {
@@ -674,7 +674,7 @@ public class ShipUI : Singleton<ShipUI>
         savedRectElement.AddToClassList("rect"); // 套用矩形樣式
         savedRectElement.style.position = Position.Absolute;
 
-        root.Add(savedRectElement);
+        rectContainer.Add(savedRectElement);
         UpdateSavedRectPosition(rect); // 初始化位置
         Debug.Log($"[ShipUI] 繪製保存的矩形區域: {rect}");
     }
