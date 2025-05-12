@@ -159,6 +159,7 @@ public class ShipUI : Singleton<ShipUI>
     void Update()
     {
         UpdateLevelAndExperienceUI(); // 每幀更新等級和經驗值的顯示
+        SetUIPosition(); // 每幀更新 UI 位置
     }
 
     void SpeedControll(float percentage)
@@ -530,16 +531,16 @@ public class ShipUI : Singleton<ShipUI>
 
     private void SetUIPosition()
     {
-        if (Camera.main == null)
+        if (ship == null)
         {
-            LogError("Camera.main 為 null，無法設定 UI 位置！");
+            LogError("Ship 為 null，無法設定 UI 位置！");
             return;
         }
 
         Vector2 shipScreenPosition = Camera.main.WorldToScreenPoint(ship.transform.position);
-        Debug.Log("Ship Screen Position: " + shipScreenPosition);
         Panel.style.left = shipScreenPosition.x;
-        Panel.style.top = shipScreenPosition.y;
+        Panel.style.top = Screen.height - shipScreenPosition.y; // 修正為屏幕坐標系
+        Debug.Log($"[ShipUI] 設定 UI 位置為: {shipScreenPosition}");
     }
 
     private void RegisterPointerEvents()
