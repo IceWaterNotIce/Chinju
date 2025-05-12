@@ -37,7 +37,7 @@ public class ShipUI : Singleton<ShipUI>
     void TiggerMap()
     {
         //Enable the Line renderer
-        
+
     }
 
     void Start()
@@ -94,10 +94,22 @@ public class ShipUI : Singleton<ShipUI>
             return;
         }
 
+
         var root = uiDoc.rootVisualElement;
         if (root == null)
         {
             LogError("UIDocument 的 rootVisualElement 為 null！");
+            return;
+        }
+
+        var styleSheet = Resources.Load<StyleSheet>("UI/ShipUI");
+        if (styleSheet != null)
+        {
+            root.styleSheets.Add(styleSheet);
+        }
+        else
+        {
+            LogError("無法加載 ShipUI 的樣式表！");
             return;
         }
 
@@ -210,18 +222,18 @@ public class ShipUI : Singleton<ShipUI>
             if (weapon != null)
             {
                 icon.style.backgroundColor = new Color(0.8f, 0.8f, 0.2f, 1f);
-                icon.tooltip = $"武器{i+1}";
+                icon.tooltip = $"武器{i + 1}";
                 int weaponIndex = i;
                 icon.RegisterCallback<ClickEvent>(ev => ShowWeaponDetail(ship.weapons[weaponIndex]));
             }
             else
             {
                 icon.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.3f);
-                icon.tooltip = $"空武器槽{i+1}";
+                icon.tooltip = $"空武器槽{i + 1}";
             }
             row.Add(icon);
 
-            Label label = new Label(weapon != null ? $"武器{i+1}" : $"空武器槽{i+1}");
+            Label label = new Label(weapon != null ? $"武器{i + 1}" : $"空武器槽{i + 1}");
             row.Add(label);
 
             weaponsPanel.Add(row);
