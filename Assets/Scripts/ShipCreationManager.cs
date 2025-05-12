@@ -162,7 +162,7 @@ public class ShipCreationManager : MonoBehaviour
                 AttackPower = 20,
                 Defense = 10,
                 Position = position,
-                Fuel = 100,
+                CurrentFuel = 100,
                 Speed = 5,
                 Rotation = 0
             };

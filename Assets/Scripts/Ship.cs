@@ -15,6 +15,13 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     [Header("Health Settings")]
     [SerializeField] private float m_maxHealth = 100f;
     [SerializeField] private float m_health = 100f;
+
+
+    [Header("Fuel Settings")]
+
+    [SerializeField] private float m_maxFuel = 100f; // 最大燃料
+    [SerializeField] private float m_fuel = 100f; // 燃料
+
     [SerializeField] private float m_fuelConsumption = 0.1f;
 
     public float MaxHealth
@@ -74,13 +81,42 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         Destroy(gameObject);
     }
 
-    public float FuelConsumption
+    public float FuelConsumptionRate
     {
         get => m_fuelConsumption;
         set => m_fuelConsumption = Mathf.Max(0, value);
     }
 
+    public float MaxFuel
+    {
+        get => m_maxFuel;
+        set => m_maxFuel = Mathf.Max(0, value);
+    }
+
+    public float CurrentFuel
+    {
+        get => m_fuel;
+        set
+        {
+            m_fuel = Mathf.Clamp(value, 0, m_maxFuel);
+            OnFuelChanged?.Invoke(m_fuel);
+
+            if (m_fuel <= 0)
+            {
+                Debug.LogWarning($"[Ship] {name} 燃料耗盡，無法繼續移動！");
+                StopMovement();
+            }
+        }
+    }
+
     public event Action<float> OnHealthChanged;
+    public event Action<float> OnFuelChanged;
+
+    private void StopMovement()
+    {
+        TargetSpeed = 0;
+        Speed = 0;
+    }
     #endregion
 
     #region Movement
@@ -376,18 +412,26 @@ public class Ship : MonoBehaviour, IPointerClickHandler
 
     void Move()
     {
-        m_speed = Mathf.MoveTowards(m_speed, m_targetSpeed, m_acceleration * Time.deltaTime);
-        Vector3 newPosition = transform.position + transform.right * Speed * Time.deltaTime;
-
-        // 檢查新位置是否為海洋 Tile
-        Vector3Int tilePosition = tilemap.WorldToCell(newPosition);
-        if (tilemap.GetTile(tilePosition) == oceanTile)
+        if (CurrentFuel > 0)
         {
-            transform.position = newPosition;
+            m_speed = Mathf.MoveTowards(m_speed, m_targetSpeed, m_acceleration * Time.deltaTime);
+            Vector3 newPosition = transform.position + transform.right * Speed * Time.deltaTime;
+
+            // 檢查新位置是否為海洋 Tile
+            Vector3Int tilePosition = tilemap.WorldToCell(newPosition);
+            if (tilemap.GetTile(tilePosition) == oceanTile)
+            {
+                transform.position = newPosition;
+                CurrentFuel -= FuelConsumptionRate * Speed * Time.deltaTime; // 消耗燃料
+            }
+            else
+            {
+                Debug.LogWarning("無法移動到非海洋 Tile 的位置！");
+            }
         }
         else
         {
-            Debug.LogWarning("無法移動到非海洋 Tile 的位置！");
+            Debug.LogWarning($"[Ship] {name} 燃料不足，無法移動！");
         }
     }
 
@@ -422,14 +466,16 @@ public class Ship : MonoBehaviour, IPointerClickHandler
             Name = this.name, // 保存船隻名稱
             Position = transform.position,
             Health = (int)Health,
-            Fuel = (int)FuelConsumption, // 顯式轉換
+            FuelConsumptionRate = (int)FuelConsumptionRate, // 顯式轉換
             Speed = Speed,
             Rotation = transform.rotation.eulerAngles.z,
             WeaponLimit = IntWeaponLimit, // 保存武器數量上限
             Level = Level, // 保存等級
             Experience = Experience, // 保存經驗值
             Weapons = new List<GameData.WeaponData>(), // 保存武器數據
-            PrefabName = gameObject.name.Replace("(Clone)", "").Trim()
+            PrefabName = gameObject.name.Replace("(Clone)", "").Trim(),
+            MaxFuel = MaxFuel, // 保存最大燃料
+            CurrentFuel = m_fuel // 保存當前燃料
         };
 
         foreach (var weapon in weapons)
@@ -452,6 +498,8 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         this.IntWeaponLimit = shipData.WeaponLimit; // 載入武器數量上限
         this.Level = shipData.Level; // 載入等級
         this.Experience = shipData.Experience; // 載入經驗值
+        this.MaxFuel = shipData.MaxFuel; // 載入最大燃料
+        this.CurrentFuel = shipData.CurrentFuel; // 載入當前燃料
 
         // 清空現有武器
         foreach (var weapon in weapons)
@@ -527,6 +575,7 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         TargetSpeed = m_targetSpeed;
         TargetRotationSpeed = m_targetRotationSpeed;
         m_visibleRadius = Mathf.Max(0, m_visibleRadius);
+        CurrentFuel = m_fuel; // 確保燃料值在檢查時被限制
     }
 
     private void OnDrawGizmosSelected()

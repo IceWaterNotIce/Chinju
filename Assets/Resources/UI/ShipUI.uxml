@@ -23,6 +23,14 @@
                 <engine:Label text="1/2" name="lblRotationRightHalf" />
                 <engine:Label text="Full" name="lblRotationRightFull" />
             </engine:VisualElement>
+            <engine:VisualElement>
+                <engine:Label text="Health" />
+                <engine:Label name="lblHealth" text="健康值: 100/100" />
+            </engine:VisualElement>
+            <engine:VisualElement>
+                <engine:Label text="Fuel" />
+                <engine:Label name="lblFuel" text="燃料: 100/100" />
+            </engine:VisualElement>
             <engine:VisualElement name="weaponListContainer" />
             <engine:VisualElement>
                 <engine:Label name="lblLevel" text="等級: 1" />

@@ -34,6 +34,9 @@ public class ShipUI : Singleton<ShipUI>
     private const float PopupWidth = 300f; // Constant for popup width
     private const float PopupPadding = 10f; // Constant for popup padding
 
+    private Label lblHealth; // 新增：顯示健康值的 Label
+    private Label lblFuel; // 新增：顯示燃料的 Label
+
     void TiggerMap()
     {
         //Enable the Line renderer
@@ -67,6 +70,7 @@ public class ShipUI : Singleton<ShipUI>
         InitializeRotationLabels();
         InitializeWeaponListContainer();
         InitializeLevelAndExperienceLabels();
+        InitializeHealthAndFuelLabels();
     }
 
     public void Initial(Ship s)
@@ -126,7 +130,14 @@ public class ShipUI : Singleton<ShipUI>
         InitializeRotationLabels();
         InitializeWeaponListContainer();
         InitializeLevelAndExperienceLabels();
+        InitializeHealthAndFuelLabels();
         UpdateLevelAndExperienceUI();
+        UpdateHealth(ship.Health, ship.MaxHealth);
+        UpdateFuel(ship.CurrentFuel, ship.MaxFuel);
+
+        // 訂閱事件
+        ship.OnHealthChanged += health => UpdateHealth(health, ship.MaxHealth);
+        ship.OnFuelChanged += fuel => UpdateFuel(fuel, ship.MaxFuel);
 
         SetUIPosition();
     }
@@ -365,6 +376,22 @@ public class ShipUI : Singleton<ShipUI>
         }
     }
 
+    private void UpdateHealth(float currentHealth, float maxHealth)
+    {
+        if (lblHealth != null)
+        {
+            lblHealth.text = $"健康值: {Mathf.RoundToInt(currentHealth)}/{Mathf.RoundToInt(maxHealth)}";
+        }
+    }
+
+    private void UpdateFuel(float currentFuel, float maxFuel)
+    {
+        if (lblFuel != null)
+        {
+            lblFuel.text = $"燃料: {Mathf.RoundToInt(currentFuel)}/{Mathf.RoundToInt(maxFuel)}";
+        }
+    }
+
     private void InitializeSpeedLabels()
     {
         lblSpeedFrontFull = InitializeSpeedLabel("lblSpeedFrontFull", 1.0f);
@@ -402,6 +429,12 @@ public class ShipUI : Singleton<ShipUI>
     {
         lblLevel = InitializeLabel("lblLevel", 10);
         lblExperience = InitializeLabel("lblExperience", 5);
+    }
+
+    private void InitializeHealthAndFuelLabels()
+    {
+        lblHealth = InitializeLabel("lblHealth", 10);
+        lblFuel = InitializeLabel("lblFuel", 5);
     }
 
     private Label InitializeLabel(string name, int marginTop)

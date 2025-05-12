@@ -35,7 +35,7 @@ public class LabShipSceneManager : MonoBehaviour
         shipScript.Acceleration = acceleration;
         shipScript.RotationAcceleration = RotationAcceleration;
         shipScript.DetectionDistance = detectionDistance;
-        shipScript.FuelConsumption = fuelConsumption;
+        shipScript.FuelConsumptionRate = fuelConsumption;
         shipScript.CombatMode = mode;
     }
 }

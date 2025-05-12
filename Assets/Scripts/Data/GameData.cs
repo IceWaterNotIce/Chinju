@@ -52,7 +52,10 @@ public class GameData
         public int AttackPower;
         public int Defense;
         public Vector3 Position;
-        public float Fuel;
+        public float MaxFuel; // 新增：保存船隻的最大燃料
+        public float CurrentFuel;
+
+        public float FuelConsumptionRate; // 新增：保存船隻的燃料消耗率
         public float Speed;
         public float Rotation;
 
