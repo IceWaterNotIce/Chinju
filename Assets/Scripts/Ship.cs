@@ -303,7 +303,18 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     public Rect SavedRectArea
     {
         get => savedRectArea;
-        set => savedRectArea = value;
+        set
+        {
+            savedRectArea = value;
+
+            // 新增：清除目標速度和目標旋轉，並開始在矩形區域內移動
+            if (savedRectArea != Rect.zero)
+            {
+                TargetSpeed = 0;
+                TargetRotationSpeed = 0;
+                Debug.Log($"[Ship] {name} 的 SavedRectArea 更新，開始在矩形區域內移動。");
+            }
+        }
     }
 
     public void Start()
@@ -328,6 +339,12 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         Rotate();
         Move();
         DetectAndAttackTarget();
+
+        // 新增：檢查是否有矩形區域數據，且沒有目標速度和目標旋轉
+        if (SavedRectArea != Rect.zero && TargetSpeed == 0 && TargetRotationSpeed == 0)
+        {
+            MoveWithinRect();
+        }
     }
 
     private void DetectAndAttackTarget()
@@ -440,6 +457,28 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         else
         {
             Debug.LogWarning($"[Ship] {name} 燃料不足，無法移動！");
+        }
+    }
+
+    private void MoveWithinRect()
+    {
+        // 設定移動速度為 2
+        float moveSpeed = 2f;
+
+        // 隨機選擇一個方向
+        Vector2 randomDirection = UnityEngine.Random.insideUnitCircle.normalized;
+
+        // 計算新的位置
+        Vector3 newPosition = transform.position + (Vector3)(randomDirection * moveSpeed * Time.deltaTime);
+
+        // 確保新位置在矩形區域內
+        if (SavedRectArea.Contains(new Vector2(newPosition.x, newPosition.y)))
+        {
+            transform.position = newPosition;
+        }
+        else
+        {
+            Debug.Log($"[Ship] {name} 嘗試移動超出矩形區域，停止移動。");
         }
     }
 
