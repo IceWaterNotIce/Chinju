@@ -140,7 +140,7 @@ MonoBehaviour:
   m_maxHealth: 100
   m_health: 100
   m_fuelConsumption: 0.1
-  m_maxSpeed: 3
+  m_maxSpeed: 2
   m_acceleration: 0.2
   m_targetSpeed: 0
   m_speed: 0

@@ -140,8 +140,8 @@ MonoBehaviour:
   m_maxHealth: 100
   m_health: 100
   m_fuelConsumption: 0.1
-  m_maxSpeed: 10
-  m_acceleration: 2
+  m_maxSpeed: 2
+  m_acceleration: 0.1
   m_targetSpeed: 0
   m_speed: 0
   m_maxRotationSpeed: 90
@@ -152,7 +152,10 @@ MonoBehaviour:
   m_detectionDistance: 50
   m_combatMode: 0
   m_visibleRadius: 10
+  level: 1
+  experience: 0
   tilemap: {fileID: 0}
   oceanTile: {fileID: 0}
   intWeaponLimit: 2
   weapons: []
+  IsPlayerShip: 1
