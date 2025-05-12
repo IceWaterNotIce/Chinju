@@ -37,6 +37,8 @@ public class ShipUI : Singleton<ShipUI>
     private Label lblHealth; // 新增：顯示健康值的 Label
     private Label lblFuel; // 新增：顯示燃料的 Label
 
+    private Button btnCancelFollow; // 新增取消跟隨按鈕
+
     void TiggerMap()
     {
         //Enable the Line renderer
@@ -71,6 +73,7 @@ public class ShipUI : Singleton<ShipUI>
         InitializeWeaponListContainer();
         InitializeLevelAndExperienceLabels();
         InitializeHealthAndFuelLabels();
+        InitializeCancelFollowButton();
     }
 
     public void Initial(Ship s)
@@ -464,6 +467,23 @@ public class ShipUI : Singleton<ShipUI>
         };
         Panel.Add(weaponListContainer);
         weaponListContainer.Clear();
+    }
+
+    private void InitializeCancelFollowButton()
+    {
+        btnCancelFollow = UIHelper.InitializeElement<Button>(Panel, "btnCancelFollow");
+        if (btnCancelFollow != null)
+        {
+            btnCancelFollow.clicked += () =>
+            {
+                var cameraController = Camera.main?.GetComponent<CameraBound2D>();
+                if (cameraController != null)
+                {
+                    cameraController.StopFollowing();
+                    Debug.Log("[ShipUI] 已取消攝影機跟隨。");
+                }
+            };
+        }
     }
 
     private void SetUIPosition()

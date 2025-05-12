@@ -36,6 +36,7 @@
                 <engine:Label name="lblLevel" text="等級: 1" />
                 <engine:Label name="lblExperience" text="經驗值: 0/10" />
             </engine:VisualElement>
+            <engine:Button name="btnCancelFollow" text="取消跟隨" class="cancel-follow-btn" />
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>
