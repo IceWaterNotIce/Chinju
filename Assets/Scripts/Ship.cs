@@ -225,8 +225,8 @@ public class Ship : MonoBehaviour, IPointerClickHandler
     #region Unity Events
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("Ship clicked", this);
-        
+        Debug.Log("[Ship] Ship clicked", this);
+
         if (UI == null)
         {
             Debug.LogError("[Ship] ShipUI.Instance 為 null，無法初始化 UI！");
