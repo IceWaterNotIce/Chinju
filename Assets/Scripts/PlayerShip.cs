@@ -43,6 +43,20 @@ public class PlayerShip : Warship, IPointerClickHandler
 
     protected override void Move()
     {
+
+        if (m_waypoints.Count > 0)
+        {
+            Vector3 target = m_waypoints[0];
+            Vector3 direction = (target - transform.position).normalized;
+            TargetRotation = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg; // 計算新的目標旋轉
+            TargetSpeed = 2f; // 設置導航速度
+            Debug.Log($"[PlayerShip] Adjusted TargetSpeed: {TargetSpeed}, TargetRotation: {TargetRotation}");
+            if (Vector3.Distance(transform.position, target) < 0.1f)
+            {
+                m_waypoints.RemoveAt(0); // 移除已到達的路徑點
+            }
+        }
+    
         if (NavigationArea != Rect.zero)
         {
             Debug.Log("[PlayerShip] Handling area navigation...");

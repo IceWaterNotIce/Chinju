@@ -167,6 +167,7 @@ public class ShipUI : Singleton<ShipUI>
         SetUIPosition(); // 每幀更新 UI 位置
         SetRectPosition(); // 每幀更新矩形位置
     }
+    
     private void SetRectPosition()
     {
         DrawSavedRect(ship.NavigationArea);
