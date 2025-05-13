@@ -100,7 +100,7 @@ public class WeaponCreatePanelController : MonoBehaviour
     {
         if (root != null)
         {
-            PopupManager.Instance.ShowPopup("ShipCreationPanel");
+            PopupManager.Instance.ShowPopup("WeaponCreatePanel");
             Debug.Log($"[WeaponCreatePanelController] 顯示武器創建面板，root.style.display = {root.style.display}");
         }
         else
@@ -113,7 +113,7 @@ public class WeaponCreatePanelController : MonoBehaviour
     {
         if (root != null)
         {
-            PopupManager.Instance.HidePopup("ShipCreationPanel");
+            PopupManager.Instance.HidePopup("WeaponCreatePanel");
             Debug.Log("[WeaponCreatePanelController] 隱藏武器創建面板");
         }
         else
