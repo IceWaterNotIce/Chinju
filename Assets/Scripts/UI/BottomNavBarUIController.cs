@@ -3,11 +3,9 @@ using UnityEngine.UIElements;
 
 public class BottomNavBarUIController : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject weaponPanel; // 參考武器面板
-
     private Button toggleWeaponPanelButton; // 切換武器面板按鈕
     private Button toggleShipListPanelButton; // 切換船隻列表面板按鈕
+    private Button toggleSettingMenuButton; // 新增：切換設定選單按鈕
 
     void Start()
     {
@@ -32,6 +30,17 @@ public class BottomNavBarUIController : MonoBehaviour
         {
             Debug.LogError("[BottomNavBarUIController] 找不到 'ToggleShipListPanelButton' 按鈕。");
         }
+
+        // 新增：綁定切換設定選單按鈕
+        toggleSettingMenuButton = root.Q<Button>("ToggleSettingMenuButton");
+        if (toggleSettingMenuButton != null)
+        {
+            toggleSettingMenuButton.clicked += ToggleSettingMenu;
+        }
+        else
+        {
+            Debug.LogError("[BottomNavBarUIController] 找不到 'ToggleSettingMenuButton' 按鈕。");
+        }
     }
 
     private void ToggleWeaponPanel()
@@ -55,6 +64,19 @@ public class BottomNavBarUIController : MonoBehaviour
         else
         {
             PopupManager.Instance.ShowPopup("ShipListPanel");
+        }
+    }
+
+    // 新增：切換設定選單
+    private void ToggleSettingMenu()
+    {
+        if (PopupManager.Instance.IsPopupVisible("SettingMenu"))
+        {
+            PopupManager.Instance.HidePopup("SettingMenu");
+        }
+        else
+        {
+            PopupManager.Instance.ShowPopup("SettingMenu");
         }
     }
 

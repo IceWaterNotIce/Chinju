@@ -2,5 +2,6 @@
     <engine:VisualElement style="flex-grow: 1; flex-direction: row; align-items: stretch; align-self: auto; align-content: auto; justify-content: flex-start; bottom: 0; height: 200px; max-height: 200px; min-height: 200px; position: absolute;">
         <engine:Button name="ToggleWeaponPanelButton" text="切換武器面板" />
         <engine:Button name="ToggleShipListPanelButton" text="切換船隻列表面板" />
+        <engine:Button name="ToggleSettingMenuButton" text="切換設定選單" /> <!-- 新增按鈕 -->
     </engine:VisualElement>
 </engine:UXML>

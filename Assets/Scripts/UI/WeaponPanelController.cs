@@ -10,7 +10,7 @@ public class WeaponPanelController : MonoBehaviour
     private void Start()
     {
         root = GetComponent<UIDocument>().rootVisualElement;
-        PopupManager.Instance.RegisterPopup("WeaponPanel", root);
+        PopupManager.Instance.RegisterPopup("WeaponPanel", gameObject);
     }
     void OnEnable()
     {

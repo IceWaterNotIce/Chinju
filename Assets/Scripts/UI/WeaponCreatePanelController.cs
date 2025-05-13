@@ -11,6 +11,18 @@ public class WeaponCreatePanelController : MonoBehaviour
 
     void Awake()
     {
+        // 註冊面板到 PopupManager
+        PopupManager.Instance.RegisterPopup("WeaponCreatePanel", gameObject);
+        Debug.Log("[WeaponCreatePanelController] 面板初始化完成並預設隱藏");
+    }
+
+    private void OnEnable()
+    {
+        InitializeUI();
+    }
+
+    private void InitializeUI()
+    {
         root = GetComponent<UIDocument>().rootVisualElement;
 
         var dropdown = UIHelper.InitializeElement<DropdownField>(root, "weapon-dropdown");
@@ -65,7 +77,7 @@ public class WeaponCreatePanelController : MonoBehaviour
                     Debug.Log($"[WeaponCreatePanelController] 成功創建：{selectedWeapon.Name}，剩餘金幣：{playerData.Gold}");
                 }
 
-                Hide();
+                PopupManager.Instance.HidePopup("WeaponCreatePanel");
             }
             else
             {
@@ -74,14 +86,13 @@ public class WeaponCreatePanelController : MonoBehaviour
             }
         };
 
-        closeBtn.clicked += Hide;
+        closeBtn.clicked += () =>
+        {
+            PopupManager.Instance.HidePopup("WeaponCreatePanel");
+        };
 
         if (chinjuUIController == null)
             chinjuUIController = FindFirstObjectByType<ChinjuUIController>();
-
-        // 註冊面板到 PopupManager
-        PopupManager.Instance.RegisterPopup("WeaponCreatePanel", root);
-        Debug.Log("[WeaponCreatePanelController] 面板初始化完成並預設隱藏");
     }
 
     void LoadWeaponPrefabs()
@@ -89,41 +100,5 @@ public class WeaponCreatePanelController : MonoBehaviour
         weaponPrefabs.Clear();
         var loadedPrefabs = Resources.LoadAll<Weapon>("Prefabs/Weapon");
         weaponPrefabs.AddRange(loadedPrefabs);
-    }
-
-    void OnEnable()
-    {
-        Hide();
-    }
-
-    public void Show()
-    {
-        if (root != null)
-        {
-            PopupManager.Instance.ShowPopup("WeaponCreatePanel");
-            Debug.Log($"[WeaponCreatePanelController] 顯示武器創建面板，root.style.display = {root.style.display}");
-        }
-        else
-        {
-            Debug.LogError("[WeaponCreatePanelController] 無法顯示武器創建面板，root 為 null");
-        }
-    }
-
-    public void Hide()
-    {
-        if (root != null)
-        {
-            PopupManager.Instance.HidePopup("WeaponCreatePanel");
-            Debug.Log("[WeaponCreatePanelController] 隱藏武器創建面板");
-        }
-        else
-        {
-            Debug.LogError("[WeaponCreatePanelController] 無法隱藏武器創建面板，root 為 null");
-        }
-
-        if (chinjuUIController != null)
-        {
-            chinjuUIController.Show();
-        }
     }
 }

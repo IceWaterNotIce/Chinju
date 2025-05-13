@@ -18,7 +18,7 @@ public class ShipListPanelController : MonoBehaviour
         closeButton = root.Q<Button>("CloseButton");
 
         // 註冊面板到 PopupManager
-        PopupManager.Instance.RegisterPopup("ShipListPanel", root);
+        PopupManager.Instance.RegisterPopup("ShipListPanel", gameObject);
 
         // 註冊關閉按鈕事件
         closeButton.RegisterCallback<ClickEvent>(ev => PopupManager.Instance.HidePopup("ShipListPanel"));

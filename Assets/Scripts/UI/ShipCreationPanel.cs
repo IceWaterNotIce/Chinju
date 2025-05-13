@@ -15,20 +15,9 @@ public class ShipCreationPanel : MonoBehaviour
     private IntegerField oilInputField;
     private IntegerField cubeInputField;
 
-    // 建議建造成本（用於提升相近資源輸入時的隨機機率）
-
-
-    [SerializeField] private MapController mapController;
-    [SerializeField] private ChinjuUIController chinjuUIController; // 新增
-
     void Awake()
     {
-        // 確保 GameDataController 已初始化
-        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData == null)
-        {
-            GameDataController.Instance.CurrentGameData = new GameData();
-        }
-        InitializeUI();
+        PopupManager.Instance.RegisterPopup("ShipCreationPanel", gameObject);
     }
 
     void OnEnable()
@@ -38,10 +27,7 @@ public class ShipCreationPanel : MonoBehaviour
         {
             GameDataController.Instance.CurrentGameData = new GameData();
         }
-        if (root == null)
-        {
-            InitializeUI();
-        }
+        InitializeUI();
     }
 
     private void InitializeUI()
@@ -106,29 +92,29 @@ public class ShipCreationPanel : MonoBehaviour
         var closeBtn = root.Q<Button>("close-ship-panel-btn");
         if (closeBtn == null)
         {
-            closeBtn = new Button(() => Hide()) { text = "關閉" };
+            closeBtn = new Button(() => 
+            {
+               PopupManager.Instance.HidePopup("ShipCreationPanel");
+            }) { text = "關閉" };
             closeBtn.name = "close-ship-panel-btn";
             closeBtn.style.marginTop = 8;
             root.Add(closeBtn);
         }
         else
         {
-            closeBtn.clicked += Hide;
+            closeBtn.clicked += () => 
+            {
+                PopupManager.Instance.HidePopup("ShipCreationPanel");
+            };
         }
 
         // 初始化面板狀態
-        PopupManager.Instance.RegisterPopup("ShipCreationPanel", root);
+        PopupManager.Instance.RegisterPopup("ShipCreationPanel", gameObject);
         UpdateCostDisplay(0, 0, 0);
 
         Debug.Log("[ShipCreationPanel] 船隻建造面板初始化完成");
     }
 
-    void Start()
-    {
-        // 自動尋找 ChinjuUIController
-        if (chinjuUIController == null)
-            chinjuUIController = FindFirstObjectByType<ChinjuUIController>();
-    }
 
     private void OnResourceInputChanged()
     {
@@ -137,29 +123,14 @@ public class ShipCreationPanel : MonoBehaviour
         int cube = Mathf.Max(0, cubeInputField.value);
         UpdateCostDisplay(gold, oil, cube);
 
-        // 啟用條件：資源大於10/10/1
-        bool enable = false;
-
         if (gold >= 10 && oil >= 10 && cube >= 1)
         {
-            // 檢查有沒有可負擭的船型
-            var gameData = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
-            if (gameData != null && gameData.playerData != null)
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    if (gameData.playerData.Gold >= ShipCreationManager.Instance.shipCosts[i, 0] &&
-                        gameData.playerData.Oils >= ShipCreationManager.Instance.shipCosts[i, 1] &&
-                        gameData.playerData.Cube >= ShipCreationManager.Instance.shipCosts[i, 2])
-                    {
-                        enable = true;
-                        break;
-                    }
-                }
-            }
+            createShipBtn.SetEnabled(true);
         }
-
-        createShipBtn.SetEnabled(enable);
+        else
+        {
+            createShipBtn.SetEnabled(false);
+        }
     }
 
     private void SelectShipType(int idx)
@@ -178,61 +149,6 @@ public class ShipCreationPanel : MonoBehaviour
         cubeInputField.value = ShipCreationManager.Instance.shipCosts[idx, 2];
 
         OnResourceInputChanged();
-    }
-
-    /// <summary>
-    /// 顯示面板
-    /// </summary>
-    public void Show()
-    {
-        if (root != null)
-        {
-            PopupManager.Instance.ShowPopup("ShipCreationPanel");
-            Debug.Log($"[WeaponCreatePanelController] 顯示武器創建面板，root.style.display = {root.style.display}");
-        }
-        else
-        {
-            Debug.LogError("[WeaponCreatePanelController] 無法顯示武器創建面板，root 為 null");
-        }
-    }
-
-    /// <summary>
-    /// 隱藏面板
-    /// </summary>
-    public void Hide()
-    {
-        if (root != null)
-        {
-            PopupManager.Instance.HidePopup("ShipCreationPanel");
-            Debug.Log("[WeaponCreatePanelController] 隱藏武器創建面板, root.style.display = " + root.style.display);
-
-        }
-        else
-        {
-            Debug.LogError("[WeaponCreatePanelController] 無法隱藏武器創建面板，root 為 null");
-        }
-    }
-
-    /// <summary>
-    /// 切換面板顯示狀態
-    /// </summary>
-    public void Toggle()
-    {
-        Debug.Log("[ShipCreationPanel] 切換船隻建造面板顯示狀態");
-        if (root != null)
-        {
-            bool isVisible = root.style.display == DisplayStyle.Flex; // 修改為檢查根元素
-            Debug.Log($"[ShipCreationPanel] 當前面板狀態：{(isVisible ? "顯示" : "隱藏")}");
-            root.style.display = isVisible ? DisplayStyle.None : DisplayStyle.Flex; // 修改為控制根元素
-            if (isVisible)
-            {
-                ResetPanel();
-            }
-        }
-        else
-        {
-            Debug.LogError("[ShipCreationPanel] 無法切換面板：root 是 null");
-        }
     }
 
     /// <summary>
@@ -258,6 +174,7 @@ public class ShipCreationPanel : MonoBehaviour
         goldInputField.value = gold;
         oilInputField.value = oil;
         cubeInputField.value = cube;
+
     }
 
     private void OnBuildButtonClicked()
@@ -270,10 +187,7 @@ public class ShipCreationPanel : MonoBehaviour
             return;
         }
 
-        PlayerShip newShip = null;
-
-
-        newShip = ShipCreationManager.Instance.TryCreateRandomShip(goldInputField.value, oilInputField.value, cubeInputField.value);
+        PlayerShip newShip = ShipCreationManager.Instance.TryCreateRandomShip(goldInputField.value, oilInputField.value, cubeInputField.value);
 
 
         if (newShip != null)

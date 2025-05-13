@@ -6,19 +6,18 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 
-using System;
-using System.IO;
+
 
 public class PopupManager : Singleton<PopupManager>
 {
-    private Dictionary<string, VisualElement> PopupPanels = new Dictionary<string, VisualElement>();
+    private Dictionary<string, GameObject> PopupPanels = new Dictionary<string, GameObject>();
 
-    public void RegisterPopup(string popupName, VisualElement popupPanelRoot)
+    public void RegisterPopup(string popupName, GameObject popupPanelRoot)
     {
         if (!PopupPanels.ContainsKey(popupName))
         {
             PopupPanels.Add(popupName, popupPanelRoot);
-            popupPanelRoot.style.display = DisplayStyle.None; // 隱藏面板
+            popupPanelRoot.SetActive(false); // 隱藏面板
         }
         else
         {
@@ -30,7 +29,7 @@ public class PopupManager : Singleton<PopupManager>
     {
         if (PopupPanels.TryGetValue(popupName, out var popupPanelRoot))
         {
-            popupPanelRoot.style.display = DisplayStyle.Flex; // 顯示面板
+            popupPanelRoot.SetActive(true); // 顯示面板
         }
         else
         {
@@ -42,7 +41,7 @@ public class PopupManager : Singleton<PopupManager>
     {
         if (PopupPanels.TryGetValue(popupName, out var popupPanelRoot))
         {
-            popupPanelRoot.style.display = DisplayStyle.None; // 隱藏面板
+            popupPanelRoot.SetActive(false); // 隱藏面板
         }
         else
         {
@@ -72,14 +71,14 @@ public class PopupManager : Singleton<PopupManager>
 
     public bool IsAllPopupsHidden()
     {
-        return PopupPanels.Values.All(p => p.style.display == DisplayStyle.None);
+        return PopupPanels.Values.All(p => !p.activeSelf);
     }
 
     public bool IsPopupVisible(string popupName)
     {
         if (PopupPanels.TryGetValue(popupName, out var popupPanelRoot))
         {
-            return popupPanelRoot.style.display == DisplayStyle.Flex;
+            return popupPanelRoot.activeSelf;
         }
         return false;
     }

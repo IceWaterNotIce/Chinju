@@ -180,4 +180,33 @@ public class ShipCreationManager : MonoBehaviour
     {
         return Vector3.zero; // 這裡可根據遊戲需求調整
     }
+
+    public void InstantiateShipFromData(GameData.ShipData shipData)
+    {
+        if (shipData == null)
+        {
+            Debug.LogWarning("[ShipCreationManager] ShipData 為 null，無法實例化船隻！");
+            return;
+        }
+
+        GameObject shipPrefab = Resources.Load<GameObject>($"Prefabs/Player/{shipData.PrefabName}");
+        if (shipPrefab != null)
+        {
+            GameObject shipObj = Instantiate(shipPrefab, shipData.Position, Quaternion.Euler(0, 0, shipData.Rotation));
+            var shipComp = shipObj.GetComponent<PlayerShip>();
+            if (shipComp != null)
+            {
+                shipComp.LoadShipData(shipData);
+                Debug.Log($"[ShipCreationManager] 已成功實例化船隻: {shipData.PrefabName}");
+            }
+            else
+            {
+                Debug.LogWarning("[ShipCreationManager] 實例化的物件缺少 PlayerShip 組件！");
+            }
+        }
+        else
+        {
+            Debug.LogWarning($"[ShipCreationManager] 找不到船隻預製物: {shipData.PrefabName}");
+        }
+    }
 }

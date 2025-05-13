@@ -25,9 +25,6 @@ public class MapController : MonoBehaviour
     public Camera mainCamera; // 新增主攝影機引用
     public CameraBound2D cameraController; // 新增 CameraController 引用
 
-    [Header("UI References")]
-    [SerializeField] private ChinjuUIController chinjuUIController;
-
     private GameManager gameManager;
     private List<Vector3Int> oilTilePositions = new List<Vector3Int>(); // 保存石油 Tile 的位置
     public GameObject oilShipPrefab; // 新增：石油船的預製物
@@ -40,22 +37,6 @@ public class MapController : MonoBehaviour
             seed = Random.Range(0, int.MaxValue);
         }
         Random.InitState(seed); // 初始化隨機數生成器
-
-        // 自動尋找 ChinjuUIController
-        if (chinjuUIController == null)
-        {
-            chinjuUIController = FindFirstObjectByType<ChinjuUIController>();
-            if (chinjuUIController == null)
-            {
-                Debug.LogError("[MapController] ChinjuUIController 未設置且場景中找不到 ChinjuUIController！");
-            }
-        }
-
-        // 檢查必要組件
-        if (chinjuUIController == null)
-        {
-            Debug.LogError("[MapController] ChinjuUIController 未設置！請在 Inspector 中設置引用。");
-        }
 
         if (File.Exists(MapCacheFilePath))
         {
@@ -373,22 +354,15 @@ public class MapController : MonoBehaviour
                 else if (tile == chinjuTile)
                 {
                     Debug.Log("[MapController] 這是神獸 Tile");
-                    if (chinjuUIController != null)
-                    {
-                        if (PopupManager.Instance.IsAllPopupsHidden())
-                        {
-                            Debug.Log("[MapController] 正在開啟 Chinju UI 面板...");
-                            chinjuUIController.ToggleMainPanelOnly();
-                        }
-                        else
-                        {
-                            chinjuUIController.Hide();
-                        }
 
+                    if (PopupManager.Instance.IsAllPopupsHidden())
+                    {
+                        Debug.Log("[MapController] 正在開啟 Chinju UI 面板...");
+                        PopupManager.Instance.ShowPopup("ChinjuUI");
                     }
                     else
                     {
-                        Debug.LogError("[MapController] ChinjuUIController 是 null！");
+                        PopupManager.Instance.HidePopup("ChinjuUI");
                     }
                 }
                 else if (tile == oilTile)

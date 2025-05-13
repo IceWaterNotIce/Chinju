@@ -3,10 +3,8 @@ using UnityEngine;
 using System.Linq; // 新增引用
 
 // 遊戲資料控制器，集中管理 GameData 實例
-public class GameDataController : MonoBehaviour
+public class GameDataController : Singleton<GameDataController>
 {
-    public static GameDataController Instance { get; private set; }
-
     [SerializeField]
     private GameData currentGameData;
     public GameData CurrentGameData
@@ -31,14 +29,6 @@ public class GameDataController : MonoBehaviour
     private void Awake()
     {
         Debug.Log("[GameDataController] Awake 方法執行。");
-
-        if (Instance != null && Instance != this)
-        {
-            Destroy(this);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
 
         // 確保 currentGameData 初始化
         if (currentGameData == null)

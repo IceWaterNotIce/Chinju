@@ -11,6 +11,11 @@ public class SettingMenu : MonoBehaviour
     private Button exitGameButton;
     private Button newGameButton; // 新增
 
+    void Awake()
+    {
+        PopupManager.Instance.RegisterPopup("SettingMenu", gameObject);
+    }
+
     void Update()
     {
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
@@ -19,7 +24,7 @@ public class SettingMenu : MonoBehaviour
         }
     }
 
-    void Start()
+    void OnEnable()
     {
         InitializeUI();
     }
@@ -54,7 +59,7 @@ public class SettingMenu : MonoBehaviour
             newGameButton = UIHelper.InitializeElement<Button>(root, "newGameButton"); // 新增
 
             RegisterButtonCallbacks();
-            PopupManager.Instance.RegisterPopup("SettingMenu", root);
+            PopupManager.Instance.RegisterPopup("SettingMenu", gameObject);
             Debug.Log("[SettingMenu] UI初始化成功");
         }
         catch (System.Exception e)
