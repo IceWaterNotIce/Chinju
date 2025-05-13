@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -7,24 +8,23 @@ public class WeaponPanelController : MonoBehaviour
     {
         Debug.Log("[WeaponPanelController] Start 方法執行。");
 
+        StartCoroutine(WaitForGameDataControllerInitialization());
+    }
+
+    private IEnumerator WaitForGameDataControllerInitialization()
+    {
+        while (GameDataController.Instance == null || GameDataController.Instance.CurrentGameData == null)
+        {
+            Debug.LogWarning("[WeaponPanelController] 等待 GameDataController 初始化...");
+            yield return null; // 等待下一幀
+        }
+
         var root = GetComponent<UIDocument>().rootVisualElement;
 
         var weaponList = UIHelper.InitializeElement<ScrollView>(root, "weapon-list");
-        if (weaponList == null) return;
+        if (weaponList == null) yield break;
 
         weaponList.Clear(); // 清空清單
-
-        if (GameDataController.Instance == null)
-        {
-            Debug.LogError("[WeaponPanelController] GameDataController.Instance 為空。");
-            return;
-        }
-
-        if (GameDataController.Instance.CurrentGameData == null)
-        {
-            Debug.LogError("[WeaponPanelController] CurrentGameData 為空。");
-            return;
-        }
 
         var playerData = GameDataController.Instance.CurrentGameData.playerData;
         if (playerData != null && playerData.Weapons != null)
