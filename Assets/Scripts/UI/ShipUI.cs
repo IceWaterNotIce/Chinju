@@ -532,7 +532,19 @@ public class ShipUI : Singleton<ShipUI>
         {
             startDrawButton.clicked += () =>
             {
-                EnableDrawing();
+                if (rectContainer != null && rectContainer.childCount > 0)
+                {
+                                  
+                    // Clear existing rectangles and reset PlayerShip data
+                    ClearRectAndData();
+                    startDrawButton.text = "Start Draw"; // Update button text
+                }
+                else
+                {
+                    // Enable drawing mode
+                    EnableDrawing();
+                    startDrawButton.text = "Clear Rect"; // Update button text
+                }
             };
         }
         else
@@ -706,6 +718,7 @@ public class ShipUI : Singleton<ShipUI>
 
     private void DrawSavedRect(Rect rect)
     {
+        if (rect == Rect.zero) return; // 如果矩形為零，則不繪製
         var rectContainer = GetComponent<UIDocument>().rootVisualElement.Q<VisualElement>("rectContainer");
 
         if (savedRectElement != null)
