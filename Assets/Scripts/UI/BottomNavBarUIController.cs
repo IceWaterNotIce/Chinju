@@ -25,19 +25,19 @@ public class BottomNavBarUIController : MonoBehaviour
 
     private void ToggleWeaponPanel()
     {
-        if (weaponPanel != null)
+        if (PopupManager.Instance.IsPopupVisible("WeaponPanel"))
         {
-            weaponPanel.SetActive(!weaponPanel.activeSelf);
+            PopupManager.Instance.HidePopup("WeaponPanel");
         }
         else
         {
-            Debug.LogError("[BottomNavBarUIController] 未設定武器面板。");
+            PopupManager.Instance.ShowPopup("WeaponPanel");
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }

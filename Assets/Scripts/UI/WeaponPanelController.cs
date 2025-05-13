@@ -1,9 +1,17 @@
 using System.Collections;
+using System.ComponentModel.Design.Serialization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class WeaponPanelController : MonoBehaviour
 {
+    public VisualElement root;
+
+    private void Start()
+    {
+        root = GetComponent<UIDocument>().rootVisualElement;
+        PopupManager.Instance.RegisterPopup("WeaponPanel", root);
+    }
     void OnEnable()
     {
         Debug.Log("[WeaponPanelController] Start 方法執行。");

@@ -74,4 +74,13 @@ public class PopupManager : Singleton<PopupManager>
     {
         return PopupPanels.Values.All(p => p.style.display == DisplayStyle.None);
     }
+
+    public bool IsPopupVisible(string popupName)
+    {
+        if (PopupPanels.TryGetValue(popupName, out var popupPanelRoot))
+        {
+            return popupPanelRoot.style.display == DisplayStyle.Flex;
+        }
+        return false;
+    }
 }
