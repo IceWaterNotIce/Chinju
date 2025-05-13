@@ -1297,7 +1297,7 @@ MonoBehaviour:
   smoothTime: 0.2
   zoomSpeed: 500
   minZoom: 3
-  maxZoom: 10
+  maxZoom: 30
   zoomSmoothTime: 0.2
 --- !u!81 &2019224607
 AudioListener:
@@ -1342,7 +1342,7 @@ Camera:
   far clip plane: 1000
   field of view: 60.000004
   orthographic: 1
-  orthographic size: 10
+  orthographic size: 15
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
