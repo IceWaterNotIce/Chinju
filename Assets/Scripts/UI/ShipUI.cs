@@ -167,7 +167,7 @@ public class ShipUI : Singleton<ShipUI>
         SetUIPosition(); // 每幀更新 UI 位置
         SetRectPosition(); // 每幀更新矩形位置
     }
-    
+
     private void SetRectPosition()
     {
         DrawSavedRect(ship.NavigationArea);
@@ -180,6 +180,9 @@ public class ShipUI : Singleton<ShipUI>
             LogError("ship speed control fail. Ship is not set.");
             return;
         }
+
+        ClearRectAndData();
+
         float MaxSpeed = ship.MaxSpeed;
         float TargetSpeed = MaxSpeed * percentage;
         ship.TargetSpeed = TargetSpeed;
@@ -195,13 +198,28 @@ public class ShipUI : Singleton<ShipUI>
             LogError("ship rotation control fail. Ship is not set.");
             return;
         }
+        ClearRectAndData();
+
         float MaxRotationSpeed = ship.MaxRotationSpeed;
         float TargetRotationSpeed = MaxRotationSpeed * percentage;
         ship.TargetRotationSpeed = TargetRotationSpeed;
         Debug.Log("Rotation Speed: " + TargetRotationSpeed);
 
     }
+    // 新增方法：清除矩形和矩形數據
+    private void ClearRectAndData()
+    {
+        if (rectContainer != null)
+        {
+            rectContainer.Clear(); // 清除所有矩形
+        }
 
+        if (ship != null)
+        {
+            ship.NavigationArea = new Rect(); // 重置矩形數據
+            Debug.Log("[ShipUI] 矩形和數據已清除");
+        }
+    }
     // 新增：顯示武器詳細資訊
     private void ShowWeaponDetail(Weapon weapon)
     {
