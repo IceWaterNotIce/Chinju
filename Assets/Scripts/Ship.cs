@@ -44,7 +44,15 @@ public class Ship : MonoBehaviour
     public event Action<float> OnHealthChanged;
     public event Action<float> OnFuelChanged;
 
-    protected virtual void OnDeath() => Destroy(gameObject);
+    protected virtual void OnDeath()
+    {
+        Destroy(gameObject);
+        if (this is PlayerShip && ShipUI.Instance != null)
+        {
+            Destroy(ShipUI.Instance.gameObject); // 銷毀 ShipUI
+            Debug.Log("[Ship] ShipUI 已銷毀");
+        }
+    }
     protected void StopMovement() => Speed = TargetSpeed = 0;
     #endregion
 
