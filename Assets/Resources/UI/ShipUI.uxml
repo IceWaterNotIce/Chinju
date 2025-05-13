@@ -31,6 +31,7 @@
             <engine:VisualElement style="flex-grow: 1; width: 225px;">
                 <engine:Button name="btnCancelFollow" text="取消跟隨" class="cancel-follow-btn" style="width: 130px;" />
                 <engine:Button name="StartDrawButton" text="Start Draw" class="draw-button" />
+                <engine:Button name="btnToggleCombatMode" text="進入戰鬥模式" class="combat-mode-btn" style="width: 150px;" />
                 <engine:Button name="btnCloseUI" text="關閉 UI" class="close-ui-btn" />
             </engine:VisualElement>
         </engine:VisualElement>

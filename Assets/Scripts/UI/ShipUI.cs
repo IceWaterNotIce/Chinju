@@ -50,6 +50,8 @@ public class ShipUI : Singleton<ShipUI>
 
     private VisualElement savedRectElement; // 保存的矩形 UI 元素
 
+    private Button btnToggleCombatMode; // 新增切換戰鬥模式的按鈕
+
     void Start()
     {
         var uiDoc = GetComponent<UIDocument>();
@@ -81,6 +83,7 @@ public class ShipUI : Singleton<ShipUI>
         InitializeCancelFollowButton();
         InitializeDrawButton();
         InitializeCloseUIButton();
+        InitializeToggleCombatModeButton(); // 初始化切換戰鬥模式按鈕
         RegisterPointerEvents();
     }
 
@@ -533,6 +536,27 @@ public class ShipUI : Singleton<ShipUI>
         else
         {
             LogError("找不到名為 'btnCloseUI' 的按鈕！");
+        }
+    }
+
+    private void InitializeToggleCombatModeButton()
+    {
+        btnToggleCombatMode = UIHelper.InitializeElement<Button>(UIPanel, "btnToggleCombatMode");
+        if (btnToggleCombatMode != null)
+        {
+            btnToggleCombatMode.clicked += () =>
+            {
+                if (ship != null)
+                {
+                    ship.CombatMode = !ship.CombatMode;
+                    Debug.Log($"[ShipUI] 戰鬥模式切換為: {(ship.CombatMode ? "開啟" : "關閉")}");
+                    btnToggleCombatMode.text = ship.CombatMode ? "退出戰鬥模式" : "進入戰鬥模式";
+                }
+            };
+        }
+        else
+        {
+            LogError("找不到名為 'btnToggleCombatMode' 的按鈕！");
         }
     }
 
