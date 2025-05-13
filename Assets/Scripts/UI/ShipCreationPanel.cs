@@ -88,26 +88,6 @@ public class ShipCreationPanel : MonoBehaviour
         oilInputField = UIHelper.InitializeElement<IntegerField>(root, "oil-input");
         cubeInputField = UIHelper.InitializeElement<IntegerField>(root, "cube-input");
 
-        // 若找不到則自動建立（方便測試）
-        if (goldInputField == null)
-        {
-            goldInputField = new IntegerField("金幣") { value = 10 };
-            goldInputField.name = "gold-input";
-            panel.Add(goldInputField);
-        }
-        if (oilInputField == null)
-        {
-            oilInputField = new IntegerField("石油") { value = 10 };
-            oilInputField.name = "oil-input";
-            panel.Add(oilInputField);
-        }
-        if (cubeInputField == null)
-        {
-            cubeInputField = new IntegerField("方塊") { value = 1 };
-            cubeInputField.name = "cube-input";
-            panel.Add(cubeInputField);
-        }
-
         // 註冊輸入變更事件
         goldInputField.RegisterValueChangedCallback(evt => OnResourceInputChanged());
         oilInputField.RegisterValueChangedCallback(evt => OnResourceInputChanged());
