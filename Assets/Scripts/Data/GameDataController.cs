@@ -26,7 +26,7 @@ public class GameDataController : Singleton<GameDataController>
     public System.Action<GameData> OnGameDataChanged;
     public System.Action OnMapDataChanged; // 新增：地圖數據變更事件
 
-    private void Awake()
+    private new void Awake()
     {
         Debug.Log("[GameDataController] Awake 方法執行。");
 

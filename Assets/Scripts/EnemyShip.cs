@@ -162,7 +162,7 @@ public class EnemyShip : Warship
         }
     }
 
-    private void OnDeath()
+    protected override void OnDeath()
     {
         Debug.Log("[EnemyShip] Enemy ship destroyed!");
         // 實作死亡效果（爆炸動畫、掉落物品等）
