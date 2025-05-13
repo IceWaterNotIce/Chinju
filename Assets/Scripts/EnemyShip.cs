@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class EnemyShip : Ship 
+public class EnemyShip : Warship
 {
     #region Enemy-Specific Properties
     [SerializeField] private float attackRange = 5f;  // 預設攻擊範圍
@@ -17,13 +17,17 @@ public class EnemyShip : Ship
         {
             if (playerTarget == null)
             {
-                Ship[] ships = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
-                foreach (Ship ship in ships)
+                PlayerShip[] ships = GameObject.FindObjectsByType<PlayerShip>(FindObjectsSortMode.None);
+
+                //get the nearest player ship
+                float minDistance = Mathf.Infinity;
+                foreach (var ship in ships)
                 {
-                    if (ship.IsPlayerShip) // 假設 Ship 類別有 IsPlayerShip 屬性
+                    float distance = Vector3.Distance(transform.position, ship.transform.position);
+                    if (distance < minDistance)
                     {
+                        minDistance = distance;
                         playerTarget = ship.transform;
-                        break;
                     }
                 }
             }
@@ -40,7 +44,7 @@ public class EnemyShip : Ship
     private float randomAngle = 0f;
     private Vector2 lastPosition;
 
-   new void Start()
+    new void Start()
     {
         base.Start();
         PickNewRandomMove();
@@ -57,8 +61,8 @@ public class EnemyShip : Ship
     private void HandleAIBehavior()
     {
         // 計算與玩家的距離
-        float distanceToPlayer = PlayerTarget != null 
-            ? Vector3.Distance(transform.position, PlayerTarget.position) 
+        float distanceToPlayer = PlayerTarget != null
+            ? Vector3.Distance(transform.position, PlayerTarget.position)
             : Mathf.Infinity;
 
         // 行為決策樹

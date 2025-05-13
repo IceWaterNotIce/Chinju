@@ -59,6 +59,8 @@ public class GameData
         public float Speed;
         public float Rotation;
 
+
+public bool CombatMode; // 新增：保存船隻的戰鬥模式
         public int WeaponLimit;
 
         public int Level; // 新增：保存船隻等級
@@ -69,7 +71,7 @@ public class GameData
         // 新增：保存船隻的預製物名稱
         public string PrefabName;
 
-        public Rect SavedRectArea; // 新增：保存矩形區域
+        public Rect NavigationArea; // 新增：保存矩形區域
     }
 
     [System.Serializable]

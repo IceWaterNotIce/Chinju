@@ -59,8 +59,8 @@ public class GameManager : Singleton<GameManager>
                 try
                 {
                     // 保存玩家船隻數據
-                    var playerShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None)
-                        .Where(ship => ship.IsPlayerShip)
+                    var playerShips = GameObject.FindObjectsByType<PlayerShip>(FindObjectsSortMode.None)
+                        .Where(ship => ship != null)
                         .ToList();
 
                     data.playerData.Ships.Clear();

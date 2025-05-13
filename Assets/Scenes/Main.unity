@@ -586,11 +586,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shipPrefabs:
-  - {fileID: 5027843112951608512, guid: 0fd785c6bdef9ba47b6c6b09c249ac9a, type: 3}
-  - {fileID: 2993792429627521981, guid: ff7cad2ddfc6e6943b259acbfea3f1b8, type: 3}
-  - {fileID: 2108854950027416566, guid: cac02026b733af143935e4842002ecc0, type: 3}
-  - {fileID: 33835131033531580, guid: 691cb949c1b8b5b488c76ce38a55b5c3, type: 3}
-  - {fileID: 5248927314322901264, guid: 96a9755c90b97ea4ca48c5dedc86def9, type: 3}
+  - {fileID: 5248927314322901264, guid: b4a437efd38f1f44d947ec85d6e90dc9, type: 3}
+  - {fileID: 33835131033531580, guid: aab2c6c2bea387e4f9b7333118d881cf, type: 3}
+  - {fileID: 2108854950027416566, guid: c9ccf95d563093745b91d3a289ef5838, type: 3}
+  - {fileID: 2993792429627521981, guid: 87b51917aaf96fc4c85d78ff90eabaf1, type: 3}
+  - {fileID: 5027843112951608512, guid: 27310c30ab0be364abdd4fb6bb2668d9, type: 3}
   mapController: {fileID: 1920876238}
 --- !u!4 &856271947
 Transform:

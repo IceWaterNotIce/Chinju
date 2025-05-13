@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 public class ShipUI : Singleton<ShipUI>
 {
-    public Ship ship;
+    public PlayerShip ship;
     private VisualElement UIPanel;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     private Label lblSpeedFrontFull;
@@ -84,7 +84,7 @@ public class ShipUI : Singleton<ShipUI>
         RegisterPointerEvents();
     }
 
-    public void Initial(Ship s)
+    public void Initial(PlayerShip s)
     {
         ship = s;
 
@@ -151,9 +151,9 @@ public class ShipUI : Singleton<ShipUI>
         SetUIPosition();
 
         // 如果船隻有保存的矩形區域，繪製矩形 UI
-        if (ship.SavedRectArea.width > 0 && ship.SavedRectArea.height > 0)
+        if (ship.NavigationArea.width > 0 && ship.NavigationArea.height > 0)
         {
-            DrawSavedRect(ship.SavedRectArea);
+            DrawSavedRect(ship.NavigationArea);
         }
     }
 
@@ -166,7 +166,7 @@ public class ShipUI : Singleton<ShipUI>
     }
     private void SetRectPosition()
     {
-        DrawSavedRect(ship.SavedRectArea);
+        DrawSavedRect(ship.NavigationArea);
     }
 
     void SpeedControll(float percentage)
@@ -238,7 +238,7 @@ public class ShipUI : Singleton<ShipUI>
         title.AddToClassList("title");
         weaponsPanel.Add(title);
 
-        int weaponSlotCount = ship.IntWeaponLimit;
+        int weaponSlotCount = ship.WeaponLimit;
         for (int i = 0; i < weaponSlotCount; i++)
         {
             Weapon weapon = (ship.weapons != null && i < ship.weapons.Count) ? ship.weapons[i] : null;
@@ -349,7 +349,7 @@ public class ShipUI : Singleton<ShipUI>
 
         weaponListContainer.Clear();
 
-        int weaponSlotCount = ship.IntWeaponLimit;
+        int weaponSlotCount = ship.WeaponLimit;
         for (int i = 0; i < weaponSlotCount; i++)
         {
             Weapon weapon = (i < ship.weapons.Count) ? ship.weapons[i] : null;
@@ -648,7 +648,7 @@ public class ShipUI : Singleton<ShipUI>
                 // 保存矩形區域到船隻數據
                 if (ship != null)
                 {
-                    ship.SavedRectArea = worldRect;
+                    ship.NavigationArea = worldRect;
                     Debug.Log($"[ShipUI] 矩形區域已保存到船隻: {worldRect}");
                 }
 

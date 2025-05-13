@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -289,7 +290,7 @@ public class ShipCreationPanel : MonoBehaviour
             return;
         }
 
-        Ship newShip = null;
+        PlayerShip newShip = null;
 
 
         newShip = ShipCreationManager.Instance.TryCreateRandomShip(goldInputField.value, oilInputField.value, cubeInputField.value);
@@ -297,7 +298,7 @@ public class ShipCreationPanel : MonoBehaviour
 
         if (newShip != null)
         {
-            newShip.AddRandomWeapon(); // 隨機生成武器並分配給新船隻
+            newShip.AddRandomWeapon();
         }
         else
         {

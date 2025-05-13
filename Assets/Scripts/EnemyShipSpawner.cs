@@ -89,12 +89,12 @@ public class EnemyShipSpawner : MonoBehaviour
             GameObject weapon = Instantiate(weaponPrefab, enemyShip.transform);
             weapon.transform.localPosition = Vector3.zero; // 將武器放置於船隻中心
 
-            // 將武器添加到 Ship 的 weapons 列表中
-            if (enemyShip.TryGetComponent<Ship>(out Ship ship))
+            // 將武器添加到 Warship 的 weapons 列表中
+            if (enemyShip.TryGetComponent<Warship>(out Warship warship))
             {
                 if (weapon.TryGetComponent<Weapon>(out Weapon weaponComponent))
                 {
-                    ship.weapons.Add(weaponComponent);
+                    warship.AddWeapon(weaponComponent);
                     Debug.Log($"[EnemyShipSpawner] 為敵方船隻分配了武器: {weaponPrefab.name}");
                 }
                 else

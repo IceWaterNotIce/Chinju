@@ -30,7 +30,7 @@ public class Weapon : MonoBehaviour
         Vector3 direction = (target.transform.position - transform.position).normalized;
 
         // 計算攻擊成功率
-        var ownerShip = GetComponentInParent<Ship>();
+        var ownerShip = GetComponentInParent<Warship>();
         float successRate = 20f + (ownerShip != null ? Mathf.Min(ownerShip.Level / 2f, 79f) : 0f); // 最大 99%
         bool isSuccessful = Random.Range(0f, 100f) <= successRate;
 

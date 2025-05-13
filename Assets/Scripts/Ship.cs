@@ -1,34 +1,23 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.Tilemaps;
 using System;
 using System.Collections.Generic;
-using System.Linq; // 新增引用
 
-public class Ship : MonoBehaviour, IPointerClickHandler
+public class Ship : MonoBehaviour
 {
-    #region Core Systems
-    private ShipUI UI => ShipUI.Instance;
-    #endregion
-
     #region Health & Fuel
     [Header("Health Settings")]
-    [SerializeField] private float m_maxHealth = 100f;
-    [SerializeField] private float m_health = 100f;
-
+    [SerializeField] protected float m_maxHealth = 100f;
+    [SerializeField] protected float m_health = 100f;
 
     [Header("Fuel Settings")]
+    [SerializeField] protected float m_maxFuel = 100f;
+    [SerializeField] protected float m_fuel = 100f;
+    [SerializeField] protected float m_fuelConsumption = 0.1f;
 
-    [SerializeField] private float m_maxFuel = 100f; // 最大燃料
-    [SerializeField] private float m_fuel = 100f; // 燃料
-
-    [SerializeField] private float m_fuelConsumption = 0.1f;
-
-    public float MaxHealth
-    {
-        get => m_maxHealth;
-        set => m_maxHealth = Mathf.Max(0, value);
-    }
+    public float MaxHealth { get => m_maxHealth; set => m_maxHealth = Mathf.Max(0, value); }
+    public float FuelConsumptionRate { get => m_fuelConsumption; set => m_fuelConsumption = Mathf.Max(0, value); }
+    public float MaxFuel { get => m_maxFuel; set => m_maxFuel = Mathf.Max(0, value); }
 
     public virtual float Health
     {
@@ -37,60 +26,8 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         {
             m_health = Mathf.Clamp(value, 0, m_maxHealth);
             OnHealthChanged?.Invoke(m_health);
-
-            if (m_health <= 0)
-            {
-                OnDeath();
-            }
+            if (m_health <= 0) OnDeath();
         }
-    }
-
-    private void OnDeath()
-    {
-        Debug.Log($"[Ship] {name} 被摧毀！");
-
-        // 獲得經驗值給擊殺者
-        if (!IsPlayerShip)
-        {
-            var playerShip = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None)
-                .FirstOrDefault(ship => ship.IsPlayerShip);
-            if (playerShip != null)
-            {
-                playerShip.AddExperience(10f); // 擊殺敵方船隻獲得固定經驗值
-            }
-        }
-
-        // 從 GameData 中移除該船隻數據
-        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData != null)
-        {
-            var gameData = GameDataController.Instance.CurrentGameData;
-
-            if (IsPlayerShip)
-            {
-                gameData.playerData.Ships.RemoveAll(ship => ship.Name == name);
-                Debug.Log($"[Ship] 玩家船隻 {name} 已從 GameData 中移除。");
-            }
-            else
-            {
-                gameData.enemyShips.RemoveAll(ship => ship.Name == name);
-                Debug.Log($"[Ship] 敵方船隻 {name} 已從 GameData 中移除。");
-            }
-        }
-
-        // 銷毀遊戲物件
-        Destroy(gameObject);
-    }
-
-    public float FuelConsumptionRate
-    {
-        get => m_fuelConsumption;
-        set => m_fuelConsumption = Mathf.Max(0, value);
-    }
-
-    public float MaxFuel
-    {
-        get => m_maxFuel;
-        set => m_maxFuel = Mathf.Max(0, value);
     }
 
     public float CurrentFuel
@@ -100,556 +37,126 @@ public class Ship : MonoBehaviour, IPointerClickHandler
         {
             m_fuel = Mathf.Clamp(value, 0, m_maxFuel);
             OnFuelChanged?.Invoke(m_fuel);
-
-            if (m_fuel <= 0)
-            {
-                Debug.LogWarning($"[Ship] {name} 燃料耗盡，無法繼續移動！");
-                StopMovement();
-            }
+            if (m_fuel <= 0) StopMovement();
         }
     }
 
     public event Action<float> OnHealthChanged;
     public event Action<float> OnFuelChanged;
 
-    private void StopMovement()
-    {
-        TargetSpeed = 0;
-        Speed = 0;
-    }
+    protected virtual void OnDeath() => Destroy(gameObject);
+    protected void StopMovement() => Speed = TargetSpeed = 0;
     #endregion
 
-    #region Movement
+    #region Movement & Rotation
     [Header("Movement Settings")]
-    [SerializeField] private float m_maxSpeed = 10f;
-    [SerializeField] private float m_acceleration = 2f;
-    [SerializeField] private float m_targetSpeed = 0f;
-    [SerializeField] private float m_speed = 0f;
+    [SerializeField] protected float m_maxSpeed = 10f;
+    [SerializeField] protected float m_acceleration = 2f;
+    [SerializeField] protected float m_targetSpeed = 0f;
+    [SerializeField] protected float m_speed = 0f;
 
-    public float MaxSpeed
-    {
-        get => m_maxSpeed;
-        set => m_maxSpeed = Mathf.Max(0, value);
-    }
-
-    public float Acceleration
-    {
-        get => m_acceleration;
-        set => m_acceleration = Mathf.Max(0, value);
-    }
-
-    public float TargetSpeed
-    {
-        get => m_targetSpeed;
-        set => m_targetSpeed = Mathf.Clamp(value, 0, m_maxSpeed);
-    }
-
-    public float Speed
-    {
-        get => m_speed;
-        set => m_speed = Mathf.Clamp(value, 0, m_maxSpeed);
-    }
-    #endregion
-
-    #region Rotation
     [Header("Rotation Settings")]
-    [SerializeField] private float m_maxRotationSpeed = 90f;
-    [SerializeField] private float m_rotationAcceleration = 45f;
-    [SerializeField] private float m_targetRotation = 0f;
-    [SerializeField] private float m_targetRotationSpeed = 0f;
-    [SerializeField] private float m_rotationSpeed = 0f;
+    [SerializeField] protected float m_maxRotationSpeed = 90f;
+    [SerializeField] protected float m_rotationAcceleration = 45f;
+    [SerializeField] protected float m_targetRotation = 0f;
+    [SerializeField] protected float m_targetRotationSpeed = 0f;
+    [SerializeField] protected float m_rotationSpeed = 0f;
 
-    public float MaxRotationSpeed
-    {
-        get => m_maxRotationSpeed;
-        set => m_maxRotationSpeed = Mathf.Max(0, value);
-    }
+    public float MaxSpeed { get => m_maxSpeed; set => m_maxSpeed = Mathf.Max(0, value); }
+    public float Acceleration { get => m_acceleration; set => m_acceleration = Mathf.Max(0, value); }
+    public float TargetSpeed { get => m_targetSpeed; set => m_targetSpeed = Mathf.Clamp(value, 0, m_maxSpeed); }
+    public float Speed { get => m_speed; set => m_speed = Mathf.Clamp(value, 0, m_maxSpeed); }
 
-    public float RotationAcceleration
-    {
-        get => m_rotationAcceleration;
-        set => m_rotationAcceleration = Mathf.Max(0, value);
-    }
-
-    public float TargetRotation
-    {
-        get => m_targetRotation;
-        set => m_targetRotation = value % 360f; // Normalize angle
-    }
-
-    public float TargetRotationSpeed
-    {
-        get => m_targetRotationSpeed;
-        set => m_targetRotationSpeed = Mathf.Clamp(value, -m_maxRotationSpeed, m_maxRotationSpeed);
-    }
-
-    public float RotationSpeed
-    {
-        get => m_rotationSpeed;
-        set => m_rotationSpeed = Mathf.Clamp(value, -m_maxRotationSpeed, m_maxRotationSpeed);
-    }
+    public float MaxRotationSpeed { get => m_maxRotationSpeed; set => m_maxRotationSpeed = Mathf.Max(0, value); }
+    public float RotationAcceleration { get => m_rotationAcceleration; set => m_rotationAcceleration = Mathf.Max(0, value); }
+    public float TargetRotation { get => m_targetRotation; set => m_targetRotation = value % 360f; }
+    public float TargetRotationSpeed { get => m_targetRotationSpeed; set => m_targetRotationSpeed = Mathf.Clamp(value, -m_maxRotationSpeed, m_maxRotationSpeed); }
+    public float RotationSpeed { get => m_rotationSpeed; set => m_rotationSpeed = Mathf.Clamp(value, -m_maxRotationSpeed, m_maxRotationSpeed); }
     #endregion
 
-    #region Combat & Detection
-    [Header("Combat Settings")]
-    [SerializeField] private float m_detectionDistance = 50f;
-    [SerializeField] private bool m_combatMode = false;
-
-    [Header("Visible Area")]
-    [SerializeField] private float m_visibleRadius = 10f; // 玩家可見半徑
-
-    public float DetectionDistance
-    {
-        get => m_detectionDistance;
-        set => m_detectionDistance = Mathf.Max(0, value);
-    }
-
-    public bool CombatMode
-    {
-        get => m_combatMode;
-        set => m_combatMode = value;
-    }
-
-    public float VisibleRadius
-    {
-        get => m_visibleRadius;
-        set => m_visibleRadius = Mathf.Max(0, value);
-    }
+    #region Components
+    [SerializeField] public Tilemap tilemap;
+    [SerializeField] public TileBase oceanTile;
     #endregion
 
-    #region Experience
-    [Header("Experience Settings")]
-    [SerializeField] private int level = 1;
-    [SerializeField] private float experience = 0f;
-
-    public int Level
-    {
-        get => level;
-        private set => level = Mathf.Max(1, value);
-    }
-
-    public float Experience
-    {
-        get => experience;
-        private set => experience = Mathf.Max(0, value);
-    }
-
-    public void AddExperience(float exp)
-    {
-        Experience += exp;
-        Debug.Log($"[Ship] 獲得經驗值: {exp}，當前經驗值: {Experience}");
-
-        float upgradeNeed = Level * 10f;
-        while (Experience >= upgradeNeed)
-        {
-            Experience -= upgradeNeed;
-            Level += 1;
-            Debug.Log($"[Ship] 升級！當前等級: {Level}");
-            upgradeNeed = Level * 10f;
-        }
-    }
-    #endregion
-
-    #region Waypoints
-    private List<Vector3> m_waypoints = new List<Vector3>();
-    public IReadOnlyList<Vector3> Waypoints => m_waypoints.AsReadOnly();
-
-    public void AddWaypoint(Vector3 point) => m_waypoints.Add(point);
-    public void ClearWaypoints() => m_waypoints.Clear();
-    #endregion
-
-    #region UI
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        Debug.Log("[Ship] Ship clicked", this);
-
-        if (UI == null)
-        {
-            Debug.LogError("[Ship] ShipUI.Instance 為 null，無法初始化 UI！");
-            return;
-        }
-
-        UI.Initial(this);
-
-        // 新增：通知攝影機跟隨該船隻
-        var cameraController = Camera.main?.GetComponent<CameraBound2D>();
-        if (cameraController != null)
-        {
-            cameraController.FollowTarget(this.transform);
-        }
-    }
-    #endregion
-
-    [SerializeField] public Tilemap tilemap; // 引用地圖的 Tilemap，改為 public
-    [SerializeField] public TileBase oceanTile; // 引用海洋 Tile，改為 public
-
-    // 新增：武器數量上限
-    [Header("Weapon Settings")]
-    [SerializeField] private int intWeaponLimit = 2;
-    public int IntWeaponLimit
-    {
-        get => intWeaponLimit;
-        set => intWeaponLimit = Mathf.Max(0, value);
-    }
-
-    // public Weapon weapon;
-    public List<Weapon> weapons = new List<Weapon>();
-
-    [Header("Ship Type")]
-    public bool IsPlayerShip = true; // 確保屬性名稱為 IsPlayerShip
-
-    [SerializeField] private Rect savedRectArea; // 新增變數保存矩形區域
-
-    public Rect SavedRectArea
-    {
-        get => savedRectArea;
-        set
-        {
-            savedRectArea = value;
-
-            // 新增：清除目標速度和目標旋轉，並開始在矩形區域內移動
-            if (savedRectArea != Rect.zero)
-            {
-                TargetSpeed = 0;
-                TargetRotationSpeed = 0;
-                Debug.Log($"[Ship] {name} 的 SavedRectArea 更新，開始在矩形區域內移動。");
-            }
-        }
-    }
-
-    public void Start()
+    public virtual void Start()
     {
         tilemap = FindFirstObjectByType<Tilemap>();
-        if (tilemap == null)
-        {
-            Debug.LogError("Tilemap not found in the scene!", this);
-            return;
-        }
-        // Resource/Tilemap/OceanTile
         oceanTile = Resources.Load<TileBase>("Tilemap/OceanTile");
-        if (oceanTile == null)
-        {
-            Debug.LogError("Ocean Tile not found in Resources!", this);
-            return;
-        }
+        if (tilemap == null || oceanTile == null)
+            Debug.LogError("Tilemap or Ocean Tile not found!", this);
     }
 
-    public void Update()
+    public virtual void Update()
     {
         Rotate();
         Move();
-        DetectAndAttackTarget();
     }
 
-    private void DetectAndAttackTarget()
-    {
-        Ship nearestTarget = null;
-        float nearestDistance = float.MaxValue;
-
-        // 獲取所有船隻
-        var allShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
-
-        foreach (var ship in allShips)
-        {
-            // 忽略自己和同類型的船隻
-            if (ship == this || ship.IsPlayerShip == this.IsPlayerShip) continue;
-
-            // 計算與目標船隻的距離
-            float distance = Vector3.Distance(transform.position, ship.transform.position);
-
-            // 如果進入偵測範圍，並且距離比當前最近的目標更近
-            if (distance <= DetectionDistance && distance < nearestDistance)
-            {
-                nearestTarget = ship;
-                nearestDistance = distance;
-            }
-        }
-
-        // 如果找到最近的目標，並且進入武器最大攻擊距離，開始攻擊
-        if (nearestTarget != null && nearestDistance <= MaxWeaponAttackDistance())
-        {
-            if (weapons.Any(weapon => weapon.IsAttackingTarget(nearestTarget.gameObject)))
-            {
-                Debug.Log($"[Ship] 目標未改變，繼續攻擊: {nearestTarget.name}");
-            }
-            else
-            {
-                Debug.Log($"[Ship] 更新目標為最近的船隻: {nearestTarget.name}，距離: {nearestDistance}");
-                AttackTarget(nearestTarget.gameObject);
-            }
-        }
-        else
-        {
-            // 修正：確保停止攻擊並清空目標
-            Debug.Log("[Ship] 未找到有效目標，停止攻擊。");
-            StopAttack();
-        }
-    }
-
-    private float MaxWeaponAttackDistance()
-    {
-        // 返回當前武器的最大攻擊距離
-        float maxDistance = 0f;
-        foreach (var weapon in weapons)
-        {
-            if (weapon != null)
-            {
-                maxDistance = Mathf.Max(maxDistance, weapon.MaxAttackDistance);
-            }
-        }
-        return maxDistance;
-    }
-
-    void Rotate()
+    protected virtual void Rotate()
     {
         if (Mathf.Abs(m_targetRotationSpeed) > 0.01f)
         {
-            // 以速度控制旋轉
             m_rotationSpeed = Mathf.MoveTowards(m_rotationSpeed, m_targetRotationSpeed, m_rotationAcceleration * Time.deltaTime);
-            transform.rotation = Quaternion.Euler(0, 0, transform.rotation.eulerAngles.z + m_rotationSpeed * Time.deltaTime);
+            transform.Rotate(0, 0, m_rotationSpeed * Time.deltaTime);
         }
         else
         {
-            // 自動補間到 TargetRotation
-            float currentZ = transform.rotation.eulerAngles.z;
-            float delta = Mathf.DeltaAngle(currentZ, m_targetRotation);
-
-            if (Mathf.Abs(delta) < 0.1f)
+            float delta = Mathf.DeltaAngle(transform.eulerAngles.z, m_targetRotation);
+            if (Mathf.Abs(delta) > 0.1f)
             {
-                transform.rotation = Quaternion.Euler(0, 0, m_targetRotation);
-                m_rotationSpeed = 0f;
-            }
-            else
-            {
-                float maxStep = m_maxRotationSpeed * Time.deltaTime;
-                float step = Mathf.Clamp(delta, -maxStep, maxStep);
-                transform.rotation = Quaternion.Euler(0, 0, currentZ + step);
-                m_rotationSpeed = step / Time.deltaTime;
+                float step = Mathf.Clamp(delta, -m_maxRotationSpeed * Time.deltaTime, m_maxRotationSpeed * Time.deltaTime);
+                transform.Rotate(0, 0, step);
             }
         }
     }
 
-    void Move()
+    protected virtual void Move()
     {
-        if (CurrentFuel > 0)
+        if (CurrentFuel <= 0) return;
+
+        m_speed = Mathf.MoveTowards(m_speed, m_targetSpeed, m_acceleration * Time.deltaTime);
+        Vector3 newPosition = transform.position + transform.right * m_speed * Time.deltaTime;
+
+        Vector3Int tilePosition = tilemap.WorldToCell(newPosition);
+        if (tilemap.GetTile(tilePosition) == oceanTile)
         {
-            if (TargetSpeed != 0 || TargetRotationSpeed != 0)
-            {
-                m_speed = Mathf.MoveTowards(m_speed, m_targetSpeed, m_acceleration * Time.deltaTime);
-                Vector3 newPosition = transform.position + transform.right * m_speed * Time.deltaTime;
-
-                // 檢查新位置是否為海洋 Tile
-                Vector3Int tilePosition = tilemap.WorldToCell(newPosition);
-                if (tilemap.GetTile(tilePosition) == oceanTile)
-                {
-                    transform.position = newPosition;
-                    CurrentFuel -= FuelConsumptionRate * m_speed * Time.deltaTime; // 消耗燃料
-                }
-                else
-                {
-                    Debug.LogWarning("無法移動到非海洋 Tile 的位置！");
-                }
-            }
-            else if (SavedRectArea != Rect.zero)
-            {
-                // if near the border of the rectangle than 0.5f, 反向旋轉
-                if (Mathf.Abs(transform.position.x - SavedRectArea.xMin) < 0.2f ||
-                    Mathf.Abs(transform.position.x - SavedRectArea.xMax) < 0.2f ||
-                    Mathf.Abs(transform.position.y - SavedRectArea.yMin) < 0.2f ||
-                    Mathf.Abs(transform.position.y - SavedRectArea.yMax) < 0.2f)
-                {
-                    transform.Rotate(0, 0, UnityEngine.Random.Range(-180f, 180f)); // 隨機旋轉
-                }
-                // 在矩形區域內隨機移動
-                // 設定移動速度為 2
-                float moveSpeed = 2f;
-                // 計算新的位置
-                Vector3 newPosition = transform.position + transform.right * moveSpeed * Time.deltaTime;
-
-                // 確保新位置在矩形區域內
-                if (SavedRectArea.Contains(new Vector2(newPosition.x, newPosition.y)))
-                {
-                    Vector3Int tilePosition = tilemap.WorldToCell(newPosition);
-                    if (tilemap.GetTile(tilePosition) == oceanTile)
-                    {
-                        transform.position = newPosition;
-                        CurrentFuel -= FuelConsumptionRate * moveSpeed * Time.deltaTime; // 消耗燃料
-                    }
-                    else
-                    {
-                        transform.Rotate(0, 0, UnityEngine.Random.Range(-180f, 180f)); // 隨機旋轉
-                        Debug.LogWarning("矩形區域內無法移動到非海洋 Tile 的位置！反向旋轉 ");
-                    }
-
-                }
-                else
-                {
-                    Debug.Log($"[Ship] {name} 嘗試移動超出矩形區域，停止移動。");
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"[Ship] {name} 沒有設定目標速度或矩形區域，無法移動！");
-            }
-        }
-        else
-        {
-            Debug.LogWarning($"[Ship] {name} 燃料不足，無法移動！");
+            transform.position = newPosition;
+            CurrentFuel -= FuelConsumptionRate * m_speed * Time.deltaTime;
         }
     }
 
-
-
-    public void AttackTarget(GameObject target)
+    public virtual GameData.ShipData SaveShipData()
     {
-        foreach (var weapon in weapons)
+        return new GameData.ShipData
         {
-            if (weapon != null && target != null)
-            {
-                weapon.StartAttack(target);
-                Debug.Log($"[Ship] {name} 開始攻擊目標: {target.name}");
-            }
-        }
-    }
 
-    public void StopAttack()
-    {
-        foreach (var weapon in weapons)
-        {
-            if (weapon != null)
-            {
-                weapon.StopAttack();
-                Debug.Log($"[Ship] {name} 停止攻擊。");
-            }
-        }
-    }
 
-    public GameData.ShipData SaveShipData()
-    {
-        GameData.ShipData shipData = new GameData.ShipData
-        {
-            Name = this.name, // 保存船隻名稱
+            Name = this.name,
             Position = transform.position,
             Health = (int)Health,
-            FuelConsumptionRate = (int)FuelConsumptionRate, // 顯式轉換
+            FuelConsumptionRate = (int)FuelConsumptionRate,
             Speed = Speed,
             Rotation = transform.rotation.eulerAngles.z,
-            WeaponLimit = IntWeaponLimit, // 保存武器數量上限
-            Level = Level, // 保存等級
-            Experience = Experience, // 保存經驗值
-            Weapons = new List<GameData.WeaponData>(), // 保存武器數據
+            Level = 1,
+            Experience = 0,
             PrefabName = gameObject.name.Replace("(Clone)", "").Trim(),
-            MaxFuel = MaxFuel, // 保存最大燃料
-            CurrentFuel = m_fuel, // 保存當前燃料
-            SavedRectArea = SavedRectArea, // 保存矩形區域
+            MaxFuel = MaxFuel,
+            CurrentFuel = m_fuel
         };
-
-        foreach (var weapon in weapons)
-        {
-            if (weapon != null)
-            {
-                shipData.Weapons.Add(weapon.SaveWeaponData()); // 使用 SaveWeaponData 方法
-            }
-        }
-
-        return shipData;
     }
-
-    public void LoadShipData(GameData.ShipData shipData)
+    public virtual void LoadShipData(GameData.ShipData shipData)
     {
-        // 根據 shipData 初始化船隻屬性
-        this.name = shipData.Name; // 載入船隻名稱
-        this.transform.position = shipData.Position;
+        this.name = shipData.Name; this.transform.position = shipData.Position;
         this.transform.rotation = Quaternion.Euler(0, 0, shipData.Rotation);
-        this.IntWeaponLimit = shipData.WeaponLimit; // 載入武器數量上限
-        this.Level = shipData.Level; // 載入等級
-        this.Experience = shipData.Experience; // 載入經驗值
-        this.MaxFuel = shipData.MaxFuel; // 載入最大燃料
-        this.CurrentFuel = shipData.CurrentFuel; // 載入當前燃料
-        this.SavedRectArea = shipData.SavedRectArea; // 載入矩形區域
-
-        // 清空現有武器
-        foreach (var weapon in weapons)
-        {
-            if (weapon != null)
-            {
-                Destroy(weapon.gameObject);
-            }
-        }
-        weapons.Clear();
-
-        // 載入武器數據
-        foreach (var weaponData in shipData.Weapons)
-        {
-            var weaponPrefab = Resources.Load<GameObject>($"Prefabs/Weapon/{weaponData.PrefabName}");
-            if (weaponPrefab != null)
-            {
-                var weaponObj = Instantiate(weaponPrefab, transform);
-                var weaponComp = weaponObj.GetComponent<Weapon>();
-                if (weaponComp != null)
-                {
-                    weaponComp.name = weaponData.Name;
-                    weaponComp.Damage = weaponData.Damage;
-                    weaponComp.MaxAttackDistance = weaponData.MaxAttackDistance;
-                    weaponComp.MinAttackDistance = weaponData.MinAttackDistance;
-                    weaponComp.AttackSpeed = weaponData.AttackSpeed;
-                    weaponComp.CooldownTime = weaponData.CooldownTime;
-                    weapons.Add(weaponComp);
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"[Ship] 找不到武器預製物: {weaponData.PrefabName}");
-            }
-        }
-
-        Debug.Log($"[Ship] 已載入船隻數據: {shipData.Name}");
+        this.MaxFuel = shipData.MaxFuel; this.CurrentFuel = shipData.CurrentFuel;
     }
-
-    public void AddRandomWeapon()
-    {
-        if (weapons.Count >= IntWeaponLimit)
-        {
-            Debug.LogWarning("[Ship] 武器數量已達上限，無法添加新武器！");
-            return;
-        }
-
-        var weaponPrefabs = Resources.LoadAll<Weapon>("Prefabs/Weapon");
-        if (weaponPrefabs.Length == 0)
-        {
-            Debug.LogError("[Ship] 無法找到任何武器預製體！");
-            return;
-        }
-
-        var randomWeaponPrefab = weaponPrefabs[UnityEngine.Random.Range(0, weaponPrefabs.Length)]; // 明確使用 UnityEngine.Random
-        var newWeapon = Instantiate(randomWeaponPrefab, transform);
-        weapons.Add(newWeapon);
-
-        Debug.Log($"[Ship] 隨機生成武器：{newWeapon.Name}");
-    }
-
-    public void AddWeapon(Weapon weapon)
-    {
-        // 將武器添加到船隻的武器列表或其他結構中
-        Debug.Log($"[Ship] 添加武器: {weapon.name}");
-    }
-
     #region Debug
     private void OnValidate()
     {
-        // Auto-clamp values in Inspector
-        Health = m_health;
-        TargetSpeed = m_targetSpeed;
+        Health = m_health; TargetSpeed = m_targetSpeed;
         TargetRotationSpeed = m_targetRotationSpeed;
-        m_visibleRadius = Mathf.Max(0, m_visibleRadius);
-        CurrentFuel = m_fuel; // 確保燃料值在檢查時被限制
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        // 在 Scene 視窗中繪製可見半徑
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, m_visibleRadius);
+        CurrentFuel = m_fuel;
     }
     #endregion
 }

@@ -1,0 +1,118 @@
+using UnityEngine;
+using System.Linq;
+using System.Collections.Generic;
+
+public class Warship : Ship
+{
+    #region Combat Settings
+    [Header("Combat Settings")]
+    [SerializeField] private float m_detectionDistance = 50f;
+    [SerializeField] private bool m_combatMode = false;
+    [SerializeField] private int m_weaponLimit = 2;
+    [SerializeField] public List<Weapon> weapons = new List<Weapon>();
+
+    public float DetectionDistance { get => m_detectionDistance; set => m_detectionDistance = Mathf.Max(0, value); }
+    public bool CombatMode { get => m_combatMode; set => m_combatMode = value; }
+    public int WeaponLimit { get => m_weaponLimit; set => m_weaponLimit = Mathf.Max(0, value); }
+    #endregion
+
+    #region Experience System
+    [Header("Experience Settings")]
+    [SerializeField] private int m_level = 1;
+    [SerializeField] private float m_experience = 0f;
+
+    public int Level { get => m_level; private set => m_level = Mathf.Max(1, value); }
+    public float Experience { get => m_experience; private set => m_experience = Mathf.Max(0, value); }
+
+    public void AddExperience(float exp)
+    {
+        Experience += exp;
+        float upgradeNeed = Level * 10f;
+        while (Experience >= upgradeNeed)
+        {
+            Experience -= upgradeNeed;
+            Level++;
+            upgradeNeed = Level * 10f;
+        }
+    }
+    #endregion
+
+    public override void Update()
+    {
+        base.Update();
+        if (CombatMode) DetectAndAttackTarget();
+    }
+
+    private void DetectAndAttackTarget()
+    {
+        var target = FindNearestEnemy();
+        if (target != null && Vector3.Distance(transform.position, target.transform.position) <= GetMaxWeaponRange())
+        {
+            AttackTarget(target.gameObject);
+        }
+        else
+        {
+            StopAttack();
+        }
+    }
+
+    private Ship FindNearestEnemy()
+    {
+        return FindObjectsByType<Ship>(FindObjectsSortMode.None)
+            .Where(ship => ship != this)
+            .OrderBy(ship => Vector3.Distance(transform.position, ship.transform.position))
+            .FirstOrDefault(ship => Vector3.Distance(transform.position, ship.transform.position) <= DetectionDistance);
+    }
+
+    private float GetMaxWeaponRange() => weapons.Count > 0 ? weapons.Max(w => w.MaxAttackDistance) : 0f;
+
+    public void AttackTarget(GameObject target)
+    {
+        weapons.ForEach(weapon => 
+        {
+            if (weapon != null && target != null) weapon.StartAttack(target);
+        });
+    }
+
+    public void StopAttack() =>weapons.ForEach(weapon => weapon?.StopAttack());
+
+    protected override void OnDeath()
+    {
+        var killer = FindObjectsByType<Ship>(FindObjectsSortMode.None)
+            .FirstOrDefault(s => s != this);
+        if (killer is Warship warship) warship.AddExperience(10f);
+        
+        base.OnDeath();
+    }
+
+    public void AddWeapon(Weapon weapon)
+    {
+        if (weapons.Count >= WeaponLimit) return;
+        weapons.Add(weapon);
+    }
+
+    public void AddRandomWeapon()
+    {
+        if (weapons.Count >= WeaponLimit) return;
+        
+        var availableWeapons = Resources.LoadAll<Weapon>("Prefabs/Weapon");
+        if (availableWeapons.Length == 0) return;
+        
+        var newWeapon = Instantiate(
+            availableWeapons[Random.Range(0, availableWeapons.Length)], 
+            transform
+        );
+        weapons.Add(newWeapon);
+    }
+
+       public override GameData.ShipData SaveShipData()
+    {
+        var data = base.SaveShipData();
+        data.Experience = Experience;
+        data.Level = Level;
+        data.CombatMode = CombatMode;
+        data.WeaponLimit = WeaponLimit;
+        return data;
+    }
+
+}

@@ -22,7 +22,7 @@ public class ShipCreationManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    public Ship TryCreateRandomShip(int inputGold, int inputOil, int inputCube)
+    public PlayerShip TryCreateRandomShip(int inputGold, int inputOil, int inputCube)
     {
         System.Collections.Generic.List<int> candidates = new System.Collections.Generic.List<int>();
         System.Collections.Generic.List<int> weights = new System.Collections.Generic.List<int>();
@@ -74,7 +74,7 @@ public class ShipCreationManager : MonoBehaviour
 
     }
 
-    private Ship InstantiateShip(int shipTypeIdx)
+    private PlayerShip InstantiateShip(int shipTypeIdx)
     {
         if (shipTypeIdx < 0 || shipTypeIdx >= shipPrefabs.Length)
         {
@@ -117,7 +117,7 @@ public class ShipCreationManager : MonoBehaviour
         {
             Debug.Log("[ShipCreationManager] 戰艦實例化成功！");
             SaveShipData(spawnPosition);
-            return battleShip.GetComponent<Ship>();
+            return battleShip.GetComponent<PlayerShip>();
         }
         else
         {
