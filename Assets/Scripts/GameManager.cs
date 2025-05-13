@@ -69,6 +69,17 @@ public class GameManager : Singleton<GameManager>
                         data.playerData.Ships.Add(ship.SaveShipData());
                     }
 
+                    // 保存敵人數據
+                    var enemyShips = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None)
+                        .Where(ship => ship != null)
+                        .ToList();
+
+                    data.enemyShips.Clear();
+                    foreach (var ship in enemyShips)
+                    {
+                        data.enemyShips.Add(ship.SaveShipData());
+                    }
+
                     string json = JsonUtility.ToJson(data, true);
                     File.WriteAllText(saveFilePath, json);
                     Debug.Log($"[GameManager] 遊戲已保存至 {saveFilePath}");
@@ -117,6 +128,26 @@ public class GameManager : Singleton<GameManager>
                         else
                         {
                             Debug.LogError("[GameManager] ShipCreationManager 未初始化，無法實例化船隻！");
+                        }
+                    }
+
+                    // CLear existing enemy ships before loading new ones
+                    var existingEnemyShips = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None);
+                    foreach (var enemyShip in existingEnemyShips)
+                    {
+                        GameObject.Destroy(enemyShip.gameObject);
+                    }
+
+                    // 使用 EnemyShipSpawner 載入敵人數據並生成敵人
+                    foreach (var shipData in data.enemyShips)
+                    {
+                        if (EnemyShipSpawner.Instance != null)
+                        {
+                            EnemyShipSpawner.Instance.SpawnEnemyFromData(shipData);
+                        }
+                        else
+                        {
+                            Debug.LogError("[GameManager] EnemyShipSpawner 未初始化，無法生成敵人！");
                         }
                     }
 

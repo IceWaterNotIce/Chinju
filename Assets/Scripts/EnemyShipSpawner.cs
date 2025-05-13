@@ -3,6 +3,8 @@ using UnityEngine.Tilemaps;
 
 public class EnemyShipSpawner : MonoBehaviour
 {
+    public static EnemyShipSpawner Instance { get; private set; }
+
     [Header("Spawn Settings")]
     public GameObject enemyShipPrefab;
     public float spawnInterval = 2f;
@@ -17,6 +19,12 @@ public class EnemyShipSpawner : MonoBehaviour
 
     private Tilemap tilemap;
     private TileBase oceanTile;
+
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
 
     void Start()
     {
@@ -71,6 +79,34 @@ public class EnemyShipSpawner : MonoBehaviour
                 Debug.Log($"[EnemyShipSpawner] 成功生成敵方船隻於位置: {spawnPos}");
                 break;
             }
+        }
+    }
+
+    public void SpawnEnemyFromData(GameData.ShipData shipData)
+    {
+        if (shipData == null)
+        {
+            Debug.LogWarning("[EnemyShipSpawner] ShipData 為 null，無法生成敵人！");
+            return;
+        }
+
+        GameObject enemyShip = EnemyShipPool.Instance.GetEnemyShip();
+        if (enemyShip != null)
+        {
+            var enemyComp = enemyShip.GetComponent<EnemyShip>();
+            if (enemyComp != null)
+            {
+                enemyComp.LoadShipData(shipData);
+                Debug.Log($"[EnemyShipSpawner] 已成功生成敵人: {shipData.PrefabName}");
+            }
+            else
+            {
+                Debug.LogWarning("[EnemyShipSpawner] 生成的物件缺少 EnemyShip 組件！");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[EnemyShipSpawner] 無法生成敵人！");
         }
     }
 

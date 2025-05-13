@@ -785,7 +785,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemyShipPrefab: {fileID: 4572884418056175630, guid: b739a16e81daf8d4c9daf5b176d5caca, type: 3}
   spawnInterval: 2
-  maxEnemyShips: 100
+  maxEnemyShips: 15
   weaponPrefabs:
   - {fileID: 1784742138039663330, guid: aea540dc861280a40b4ea64e42b9938d, type: 3}
 --- !u!114 &937809618
@@ -1014,7 +1014,6 @@ MonoBehaviour:
   useRandomSeed: 0
   mainCamera: {fileID: 2019224608}
   cameraController: {fileID: 2019224605}
-  chinjuUIController: {fileID: 933149506}
   oilShipPrefab: {fileID: 0}
 --- !u!483693784 &1920876239
 TilemapRenderer:
@@ -1169,7 +1168,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2cb270a7eb2e9bc45927b91918f3b73e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponPanel: {fileID: 436570984}
 --- !u!114 &1984032769
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1518,8 +1516,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cfa59687f8f4e7438014b84530bfd06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mapController: {fileID: 1920876238}
-  chinjuUIController: {fileID: 933149506}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
