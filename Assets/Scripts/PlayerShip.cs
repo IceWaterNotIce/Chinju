@@ -14,6 +14,8 @@ public class PlayerShip : Warship, IPointerClickHandler
     [Header("Player Settings")]
     [SerializeField] private Rect m_navigationArea;
 
+    private float m_healthRegenTimer = 0f; // 用於計時的變數
+
     public Rect NavigationArea
     {
         get => m_navigationArea;
@@ -109,6 +111,20 @@ public class PlayerShip : Warship, IPointerClickHandler
         }
 
         base.Move(); // 使用基類的移動邏輯
+    }
+
+    public override void Update()
+    {
+        // 每分鐘增加 1 點健康值
+        m_healthRegenTimer += Time.deltaTime;
+        if (m_healthRegenTimer >= 60f)
+        {
+            Health += 1;
+            m_healthRegenTimer = 0f;
+            Debug.Log($"[PlayerShip] Health increased by 1. Current Health: {Health}");
+        }
+
+        base.Update(); // 使用基類的更新邏輯
     }
 
     // UI 互動邏輯
