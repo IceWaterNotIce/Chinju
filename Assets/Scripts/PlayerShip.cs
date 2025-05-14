@@ -69,8 +69,8 @@ public class PlayerShip : Warship, IPointerClickHandler
             }
 
             // Navigation rect
-            if (transform.position.x < NavigationArea.xMin || transform.position.x > NavigationArea.xMax ||
-                transform.position.y < NavigationArea.yMin || transform.position.y > NavigationArea.yMax)
+            if (transform.position.x < NavigationArea.xMin + 2 || transform.position.x > NavigationArea.xMax - 2 ||
+                transform.position.y < NavigationArea.yMin + 2 || transform.position.y > NavigationArea.yMax - 2)  
             {
                 //改變方向 to rect center
                 Vector3 center = new Vector3((NavigationArea.xMin + NavigationArea.xMax) / 2, (NavigationArea.yMin + NavigationArea.yMax) / 2, 0);
