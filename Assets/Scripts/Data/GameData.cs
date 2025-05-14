@@ -60,7 +60,8 @@ public class GameData
         public float Rotation;
 
 
-public bool CombatMode; // 新增：保存船隻的戰鬥模式
+
+        public bool CombatMode; // 新增：保存船隻的戰鬥模式
         public int WeaponLimit;
 
         public int Level; // 新增：保存船隻等級

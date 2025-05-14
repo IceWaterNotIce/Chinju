@@ -77,7 +77,26 @@ public class GameManager : Singleton<GameManager>
                     data.enemyShips.Clear();
                     foreach (var ship in enemyShips)
                     {
-                        data.enemyShips.Add(ship.SaveShipData());
+                        var shipData = ship.SaveShipData();
+
+                        // 保存武器數據
+                        shipData.Weapons.Clear();
+                        foreach (var weapon in ship.GetWeapons())
+                        {
+                            var weaponData = new GameData.WeaponData
+                            {
+                                Name = weapon.name,
+                                Damage = (int)weapon.Damage,
+                                MaxAttackDistance = weapon.MaxAttackDistance,
+                                MinAttackDistance = weapon.MinAttackDistance,
+                                AttackSpeed = weapon.AttackSpeed,
+                                CooldownTime = weapon.CooldownTime,
+                                PrefabName = weapon.Name
+                            };
+                            shipData.Weapons.Add(weaponData);
+                        }
+
+                        data.enemyShips.Add(shipData);
                     }
 
                     string json = JsonUtility.ToJson(data, true);

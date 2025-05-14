@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class EnemyShip : Warship
 {
@@ -167,5 +168,10 @@ public class EnemyShip : Warship
         Debug.Log("[EnemyShip] Enemy ship destroyed!");
         // 實作死亡效果（爆炸動畫、掉落物品等）
         Destroy(gameObject, 0.5f);  // 延遲0.5秒銷毀
+    }
+
+    public List<Weapon> GetWeapons()
+    {
+        return weapons; // 假設 `weapons` 是 Warship 類別中的武器列表
     }
 }

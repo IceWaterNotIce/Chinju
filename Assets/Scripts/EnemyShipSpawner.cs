@@ -97,6 +97,35 @@ public class EnemyShipSpawner : MonoBehaviour
             if (enemyComp != null)
             {
                 enemyComp.LoadShipData(shipData);
+
+                // 載入武器
+                foreach (var weaponData in shipData.Weapons)
+                {
+                    if (!string.IsNullOrEmpty(weaponData.PrefabName))
+                    {
+                        GameObject weaponPrefab = Resources.Load<GameObject>($"Prefabs/Weapons/{weaponData.PrefabName}");
+                        if (weaponPrefab != null)
+                        {
+                            GameObject weapon = Instantiate(weaponPrefab, enemyShip.transform);
+                            weapon.transform.localPosition = Vector3.zero;
+
+                            if (weapon.TryGetComponent<Weapon>(out Weapon weaponComponent))
+                            {
+                                enemyComp.AddWeapon(weaponComponent);
+                                Debug.Log($"[EnemyShipSpawner] 已為敵方船隻載入武器: {weaponData.Name}");
+                            }
+                            else
+                            {
+                                Debug.LogWarning($"[EnemyShipSpawner] 武器預製件 {weaponData.PrefabName} 缺少 Weapon 組件！");
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[EnemyShipSpawner] 無法找到武器預製件: {weaponData.PrefabName}");
+                        }
+                    }
+                }
+
                 Debug.Log($"[EnemyShipSpawner] 已成功生成敵人: {shipData.PrefabName}");
             }
             else
