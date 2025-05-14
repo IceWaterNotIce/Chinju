@@ -52,6 +52,9 @@ public class ShipUI : Singleton<ShipUI>
 
     private Button btnToggleCombatMode; // 新增切換戰鬥模式的按鈕
 
+    private Button btnFormShipLine; // 新增：形成船隊的按鈕
+    private bool isSelectingShipForLine = false; // 狀態標誌，用於選擇船隻
+
     void Start()
     {
         var uiDoc = GetComponent<UIDocument>();
@@ -84,6 +87,7 @@ public class ShipUI : Singleton<ShipUI>
         InitializeDrawButton();
         InitializeCloseUIButton();
         InitializeToggleCombatModeButton(); // 初始化切換戰鬥模式按鈕
+        InitializeFormShipLineButton(); // 初始化形成船隊按鈕
         RegisterPointerEvents();
     }
 
@@ -591,6 +595,23 @@ public class ShipUI : Singleton<ShipUI>
         }
     }
 
+    private void InitializeFormShipLineButton()
+    {
+        btnFormShipLine = UIHelper.InitializeElement<Button>(UIPanel, "btnFormShipLine");
+        if (btnFormShipLine != null)
+        {
+            btnFormShipLine.clicked += () =>
+            {
+                isSelectingShipForLine = true; // 啟用選擇船隻模式
+                Debug.Log("[ShipUI] 選擇船隻以形成船隊模式啟用");
+            };
+        }
+        else
+        {
+            LogError("找不到名為 'btnFormShipLine' 的按鈕！");
+        }
+    }
+
     private void SetUIPosition()
     {
         if (ship == null)
@@ -612,6 +633,7 @@ public class ShipUI : Singleton<ShipUI>
         root.RegisterCallback<PointerDownEvent>(OnPointerDown); // 修正為 PointerDownEvent
         root.RegisterCallback<PointerMoveEvent>(OnPointerMove); // 修正為 PointerMoveEvent
         root.RegisterCallback<PointerUpEvent>(OnPointerUp);     // 修正為 PointerUpEvent
+        root.RegisterCallback<PointerDownEvent>(HandleShipSelectionForLine); // 新增處理船隻選擇的事件
     }
 
     private void EnableDrawing()
@@ -749,10 +771,45 @@ public class ShipUI : Singleton<ShipUI>
         savedRectElement.style.height = Mathf.Abs(worldToScreenMax.y - worldToScreenMin.y);
     }
 
+    private void HandleShipSelectionForLine(PointerDownEvent evt)
+    {
+        Debug.Log("[ShipUI] HandleShipSelectionForLine");
+        if (isSelectingShipForLine && evt.button == 0) // 左鍵點擊
+        {
+            Ray ray = Camera.main.ScreenPointToRay(evt.position);
+
+            // 確保 Raycast 檢測到正確的碰撞體
+            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, LayerMask.GetMask("Ship")))
+            {
+                var selectedShip = hit.collider.GetComponent<PlayerShip>();
+                if (selectedShip != null && selectedShip != ship)
+                {
+                    var shipLine = ship.GetComponent<ShipLine>();
+                    if (shipLine == null)
+                    {
+                        shipLine = ship.gameObject.AddComponent<ShipLine>();
+                    }
+                    shipLine.followers.Add(selectedShip.transform);
+                    Debug.Log($"[ShipUI] 已將船隻 {selectedShip.name} 添加到船隊");
+                    isSelectingShipForLine = false; // 停止選擇模式
+                }
+                else
+                {
+                    Debug.LogWarning("[ShipUI] 點擊的物件不是有效的 PlayerShip 或是自身船隻");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[ShipUI] Raycast 未檢測到任何物件");
+            }
+        }
+        Debug.Log("[ShipUI] Ship selection for line ended");
+    }
+
     private void OnDestroy()
     {
         Debug.Log("[ShipUI] 銷毀 ShipUI");
         //Debug where call this destroy
-        Debug.Log(new System.Diagnostics.StackTrace().ToString());
+        // Debug.Log(new System.Diagnostics.StackTrace().ToString());
     }
 }

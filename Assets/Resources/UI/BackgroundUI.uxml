@@ -7,8 +7,8 @@
         <engine:Instance template="MiniMap" style="width: 353px;" />
     </engine:VisualElement>
     <engine:VisualElement style="flex-grow: 1; position: absolute; top: 0; right: 0; flex-direction: column-reverse; width: auto; flex-basis: auto; justify-content: flex-start; align-items: auto; align-self: auto;">
-        <engine:Instance template="StatusBar" />
         <engine:Instance template="TimeControlBar" name="TemplateContainer" style="flex-direction: column;" />
+        <engine:Instance template="StatusBar" />
     </engine:VisualElement>
     <engine:Instance template="BottomNavBar" name="TemplateContainer" style="max-height: 927px; height: 203px; bottom: 0; position: absolute;" />
 </engine:UXML>

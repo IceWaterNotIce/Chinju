@@ -1,7 +1,8 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" style="Assets/Resources/UI/BottomNavBar.uss">
-    <engine:VisualElement style="flex-grow: 1; flex-direction: row; align-items: stretch; align-self: auto; align-content: auto; justify-content: flex-start; bottom: 0; height: 200px; max-height: 200px; min-height: 200px; position: absolute;">
-        <engine:Button name="ToggleWeaponPanelButton" text="切換武器面板" />
-        <engine:Button name="ToggleShipListPanelButton" text="切換船隻列表面板" />
-        <engine:Button name="ToggleSettingMenuButton" text="切換設定選單" /> <!-- 新增按鈕 -->
+    <Style src="project://database/Assets/Resources/UI/BottomNavBar.uss?fileID=7433441132597879392&amp;guid=9b3e6aeb8ba70a54599c74af7b21b377&amp;type=3#BottomNavBar" />
+    <engine:VisualElement style="flex-grow: 1; flex-direction: row; align-items: stretch; align-self: auto; align-content: auto; justify-content: flex-start; bottom: 0; height: 100px; max-height: 100px; min-height: 100px; position: absolute;">
+        <engine:Button name="ToggleWeaponPanelButton" text="切換武器面板" class="bottom-nav-btn" />
+        <engine:Button name="ToggleShipListPanelButton" text="切換船隻列表面板" class="bottom-nav-btn" />
+        <engine:Button name="ToggleSettingMenuButton" text="切換設定選單" class="bottom-nav-btn" />
     </engine:VisualElement>
 </engine:UXML>

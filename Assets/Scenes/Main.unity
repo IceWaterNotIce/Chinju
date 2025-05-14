@@ -519,7 +519,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 794751195}
-  - component: {fileID: 794751197}
   m_Layer: 0
   m_Name: UIManager
   m_TagString: Untagged
@@ -544,19 +543,6 @@ Transform:
   - {fileID: 451232345}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &794751197
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 794751194}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4364fe4ed89ce2048b008475dc7b71dd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerStatsUI: {fileID: 0}
 --- !u!1 &856271945
 GameObject:
   m_ObjectHideFlags: 0
@@ -916,7 +902,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GoldPerMinute: 3
   OilPerMinute: 10
-  CubePerMinute: 0
+  CubePerMinute: 1
 --- !u!4 &1688887480
 Transform:
   m_ObjectHideFlags: 0
