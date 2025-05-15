@@ -776,12 +776,12 @@ public class ShipUI : Singleton<ShipUI>
         Debug.Log("[ShipUI] HandleShipSelectionForLine");
         if (isSelectingShipForLine && evt.button == 0) // 左鍵點擊
         {
-            Ray ray = Camera.main.ScreenPointToRay(evt.position);
+            Vector2 worldPoint = Camera.main.ScreenToWorldPoint(evt.position); // 將螢幕座標轉換為世界座標
+            Collider2D hitCollider = Physics2D.OverlapPoint(worldPoint, LayerMask.GetMask("Ship")); // 使用 2D 碰撞檢測
 
-            // 確保 Raycast 檢測到正確的碰撞體
-            if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, LayerMask.GetMask("Ship")))
+            if (hitCollider != null)
             {
-                var selectedShip = hit.collider.GetComponent<Ship>(); // 修改為 Ship 類型
+                var selectedShip = hitCollider.GetComponent<Ship>(); // 確保檢測到的是 Ship 類型
                 if (selectedShip != null && selectedShip != ship)
                 {
                     var shipLine = ship.GetComponent<ShipLine>();
@@ -789,7 +789,7 @@ public class ShipUI : Singleton<ShipUI>
                     {
                         shipLine = ship.gameObject.AddComponent<ShipLine>();
                     }
-                    shipLine.followers.Add(selectedShip); // 添加 Ship 而非 Transform
+                    shipLine.followers.Add(selectedShip); // 添加 Ship
                     Debug.Log($"[ShipUI] 已將船隻 {selectedShip.name} 添加到船隊");
                     isSelectingShipForLine = false; // 停止選擇模式
                 }
