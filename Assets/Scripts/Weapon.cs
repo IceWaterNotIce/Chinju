@@ -19,9 +19,9 @@ public class Weapon : MonoBehaviour
 
     public void Attack(GameObject target)
     {
-        if (AmmoPrefab == null)
+        if (AmmoManager.Instance == null)
         {
-            Debug.LogError("[Weapon] AmmoPrefab 未設置，無法生成彈藥！");
+            Debug.LogError("[Weapon] AmmoManager 未初始化，無法生成彈藥！");
             return;
         }
 
@@ -45,39 +45,36 @@ public class Weapon : MonoBehaviour
         // 計算彈藥的生成位置，設置為船隻與目標之間的位置
         Vector3 spawnPosition = transform.position + direction * MinAttackDistance;
 
-        GameObject ammoObj = Instantiate(AmmoPrefab, spawnPosition, Quaternion.identity);
-
-        if (ammoObj != null)
+        GameObject ammoObj = AmmoManager.Instance.GetAmmo();
+        if (ammoObj == null)
         {
-            ammoObj.transform.SetParent(null); // 確保彈藥生成在場景的根層級
-            Ammo ammo = ammoObj.GetComponent<Ammo>();
-            if (ammo != null)
+            Debug.LogError("[Weapon] 無法從 AmmoManager 獲取有效的彈藥物件！");
+            return;
+        }
+
+        ammoObj.transform.position = spawnPosition;
+        ammoObj.transform.rotation = Quaternion.identity;
+        ammoObj.transform.SetParent(AmmoManager.Instance.transform); // 設置為 AmmoManager 的子物件
+
+        Ammo ammo = ammoObj.GetComponent<Ammo>();
+        if (ammo != null)
+        {
+            ammo.SetDirection(direction);
+
+            // 設置彈藥的擁有者為武器所屬的船隻
+            if (ownerShip != null)
             {
-                ammo.SetDirection(direction);
-
-                // 設置彈藥的擁有者為武器所屬的船隻
-                if (ownerShip != null)
-                {
-                    ammo.SetOwner(ownerShip.gameObject);
-                    Debug.Log($"[Weapon] 彈藥生成成功，設置擁有者為 {ownerShip.name}");
-                }
-                else
-                {
-                    Debug.LogWarning("[Weapon] 無法找到武器的擁有者船隻，請檢查武器的層級結構！");
-                }
-
-                // 確保彈藥初始化完成後才設置壽命
-                Debug.Log("[Weapon] 彈藥初始化完成，設置壽命為 5 秒。");
-                Destroy(ammoObj, 5f); // 5秒後自動銷毀彈藥
+                ammo.SetOwner(ownerShip.gameObject);
+                Debug.Log($"[Weapon] 彈藥生成成功，設置擁有者為 {ownerShip.name}");
             }
             else
             {
-                Debug.LogError("[Weapon] 無法找到 Ammo 組件，請檢查 AmmoPrefab 是否正確設置！");
+                Debug.LogWarning("[Weapon] 無法找到武器的擁有者船隻，請檢查武器的層級結構！");
             }
         }
         else
         {
-            Debug.LogError("[Weapon] 無法生成 AmmoPrefab，請檢查資源是否正確設置！");
+            Debug.LogError("[Weapon] 無法找到 Ammo 組件，請檢查 AmmoPrefab 是否正確設置！");
         }
     }
 

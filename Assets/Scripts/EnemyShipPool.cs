@@ -5,7 +5,7 @@ public class EnemyShipPool : MonoBehaviour
 {
     public static EnemyShipPool Instance { get; private set; }
 
-    [SerializeField] private GameObject enemyShipPrefab;
+    [SerializeField] private List<GameObject> enemyShipPrefabs; // 支持多個預製物
     [SerializeField] private int initialPoolSize = 10;
 
     private Queue<GameObject> pool = new Queue<GameObject>();
@@ -25,15 +25,18 @@ public class EnemyShipPool : MonoBehaviour
 
     private void InitializePool()
     {
-        for (int i = 0; i < initialPoolSize; i++)
+        foreach (var prefab in enemyShipPrefabs)
         {
-            var enemyShip = Instantiate(enemyShipPrefab);
+            for (int i = 0; i < initialPoolSize; i++)
+            {
+                var enemyShip = Instantiate(prefab);
 
-            // 設置為 EnemyShipPool 的子物件
-            enemyShip.transform.SetParent(this.transform);
+                // 設置為 EnemyShipPool 的子物件
+                enemyShip.transform.SetParent(this.transform);
 
-            enemyShip.SetActive(false);
-            pool.Enqueue(enemyShip);
+                enemyShip.SetActive(false);
+                pool.Enqueue(enemyShip);
+            }
         }
     }
 
@@ -51,7 +54,9 @@ public class EnemyShipPool : MonoBehaviour
         }
         else
         {
-            var enemyShip = Instantiate(enemyShipPrefab);
+            // 隨機選擇一個預製物
+            var prefab = enemyShipPrefabs[Random.Range(0, enemyShipPrefabs.Count)];
+            var enemyShip = Instantiate(prefab);
 
             // 設置為 EnemyShipPool 的子物件
             enemyShip.transform.SetParent(this.transform);

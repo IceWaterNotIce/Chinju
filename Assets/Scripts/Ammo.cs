@@ -37,17 +37,16 @@ public class Ammo : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        // 嘗試獲取 Ship 或 EnemyShip 類型的物件
-        var ship = collision.gameObject.GetComponent<Ship>();
+        // 嘗試獲取 PlayerShip 或 EnemyShip 類型的物件
+        var playerShip = collision.gameObject.GetComponent<PlayerShip>();
         var enemyShip = collision.gameObject.GetComponent<EnemyShip>();
 
-        if (ship != null || enemyShip != null)
+        if (playerShip != null || enemyShip != null)
         {
             // 處理傷害
-            if (ship != null)
+            if (playerShip != null)
             {
-                ship.Health -= Damage;
-                Debug.Log($"[Ammo] 彈藥命中玩家船隻 {ship.name}，造成 {Damage} 傷害。");
+                Debug.Log($"[Ammo] 彈藥命中玩家船隻 {playerShip.name}，但沒有造成傷害。");
             }
             else if (enemyShip != null)
             {
@@ -63,11 +62,16 @@ public class Ammo : MonoBehaviour
         
     }
 
-
     void OnDestroy()
     {
         Debug.Log($"[Ammo] 彈藥 {gameObject.name} 被銷毀。");
-        // 在這裡可以添加其他銷毀後的邏輯，例如播放特效等
-    
+        if (AmmoManager.Instance != null)
+        {
+            AmmoManager.Instance.ReturnAmmo(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject); // 如果 AmmoManager 不存在，直接銷毀
+        }
     }
 }

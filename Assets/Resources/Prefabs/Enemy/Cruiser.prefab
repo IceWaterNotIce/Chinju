@@ -156,7 +156,8 @@ MonoBehaviour:
   m_detectionDistance: 10
   m_combatMode: 0
   m_weaponLimit: 2
-  weapons: []
+  weapons:
+  - {fileID: 3196780251513181377, guid: 0967497d6e6b34547a6aa5a4663e58c9, type: 3}
   m_level: 1
   m_experience: 0
   attackRange: 5

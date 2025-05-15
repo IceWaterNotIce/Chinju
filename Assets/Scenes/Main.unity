@@ -183,6 +183,52 @@ MonoBehaviour:
   m_WorldSpaceSizeMode: 1
   m_WorldSpaceWidth: 1920
   m_WorldSpaceHeight: 1080
+--- !u!1 &130904846
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 130904847}
+  - component: {fileID: 130904848}
+  m_Layer: 0
+  m_Name: AmmoManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &130904847
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 130904846}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 158259544}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &130904848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 130904846}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35ca6524eb3f6de449c7cf7aa441c615, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AmmoPrefab: {fileID: 4738637386504094231, guid: 3b14219417392fd42aff884981ad45d1, type: 3}
+  PoolSize: 20
 --- !u!1 &158259543
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,10 +259,11 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 318057346}
-  - {fileID: 586510289}
   - {fileID: 572011471}
+  - {fileID: 586510289}
   - {fileID: 856271947}
   - {fileID: 937809616}
+  - {fileID: 130904847}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &318057343
@@ -806,12 +853,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa39d874f648aae4ca6d05d3007d8557, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyShipPrefab: {fileID: 4572884418056175630, guid: b739a16e81daf8d4c9daf5b176d5caca, type: 3}
   spawnInterval: 2
   maxEnemyShips: 15
-  weaponPrefabs:
-  - {fileID: 1784742138039663330, guid: aea540dc861280a40b4ea64e42b9938d, type: 3}
-  progressBarController: {fileID: 0}
+  progressBarController: {fileID: 1984032773}
   progressBarDuration: 10
 --- !u!114 &937809618
 MonoBehaviour:
@@ -825,7 +869,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e348c432ed1ab804191d78dc5886f4db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyShipPrefab: {fileID: 4572884418056175630, guid: b739a16e81daf8d4c9daf5b176d5caca, type: 3}
+  enemyShipPrefabs:
+  - {fileID: 2108854950027416566, guid: 3bdce1d35eea703429c0185c49066a04, type: 3}
+  - {fileID: 33835131033531580, guid: aee3f8361864d454c9b54048485f5a0e, type: 3}
+  - {fileID: 2993792429627521981, guid: dc39cb67faf71644d93f0fcf26331d9f, type: 3}
   initialPoolSize: 10
 --- !u!1 &1028576058
 GameObject:

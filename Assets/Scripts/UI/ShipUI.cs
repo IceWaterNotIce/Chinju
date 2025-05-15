@@ -784,7 +784,7 @@ public class ShipUI : Singleton<ShipUI>
                 var selectedShip = hit.collider.GetComponent<Ship>(); // 確保檢測到的是 Ship 類型
                 if (selectedShip != null && selectedShip != ship)
                 {
-                    var shipLine = ship.GetComponent<ShipLine>();
+                    var shipLine = selectedShip.GetComponent<ShipLine>();
                     if (shipLine == null)
                     {
                         shipLine = selectedShip.gameObject.AddComponent<ShipLine>();
