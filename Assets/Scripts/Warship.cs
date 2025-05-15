@@ -91,15 +91,13 @@ public class Warship : Ship
         });
     }
 
-    public void StopAttack() =>weapons.ForEach(weapon => weapon?.StopAttack());
+    public void StopAttack() => weapons.ForEach(weapon => weapon?.StopAttack());
 
-    protected override void OnDeath()
+    private void OnDisable()
     {
         var killer = FindObjectsByType<Ship>(FindObjectsSortMode.None)
             .FirstOrDefault(s => s != this);
         if (killer is Warship warship) warship.AddExperience(10f);
-        
-        base.OnDeath();
     }
 
     public void AddWeapon(Weapon weapon)
