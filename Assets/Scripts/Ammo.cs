@@ -4,8 +4,8 @@ public class Ammo : MonoBehaviour
 {
     public float Damage = 10f;
     public float Speed = 1f;
-    private Vector3 direction;
     private GameObject owner; // 記錄發射彈藥的船隻
+    private Vector3 direction;
 
     public void SetDirection(Vector3 dir)
     {
@@ -51,6 +51,7 @@ public class Ammo : MonoBehaviour
             else if (enemyShip != null)
             {
                 enemyShip.Health -= Damage;
+                owner.GetComponent<Warship>().AddExperience(Damage); // 增加經驗值
                 Debug.Log($"[Ammo] 彈藥命中敵方船隻 {enemyShip.name}，造成 {Damage} 傷害。");
             }
             Destroy(gameObject);

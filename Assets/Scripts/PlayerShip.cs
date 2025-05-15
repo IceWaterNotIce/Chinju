@@ -189,7 +189,7 @@ public class PlayerShip : Warship, IPointerClickHandler
     }
     #endregion
 
-    private void OnDisable()
+    public void OnDisable()
     {
         // if this ship have ship line component
         if (GetComponent<ShipLine>() != null)

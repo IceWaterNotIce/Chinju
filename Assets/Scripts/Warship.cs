@@ -93,13 +93,6 @@ public class Warship : Ship
 
     public void StopAttack() => weapons.ForEach(weapon => weapon?.StopAttack());
 
-    private void OnDisable()
-    {
-        var killer = FindObjectsByType<Ship>(FindObjectsSortMode.None)
-            .FirstOrDefault(s => s != this);
-        if (killer is Warship warship) warship.AddExperience(10f);
-    }
-
     public void AddWeapon(Weapon weapon)
     {
         if (weapons.Count >= WeaponLimit) return;
