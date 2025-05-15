@@ -48,7 +48,7 @@ public class ChinjuResourceCollector : MonoBehaviour
 
         timer += Time.deltaTime;
 
-        if (timer >= 1f) // 每秒執行一次
+        if (timer >= 60f) // 每分鐘執行一次
         {
             CollectResources();
             timer = 0f;
