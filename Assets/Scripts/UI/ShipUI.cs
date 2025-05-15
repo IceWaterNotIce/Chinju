@@ -777,11 +777,11 @@ public class ShipUI : Singleton<ShipUI>
         if (isSelectingShipForLine && evt.button == 0) // 左鍵點擊
         {
             Vector2 worldPoint = Camera.main.ScreenToWorldPoint(evt.position); // 將螢幕座標轉換為世界座標
-            Collider2D hitCollider = Physics2D.OverlapPoint(worldPoint, LayerMask.GetMask("Ship")); // 使用 2D 碰撞檢測
+            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero, Mathf.Infinity); // 使用 2D Raycast
 
-            if (hitCollider != null)
+            if (hit.collider != null)
             {
-                var selectedShip = hitCollider.GetComponent<Ship>(); // 確保檢測到的是 Ship 類型
+                var selectedShip = hit.collider.GetComponent<Ship>(); // 確保檢測到的是 Ship 類型
                 if (selectedShip != null && selectedShip != ship)
                 {
                     var shipLine = ship.GetComponent<ShipLine>();
