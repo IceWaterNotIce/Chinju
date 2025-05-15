@@ -58,10 +58,27 @@ public class Warship : Ship
 
     private Ship FindNearestEnemy()
     {
-        return FindObjectsByType<Ship>(FindObjectsSortMode.None)
-            .Where(ship => ship != this)
-            .OrderBy(ship => Vector3.Distance(transform.position, ship.transform.position))
-            .FirstOrDefault(ship => Vector3.Distance(transform.position, ship.transform.position) <= DetectionDistance);
+        // get this ship tag
+        var thisTag = gameObject.tag;
+        // if the tag is "Player" then the enemy tag is "Enemy"
+        var enemyTag = thisTag == "Player" ? "Enemy" : "Player";
+        // find all ships with the enemy tag
+        var enemies = FindObjectsByType<Ship>(FindObjectsSortMode.None)
+            .Where(s => s.gameObject.tag == enemyTag)
+            .ToList();
+        // find the nearest enemy ship
+        Ship nearestEnemy = null;
+        float minDistance = float.MaxValue;
+        foreach (var enemy in enemies)
+        {
+            float distance = Vector3.Distance(transform.position, enemy.transform.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                nearestEnemy = enemy;
+            }
+        }
+        return nearestEnemy;
     }
 
     private float GetMaxWeaponRange() => weapons.Count > 0 ? weapons.Max(w => w.MaxAttackDistance) : 0f;
