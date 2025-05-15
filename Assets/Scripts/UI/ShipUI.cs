@@ -781,7 +781,7 @@ public class ShipUI : Singleton<ShipUI>
             // 確保 Raycast 檢測到正確的碰撞體
             if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, LayerMask.GetMask("Ship")))
             {
-                var selectedShip = hit.collider.GetComponent<PlayerShip>();
+                var selectedShip = hit.collider.GetComponent<Ship>(); // 修改為 Ship 類型
                 if (selectedShip != null && selectedShip != ship)
                 {
                     var shipLine = ship.GetComponent<ShipLine>();
@@ -789,13 +789,13 @@ public class ShipUI : Singleton<ShipUI>
                     {
                         shipLine = ship.gameObject.AddComponent<ShipLine>();
                     }
-                    shipLine.followers.Add(selectedShip.transform);
+                    shipLine.followers.Add(selectedShip); // 添加 Ship 而非 Transform
                     Debug.Log($"[ShipUI] 已將船隻 {selectedShip.name} 添加到船隊");
                     isSelectingShipForLine = false; // 停止選擇模式
                 }
                 else
                 {
-                    Debug.LogWarning("[ShipUI] 點擊的物件不是有效的 PlayerShip 或是自身船隻");
+                    Debug.LogWarning("[ShipUI] 點擊的物件不是有效的 Ship 或是自身船隻");
                 }
             }
             else
