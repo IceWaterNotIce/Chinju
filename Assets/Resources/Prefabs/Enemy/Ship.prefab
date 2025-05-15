@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8862241616648079018}
   - component: {fileID: 6232532347241040930}
   - component: {fileID: 6537492726164969881}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ship
   m_TagString: Ship
   m_Icon: {fileID: 0}
@@ -139,6 +139,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_maxHealth: 100
   m_health: 100
+  m_maxFuel: 100
+  m_fuel: 100
   m_fuelConsumption: 0.1
   m_maxSpeed: 2
   m_acceleration: 0.2
@@ -149,16 +151,14 @@ MonoBehaviour:
   m_targetRotation: 0
   m_targetRotationSpeed: 0
   m_rotationSpeed: 0
-  m_detectionDistance: 10
-  m_combatMode: 0
-  m_visibleRadius: 10
-  level: 1
-  experience: 0
   tilemap: {fileID: 0}
   oceanTile: {fileID: 0}
-  intWeaponLimit: 2
+  m_detectionDistance: 10
+  m_combatMode: 0
+  m_weaponLimit: 2
   weapons: []
-  IsPlayerShip: 0
+  m_level: 1
+  m_experience: 0
   attackRange: 5
   attackCooldown: 2
   damage: 10

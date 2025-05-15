@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3216380124224694994}
   - component: {fileID: 5343018971910227091}
   - component: {fileID: 1607758159362755293}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Destroyer
   m_TagString: Ship
   m_Icon: {fileID: 0}

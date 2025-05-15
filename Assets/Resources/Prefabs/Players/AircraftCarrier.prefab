@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1380318819776233463}
   - component: {fileID: 1496546483046497074}
   - component: {fileID: -6035169844185352955}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: AircraftCarrier
   m_TagString: Ship
   m_Icon: {fileID: 0}
