@@ -792,6 +792,7 @@ public class ShipUI : Singleton<ShipUI>
                     }
                     shipLine.followers.Add(ship); // 添加 Ship
                     ship.IsFollower = true;
+                    ship.LeaderShip = selectedShip.gameObject.GetComponent<PlayerShip>();
                     Debug.Log($"[ShipUI] 已將船隻 {selectedShip.name} 添加到船隊");
                     isSelectingShipForLine = false; // 停止選擇模式
                 }

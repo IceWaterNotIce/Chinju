@@ -6,19 +6,9 @@ public class ShipLine : MonoBehaviour
     public List<Ship> followers = new List<Ship>(); // List of follower ships
     public float followSpeed = 1.0f; // Speed at which followers adjust their target speed
     public float distanceBetweenFollowers = 1.0f; // Distance between followers
-    public Ship playerShip; // Reference to the player ship
 
     void Update()
     {
-        if (playerShip == null)
-        {
-            Debug.LogWarning("[ShipLine] PlayerShip 已被銷毀，停止更新線條。");
-            return;
-        }
-
-        // 確保 playerShip 存在後再訪問其 transform
-        transform.position = playerShip.transform.position;
-
         for (int i = 1; i < followers.Count; i++)
         {
             // 根據前一艘船的位置和方向計算目標旋轉與速度
@@ -28,6 +18,19 @@ public class ShipLine : MonoBehaviour
             followers[i].TargetRotation = targetRotation;
             followers[i].TargetSpeed = followSpeed;
             Debug.Log($"[ShipLine] Adjusted TargetSpeed: {followers[i].TargetSpeed}, TargetRotation: {followers[i].TargetRotation}");
+        }
+    }
+
+    public void RemoveFollower(PlayerShip ship)
+    {
+        if (followers.Contains(ship))
+        {
+            followers.Remove(ship);
+            Debug.Log($"[ShipLine] Removed follower: {ship.name}");
+        }
+        else
+        {
+            Debug.LogWarning($"[ShipLine] Attempted to remove a ship that is not a follower: {ship.name}");
         }
     }
 }

@@ -46,6 +46,7 @@ public class PlayerShip : Warship, IPointerClickHandler
     public void ClearWaypoints() => m_waypoints.Clear();
     #endregion
 
+    public PlayerShip LeaderShip;
     public bool IsFollower;
 
     #region Movement Logic
@@ -187,4 +188,22 @@ public class PlayerShip : Warship, IPointerClickHandler
         NavigationArea = data.NavigationArea;
     }
     #endregion
+
+    private void OnDisable()
+    {
+        // if this ship have ship line component
+        if (GetComponent<ShipLine>() != null)
+        {
+            // remove this ship component 
+            Destroy(GetComponent<ShipLine>());
+            Debug.Log($"[PlayerShip] ShipLine component removed from {gameObject.name}");
+        }
+
+        // if this ship is follower, call the ship line component to remove this ship
+        if (IsFollower)
+        {
+           LeaderShip?.GetComponent<ShipLine>()?.RemoveFollower(this);
+            Debug.Log($"[PlayerShip] Follower {gameObject.name} removed from Leader {LeaderShip.name}");
+        }
+    }
 }
