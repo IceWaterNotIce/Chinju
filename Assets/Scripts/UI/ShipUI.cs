@@ -777,7 +777,7 @@ public class ShipUI : Singleton<ShipUI>
         if (isSelectingShipForLine && evt.button == 0) // 左鍵點擊
         {
             Vector2 worldPoint = Camera.main.ScreenToWorldPoint(evt.position); // 將螢幕座標轉換為世界座標
-            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero, Mathf.Infinity); // 使用 2D Raycast
+            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero, Mathf.Infinity , LayerMask.GetMask("Ship")); // 使用射線檢測
 
             if (hit.collider != null)
             {
@@ -795,7 +795,8 @@ public class ShipUI : Singleton<ShipUI>
                 }
                 else
                 {
-                    Debug.LogWarning("[ShipUI] 點擊的物件不是有效的 Ship 或是自身船隻");
+                    // Debug the gameObject name 
+                    Debug.Log($"[ShipUI] 點擊的物件不是船隻或是自己: {hit.collider.gameObject.name}");
                 }
             }
             else
