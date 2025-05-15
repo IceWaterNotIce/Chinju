@@ -624,7 +624,7 @@ public class ShipUI : Singleton<ShipUI>
         Vector2 shipScreenPosition = Camera.main.WorldToScreenPoint(ship.transform.position);
         UIPanel.style.left = shipScreenPosition.x;
         UIPanel.style.top = Screen.height - shipScreenPosition.y; // 修正為屏幕坐標系
-        Debug.Log($"[ShipUI] 設定 UI 位置為: {shipScreenPosition}");
+        //Debug.Log($"[ShipUI] 設定 UI 位置為: {shipScreenPosition}");
     }
 
     private void RegisterPointerEvents()
@@ -776,8 +776,8 @@ public class ShipUI : Singleton<ShipUI>
         Debug.Log("[ShipUI] HandleShipSelectionForLine");
         if (isSelectingShipForLine && evt.button == 0) // 左鍵點擊
         {
-            Vector2 worldPoint = Camera.main.ScreenToWorldPoint(evt.position); // 將螢幕座標轉換為世界座標
-            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero, Mathf.Infinity , LayerMask.GetMask("Ship")); // 使用射線檢測
+            Vector2 worldPoint = Camera.main.ScreenToWorldPoint(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
+            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.down , LayerMask.GetMask("Ship")); // 使用射線檢測
 
             if (hit.collider != null)
             {
@@ -787,9 +787,11 @@ public class ShipUI : Singleton<ShipUI>
                     var shipLine = ship.GetComponent<ShipLine>();
                     if (shipLine == null)
                     {
-                        shipLine = ship.gameObject.AddComponent<ShipLine>();
+                        shipLine = selectedShip.gameObject.AddComponent<ShipLine>();
+                        shipLine.followers.Add(selectedShip); // 添加 Ship
                     }
-                    shipLine.followers.Add(selectedShip); // 添加 Ship
+                    shipLine.followers.Add(ship); // 添加 Ship
+                    ship.IsFollower = true;
                     Debug.Log($"[ShipUI] 已將船隻 {selectedShip.name} 添加到船隊");
                     isSelectingShipForLine = false; // 停止選擇模式
                 }

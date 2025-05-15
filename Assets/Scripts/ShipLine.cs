@@ -17,6 +17,7 @@ public class ShipLine : MonoBehaviour
 
             followers[i].TargetRotation = targetRotation;
             followers[i].TargetSpeed = followSpeed;
+            Debug.Log($"[ShipLine] Adjusted TargetSpeed: {followers[i].TargetSpeed}, TargetRotation: {followers[i].TargetRotation}");
         }
     }
 }

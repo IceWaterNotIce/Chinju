@@ -46,19 +46,23 @@ public class PlayerShip : Warship, IPointerClickHandler
     public void ClearWaypoints() => m_waypoints.Clear();
     #endregion
 
+    public bool IsFollower;
+
     #region Movement Logic
     protected override void Move()
     {
-        if (m_waypoints.Count > 0)
+        if (!IsFollower)
         {
-            NavigateToWaypoint();
-        }
+            if (m_waypoints.Count > 0)
+            {
+                NavigateToWaypoint();
+            }
 
-        if (NavigationArea != Rect.zero)
-        {
-            HandleNavigationArea();
+            if (NavigationArea != Rect.zero)
+            {
+                HandleNavigationArea();
+            }
         }
-
         base.Move(); // 使用基類的移動邏輯
     }
 
@@ -100,7 +104,7 @@ public class PlayerShip : Warship, IPointerClickHandler
         }
 
         CurrentFuel -= FuelConsumptionRate * TargetSpeed * Time.deltaTime;
-        Debug.Log($"[PlayerShip] Adjusted TargetSpeed: {TargetSpeed}, TargetRotation: {TargetRotation}, Remaining Fuel: {CurrentFuel}");
+        //Debug.Log($"[PlayerShip] Adjusted TargetSpeed: {TargetSpeed}, TargetRotation: {TargetRotation}, Remaining Fuel: {CurrentFuel}");
     }
 
     private bool IsOutOfNavigationBounds()
