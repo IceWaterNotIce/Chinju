@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
 
 public class EnemyShipSpawner : MonoBehaviour
 {
@@ -15,10 +16,22 @@ public class EnemyShipSpawner : MonoBehaviour
     [Header("Weapon Settings")]
     [SerializeField] private GameObject[] weaponPrefabs; // 可用的武器預製件
 
+    [Header("Progress Bar Controller")]
+    [SerializeField] private ProgressBarController progressBarController;
+
+    [Header("Progress Bar Settings")]
+    private VisualElement progressBar; // 修正：定義進度條變數
+    private float progressBarTimer = 0f; // 修正：定義進度條計時器
+    [SerializeField] private float progressBarDuration = 10f; // 修正：定義進度條持續時間
+    private float originalSpawnInterval; // 修正：定義原始生成間隔
+
     private float timer;
 
     private Tilemap tilemap;
     private TileBase oceanTile;
+
+    private bool isSpeedBoosted = false; // 用於追蹤是否處於加速狀態
+    private float speedBoostTimer = 0f; // 用於計時加速持續時間
 
     private void Awake()
     {
@@ -38,6 +51,21 @@ public class EnemyShipSpawner : MonoBehaviour
         {
             Debug.LogError("Ocean Tile not found in Resources!", this);
         }
+        originalSpawnInterval = spawnInterval; // 保存原始生成間隔
+        InitializeProgressBar();
+
+        if (progressBarController != null)
+        {
+            progressBarController.OnProgressComplete += HandleProgressComplete;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (progressBarController != null)
+        {
+            progressBarController.OnProgressComplete -= HandleProgressComplete;
+        }
     }
 
     void Update()
@@ -48,6 +76,20 @@ public class EnemyShipSpawner : MonoBehaviour
             SpawnEnemyShip();
             timer = 0f;
         }
+
+        if (isSpeedBoosted)
+        {
+            speedBoostTimer += Time.deltaTime;
+            if (speedBoostTimer >= 5f) // 加速持續 5 秒
+            {
+                spawnInterval = originalSpawnInterval; // 恢復到原始生成間隔
+                isSpeedBoosted = false;
+                speedBoostTimer = 0f;
+                Debug.Log($"[EnemyShipSpawner] Spawn interval reset to original: {spawnInterval} seconds.");
+            }
+        }
+
+        UpdateProgressBar();
     }
 
     void SpawnEnemyShip()
@@ -181,5 +223,46 @@ public class EnemyShipSpawner : MonoBehaviour
         Vector3Int cellPos = tilemap.WorldToCell(position);
         TileBase tile = tilemap.GetTile(cellPos);
         return tile == oceanTile;
+    }
+
+    private void InitializeProgressBar()
+    {
+        var uiDocument = FindFirstObjectByType<UIDocument>();
+        if (uiDocument != null)
+        {
+            var root = uiDocument.rootVisualElement;
+            progressBar = root.Q<VisualElement>("progress-bar");
+        }
+
+        if (progressBar == null)
+        {
+            Debug.LogError("[EnemyShipSpawner] Progress bar not found in UI!");
+        }
+    }
+
+    private void UpdateProgressBar()
+    {
+        if (progressBar == null) return;
+
+        progressBarTimer += Time.deltaTime;
+        float progress = Mathf.Clamp01(progressBarTimer / progressBarDuration);
+        progressBar.style.width = new Length(progress * 100, LengthUnit.Percent);
+
+        if (progressBarTimer >= progressBarDuration)
+        {
+            if (!isSpeedBoosted)
+            {
+                spawnInterval = Mathf.Max(1f, spawnInterval - 5f); // 每次減少 5 秒，最低為 1 秒
+                isSpeedBoosted = true; // 設置為加速狀態
+                Debug.Log($"[EnemyShipSpawner] Spawn interval decreased to {spawnInterval} seconds.");
+            }
+            progressBarTimer = 0f; // 重置進度條計時器
+        }
+    }
+
+    private void HandleProgressComplete()
+    {
+        spawnInterval = Mathf.Max(1f, spawnInterval - 5f); // 每次減少 5 秒，最低為 1 秒
+        Debug.Log($"[EnemyShipSpawner] Spawn interval decreased to {spawnInterval} seconds.");
     }
 }

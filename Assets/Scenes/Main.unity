@@ -811,6 +811,8 @@ MonoBehaviour:
   maxEnemyShips: 15
   weaponPrefabs:
   - {fileID: 1784742138039663330, guid: aea540dc861280a40b4ea64e42b9938d, type: 3}
+  progressBarController: {fileID: 0}
+  progressBarDuration: 10
 --- !u!114 &937809618
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1157,6 +1159,7 @@ GameObject:
   - component: {fileID: 1984032770}
   - component: {fileID: 1984032769}
   - component: {fileID: 1984032768}
+  - component: {fileID: 1984032773}
   m_Layer: 0
   m_Name: BackgroundUI
   m_TagString: Untagged
@@ -1249,6 +1252,21 @@ MonoBehaviour:
   m_WorldSpaceSizeMode: 1
   m_WorldSpaceWidth: 1920
   m_WorldSpaceHeight: 1080
+--- !u!114 &1984032773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1984032766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 150921762ff5b9246b3ebf25efd077bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  uiDocument: {fileID: 1984032772}
+  progressBarName: progress-bar
+  progressBarDuration: 10
 --- !u!1 &2001442110
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,8 +1,9 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <engine:Template name="MiniMap" src="project://database/Assets/Resources/UI/MiniMap.uxml?fileID=9197481963319205126&amp;guid=c49f75e9130454c40874465491611e50&amp;type=3#MiniMap" />
-    <engine:Template name="StatusBar" src="project://database/Assets/Resources/UI/StatusBar.uxml?fileID=9197481963319205126&amp;guid=c48627ebc9dc96245a414e713186dc99&amp;type=3#StatusBar" />
     <engine:Template name="TimeControlBar" src="project://database/Assets/Resources/UI/TimeControlBar.uxml?fileID=9197481963319205126&amp;guid=f4658da2bf8d7734a8d2b08a1bbb3d81&amp;type=3#TimeControlBar" />
+    <engine:Template name="StatusBar" src="project://database/Assets/Resources/UI/StatusBar.uxml?fileID=9197481963319205126&amp;guid=c48627ebc9dc96245a414e713186dc99&amp;type=3#StatusBar" />
     <engine:Template name="BottomNavBar" src="project://database/Assets/Resources/UI/BottomNavBar.uxml?fileID=9197481963319205126&amp;guid=7f516c9f89f158341ae559da2e098f0c&amp;type=3#BottomNavBar" />
+    <engine:Template name="ProgressBar" src="project://database/Assets/Resources/UI/ProgressBar.uxml?fileID=9197481963319205126&amp;guid=00c690d458256444a8fdad0bf1bec011&amp;type=3#ProgressBar" />
     <engine:VisualElement name="VisualElement" style="flex-grow: 1; align-items: flex-start; align-content: auto; top: 0; left: 0; width: 278px; height: 709px; max-height: 320px; flex-direction: column;">
         <engine:Instance template="MiniMap" style="width: 353px;" />
     </engine:VisualElement>
@@ -11,4 +12,5 @@
         <engine:Instance template="StatusBar" />
     </engine:VisualElement>
     <engine:Instance template="BottomNavBar" name="TemplateContainer" style="max-height: 927px; height: 203px; bottom: 0; position: absolute;" />
+    <engine:Instance template="ProgressBar" style="position: absolute; top: 0; left: 361px; width: 200px;" />
 </engine:UXML>
