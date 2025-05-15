@@ -5,13 +5,17 @@ public class ShipCreationManager : MonoBehaviour
     public static ShipCreationManager Instance { get; private set; }
 
     [SerializeField] private GameObject[] shipPrefabs = new GameObject[5];
+
+
     [SerializeField]
+    // 船隻建造所需資源成本 
+    // { 金幣, 油, 方塊 }
     public int[,] shipCosts = {
-        { 800, 400, 200 }, // 航空母艦
-        { 500, 200, 100 }, // 戰艦
-        { 300, 120, 60 },  // 巡洋艦
-        { 200, 80, 40 },   // 驅逐艦
-        { 150, 60, 30 }    // 潛艦
+        { 800, 400, 2 }, // 航空母艦
+        { 500, 200, 2 }, // 戰艦
+        { 300, 120, 1 },  // 巡洋艦
+        { 10, 10, 1 },   // 驅逐艦
+        { 150, 60, 1 }    // 潛艦
     };
 
     [SerializeField] private MapController mapController;
@@ -63,8 +67,15 @@ public class ShipCreationManager : MonoBehaviour
 
         if (GameDataController.Instance?.ConsumeResources(shipCosts[shipType, 0], shipCosts[shipType, 1], shipCosts[shipType, 2]) ?? false)
         {
-            // 實例化船隻
-            return InstantiateShip(shipType);
+
+            var ship = InstantiateShip(shipType);
+            if (ship != null)
+            {
+                // 分配隨機武器
+                AssignRandomWeapon(ship.gameObject);
+            }
+            Debug.Log($"[ShipCreationManager] 隨機建造了船隻：{shipPrefabs[shipType].name}，消耗資源：{shipCosts[shipType, 0]}金幣, {shipCosts[shipType, 1]}油, {shipCosts[shipType, 2]}方塊");
+            return ship;
         }
         else
         {
@@ -117,6 +128,8 @@ public class ShipCreationManager : MonoBehaviour
         {
             Debug.Log("[ShipCreationManager] 戰艦實例化成功！");
             SaveShipData(spawnPosition);
+
+
             return battleShip.GetComponent<PlayerShip>();
         }
         else
@@ -134,20 +147,26 @@ public class ShipCreationManager : MonoBehaviour
             return null;
         }
 
-        int randomIndex = Random.Range(0, shipPrefabs.Length);
-        GameObject weaponPrefab = shipPrefabs[randomIndex];
+        GameObject weaponPrefab = Resources.Load<GameObject>($"Prefabs/Weapons/Turret");
         if (weaponPrefab != null)
         {
             GameObject weapon = Instantiate(weaponPrefab, ship.transform);
             weapon.transform.localPosition = Vector3.zero; // 將武器放置於船隻中心
             Debug.Log($"[ShipCreationManager] 為船隻分配了武器: {weaponPrefab.name}");
+
+           ship.GetComponent<Warship>().AddWeapon(weapon.GetComponent<Weapon>());
+
             return weapon;
+
         }
         else
         {
             Debug.LogWarning("[ShipCreationManager] 無法實例化武器預製件！");
             return null;
         }
+
+   
+
     }
 
     private void SaveShipData(Vector3 position)
