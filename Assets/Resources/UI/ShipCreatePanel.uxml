@@ -2,13 +2,6 @@
     <Style src="project://database/Assets/Resources/UI/ShipCreatePanel.uss?fileID=7433441132597879392&amp;guid=e13a3bf54814370479c74b8d2153df4f&amp;type=3#ShipCreatePanel" />
     <engine:VisualElement name="ship-creation-panel" class="ship-panel" style="display: flex; flex-direction: column; align-items: center; width: auto;">
         <engine:Label text="建造船隻" class="panel-title" style="margin-bottom: 20px;" />
-        <engine:VisualElement name="ship-type-container" class="ship-type-container" style="margin-bottom: 20px;">
-            <engine:Button name="ship-type-btn-1" text="航空母艦" class="ship-type-btn" />
-            <engine:Button name="ship-type-btn-2" text="戰艦" class="ship-type-btn" />
-            <engine:Button name="ship-type-btn-3" text="巡洋艦" class="ship-type-btn" />
-            <engine:Button name="ship-type-btn-4" text="驅逐艦" class="ship-type-btn" />
-            <engine:Button name="ship-type-btn-5" text="潛艦" class="ship-type-btn" />
-        </engine:VisualElement>
         <engine:VisualElement name="resource-cost-container" class="resource-container" style="margin-bottom: 20px;">
             <engine:Label text="建造消耗：" class="cost-title" />
             <engine:VisualElement class="resource-item">

@@ -9,7 +9,6 @@ public class ShipCreationPanel : MonoBehaviour
 {
     private UIDocument uiDocument;
     private VisualElement root; // 修改為 root
-    private Button[] shipTypeBtns = new Button[5]; // 五種船型按鈕
     private Button createShipBtn;
     private IntegerField goldInputField;
     private IntegerField oilInputField;
@@ -56,17 +55,6 @@ public class ShipCreationPanel : MonoBehaviour
         {
             Debug.LogError("找不到 ship-creation-panel 元素！");
             return;
-        }
-
-        // 取得五個船型按鈕
-        for (int i = 0; i < 5; i++)
-        {
-            shipTypeBtns[i] = UIHelper.InitializeElement<Button>(root, $"ship-type-btn-{i + 1}");
-            int idx = i;
-            if (shipTypeBtns[i] != null)
-            {
-                shipTypeBtns[i].clicked += () => SelectShipType(idx);
-            }
         }
 
         createShipBtn = UIHelper.InitializeElement<Button>(root, "create-ship-btn");
@@ -133,34 +121,11 @@ public class ShipCreationPanel : MonoBehaviour
         }
     }
 
-    private void SelectShipType(int idx)
-    {
-        // 取消所有選擇
-        for (int i = 0; i < shipTypeBtns.Length; i++)
-        {
-            shipTypeBtns[i].RemoveFromClassList("selected");
-        }
-        // 標記選擇
-        shipTypeBtns[idx].AddToClassList("selected");
-
-        // 根據船型自動填入建造成本
-        goldInputField.value = ShipCreationManager.Instance.shipCosts[idx, 0];
-        oilInputField.value = ShipCreationManager.Instance.shipCosts[idx, 1];
-        cubeInputField.value = ShipCreationManager.Instance.shipCosts[idx, 2];
-
-        OnResourceInputChanged();
-    }
-
     /// <summary>
     /// 重置面板狀態
     /// </summary>
     private void ResetPanel()
     {
-        // 取消所有選擇
-        for (int i = 0; i < shipTypeBtns.Length; i++)
-        {
-            shipTypeBtns[i].RemoveFromClassList("selected");
-        }
         createShipBtn.SetEnabled(false);
         UpdateCostDisplay(0, 0, 0);
     }
