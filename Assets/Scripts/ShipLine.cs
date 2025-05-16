@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ShipLine : MonoBehaviour
@@ -16,7 +17,15 @@ public class ShipLine : MonoBehaviour
 
             followers[i].TargetRotation = targetRotation;
 
-            followers[i].TargetSpeed = followers[i - 1].TargetSpeed;
+            // 計算目標位置
+            if (Vector3.Distance(followers[i].transform.position, followers[i - 1].transform.position) > distanceBetweenFollowers)
+            {
+                followers[i].TargetSpeed = followers[i - 1].TargetSpeed;
+            }
+            else
+            {
+                followers[i].TargetSpeed = followers[i - 1].TargetSpeed *0.8f; // 減少速度
+            }
 
             Debug.Log($"[ShipLine] Adjusted TargetSpeed: {followers[i].TargetSpeed}, TargetRotation: {followers[i].TargetRotation}");
         }
