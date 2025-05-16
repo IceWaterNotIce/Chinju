@@ -6,12 +6,28 @@
             <engine:Label text="建造消耗：" class="cost-title" />
             <engine:VisualElement class="resource-item">
                 <engine:IntegerField name="gold-input" label="金幣" />
+
+                    <engine:Button name="gold-input-btn" text="+" class="add-btn" style="width: 20px; height: 20px;" />
+
+                    <engine:Button name="gold-input-btn" text="-" class="remove-btn" style="width: 20px; height: 20px;" />
+                
             </engine:VisualElement>
             <engine:VisualElement class="resource-item">
                 <engine:IntegerField name="oil-input" label="石油" />
+
+                    <engine:Button name="oil-input-btn" text="+" class="add-btn" style="width: 20px; height: 20px;" />
+
+                    <engine:Button name="oil-input-btn" text="-" class="remove-btn" style="width: 20px; height: 20px;" />
+
             </engine:VisualElement>
             <engine:VisualElement class="resource-item">
                 <engine:IntegerField name="cube-input" label="方塊" />
+
+                    <engine:Button name="cube-input-btn" text="+" class="add-btn" style="width: 20px; height: 20px;" />
+  
+  
+                    <engine:Button name="cube-input-btn" text="-" class="remove-btn" style="width: 20px; height: 20px;" />
+          
             </engine:VisualElement>
         </engine:VisualElement>
         <engine:Button name="create-ship-btn" text="建造" class="create-btn" style="align-self: center;" />

@@ -13,6 +13,12 @@ public class ShipCreationPanel : MonoBehaviour
     private IntegerField goldInputField;
     private IntegerField oilInputField;
     private IntegerField cubeInputField;
+    private Button goldAddBtn;
+    private Button goldSubBtn;
+    private Button oilAddBtn;
+    private Button oilSubBtn;
+    private Button cubeAddBtn;
+    private Button cubeSubBtn;
 
     void Awake()
     {
@@ -61,6 +67,22 @@ public class ShipCreationPanel : MonoBehaviour
         goldInputField = UIHelper.InitializeElement<IntegerField>(root, "gold-input");
         oilInputField = UIHelper.InitializeElement<IntegerField>(root, "oil-input");
         cubeInputField = UIHelper.InitializeElement<IntegerField>(root, "cube-input");
+
+        // 新增：取得加減按鈕
+        goldAddBtn = UIHelper.InitializeElement<Button>(root, "gold-input-btn");
+        goldSubBtn = UIHelper.InitializeElement<Button>(root, "gold-input-btn");
+        oilAddBtn = UIHelper.InitializeElement<Button>(root, "oil-input-btn");
+        oilSubBtn = UIHelper.InitializeElement<Button>(root, "oil-input-btn");
+        cubeAddBtn = UIHelper.InitializeElement<Button>(root, "cube-input-btn");
+        cubeSubBtn = UIHelper.InitializeElement<Button>(root, "cube-input-btn");
+
+        // 註冊加減按鈕事件
+        if (goldAddBtn != null) goldAddBtn.clicked += () => ChangeResourceValue(goldInputField, 10);
+        if (goldSubBtn != null) goldSubBtn.clicked += () => ChangeResourceValue(goldInputField, -10);
+        if (oilAddBtn != null) oilAddBtn.clicked += () => ChangeResourceValue(oilInputField, 10);
+        if (oilSubBtn != null) oilSubBtn.clicked += () => ChangeResourceValue(oilInputField, -10);
+        if (cubeAddBtn != null) cubeAddBtn.clicked += () => ChangeResourceValue(cubeInputField, 1);
+        if (cubeSubBtn != null) cubeSubBtn.clicked += () => ChangeResourceValue(cubeInputField, -1);
 
         // 註冊輸入變更事件
         goldInputField.RegisterValueChangedCallback(evt => OnResourceInputChanged());
@@ -165,5 +187,13 @@ public class ShipCreationPanel : MonoBehaviour
         }
 
         ResetPanel();
+    }
+
+    // 新增：資源加減方法
+    private void ChangeResourceValue(IntegerField field, int delta)
+    {
+        int value = Mathf.Max(0, field.value + delta);
+        field.value = value;
+        OnResourceInputChanged();
     }
 }
