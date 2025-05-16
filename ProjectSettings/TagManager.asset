@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ammo
   - Ship
+  - Enemy
   layers:
   - Default
   - TransparentFX

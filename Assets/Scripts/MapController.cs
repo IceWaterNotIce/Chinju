@@ -14,8 +14,6 @@ public class MapController : MonoBehaviour
     public TileBase oceanTile, grassTile;
     public TileBase chinjuTile; // 新增Chinju Tile
     public TileBase oilTile; // 新增石油 Tile
-    public int width = 100;
-    public int height = 100;
     public float islandDensity = 0.1f;
 
     [Header("Random Seed")]
@@ -24,28 +22,29 @@ public class MapController : MonoBehaviour
 
     public Camera mainCamera; // 新增主攝影機引用
     public CameraBound2D cameraController; // 新增 CameraController 引用
-
-    private GameManager gameManager;
-    private List<Vector3Int> oilTilePositions = new List<Vector3Int>(); // 保存石油 Tile 的位置
     public GameObject oilShipPrefab; // 新增：石油船的預製物
+
+    // 新增：無限地圖資料結構
+    private Dictionary<Vector3Int, TileType> generatedTiles = new Dictionary<Vector3Int, TileType>();
+    private HashSet<Vector3Int> chinjuTilePositions = new HashSet<Vector3Int>();
+    private int chunkSize = 32; // 每次生成的區塊大小
+    private int renderRadius = 3; // 以攝影機為中心，渲染多少個 chunk
+
+    // 新增：記錄目前已渲染的 tile
+    private HashSet<Vector3Int> renderedTiles = new HashSet<Vector3Int>();
 
     void Start()
     {
-        gameManager = Object.FindFirstObjectByType<GameManager>(); // 使用 FindFirstObjectByType 替代 FindObjectOfType
         if (useRandomSeed)
         {
+            
             seed = Random.Range(0, int.MaxValue);
         }
         Random.InitState(seed); // 初始化隨機數生成器
 
-        if (File.Exists(MapCacheFilePath))
-        {
-            LoadMapFromCache();
-        }
-        else
-        {
-            GenerateMapAsync();
-        }
+        // 不再載入/儲存地圖檔案，直接動態生成
+        // 初始化中心區塊
+        UpdateVisibleChunks();
 
         // 確保石油船預製物已設置
         if (oilShipPrefab == null)
@@ -101,215 +100,140 @@ public class MapController : MonoBehaviour
         var mapData = GameDataController.Instance.CurrentGameData?.mapData;
         if (mapData != null)
         {
-            LoadMap(mapData);
+            // LoadMap(mapData); // 已無此方法，直接刷新可見區塊
+            UpdateVisibleChunks();
         }
     }
 
-    private async void GenerateMapAsync()
+    private void Update()
     {
-        Debug.Log("Generating map asynchronously...");
-        var mapData = await Task.Run(() => GenerateMapData());
-        ApplyMapData(mapData);
-        SaveMapToCache(mapData);
-    }
+        // 攝影機移動時動態生成地圖
+        UpdateVisibleChunks();
 
-    private MapData GenerateMapData()
-    {
-        MapData mapData = new MapData(width, height);
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                float noiseValue = Mathf.PerlinNoise((x + seed) * 0.1f, (y + seed) * 0.1f);
-                if (noiseValue > 1f - islandDensity)
-                {
-                    mapData.Tiles[x, y] = TileType.Grass;
-                }
-                else
-                {
-                    mapData.Tiles[x, y] = TileType.Ocean;
-                }
-            }
-        }
-
-        // 設置神獸圖塊
-        Vector3Int centerIslandTile = new Vector3Int(width / 2, height / 2, 0);
-        mapData.Tiles[centerIslandTile.x, centerIslandTile.y] = TileType.Chinju;
-
-        // 隨機設置石油圖塊
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                if (mapData.Tiles[x, y] == TileType.Grass)
-                {
-                    float oilNoise = Mathf.PerlinNoise((x + seed) * 0.2f, (y + seed) * 0.2f);
-                    if (oilNoise > 0.7f)
-                    {
-                        mapData.Tiles[x, y] = TileType.Oil;
-                    }
-                }
-            }
-        }
-
-        return mapData;
-    }
-
-    private void ApplyMapData(MapData mapData)
-    {
-        tilemap.ClearAllTiles();
-        for (int x = 0; x < mapData.Width; x++)
-        {
-            for (int y = 0; y < mapData.Height; y++)
-            {
-                TileBase tile = null;
-                switch (mapData.Tiles[x, y])
-                {
-                    case TileType.Ocean:
-                        tile = oceanTile;
-                        break;
-                    case TileType.Grass:
-                        tile = grassTile;
-                        break;
-                    case TileType.Oil:
-                        tile = oilTile;
-                        break;
-                    case TileType.Chinju:
-                        tile = chinjuTile;
-                        break;
-                }
-
-                if (tile != null)
-                {
-                    tilemap.SetTile(new Vector3Int(x, y, 0), tile);
-                }
-            }
-        }
-    }
-
-    private void SaveMapToCache(MapData mapData)
-    {
-        string json = JsonUtility.ToJson(mapData);
-        string path = Path.Combine(Application.dataPath, "Resources", "map_cache.json");
-        File.WriteAllText(path, json);
-        Debug.Log("Map data cached to Resources/map_cache.json.");
-    }
-
-    private void LoadMapFromCache()
-    {
-        TextAsset mapCache = Resources.Load<TextAsset>(MapCacheFilePath);
-        if (mapCache != null)
-        {
-            MapData mapData = JsonUtility.FromJson<MapData>(mapCache.text);
-            ApplyMapData(mapData);
-            Debug.Log("Map data loaded from Resources/map_cache.json.");
-        }
-        else
-        {
-            Debug.LogError("Map cache not found in Resources/map_cache.json.");
-        }
-    }
-
-    void GenerateMap()
-    {
-        // 先填充海洋
-        tilemap.ClearAllTiles();
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                tilemap.SetTile(new Vector3Int(x, y, 0), oceanTile);
-            }
-        }
-
-        // 隨機生成島嶼（使用確定性隨機）
-        Vector3Int centerIslandTile = Vector3Int.zero;
-        float closestDistance = float.MaxValue;
-
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                float noiseValue = Mathf.PerlinNoise((x + seed) * 0.1f, (y + seed) * 0.1f);
-                if (noiseValue > 1f - islandDensity)
-                {
-                    tilemap.SetTile(new Vector3Int(x, y, 0), grassTile);
-
-                    float distance = Vector2.Distance(new Vector2(x, y), new Vector2(width / 2, height / 2));
-                    if (distance < closestDistance)
-                    {
-                        closestDistance = distance;
-                        centerIslandTile = new Vector3Int(x, y, 0);
-                    }
-                }
-            }
-        }
-
-        // 替換中心島嶼圖塊為Chinju Tile
-        if (centerIslandTile != Vector3Int.zero)
-        {
-            tilemap.SetTile(centerIslandTile, chinjuTile);
-            Debug.Log($"[MapController] 神獸圖塊生成於位置: {centerIslandTile}");
-        }
-        else
-        {
-            Debug.LogError("[MapController] 未能生成神獸圖塊！");
-        }
-
-        // 隨機生成石油圖塊
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                float noiseValue = Mathf.PerlinNoise((x + seed) * 0.2f, (y + seed) * 0.2f);
-                if (noiseValue > 0.7f)
-                {
-                    Vector3Int position = new Vector3Int(x, y, 0);
-                    if (tilemap.GetTile(position) == grassTile)
-                    {
-                        tilemap.SetTile(position, oilTile);
-                        oilTilePositions.Add(position);
-                    }
-                }
-            }
-        }
-
-        Debug.Log($"[MapController] 石油圖塊生成數量: {oilTilePositions.Count}");
-    }
-
-    public void LoadMap(GameData.MapData mapData)
-    {
-        tilemap.ClearAllTiles();
-        foreach (var position in mapData.ChinjuTiles)
-        {
-            tilemap.SetTile(position, chinjuTile);
-        }
-        Debug.Log("[MapController] 地圖數據已載入");
-    }
-
-    public void SaveMapData(Tilemap tilemap, GameData.MapData mapData)
-    {
-        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData != null)
-            mapData = GameDataController.Instance.CurrentGameData.mapData;
-
-        mapData.ChinjuTiles.Clear();
-        foreach (var position in tilemap.cellBounds.allPositionsWithin)
-        {
-            if (tilemap.GetTile(position) != null)
-            {
-                mapData.ChinjuTiles.Add(position);
-            }
-        }
-        Debug.Log("[MapController] 地圖數據已保存");
-    }
-
-    void Update()
-    {
         // 檢測滑鼠左鍵點擊
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             HandleMouseClick();
         }
+    }
+
+    // 動態生成並渲染攝影機附近的 chunk，並自動銷毀視野外的 tile
+    private void UpdateVisibleChunks()
+    {
+        if (mainCamera == null || tilemap == null) return;
+
+        Vector3 camWorldPos = mainCamera.transform.position;
+        Vector3Int camCell = tilemap.WorldToCell(camWorldPos);
+
+        int chunkX = Mathf.FloorToInt((float)camCell.x / chunkSize);
+        int chunkY = Mathf.FloorToInt((float)camCell.y / chunkSize);
+
+        // 計算本次應該顯示的 tile 範圍
+        HashSet<Vector3Int> shouldRender = new HashSet<Vector3Int>();
+        for (int dx = -renderRadius; dx <= renderRadius; dx++)
+        {
+            for (int dy = -renderRadius; dy <= renderRadius; dy++)
+            {
+                int cx = chunkX + dx;
+                int cy = chunkY + dy;
+                for (int x = 0; x < chunkSize; x++)
+                {
+                    for (int y = 0; y < chunkSize; y++)
+                    {
+                        Vector3Int pos = new Vector3Int(cx * chunkSize + x, cy * chunkSize + y, 0);
+                        shouldRender.Add(pos);
+                        if (!renderedTiles.Contains(pos))
+                        {
+                            // 只生成未渲染過的 tile
+                            if (!generatedTiles.ContainsKey(pos))
+                            {
+                                TileType type = GetTileTypeAt(pos.x, pos.y);
+                                generatedTiles[pos] = type;
+                            }
+                            TileBase tile = null;
+                            switch (generatedTiles[pos])
+                            {
+                                case TileType.Ocean: tile = oceanTile; break;
+                                case TileType.Grass: tile = grassTile; break;
+                                case TileType.Oil: tile = oilTile; break;
+                                case TileType.Chinju: tile = chinjuTile; break;
+                            }
+                            if (tile != null)
+                            {
+                                tilemap.SetTile(pos, tile);
+                            }
+                            renderedTiles.Add(pos);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 移除視野外的 tile
+        var toRemove = new List<Vector3Int>();
+        foreach (var pos in renderedTiles)
+        {
+            if (!shouldRender.Contains(pos))
+            {
+                tilemap.SetTile(pos, null);
+                toRemove.Add(pos);
+            }
+        }
+        foreach (var pos in toRemove)
+        {
+            renderedTiles.Remove(pos);
+        }
+    }
+
+    // 生成一個 chunk
+    private void GenerateChunk(int chunkX, int chunkY)
+    {
+        for (int x = 0; x < chunkSize; x++)
+        {
+            for (int y = 0; y < chunkSize; y++)
+            {
+                Vector3Int pos = new Vector3Int(chunkX * chunkSize + x, chunkY * chunkSize + y, 0);
+                if (generatedTiles.ContainsKey(pos)) continue;
+
+                TileType type = GetTileTypeAt(pos.x, pos.y);
+                generatedTiles[pos] = type;
+
+                TileBase tile = null;
+                switch (type)
+                {
+                    case TileType.Ocean: tile = oceanTile; break;
+                    case TileType.Grass: tile = grassTile; break;
+                    case TileType.Oil: tile = oilTile; break;
+                    case TileType.Chinju: tile = chinjuTile; break;
+                }
+                if (tile != null)
+                {
+                    tilemap.SetTile(pos, tile);
+                }
+            }
+        }
+    }
+
+    // 根據座標與 seed 決定 tile 類型
+    private TileType GetTileTypeAt(int x, int y)
+    {
+        // 神獸 tile 固定在 (0,0)
+        if (x == 0 && y == 0)
+        {
+            chinjuTilePositions.Add(new Vector3Int(x, y, 0));
+            return TileType.Chinju;
+        }
+
+        float noiseValue = Mathf.PerlinNoise((x + seed) * 0.1f, (y + seed) * 0.1f);
+        if (noiseValue > 1f - islandDensity)
+        {
+            // 草地
+            float oilNoise = Mathf.PerlinNoise((x + seed) * 0.2f, (y + seed) * 0.2f);
+            if (oilNoise > 0.7f)
+                return TileType.Oil;
+            return TileType.Grass;
+        }
+        return TileType.Ocean;
     }
 
     /// <summary>
@@ -499,31 +423,7 @@ public class MapController : MonoBehaviour
     /// </summary>
     public Vector3 GetChinjuTileWorldPosition()
     {
-        BoundsInt bounds = tilemap.cellBounds;
-        foreach (Vector3Int position in bounds.allPositionsWithin)
-        {
-            TileBase tile = tilemap.GetTile(position);
-            if (tile == chinjuTile)
-            {
-                return tilemap.GetCellCenterWorld(position);
-            }
-        }
-
-        return Vector3.zero; // 找不到 Chinju Tile
-    }
-}
-
-[System.Serializable]
-public class MapData
-{
-    public int Width;
-    public int Height;
-    public TileType[,] Tiles;
-
-    public MapData(int width, int height)
-    {
-        Width = width;
-        Height = height;
-        Tiles = new TileType[width, height];
+        // 神獸 tile 固定在 (0,0)
+        return tilemap.GetCellCenterWorld(Vector3Int.zero);
     }
 }

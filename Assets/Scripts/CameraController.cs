@@ -54,14 +54,8 @@ public class CameraBound2D : MonoBehaviour
             return;
         }
 
-        if (!targetTilemap.gameObject.activeInHierarchy)
-        {
-            Debug.LogError("Tilemap is not active in the hierarchy! Please activate the Tilemap.");
-            return;
-        }
-
-        targetTilemap.CompressBounds(); // 壓縮邊界到實際有圖塊的區域
-        mapBounds = targetTilemap.localBounds;
+        // 設定一個超大範圍
+        mapBounds = new Bounds(Vector3.zero, new Vector3(99999, 99999, 0));
 
         if (cam == null)
         {
@@ -96,26 +90,17 @@ public class CameraBound2D : MonoBehaviour
 
         if (targetTilemap == null) return;
 
-        // 計算攝影機視口實際覆蓋的世界空間範圍
+        // 註解掉以下 clamp 限制，讓攝影機可自由移動
+        /*
         float camWidth = cam.orthographicSize * camRatio;
         float camHeight = cam.orthographicSize;
 
-        // 修正邊界計算，確保攝影機不會超出地圖範圍
-        float minX = mapBounds.min.x + camWidth + padding;
-        float maxX = mapBounds.max.x - camWidth - padding;
-        float minY = mapBounds.min.y + camHeight + padding;
-        float maxY = mapBounds.max.y - camHeight - padding;
-
-        // 限制攝影機位置
-        Vector3 clampedPos = transform.position;
-        clampedPos.x = Mathf.Clamp(clampedPos.x, minX, maxX);
-        clampedPos.y = Mathf.Clamp(clampedPos.y, minY, maxY);
-
-        // 特殊情況處理：當地圖小於攝影機視口時，固定在地圖中心
-        if (maxX < minX) clampedPos.x = mapBounds.center.x;
-        if (maxY < minY) clampedPos.y = mapBounds.center.y;
-
-        transform.position = clampedPos;
+        transform.position = new Vector3(
+            Mathf.Clamp(transform.position.x, mapBounds.min.x + camWidth + padding, mapBounds.max.x - camWidth - padding),
+            Mathf.Clamp(transform.position.y, mapBounds.min.y + camHeight + padding, mapBounds.max.y - camHeight - padding),
+            transform.position.z
+        );
+        */
     }
 
     // 處理移動輸入
