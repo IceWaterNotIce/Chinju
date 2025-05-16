@@ -57,6 +57,7 @@ public class EnemyShip : Warship
     {
         base.Update();  // 呼叫父類的 Update 方法
         HandleAIBehavior();
+        TryFormShipLineWithNearbyEnemies();
     }
 
     private void HandleAIBehavior()
@@ -173,5 +174,39 @@ public class EnemyShip : Warship
     public List<Weapon> GetWeapons()
     {
         return weapons; // 假設 `weapons` 是 Warship 類別中的武器列表
+    }
+
+    // 新增：靠近時組成 ShipLine
+    private void TryFormShipLineWithNearbyEnemies()
+    {
+        // 若自己或父物件已有 ShipLine 則略過
+        if (GetComponent<ShipLine>() != null || transform.parent != null && transform.parent.GetComponent<ShipLine>() != null)
+            return;
+
+        // 找到所有敵艦
+        EnemyShip[] allEnemies = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None);
+        foreach (var other in allEnemies)
+        {
+            if (other == this) continue;
+            if (other.GetComponent<ShipLine>() != null) continue; // 已有 ShipLine 的略過
+
+            float dist = Vector3.Distance(transform.position, other.transform.position);
+            if (dist < 3f)
+            {
+                // 決定誰當 leader（用 name 排序）
+                EnemyShip leader = string.CompareOrdinal(this.name, other.name) < 0 ? this : other;
+                EnemyShip follower = leader == this ? other : this;
+
+                // leader 建立 ShipLine
+                ShipLine line = leader.gameObject.AddComponent<ShipLine>();
+                line.followers.Add(leader.GetComponent<Ship>());
+                line.followers.Add(follower.GetComponent<Ship>());
+                // follower 設定 parent 方便管理
+                follower.transform.SetParent(leader.transform);
+
+                Debug.Log($"[EnemyShip] {leader.name} 與 {follower.name} 組成 ShipLine");
+                break;
+            }
+        }
     }
 }
