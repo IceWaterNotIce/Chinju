@@ -69,12 +69,12 @@ public class ShipCreationPanel : MonoBehaviour
         cubeInputField = UIHelper.InitializeElement<IntegerField>(root, "cube-input");
 
         // 新增：取得加減按鈕
-        goldAddBtn = UIHelper.InitializeElement<Button>(root, "gold-input-btn");
-        goldSubBtn = UIHelper.InitializeElement<Button>(root, "gold-input-btn");
-        oilAddBtn = UIHelper.InitializeElement<Button>(root, "oil-input-btn");
-        oilSubBtn = UIHelper.InitializeElement<Button>(root, "oil-input-btn");
-        cubeAddBtn = UIHelper.InitializeElement<Button>(root, "cube-input-btn");
-        cubeSubBtn = UIHelper.InitializeElement<Button>(root, "cube-input-btn");
+        goldAddBtn = UIHelper.InitializeElement<Button>(root, "gold-input-add-btn");
+        goldSubBtn = UIHelper.InitializeElement<Button>(root, "gold-input-sub-btn");
+        oilAddBtn = UIHelper.InitializeElement<Button>(root, "oil-input-add-btn");
+        oilSubBtn = UIHelper.InitializeElement<Button>(root, "oil-input-sub-btn");
+        cubeAddBtn = UIHelper.InitializeElement<Button>(root, "cube-input-add-btn");
+        cubeSubBtn = UIHelper.InitializeElement<Button>(root, "cube-input-sub-btn");
 
         // 註冊加減按鈕事件
         if (goldAddBtn != null) goldAddBtn.clicked += () => ChangeResourceValue(goldInputField, 10);
