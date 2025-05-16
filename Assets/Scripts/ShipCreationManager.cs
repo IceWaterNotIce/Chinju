@@ -114,9 +114,31 @@ public class ShipCreationManager : MonoBehaviour
         }
 
         Vector3 spawnPosition = mapController.FindNearestOceanTile(chinjuTilePosition);
-        if (spawnPosition == Vector3.zero)
+        bool foundValid = false;
+        for (int attempt = 0; attempt < 10; attempt++)
         {
-            Debug.LogError("找不到 Chinju Tile 附近的最近海洋格子！");
+            // 檢查半徑 1 內是否有其他 PlayerShip
+            bool hasOtherPlayerShip = false;
+            Collider2D[] colliders = Physics2D.OverlapCircleAll(spawnPosition, 1f);
+            foreach (var col in colliders)
+            {
+                if (col.GetComponent<PlayerShip>() != null)
+                {
+                    hasOtherPlayerShip = true;
+                    break;
+                }
+            }
+            if (!hasOtherPlayerShip)
+            {
+                foundValid = true;
+                break;
+            }
+            // 若有其他玩家船，嘗試尋找下一個最近海洋格子
+            spawnPosition = mapController.FindNearestOceanTile(spawnPosition + Random.insideUnitSphere * 2f);
+        }
+        if (!foundValid || spawnPosition == Vector3.zero)
+        {
+            Debug.LogError("找不到 Chinju Tile 附近的最近海洋格子，或附近有其他玩家船！");
             return null;
         }
 
