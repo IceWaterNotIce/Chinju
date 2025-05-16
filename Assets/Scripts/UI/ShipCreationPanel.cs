@@ -120,7 +120,7 @@ public class ShipCreationPanel : MonoBehaviour
 
         // 初始化面板狀態
         PopupManager.Instance.RegisterPopup("ShipCreationPanel", gameObject);
-        UpdateCostDisplay(0, 0, 0);
+        UpdateCostDisplay(10, 10, 1);
 
         Debug.Log("[ShipCreationPanel] 船隻建造面板初始化完成");
     }
