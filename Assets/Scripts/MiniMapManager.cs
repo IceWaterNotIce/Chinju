@@ -96,7 +96,14 @@ public class MiniMapManager : MonoBehaviour
     /// </summary>
     private void SetupMinimapCamera()
     {
-
+        if (minimapCamera == null)
+        {
+            Debug.LogError("[MiniMapManager] 請在 Inspector 設定 minimapCamera！");
+            return;
+        }
+        minimapCamera.orthographic = true;
+        minimapCamera.targetTexture = minimapRenderTexture;
+        minimapCamera.enabled = true;
     }
 
     /// <summary>
@@ -264,4 +271,4 @@ public class MiniMapManager : MonoBehaviour
     }
 
     
-} 
+}
