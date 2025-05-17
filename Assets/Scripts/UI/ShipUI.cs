@@ -767,6 +767,7 @@ public class ShipUI : Singleton<ShipUI>
 
     private void UpdateFuel(float currentFuel, float maxFuel)
     {
+        Debug.Log($"[ShipUI] 更新燃料: {currentFuel}/{maxFuel}");
         if (lblFuel != null)
         {
             lblFuel.text = $"{Mathf.RoundToInt(currentFuel)}/{Mathf.RoundToInt(maxFuel)}";
@@ -980,6 +981,11 @@ public class ShipUI : Singleton<ShipUI>
         InitializeToggleCombatModeButton();
         InitializeFormFleetButton();
         RegisterPointerEvents();
+
+        lblFuel = UIHelper.InitializeElement<Label>(UIPanel, "lblFuel");
+        lblHealth = UIHelper.InitializeElement<Label>(UIPanel, "lblHealth");
+        lblLevel = UIHelper.InitializeElement<Label>(UIPanel, "lblLevel");
+        lblExperience = UIHelper.InitializeElement<Label>(UIPanel, "lblExperience");
     }
     #endregion
 }

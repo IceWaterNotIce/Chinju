@@ -45,7 +45,7 @@ public class PlayerShip : Warship, IPointerClickHandler
     }
 
     // 新增：Level、Experience、CombatMode 屬性覆寫，觸發 UnityEvent
-    private int _level;
+    private int _level = 1;
     public new int Level
     {
         get => _level;
