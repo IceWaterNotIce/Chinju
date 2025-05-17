@@ -957,28 +957,6 @@ public class ShipUI : Singleton<ShipUI>
             return;
         }
 
-        var styleSheet = Resources.Load<StyleSheet>("UI/ShipUI");
-        if (styleSheet != null)
-        {
-            root.styleSheets.Add(styleSheet);
-        }
-        else
-        {
-            LogError("無法加載 ShipUI 的樣式表！");
-            return;
-        }
-
-        var baseStyleSheet = Resources.Load<StyleSheet>("UI/base");
-        if (baseStyleSheet != null)
-        {
-            root.styleSheets.Add(baseStyleSheet);
-        }
-        else
-        {
-            LogError("無法加載 BaseStyle 的樣式表！");
-            return;
-        }
-
         UIPanel = UIHelper.InitializeElement<VisualElement>(root, "UIPanel");
         if (UIPanel == null)
         {
