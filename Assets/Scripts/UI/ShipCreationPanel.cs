@@ -178,7 +178,6 @@ public class ShipCreationPanel : MonoBehaviour
 
         // 建造後重設為 10, 10, 1
         UpdateCostDisplay(10, 10, 1);
-        createShipBtn.SetEnabled(false);
     }
 
     // 新增：資源加減方法
