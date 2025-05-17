@@ -34,7 +34,7 @@
                 <engine:Button name="StartDrawButton" text="Start Draw" class="draw-button" />
                 <engine:Button name="btnToggleCombatMode" text="進入戰鬥模式" class="combat-mode-btn" style="width: 150px;" />
                 <engine:Button name="btnCloseUI" text="關閉 UI" class="close-ui-btn" />
-                <engine:Button name="btnFormShipLine" text="形成船隊" class="form-shipline-btn" style="width: 130px;" />
+                <engine:Button name="btnFormFleet" text="形成船隊" class="form-shipline-btn" style="width: 130px;" />
             </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>

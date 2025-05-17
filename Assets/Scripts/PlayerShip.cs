@@ -192,17 +192,17 @@ public class PlayerShip : Warship, IPointerClickHandler
     public void OnDisable()
     {
         // if this ship have ship line component
-        if (GetComponent<ShipLine>() != null)
+        if (GetComponent<Fleet>() != null)
         {
             // remove this ship component 
-            Destroy(GetComponent<ShipLine>());
-            Debug.Log($"[PlayerShip] ShipLine component removed from {gameObject.name}");
+            Destroy(GetComponent<Fleet>());
+            Debug.Log($"[PlayerShip] Fleet component removed from {gameObject.name}");
         }
 
         // if this ship is follower, call the ship line component to remove this ship
         if (IsFollower)
         {
-           LeaderShip?.GetComponent<ShipLine>()?.RemoveFollower(this);
+           LeaderShip?.GetComponent<Fleet>()?.RemoveFollower(this);
             Debug.Log($"[PlayerShip] Follower {gameObject.name} removed from Leader {LeaderShip.name}");
         }
     }

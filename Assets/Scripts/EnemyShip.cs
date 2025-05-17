@@ -57,7 +57,7 @@ public class EnemyShip : Warship
     {
         base.Update();  // 呼叫父類的 Update 方法
         HandleAIBehavior();
-        TryFormShipLineWithNearbyEnemies();
+        TryFormFleetWithNearbyEnemies();
     }
 
     private void HandleAIBehavior()
@@ -176,11 +176,11 @@ public class EnemyShip : Warship
         return weapons; // 假設 `weapons` 是 Warship 類別中的武器列表
     }
 
-    // 新增：靠近時組成 ShipLine
-    private void TryFormShipLineWithNearbyEnemies()
+    // 新增：靠近時組成 Fleet
+    private void TryFormFleetWithNearbyEnemies()
     {
-        // 若自己或父物件已有 ShipLine 則略過
-        if (GetComponent<ShipLine>() != null || transform.parent != null && transform.parent.GetComponent<ShipLine>() != null)
+        // 若自己或父物件已有 Fleet 則略過
+        if (GetComponent<Fleet>() != null || transform.parent != null && transform.parent.GetComponent<Fleet>() != null)
             return;
 
         // 找到所有敵艦
@@ -188,7 +188,7 @@ public class EnemyShip : Warship
         foreach (var other in allEnemies)
         {
             if (other == this) continue;
-            if (other.GetComponent<ShipLine>() != null) continue; // 已有 ShipLine 的略過
+            if (other.GetComponent<Fleet>() != null) continue; // 已有 Fleet 的略過
 
             float dist = Vector3.Distance(transform.position, other.transform.position);
             if (dist < 3f)
@@ -197,14 +197,14 @@ public class EnemyShip : Warship
                 EnemyShip leader = string.CompareOrdinal(this.name, other.name) < 0 ? this : other;
                 EnemyShip follower = leader == this ? other : this;
 
-                // leader 建立 ShipLine
-                ShipLine line = leader.gameObject.AddComponent<ShipLine>();
+                // leader 建立 Fleet
+                Fleet line = leader.gameObject.AddComponent<Fleet>();
                 line.followers.Add(leader.GetComponent<Ship>());
                 line.followers.Add(follower.GetComponent<Ship>());
                 // follower 設定 parent 方便管理
                 follower.transform.SetParent(leader.transform);
 
-                Debug.Log($"[EnemyShip] {leader.name} 與 {follower.name} 組成 ShipLine");
+                Debug.Log($"[EnemyShip] {leader.name} 與 {follower.name} 組成 Fleet");
                 break;
             }
         }

@@ -52,7 +52,7 @@ public class ShipUI : Singleton<ShipUI>
 
     private Button btnToggleCombatMode; // 新增切換戰鬥模式的按鈕
 
-    private Button btnFormShipLine; // 新增：形成船隊的按鈕
+    private Button btnFormFleet; // 新增：形成船隊的按鈕
     private bool isSelectingShipForLine = false; // 狀態標誌，用於選擇船隻
 
     void Start()
@@ -87,7 +87,7 @@ public class ShipUI : Singleton<ShipUI>
         InitializeDrawButton();
         InitializeCloseUIButton();
         InitializeToggleCombatModeButton(); // 初始化切換戰鬥模式按鈕
-        InitializeFormShipLineButton(); // 初始化形成船隊按鈕
+        InitializeFormFleetButton(); // 初始化形成船隊按鈕
         RegisterPointerEvents();
     }
 
@@ -601,12 +601,12 @@ public class ShipUI : Singleton<ShipUI>
         }
     }
 
-    private void InitializeFormShipLineButton()
+    private void InitializeFormFleetButton()
     {
-        btnFormShipLine = UIHelper.InitializeElement<Button>(UIPanel, "btnFormShipLine");
-        if (btnFormShipLine != null)
+        btnFormFleet = UIHelper.InitializeElement<Button>(UIPanel, "btnFormFleet");
+        if (btnFormFleet != null)
         {
-            btnFormShipLine.clicked += () =>
+            btnFormFleet.clicked += () =>
             {
                 isSelectingShipForLine = true; // 啟用選擇船隻模式
                 Debug.Log("[ShipUI] 選擇船隻以形成船隊模式啟用");
@@ -614,7 +614,7 @@ public class ShipUI : Singleton<ShipUI>
         }
         else
         {
-            LogError("找不到名為 'btnFormShipLine' 的按鈕！");
+            LogError("找不到名為 'btnFormFleet' 的按鈕！");
         }
     }
 
@@ -790,10 +790,10 @@ public class ShipUI : Singleton<ShipUI>
                 var selectedShip = hit.collider.GetComponent<Ship>(); // 確保檢測到的是 Ship 類型
                 if (selectedShip != null && selectedShip != ship)
                 {
-                    var shipLine = selectedShip.GetComponent<ShipLine>();
+                    var shipLine = selectedShip.GetComponent<Fleet>();
                     if (shipLine == null)
                     {
-                        shipLine = selectedShip.gameObject.AddComponent<ShipLine>();
+                        shipLine = selectedShip.gameObject.AddComponent<Fleet>();
                         shipLine.followers.Add(selectedShip); // 添加 Ship
                     }
                     shipLine.followers.Add(ship); // 添加 Ship
