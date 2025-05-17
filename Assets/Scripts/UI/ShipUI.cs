@@ -162,6 +162,12 @@ public class ShipUI : Singleton<ShipUI>
         {
             DrawSavedRect(ship.NavigationArea);
         }
+
+        // 修正：根據 CombatMode 狀態設定按鈕文字
+        if (btnToggleCombatMode != null)
+        {
+            btnToggleCombatMode.text = ship.CombatMode ? "退出戰鬥模式" : "進入戰鬥模式";
+        }
     }
 
     // Update is called once per frame
