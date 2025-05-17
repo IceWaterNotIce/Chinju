@@ -9,6 +9,16 @@
                 <ui:Label text="文字大小" class="text-size-label" />
                 <ui:Slider name="textSizeSlider" class="text-size-slider" low-value="14" high-value="36" value="24" />
             </ui:VisualElement>
+            <!-- 新增：BGM 音量調整 -->
+            <ui:VisualElement class="volume-row">
+                <ui:Label text="BGM 音量" class="volume-label" />
+                <ui:Slider name="BGMSlider" class="volume-slider" low-value="0" high-value="1" value="1" />
+            </ui:VisualElement>
+            <!-- 新增：SFX 音量調整 -->
+            <ui:VisualElement class="volume-row">
+                <ui:Label text="SFX 音量" class="volume-label" />
+                <ui:Slider name="SFXSlider" class="volume-slider" low-value="0" high-value="1" value="1" />
+            </ui:VisualElement>
             <ui:Button text="繼續遊戲" name="continueButton" class="menu-button" />
             <ui:Button text="開始新遊戲" name="newGameButton" class="menu-button" />
             <ui:Button text="儲存遊戲" name="saveGameButton" class="menu-button" />

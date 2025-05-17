@@ -72,3 +72,5 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
 .fake
+Assets/Resources/Musics/~coeur~remix(Instrumental).flac.meta
+Assets/Resources/Musics/~coeur~remix(Instrumental).flac

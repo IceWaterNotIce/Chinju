@@ -11,6 +11,8 @@ public class SettingMenu : MonoBehaviour
     private Button exitGameButton;
     private Button newGameButton; // 新增
     private Slider textSizeSlider; // 新增：Slider 欄位
+    private Slider BGMSlider; // 新增
+    private Slider SFXSlider; // 新增
 
     void Awake()
     {
@@ -36,6 +38,10 @@ public class SettingMenu : MonoBehaviour
         // 新增：解除 Slider callback
         if (textSizeSlider != null)
             textSizeSlider.UnregisterValueChangedCallback(OnTextSizeSliderChanged);
+        if (BGMSlider != null)
+            BGMSlider.UnregisterValueChangedCallback(OnBGMSliderChanged);
+        if (SFXSlider != null)
+            SFXSlider.UnregisterValueChangedCallback(OnSFXSliderChanged);
     }
 
     private void InitializeUI()
@@ -62,6 +68,8 @@ public class SettingMenu : MonoBehaviour
             exitGameButton = UIHelper.InitializeElement<Button>(root, "exitGameButton");
             newGameButton = UIHelper.InitializeElement<Button>(root, "newGameButton"); // 新增
             textSizeSlider = UIHelper.InitializeElement<Slider>(root, "textSizeSlider"); // 新增：Slider 初始化
+            BGMSlider = UIHelper.InitializeElement<Slider>(root, "BGMSlider"); // 新增
+            SFXSlider = UIHelper.InitializeElement<Slider>(root, "SFXSlider"); // 新增
 
             RegisterButtonCallbacks();
 
@@ -71,6 +79,18 @@ public class SettingMenu : MonoBehaviour
                 textSizeSlider.RegisterValueChangedCallback(OnTextSizeSliderChanged);
                 // 預設初始化一次
                 UpdateMenuTextSize((int)textSizeSlider.value);
+            }
+            if (BGMSlider != null)
+            {
+                BGMSlider.RegisterValueChangedCallback(OnBGMSliderChanged);
+                // 預設初始化一次
+                SetBGMVolume(BGMSlider.value);
+            }
+            if (SFXSlider != null)
+            {
+                SFXSlider.RegisterValueChangedCallback(OnSFXSliderChanged);
+                // 預設初始化一次
+                SetSFXVolume(SFXSlider.value);
             }
 
             PopupManager.Instance.RegisterPopup("SettingMenu", gameObject);
@@ -248,5 +268,35 @@ public class SettingMenu : MonoBehaviour
         {
             button.style.fontSize = fontSize;
         }
+    }
+
+    // 新增：BGM 音量 callback
+    private void OnBGMSliderChanged(ChangeEvent<float> evt)
+    {
+        SetBGMVolume(evt.newValue);
+    }
+
+    // 新增：SFX 音量 callback
+    private void OnSFXSliderChanged(ChangeEvent<float> evt)
+    {
+        SetSFXVolume(evt.newValue);
+    }
+
+    // 新增：實際調整 BGM 音量
+    private void SetBGMVolume(float volume)
+    {
+        Debug.Log($"[SettingMenu] BGM 音量調整: {volume}");
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.SetBGMVolume(volume);
+        // 若無 AudioManager，請自行實作
+    }
+
+    // 新增：實際調整 SFX 音量
+    private void SetSFXVolume(float volume)
+    {
+        Debug.Log($"[SettingMenu] SFX 音量調整: {volume}");
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.SetSFXVolume(volume);
+        // 若無 AudioManager，請自行實作
     }
 }
