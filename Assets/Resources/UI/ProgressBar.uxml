@@ -1,5 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Resources/UI/ProgressBar.uss?fileID=7433441132597879392&amp;guid=a40633a17882c4948b30843aaaf21340&amp;type=3#ProgressBar" />
+    <Style src="project://database/Assets/Resources/UI/base.uss?fileID=7433441132597879392&amp;guid=941833fb84a940c47bce98d1493bc006&amp;type=3#base" />
     <ui:VisualElement name="progress-bar-container" class="progress-bar-container">
         <ui:VisualElement name="progress-bar" class="progress-bar" />
     </ui:VisualElement>

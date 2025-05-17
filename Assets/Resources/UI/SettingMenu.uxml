@@ -1,5 +1,6 @@
 <UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False" style="Assets/Resources/UI/SettingMenu.uss">
     <Style src="project://database/Assets/Resources/UI/SettingMenu.uss?fileID=7433441132597879392&amp;guid=b39bcf02e990c884c9116eeb898057ac&amp;type=3#SettingMenu" />
+    <Style src="project://database/Assets/Resources/UI/base.uss?fileID=7433441132597879392&amp;guid=941833fb84a940c47bce98d1493bc006&amp;type=3#base" />
     <ui:VisualElement name="menu-container" class="menu-container" style="translate: -50% -50%;">
         <ui:VisualElement name="menu-panel" class="menu-panel" style="position: relative; top: 0; left: 0;">
             <ui:Label text="遊戲選單" class="menu-title" />

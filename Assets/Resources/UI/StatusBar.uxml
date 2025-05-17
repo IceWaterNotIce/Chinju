@@ -1,4 +1,5 @@
 <UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False" style="Assets/Resources/UI/CommonStyles.uss">
+    <Style src="project://database/Assets/Resources/UI/base.uss?fileID=7433441132597879392&amp;guid=941833fb84a940c47bce98d1493bc006&amp;type=3#base" />
     <Style src="project://database/Assets/Resources/UI/StatusBar.uss?fileID=7433441132597879392&amp;guid=cdb75c02d2ebd2a4bb5a082977505433&amp;type=3#StatusBar" />
     <ui:VisualElement name="root" class="root" style="position: relative; width: auto; align-content: auto; align-self: flex-end;">
         <ui:VisualElement name="resourcePanel" class="resource-panel">

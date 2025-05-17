@@ -1,0 +1,70 @@
+/* 通用按鈕樣式 */
+.btn, Button {
+    background-color: #007acc;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 5px;
+    border: none;
+    padding: 8px 16px;
+    -unity-font-style: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.btn:hover, Button:hover {
+    background-color: #005f99;
+}
+.btn:active, Button:active {
+    background-color: #004d80;
+}
+.btn:disabled, Button:disabled {
+    background-color: #888;
+    color: #ccc;
+    cursor: default;
+}
+
+/* 通用標籤樣式 */
+.label, Label {
+    color: #fff;
+    font-size: 14px;
+    margin: 2px 0;
+}
+
+/* 通用輸入欄樣式 */
+TextField, .input, .input-field, IntegerField, FloatField {
+    background-color: #222;
+    color: #fff;
+    border-radius: 4px;
+    border: 1px solid #444;
+    padding: 6px 10px;
+    font-size: 14px;
+    margin: 4px 0;
+}
+TextField:focus, .input:focus, .input-field:focus, IntegerField:focus, FloatField:focus {
+    border-color: #007acc;
+    outline: none;
+}
+
+/* 通用下拉選單樣式 */
+DropdownField, .dropdown {
+    background-color: #222;
+    color: #fff;
+    border-radius: 4px;
+    border: 1px solid #444;
+    font-size: 14px;
+    padding: 6px 10px;
+}
+
+/* 通用面板樣式 */
+.panel, .container, VisualElement {
+    background-color: rgba(30, 30, 30, 0.85);
+    border-radius: 8px;
+    padding: 8px;
+}
+
+/* 通用間距 */
+.mt-8 { margin-top: 8px; }
+.mb-8 { margin-bottom: 8px; }
+.mt-16 { margin-top: 16px; }
+.mb-16 { margin-bottom: 16px; }
+.p-8 { padding: 8px; }
+.p-16 { padding: 16px; }

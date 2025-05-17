@@ -1,4 +1,5 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Resources/UI/base.uss?fileID=7433441132597879392&amp;guid=941833fb84a940c47bce98d1493bc006&amp;type=3#base" />
     <engine:Template name="MiniMap" src="project://database/Assets/Resources/UI/MiniMap.uxml?fileID=9197481963319205126&amp;guid=c49f75e9130454c40874465491611e50&amp;type=3#MiniMap" />
     <engine:Template name="TimeControlBar" src="project://database/Assets/Resources/UI/TimeControlBar.uxml?fileID=9197481963319205126&amp;guid=f4658da2bf8d7734a8d2b08a1bbb3d81&amp;type=3#TimeControlBar" />
     <engine:Template name="StatusBar" src="project://database/Assets/Resources/UI/StatusBar.uxml?fileID=9197481963319205126&amp;guid=c48627ebc9dc96245a414e713186dc99&amp;type=3#StatusBar" />

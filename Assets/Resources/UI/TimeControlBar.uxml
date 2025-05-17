@@ -1,4 +1,5 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" style="Assets/Resources/UI/TimeControlBar.uss">
+    <Style src="project://database/Assets/Resources/UI/base.uss?fileID=7433441132597879392&amp;guid=941833fb84a940c47bce98d1493bc006&amp;type=3#base" />
     <Style src="project://database/Assets/Resources/UI/TimeControlBar.uss?fileID=7433441132597879392&amp;guid=574de732c3680c74fb439dff03f05f71&amp;type=3#TimeControlBar" />
     <engine:VisualElement name="time-control-bar" class="time-control-bar" style="flex-direction: row-reverse; right: auto; align-items: auto; align-content: auto; flex-grow: 0;">
         <engine:Button name="pause-btn" text="暫停" class="time-control-button time-control-btn" />

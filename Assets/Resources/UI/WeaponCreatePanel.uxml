@@ -1,4 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False" style="Assets/Resources/UI/WeaponCreatePanel.uss">
+    <Style src="project://database/Assets/Resources/UI/base.uss?fileID=7433441132597879392&amp;guid=941833fb84a940c47bce98d1493bc006&amp;type=3#base" />
     <Style src="project://database/Assets/Resources/UI/WeaponCreatePanel.uss?fileID=7433441132597879392&amp;guid=4134c9774341aa746b3f76f4b2a5ffdc&amp;type=3#WeaponCreatePanel" />
     <ui:VisualElement class="weapon-create-panel" style="display: flex; flex-direction: column; align-items: center;">
         <ui:Label text="武器製造" class="weapon-create-title" style="margin-bottom: 20px;" />
