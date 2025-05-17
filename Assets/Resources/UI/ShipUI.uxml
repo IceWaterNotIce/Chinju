@@ -4,18 +4,25 @@
         <engine:VisualElement name="rectContainer" style="flex-grow: 1; width: 0; max-width: 0; min-width: 0; max-height: 0; min-height: 0; height: 0; position: absolute; top: 0; left: 0;" />
         <engine:VisualElement name="UIPanel" style="width: 420px; flex-direction: column; padding: 10px;">
             <engine:VisualElement style="flex-direction: row; justify-content: space-between; height: 15px;">
-                <engine:VisualElement style="flex-direction: column; flex-grow: 1; justify-content: space-between; height: 50px; width: auto;">
-                    <engine:VisualElement name="expBarContainer" class="progress-bar-container" style="background-size: 100px 100%; width: 150px; background-color: rgb(255, 255, 255); height: 15px;">
+                <engine:VisualElement style="flex-direction: column; flex-grow: 1; justify-content: space-between; height: 70px; width: auto;">
+                    <engine:VisualElement style="flex-grow: 1; flex-direction: row; max-height: 15px; justify-content: space-between; width: 150px;">
+                        <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
+                            <engine:VisualElement name="ShipTypeIcon" style="flex-grow: 1; width: 15px; height: 15px; max-width: 15px; max-height: 15px; min-width: 15px; min-height: 15px; background-image: resource(&apos;Images/Ship/Ship&apos;); background-position-x: center 0; -unity-background-scale-mode: scale-to-fit; transform-origin: center; rotate: 0;" />
+                            <engine:Label text="Name" name="lblName" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 10px; -unity-text-align: middle-left;" />
+                        </engine:VisualElement>
+                        <engine:Label name="lblLevel" text="等級: 1" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 10px; -unity-text-align: middle-left;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="expBarContainer" class="progress-bar-container">
                         <engine:VisualElement name="expBar" class="progress-bar" style="background-color: rgb(162, 214, 80);" />
-                        <engine:Label name="lblExperience" text="0/10" style="position: absolute; right: 0; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 10px; -unity-text-align: middle-left;" />
+                        <engine:Label name="lblExperience" text="0/10" class="progress-label" />
                     </engine:VisualElement>
-                    <engine:VisualElement name="healthBarContainer" class="progress-bar-container" style="width: 150px; background-color: rgb(255, 255, 255); height: 15px;">
+                    <engine:VisualElement name="healthBarContainer" class="progress-bar-container">
                         <engine:VisualElement name="healthBar" class="progress-bar" style="background-color: rgb(255, 0, 0);" />
-                        <engine:Label name="lblHealth" text="100/100" style="position: absolute; right: 0; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 10px; -unity-text-align: middle-left;" />
+                        <engine:Label name="lblHealth" text="100/100" class="progress-label" />
                     </engine:VisualElement>
-                    <engine:VisualElement name="fuelBarContainer" class="progress-bar-container" style="width: 150px; background-color: rgb(255, 255, 255); height: 15px;">
-                        <engine:VisualElement name="fuelBar" class="progress-bar" style="position: absolute; background-color: rgb(70, 75, 70);" />
-                        <engine:Label name="lblFuel" text="100/100" style="position: absolute; right: 0; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 10px; -unity-text-align: middle-left;" />
+                    <engine:VisualElement name="fuelBarContainer" class="progress-bar-container">
+                        <engine:VisualElement name="fuelBar" class="progress-bar" style="background-color: rgb(70, 75, 70);" />
+                        <engine:Label name="lblFuel" text="100/100" class="progress-label" />
                     </engine:VisualElement>
                 </engine:VisualElement>
                 <engine:VisualElement style="flex-direction: column; margin-right: 10px;">

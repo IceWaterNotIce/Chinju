@@ -732,7 +732,7 @@ public class ShipUI : Singleton<ShipUI>
         if (ship != null)
         {
             lblLevel.text = $"等級: {ship.Level}";
-            lblExperience.text = $"經驗值: {ship.Experience}/{ship.Level * 10}";
+            lblExperience.text = $"{ship.Experience}/{ship.Level * 10}";
             if (expBar != null)
             {
                 float percent = (ship.Level * 10 > 0) ? (float)ship.Experience / (ship.Level * 10) : 0f;
@@ -746,7 +746,7 @@ public class ShipUI : Singleton<ShipUI>
     {
         if (lblHealth != null)
         {
-            lblHealth.text = $"健康值: {Mathf.RoundToInt(currentHealth)}/{Mathf.RoundToInt(maxHealth)}";
+            lblHealth.text = $"{Mathf.RoundToInt(currentHealth)}/{Mathf.RoundToInt(maxHealth)}";
         }
         if (healthBar != null)
         {
@@ -769,7 +769,7 @@ public class ShipUI : Singleton<ShipUI>
     {
         if (lblFuel != null)
         {
-            lblFuel.text = $"燃料: {Mathf.RoundToInt(currentFuel)}/{Mathf.RoundToInt(maxFuel)}";
+            lblFuel.text = $"{Mathf.RoundToInt(currentFuel)}/{Mathf.RoundToInt(maxFuel)}";
         }
         if (fuelBar != null)
         {
