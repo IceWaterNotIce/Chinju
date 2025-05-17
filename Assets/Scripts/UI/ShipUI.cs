@@ -281,14 +281,31 @@ public class ShipUI : Singleton<ShipUI>
     {
         if (savedRectElement == null) return;
 
-        // 將矩形區域轉換為世界空間中的屏幕坐標
-        Vector2 worldToScreenMin = Camera.main.WorldToScreenPoint(new Vector3(rect.xMin, rect.yMin, 0));
-        Vector2 worldToScreenMax = Camera.main.WorldToScreenPoint(new Vector3(rect.xMax, rect.yMax, 0));
+        // 取世界座標的四個角
+        Vector3 worldA = new Vector3(rect.xMin, rect.yMin, 0);
+        Vector3 worldB = new Vector3(rect.xMax, rect.yMax, 0);
 
-        savedRectElement.style.left = worldToScreenMin.x;
-        savedRectElement.style.top = Screen.height - worldToScreenMax.y; // 修正為屏幕坐標系
-        savedRectElement.style.width = Mathf.Abs(worldToScreenMax.x - worldToScreenMin.x);
-        savedRectElement.style.height = Mathf.Abs(worldToScreenMax.y - worldToScreenMin.y);
+        // 轉螢幕座標
+        Vector2 screenA = Camera.main.WorldToScreenPoint(worldA);
+        Vector2 screenB = Camera.main.WorldToScreenPoint(worldB);
+
+        // 取螢幕座標最小最大，確保方向正確
+        float left = Mathf.Min(screenA.x, screenB.x);
+        float right = Mathf.Max(screenA.x, screenB.x);
+        float bottom = Mathf.Min(screenA.y, screenB.y);
+        float top = Mathf.Max(screenA.y, screenB.y);
+
+        // UI Toolkit Y 軸反向
+        float uiLeft = left;
+        float uiTop = Screen.height - top;
+        float width = right - left;
+        float height = top - bottom;
+
+        // 綁定左上角
+        savedRectElement.style.left = uiLeft;
+        savedRectElement.style.top = uiTop;
+        savedRectElement.style.width = Mathf.Abs(width);
+        savedRectElement.style.height = Mathf.Abs(height);
     }
     #endregion
 
