@@ -55,6 +55,8 @@ public class ShipUI : Singleton<ShipUI>
     private Button btnFormFleet; // 新增：形成船隊的按鈕
     private bool isSelectingShipForLine = false; // 狀態標誌，用於選擇船隻
 
+    private Button btnFleetCombatMode; // 新增：編輯船隊戰鬥模式按鈕
+
     void Start()
     {
         var uiDoc = GetComponent<UIDocument>();
@@ -86,6 +88,7 @@ public class ShipUI : Singleton<ShipUI>
         InitializeCancelFollowButton();
         InitializeDrawButton();
         InitializeCloseUIButton();
+        InitializeFleetCombatModeButton(); // 新增
         InitializeToggleCombatModeButton(); // 初始化切換戰鬥模式按鈕
         InitializeFormFleetButton(); // 初始化形成船隊按鈕
         RegisterPointerEvents();
@@ -168,6 +171,11 @@ public class ShipUI : Singleton<ShipUI>
         {
             btnToggleCombatMode.text = ship.CombatMode ? "退出戰鬥模式" : "進入戰鬥模式";
         }
+
+        InitializeCloseUIButton();
+        InitializeFleetCombatModeButton(); // 新增
+        InitializeToggleCombatModeButton();
+        InitializeFormFleetButton();
     }
 
     // Update is called once per frame
@@ -615,6 +623,52 @@ public class ShipUI : Singleton<ShipUI>
         else
         {
             LogError("找不到名為 'btnFormFleet' 的按鈕！");
+        }
+    }
+
+    private void InitializeFleetCombatModeButton()
+    {
+        // 僅當船隻在 fleet 中才顯示
+        if (ship != null && (ship.IsFollower || ship.LeaderShip != null))
+        {
+            btnFleetCombatMode = UIPanel.Q<Button>("btnFleetCombatMode");
+            if (btnFleetCombatMode == null)
+            {
+                btnFleetCombatMode = new Button();
+                btnFleetCombatMode.name = "btnFleetCombatMode";
+                btnFleetCombatMode.text = "編輯船隊戰鬥模式";
+                btnFleetCombatMode.style.marginTop = 10;
+                UIPanel.Add(btnFleetCombatMode);
+            }
+            btnFleetCombatMode.clicked += () =>
+            {
+                // 找到 fleet leader
+                PlayerShip leader = ship.LeaderShip != null ? ship.LeaderShip : ship;
+                Fleet fleet = leader.GetComponent<Fleet>();
+                if (fleet != null && fleet.followers != null)
+                {
+                    bool newCombatMode = !leader.CombatMode;
+                    foreach (var follower in fleet.followers)
+                    {
+                        PlayerShip ps = follower as PlayerShip;
+                        if (ps != null)
+                        {
+                            ps.CombatMode = newCombatMode;
+                        }
+                    }
+                    leader.CombatMode = newCombatMode;
+                    Debug.Log($"[ShipUI] 已將船隊所有船隻戰鬥模式設為: {(newCombatMode ? "開啟" : "關閉")}");
+                    if (btnToggleCombatMode != null)
+                        btnToggleCombatMode.text = newCombatMode ? "退出戰鬥模式" : "進入戰鬥模式";
+                }
+            };
+        }
+        else
+        {
+            // 若不在 fleet，移除按鈕
+            var existBtn = UIPanel.Q<Button>("btnFleetCombatMode");
+            if (existBtn != null)
+                existBtn.RemoveFromHierarchy();
         }
     }
 

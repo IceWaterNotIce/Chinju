@@ -34,6 +34,7 @@
                 <engine:Button name="btnCancelFollow" text="取消跟隨" class="cancel-follow-btn" style="width: 130px;" />
                 <engine:Button name="StartDrawButton" text="Start Draw" class="draw-button" />
                 <engine:Button name="btnToggleCombatMode" text="進入戰鬥模式" class="combat-mode-btn" style="width: 150px;" />
+                <engine:Button name="btnFleetCombatMode" text="編輯船隊戰鬥模式" style="width: 150px; display: none;" /> <!-- 新增 -->
                 <engine:Button name="btnCloseUI" text="關閉 UI" class="close-ui-btn" />
                 <engine:Button name="btnFormFleet" text="形成船隊" class="form-shipline-btn" style="width: 130px;" />
             </engine:VisualElement>
