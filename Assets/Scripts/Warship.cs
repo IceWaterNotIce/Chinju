@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 public class Warship : Ship
 {
+    // 新增：標記是否為跟隨者
+    public bool IsFollower;
+    public PlayerShip LeaderShip; // 新增：領隊船參考
+
     #region Combat Settings
     [Header("Combat Settings")]
     [SerializeField] private float m_detectionDistance = 50f;

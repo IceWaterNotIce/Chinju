@@ -782,32 +782,40 @@ public class ShipUI : Singleton<ShipUI>
         if (isSelectingShipForLine && evt.button == 0) // 左鍵點擊
         {
             Vector2 worldPoint = Camera.main.ScreenToWorldPoint(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
-            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.down , LayerMask.GetMask("Ship")); // 使用射線檢測
+            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.down, LayerMask.GetMask("Ship")); // 使用射線檢測
 
             if (hit.collider != null)
             {
                 var selectedShip = hit.collider.GetComponent<Ship>(); // 確保檢測到的是 Ship 類型
                 if (selectedShip != null && selectedShip != ship)
                 {
-                    var shipLine = selectedShip.GetComponent<Fleet>();
-                    if (shipLine == null)
-                    {
-                        shipLine = selectedShip.gameObject.AddComponent<Fleet>();
-                        shipLine.followers.Add(selectedShip); // 添加 Ship
-                    }
-                    shipLine.followers.Add(ship); // 添加 Ship
+                    // 建立 Fleet parent 物件
+                    GameObject fleetParent = new GameObject("FleetGroup");
+                    fleetParent.transform.position = selectedShip.transform.position;
+
+                    // 將 leader 船與被選擇船設為 parent 的子物件
+                    selectedShip.transform.SetParent(fleetParent.transform);
+                    ship.transform.SetParent(fleetParent.transform);
+
+                    // 掛載 Fleet 組件到 parent
+                    var fleet = fleetParent.AddComponent<Fleet>();
+                    fleet.followers.Add(selectedShip);
+                    fleet.followers.Add(ship);
+
+                    // 設定跟隨狀態
                     ship.IsFollower = true;
-                    ship.LeaderShip = selectedShip.gameObject.GetComponent<PlayerShip>();
-                    Debug.Log($"[ShipUI] 已將船隻 {selectedShip.name} 添加到船隊");
+                    // 若有 LeaderShip 欄位，設為 selectedShip
+                    ship.LeaderShip = selectedShip as PlayerShip;
+
+                    Debug.Log($"[ShipUI] 已建立 FleetGroup 並將 {selectedShip.name} 和 {ship.name} 加入船隊");
                     isSelectingShipForLine = false; // 停止選擇模式
 
-                    // close the UI
-                    Destroy(gameObject); // 銷毀 ShipUI
+                    // 關閉 UI
+                    Destroy(gameObject);
                     Debug.Log("[ShipUI] Ship UI 已關閉。");
                 }
                 else
                 {
-                    // Debug the gameObject name 
                     Debug.Log($"[ShipUI] 點擊的物件不是船隻或是自己: {hit.collider.gameObject.name}");
                 }
             }

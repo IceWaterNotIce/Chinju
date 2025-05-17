@@ -95,9 +95,6 @@ public class PlayerShip : Warship, IPointerClickHandler
     public void ClearWaypoints() => m_waypoints.Clear();
     #endregion
 
-    public PlayerShip LeaderShip;
-    public bool IsFollower;
-
     #region Movement Logic
     protected override void Move()
     {

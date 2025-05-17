@@ -1,0 +1,35 @@
+.fleet-ui-root {
+    width: 320px;
+    padding: 16px;
+    background-color: rgba(30, 30, 30, 0.97);
+    border-radius: 10px;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.fleet-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 12px;
+}
+
+.fleet-section-title {
+    font-size: 14px;
+    color: #eee;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+
+.fleet-dropdown {
+    width: 140px;
+}
+
+.fleet-follower-list {
+    background-color: #222;
+    border-radius: 6px;
+    padding: 6px;
+    width: 100%;
+    min-height: 60px;
+    max-height: 160px;
+}
