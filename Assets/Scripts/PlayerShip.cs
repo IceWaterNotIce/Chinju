@@ -3,10 +3,16 @@ using UnityEngine.EventSystems;
 using System.Collections.Generic;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
-
+using UnityEngine.Events; // 新增
 
 public class PlayerShip : Warship, IPointerClickHandler
 {
+    #region UnityEvents for UI
+    public UnityEvent<int> OnLevelChanged = new UnityEvent<int>();
+    public UnityEvent<float> OnExperienceChanged = new UnityEvent<float>();
+    public UnityEvent<bool> OnCombatModeChanged = new UnityEvent<bool>();
+    #endregion
+
     #region UI References
     private ShipUI UI => ShipUI.Instance;
     #endregion
@@ -34,6 +40,49 @@ public class PlayerShip : Warship, IPointerClickHandler
             else
             {
                 Debug.LogWarning("[PlayerShip] NavigationArea is set to Rect.zero, navigation disabled.");
+            }
+        }
+    }
+
+    // 新增：Level、Experience、CombatMode 屬性覆寫，觸發 UnityEvent
+    private int _level;
+    public new int Level
+    {
+        get => _level;
+        set
+        {
+            if (_level != value)
+            {
+                _level = value;
+                OnLevelChanged.Invoke(_level);
+            }
+        }
+    }
+
+    private float _experience;
+    public new float Experience
+    {
+        get => _experience;
+        set
+        {
+            if (_experience != value)
+            {
+                _experience = value;
+                OnExperienceChanged.Invoke(_experience);
+            }
+        }
+    }
+
+    private bool _combatMode;
+    public new bool CombatMode
+    {
+        get => _combatMode;
+        set
+        {
+            if (_combatMode != value)
+            {
+                _combatMode = value;
+                OnCombatModeChanged.Invoke(_combatMode);
             }
         }
     }
@@ -179,6 +228,10 @@ public class PlayerShip : Warship, IPointerClickHandler
     {
         var data = base.SaveShipData();
         data.NavigationArea = NavigationArea;
+        // 同步保存 Level/Experience/CombatMode
+        data.Level = Level;
+        data.Experience = Experience;
+        data.CombatMode = CombatMode;
         return data;
     }
 
@@ -186,6 +239,10 @@ public class PlayerShip : Warship, IPointerClickHandler
     {
         base.LoadShipData(data);
         NavigationArea = data.NavigationArea;
+        // 同步載入 Level/Experience/CombatMode
+        Level = data.Level;
+        Experience = data.Experience;
+        CombatMode = data.CombatMode;
     }
     #endregion
 

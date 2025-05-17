@@ -1,8 +1,10 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.Events; // 新增
 
 public class ShipUI : Singleton<ShipUI>
 {
+    #region Fields
     public PlayerShip ship;
     private VisualElement UIPanel;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -56,100 +58,19 @@ public class ShipUI : Singleton<ShipUI>
     private bool isSelectingShipForLine = false; // 狀態標誌，用於選擇船隻
 
     private Button btnFleetCombatMode; // 新增：編輯船隊戰鬥模式按鈕
+    private VisualElement rectContainer; // <-- 移到這裡
+    #endregion
 
+    #region Unity Methods
     void Start()
     {
-        var uiDoc = GetComponent<UIDocument>();
-        if (uiDoc == null)
-        {
-            LogError("無法找到 UIDocument 組件！");
-            return;
-        }
-
-        var root = uiDoc.rootVisualElement;
-        if (root == null)
-        {
-            LogError("無法初始化 root 元素！");
-            return;
-        }
-
-        UIPanel = UIHelper.InitializeElement<VisualElement>(root, "UIPanel");
-        if (UIPanel == null)
-        {
-            LogError("找不到名為 'Panel' 的 VisualElement！");
-            return;
-        }
-
-        InitializeSpeedLabels();
-        InitializeRotationLabels();
-        InitializeWeaponListContainer();
-        InitializeLevelAndExperienceLabels();
-        InitializeHealthAndFuelLabels();
-        InitializeCancelFollowButton();
-        InitializeDrawButton();
-        InitializeCloseUIButton();
-        InitializeFleetCombatModeButton(); // 新增
-        InitializeToggleCombatModeButton(); // 初始化切換戰鬥模式按鈕
-        InitializeFormFleetButton(); // 初始化形成船隊按鈕
-        RegisterPointerEvents();
+        InitializeUI();
     }
 
     public void Initial(PlayerShip s)
     {
         ship = s;
-
-        var uiDoc = GetComponent<UIDocument>() ?? gameObject.AddComponent<UIDocument>();
-        if (uiDoc == null)
-        {
-            LogError("UIDocument 無法初始化！");
-            return;
-        }
-
-        uiDoc.panelSettings = Resources.Load<PanelSettings>("UI/PanelSettings");
-        if (uiDoc.panelSettings == null)
-        {
-            LogError("無法加載 PanelSettings 資源！");
-            return;
-        }
-
-        uiDoc.visualTreeAsset = Resources.Load<VisualTreeAsset>("UI/ShipUI");
-        if (uiDoc.visualTreeAsset == null)
-        {
-            LogError("無法加載 ShipUI 資源！");
-            return;
-        }
-
-
-        var root = uiDoc.rootVisualElement;
-        if (root == null)
-        {
-            LogError("UIDocument 的 rootVisualElement 為 null！");
-            return;
-        }
-
-        var styleSheet = Resources.Load<StyleSheet>("UI/ShipUI");
-        if (styleSheet != null)
-        {
-            root.styleSheets.Add(styleSheet);
-        }
-        else
-        {
-            LogError("無法加載 ShipUI 的樣式表！");
-            return;
-        }
-
-        UIPanel = root.Q<VisualElement>("UIPanel");
-        if (UIPanel == null)
-        {
-            LogError("找不到名為 'Panel' 的 VisualElement！");
-            return;
-        }
-
-        InitializeSpeedLabels();
-        InitializeRotationLabels();
-        InitializeWeaponListContainer();
-        InitializeLevelAndExperienceLabels();
-        InitializeHealthAndFuelLabels();
+        InitializeUI();
         UpdateLevelAndExperienceUI();
         UpdateHealth(ship.Health, ship.MaxHealth);
         UpdateFuel(ship.CurrentFuel, ship.MaxFuel);
@@ -157,6 +78,9 @@ public class ShipUI : Singleton<ShipUI>
         // 訂閱事件
         ship.OnHealthChanged += health => UpdateHealth(health, ship.MaxHealth);
         ship.OnFuelChanged += fuel => UpdateFuel(fuel, ship.MaxFuel);
+
+        // 新增：訂閱等級、經驗值、戰鬥模式變化事件
+        SubscribeShipEvents();
 
         SetUIPosition();
 
@@ -171,26 +95,17 @@ public class ShipUI : Singleton<ShipUI>
         {
             btnToggleCombatMode.text = ship.CombatMode ? "退出戰鬥模式" : "進入戰鬥模式";
         }
-
-        InitializeCloseUIButton();
-        InitializeFleetCombatModeButton(); // 新增
-        InitializeToggleCombatModeButton();
-        InitializeFormFleetButton();
     }
 
-    // Update is called once per frame
     void Update()
     {
         UpdateLevelAndExperienceUI(); // 每幀更新等級和經驗值的顯示
         SetUIPosition(); // 每幀更新 UI 位置
         SetRectPosition(); // 每幀更新矩形位置
     }
+    #endregion
 
-    private void SetRectPosition()
-    {
-        DrawSavedRect(ship.NavigationArea);
-    }
-
+    #region Speed & Rotation Control
     void SpeedControll(float percentage)
     {
         if (ship == null)
@@ -224,7 +139,9 @@ public class ShipUI : Singleton<ShipUI>
         Debug.Log("Rotation Speed: " + TargetRotationSpeed);
 
     }
-    // 新增方法：清除矩形和矩形數據
+    #endregion
+
+    #region Rect Drawing
     private void ClearRectAndData()
     {
         if (rectContainer != null)
@@ -238,7 +155,141 @@ public class ShipUI : Singleton<ShipUI>
             Debug.Log("[ShipUI] 矩形和數據已清除");
         }
     }
-    // 新增：顯示武器詳細資訊
+
+    private void EnableDrawing()
+    {
+        canDraw = true; // 啟用繪製功能
+        Debug.Log("[ShipUI] 繪製功能已啟用");
+    }
+
+    private void OnPointerDown(PointerDownEvent evt)
+    {
+        Debug.Log("[ShipUI] PointerDownEvent");
+        if (rectContainer == null)
+        {
+            rectContainer = GetComponent<UIDocument>().rootVisualElement.Q<VisualElement>("rectContainer");
+            if (rectContainer == null)
+            {
+                Debug.LogError("[ShipUI] 找不到名為 'rectContainer' 的 VisualElement！");
+                return;
+            }
+        }
+        if (!canDraw || evt.button != 0) return; // 檢查是否允許繪製
+        startPos = evt.localPosition;
+
+        // Adjust start position relative to the rectContainer
+        Vector2 containerPosition = rectContainer.worldBound.position;
+        startPos -= containerPosition;
+
+        currentRect = new VisualElement();
+        currentRect.AddToClassList("rect"); // 套用矩形樣式
+        currentRect.style.position = Position.Absolute;
+        currentRect.style.left = startPos.x;
+        currentRect.style.top = startPos.y;
+        rectContainer.Add(currentRect); // Add to rectContainer instead of Panel
+        isDrawing = true;
+        Debug.Log("[ShipUI] 開始繪製矩形");
+    }
+
+    private void OnPointerMove(PointerMoveEvent evt)
+    {
+        if (isDrawing && currentRect != null)
+        {
+            Vector2 mousePos = evt.localPosition;
+
+            // Adjust mouse position relative to the rectContainer
+            Vector2 containerPosition = rectContainer.worldBound.position;
+            mousePos -= containerPosition;
+
+            Vector2 size = mousePos - startPos;
+
+            // 設定矩形大小和位置
+            currentRect.style.width = Mathf.Abs(size.x);
+            currentRect.style.height = Mathf.Abs(size.y);
+            currentRect.style.left = Mathf.Min(startPos.x, mousePos.x);
+            currentRect.style.top = Mathf.Min(startPos.y, mousePos.y);
+        }
+    }
+
+    private void OnPointerUp(PointerUpEvent evt)
+    {
+        if (evt.button == 0 && isDrawing) // 左鍵
+        {
+            isDrawing = false;
+            canDraw = false; // 繪製完成後禁用繪製功能
+
+            if (currentRect != null)
+            {
+                // 計算矩形區域
+                Rect rect = new Rect(
+                    Mathf.Min(startPos.x, evt.localPosition.x),
+                    Mathf.Min(startPos.y, evt.localPosition.y),
+                    Mathf.Abs(evt.localPosition.x - startPos.x),
+                    Mathf.Abs(evt.localPosition.y - startPos.y)
+                );
+
+                // 將屏幕坐標轉換為世界空間坐標
+                Vector3 screenToWorldMin = Camera.main.ScreenToWorldPoint(new Vector3(rect.xMin, Screen.height - rect.yMax, 0));
+                Vector3 screenToWorldMax = Camera.main.ScreenToWorldPoint(new Vector3(rect.xMax, Screen.height - rect.yMin, 0));
+
+                Rect worldRect = new Rect(
+                    screenToWorldMin.x,
+                    screenToWorldMin.y,
+                    screenToWorldMax.x - screenToWorldMin.x,
+                    screenToWorldMax.y - screenToWorldMin.y
+                );
+
+                // 保存矩形區域到船隻數據
+                if (ship != null)
+                {
+                    ship.NavigationArea = worldRect;
+                    Debug.Log($"[ShipUI] 矩形區域已保存到船隻: {worldRect}");
+                }
+
+                currentRect = null; // 重置 currentRect 狀態
+                //delete all rects
+                rectContainer.Clear();
+            }
+
+            Debug.Log("[ShipUI] 繪製結束");
+        }
+    }
+
+    private void DrawSavedRect(Rect rect)
+    {
+        if (rect == Rect.zero) return; // 如果矩形為零，則不繪製
+        var rectContainer = GetComponent<UIDocument>().rootVisualElement.Q<VisualElement>("rectContainer");
+
+        if (savedRectElement != null)
+        {
+            savedRectElement.RemoveFromHierarchy();
+        }
+
+        savedRectElement = new VisualElement();
+        savedRectElement.AddToClassList("rect"); // 套用矩形樣式
+        savedRectElement.style.position = Position.Absolute;
+
+        rectContainer.Add(savedRectElement);
+        UpdateSavedRectPosition(rect); // 初始化位置
+        Debug.Log($"[ShipUI] 繪製保存的矩形區域: {rect}");
+    }
+
+    private void UpdateSavedRectPosition(Rect rect)
+    {
+        if (savedRectElement == null) return;
+
+        // 將矩形區域轉換為世界空間中的屏幕坐標
+        Vector2 worldToScreenMin = Camera.main.WorldToScreenPoint(new Vector3(rect.xMin, rect.yMin, 0));
+        Vector2 worldToScreenMax = Camera.main.WorldToScreenPoint(new Vector3(rect.xMax, rect.yMax, 0));
+
+        savedRectElement.style.left = worldToScreenMin.x;
+        savedRectElement.style.top = Screen.height - worldToScreenMax.y; // 修正為屏幕坐標系
+        savedRectElement.style.width = Mathf.Abs(worldToScreenMax.x - worldToScreenMin.x);
+        savedRectElement.style.height = Mathf.Abs(worldToScreenMax.y - worldToScreenMin.y);
+    }
+    #endregion
+
+    #region Weapon UI
     private void ShowWeaponDetail(Weapon weapon)
     {
         if (weaponDetailPopup != null)
@@ -263,7 +314,6 @@ public class ShipUI : Singleton<ShipUI>
         UIPanel.Add(weaponDetailPopup);
     }
 
-    // 新增：武器總覽面板
     public void ShowWeaponsPanel()
     {
         if (weaponsPanel != null)
@@ -314,7 +364,6 @@ public class ShipUI : Singleton<ShipUI>
         UIPanel.Add(weaponsPanel);
     }
 
-    // 新增：顯示武器選擇面板
     private void ShowWeaponSelectionPanel(int slotIndex)
     {
         if (weaponDetailPopup != null)
@@ -378,7 +427,6 @@ public class ShipUI : Singleton<ShipUI>
         UIPanel.Add(weaponDetailPopup);
     }
 
-    // 新增：刷新武器列表的方法
     private void RefreshWeaponList()
     {
         if (ship == null || ship.weapons == null)
@@ -418,38 +466,9 @@ public class ShipUI : Singleton<ShipUI>
 
         return weaponIcon;
     }
+    #endregion
 
-    private void LogError(string message)
-    {
-        // Replace Debug.LogError with centralized logging
-        Debug.LogError($"[ShipUI] {message}");
-    }
-
-    private void UpdateLevelAndExperienceUI()
-    {
-        if (ship != null)
-        {
-            lblLevel.text = $"等級: {ship.Level}";
-            lblExperience.text = $"經驗值: {ship.Experience}/{ship.Level * 10}";
-        }
-    }
-
-    private void UpdateHealth(float currentHealth, float maxHealth)
-    {
-        if (lblHealth != null)
-        {
-            lblHealth.text = $"健康值: {Mathf.RoundToInt(currentHealth)}/{Mathf.RoundToInt(maxHealth)}";
-        }
-    }
-
-    private void UpdateFuel(float currentFuel, float maxFuel)
-    {
-        if (lblFuel != null)
-        {
-            lblFuel.text = $"燃料: {Mathf.RoundToInt(currentFuel)}/{Mathf.RoundToInt(maxFuel)}";
-        }
-    }
-
+    #region UI Label/Element Initialization
     private void InitializeSpeedLabels()
     {
         lblSpeedFrontFull = InitializeSpeedLabel("lblSpeedFrontFull", 1.0f);
@@ -582,10 +601,6 @@ public class ShipUI : Singleton<ShipUI>
                 Debug.Log("[ShipUI] Ship UI 已關閉。");
             };
         }
-        else
-        {
-            LogError("找不到名為 'btnCloseUI' 的按鈕！");
-        }
     }
 
     private void InitializeToggleCombatModeButton()
@@ -603,10 +618,6 @@ public class ShipUI : Singleton<ShipUI>
                 }
             };
         }
-        else
-        {
-            LogError("找不到名為 'btnToggleCombatMode' 的按鈕！");
-        }
     }
 
     private void InitializeFormFleetButton()
@@ -619,10 +630,6 @@ public class ShipUI : Singleton<ShipUI>
                 isSelectingShipForLine = true; // 啟用選擇船隻模式
                 Debug.Log("[ShipUI] 選擇船隻以形成船隊模式啟用");
             };
-        }
-        else
-        {
-            LogError("找不到名為 'btnFormFleet' 的按鈕！");
         }
     }
 
@@ -671,6 +678,33 @@ public class ShipUI : Singleton<ShipUI>
                 existBtn.RemoveFromHierarchy();
         }
     }
+    #endregion
+
+    #region UI Update & Position
+    private void UpdateLevelAndExperienceUI()
+    {
+        if (ship != null)
+        {
+            lblLevel.text = $"等級: {ship.Level}";
+            lblExperience.text = $"經驗值: {ship.Experience}/{ship.Level * 10}";
+        }
+    }
+
+    private void UpdateHealth(float currentHealth, float maxHealth)
+    {
+        if (lblHealth != null)
+        {
+            lblHealth.text = $"健康值: {Mathf.RoundToInt(currentHealth)}/{Mathf.RoundToInt(maxHealth)}";
+        }
+    }
+
+    private void UpdateFuel(float currentFuel, float maxFuel)
+    {
+        if (lblFuel != null)
+        {
+            lblFuel.text = $"燃料: {Mathf.RoundToInt(currentFuel)}/{Mathf.RoundToInt(maxFuel)}";
+        }
+    }
 
     private void SetUIPosition()
     {
@@ -687,6 +721,13 @@ public class ShipUI : Singleton<ShipUI>
         //Debug.Log($"[ShipUI] 設定 UI 位置為: {shipScreenPosition}");
     }
 
+    private void SetRectPosition()
+    {
+        DrawSavedRect(ship.NavigationArea);
+    }
+    #endregion
+
+    #region Pointer & Selection Events
     private void RegisterPointerEvents()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
@@ -694,141 +735,6 @@ public class ShipUI : Singleton<ShipUI>
         root.RegisterCallback<PointerMoveEvent>(OnPointerMove); // 修正為 PointerMoveEvent
         root.RegisterCallback<PointerUpEvent>(OnPointerUp);     // 修正為 PointerUpEvent
         root.RegisterCallback<PointerDownEvent>(HandleShipSelectionForLine); // 新增處理船隻選擇的事件
-    }
-
-    private void EnableDrawing()
-    {
-        canDraw = true; // 啟用繪製功能
-        Debug.Log("[ShipUI] 繪製功能已啟用");
-    }
-
-    private VisualElement rectContainer; // New container for rectangles
-
-
-    private void OnPointerDown(PointerDownEvent evt)
-    {
-        Debug.Log("[ShipUI] PointerDownEvent");
-        if (rectContainer == null)
-        {
-            rectContainer = GetComponent<UIDocument>().rootVisualElement.Q<VisualElement>("rectContainer");
-            if (rectContainer == null)
-            {
-                Debug.LogError("[ShipUI] 找不到名為 'rectContainer' 的 VisualElement！");
-                return;
-            }
-        }
-        if (!canDraw || evt.button != 0) return; // 檢查是否允許繪製
-        startPos = evt.localPosition;
-
-        // Adjust start position relative to the rectContainer
-        Vector2 containerPosition = rectContainer.worldBound.position;
-        startPos -= containerPosition;
-
-        currentRect = new VisualElement();
-        currentRect.AddToClassList("rect"); // 套用矩形樣式
-        currentRect.style.position = Position.Absolute;
-        currentRect.style.left = startPos.x;
-        currentRect.style.top = startPos.y;
-        rectContainer.Add(currentRect); // Add to rectContainer instead of Panel
-        isDrawing = true;
-        Debug.Log("[ShipUI] 開始繪製矩形");
-    }
-
-    private void OnPointerMove(PointerMoveEvent evt)
-    {
-        if (isDrawing && currentRect != null)
-        {
-            Vector2 mousePos = evt.localPosition;
-
-            // Adjust mouse position relative to the rectContainer
-            Vector2 containerPosition = rectContainer.worldBound.position;
-            mousePos -= containerPosition;
-
-            Vector2 size = mousePos - startPos;
-
-            // 設定矩形大小和位置
-            currentRect.style.width = Mathf.Abs(size.x);
-            currentRect.style.height = Mathf.Abs(size.y);
-            currentRect.style.left = Mathf.Min(startPos.x, mousePos.x);
-            currentRect.style.top = Mathf.Min(startPos.y, mousePos.y);
-        }
-    }
-
-    private void OnPointerUp(PointerUpEvent evt)
-    {
-        if (evt.button == 0 && isDrawing) // 左鍵
-        {
-            isDrawing = false;
-            canDraw = false; // 繪製完成後禁用繪製功能
-
-            if (currentRect != null)
-            {
-                // 計算矩形區域
-                Rect rect = new Rect(
-                    Mathf.Min(startPos.x, evt.localPosition.x),
-                    Mathf.Min(startPos.y, evt.localPosition.y),
-                    Mathf.Abs(evt.localPosition.x - startPos.x),
-                    Mathf.Abs(evt.localPosition.y - startPos.y)
-                );
-
-                // 將屏幕坐標轉換為世界空間坐標
-                Vector3 screenToWorldMin = Camera.main.ScreenToWorldPoint(new Vector3(rect.xMin, Screen.height - rect.yMax, 0));
-                Vector3 screenToWorldMax = Camera.main.ScreenToWorldPoint(new Vector3(rect.xMax, Screen.height - rect.yMin, 0));
-
-                Rect worldRect = new Rect(
-                    screenToWorldMin.x,
-                    screenToWorldMin.y,
-                    screenToWorldMax.x - screenToWorldMin.x,
-                    screenToWorldMax.y - screenToWorldMin.y
-                );
-
-                // 保存矩形區域到船隻數據
-                if (ship != null)
-                {
-                    ship.NavigationArea = worldRect;
-                    Debug.Log($"[ShipUI] 矩形區域已保存到船隻: {worldRect}");
-                }
-
-                currentRect = null; // 重置 currentRect 狀態
-                //delete all rects
-                rectContainer.Clear();
-            }
-
-            Debug.Log("[ShipUI] 繪製結束");
-        }
-    }
-
-    private void DrawSavedRect(Rect rect)
-    {
-        if (rect == Rect.zero) return; // 如果矩形為零，則不繪製
-        var rectContainer = GetComponent<UIDocument>().rootVisualElement.Q<VisualElement>("rectContainer");
-
-        if (savedRectElement != null)
-        {
-            savedRectElement.RemoveFromHierarchy();
-        }
-
-        savedRectElement = new VisualElement();
-        savedRectElement.AddToClassList("rect"); // 套用矩形樣式
-        savedRectElement.style.position = Position.Absolute;
-
-        rectContainer.Add(savedRectElement);
-        UpdateSavedRectPosition(rect); // 初始化位置
-        Debug.Log($"[ShipUI] 繪製保存的矩形區域: {rect}");
-    }
-
-    private void UpdateSavedRectPosition(Rect rect)
-    {
-        if (savedRectElement == null) return;
-
-        // 將矩形區域轉換為世界空間中的屏幕坐標
-        Vector2 worldToScreenMin = Camera.main.WorldToScreenPoint(new Vector3(rect.xMin, rect.yMin, 0));
-        Vector2 worldToScreenMax = Camera.main.WorldToScreenPoint(new Vector3(rect.xMax, rect.yMax, 0));
-
-        savedRectElement.style.left = worldToScreenMin.x;
-        savedRectElement.style.top = Screen.height - worldToScreenMax.y; // 修正為屏幕坐標系
-        savedRectElement.style.width = Mathf.Abs(worldToScreenMax.x - worldToScreenMin.x);
-        savedRectElement.style.height = Mathf.Abs(worldToScreenMax.y - worldToScreenMin.y);
     }
 
     private void HandleShipSelectionForLine(PointerDownEvent evt)
@@ -873,11 +779,135 @@ public class ShipUI : Singleton<ShipUI>
         }
         Debug.Log("[ShipUI] Ship selection for line ended");
     }
+    #endregion
+
+    #region UnityEvent Subscription
+    private void SubscribeShipEvents()
+    {
+        // 假設 PlayerShip 有 UnityEvent<int> OnLevelChanged, UnityEvent<float> OnExperienceChanged, UnityEvent<bool> OnCombatModeChanged
+        // 若沒有請在 PlayerShip 裡加上
+        if (ship != null)
+        {
+            // 等級變化
+            if (ship.OnLevelChanged != null)
+                ship.OnLevelChanged.AddListener(OnShipLevelChanged);
+            // 經驗值變化
+            if (ship.OnExperienceChanged != null)
+                ship.OnExperienceChanged.AddListener(OnShipExperienceChanged);
+            // 戰鬥模式變化
+            if (ship.OnCombatModeChanged != null)
+                ship.OnCombatModeChanged.AddListener(OnShipCombatModeChanged);
+        }
+    }
+
+    private void UnsubscribeShipEvents()
+    {
+        if (ship != null)
+        {
+            if (ship.OnLevelChanged != null)
+                ship.OnLevelChanged.RemoveListener(OnShipLevelChanged);
+            if (ship.OnExperienceChanged != null)
+                ship.OnExperienceChanged.RemoveListener(OnShipExperienceChanged);
+            if (ship.OnCombatModeChanged != null)
+                ship.OnCombatModeChanged.RemoveListener(OnShipCombatModeChanged);
+        }
+    }
+
+    private void OnShipLevelChanged(int newLevel)
+    {
+        UpdateLevelAndExperienceUI();
+    }
+
+    private void OnShipExperienceChanged(float newExp)
+    {
+        UpdateLevelAndExperienceUI();
+    }
+
+    private void OnShipCombatModeChanged(bool isCombatMode)
+    {
+        if (btnToggleCombatMode != null)
+            btnToggleCombatMode.text = isCombatMode ? "退出戰鬥模式" : "進入戰鬥模式";
+    }
+    #endregion
+
+    #region Utility
+    private void LogError(string message)
+    {
+        // Replace Debug.LogError with centralized logging
+        Debug.LogError($"[ShipUI] {message}");
+    }
 
     private void OnDestroy()
     {
+        UnsubscribeShipEvents(); // 解除事件訂閱
         Debug.Log("[ShipUI] 銷毀 ShipUI");
         //Debug where call this destroy
         // Debug.Log(new System.Diagnostics.StackTrace().ToString());
     }
+    #endregion
+
+    #region UI Initialization
+    private void InitializeUI()
+    {
+        // 載入 UI 資源
+        var uiDoc = GetComponent<UIDocument>() ?? gameObject.AddComponent<UIDocument>();
+        if (uiDoc == null)
+        {
+            LogError("UIDocument 無法初始化！");
+            return;
+        }
+
+        uiDoc.panelSettings = Resources.Load<PanelSettings>("UI/PanelSettings");
+        if (uiDoc.panelSettings == null)
+        {
+            LogError("無法加載 PanelSettings 資源！");
+            return;
+        }
+
+        uiDoc.visualTreeAsset = Resources.Load<VisualTreeAsset>("UI/ShipUI");
+        if (uiDoc.visualTreeAsset == null)
+        {
+            LogError("無法加載 ShipUI 資源！");
+            return;
+        }
+
+        var root = uiDoc.rootVisualElement;
+        if (root == null)
+        {
+            LogError("UIDocument 的 rootVisualElement 為 null！");
+            return;
+        }
+
+        var styleSheet = Resources.Load<StyleSheet>("UI/ShipUI");
+        if (styleSheet != null)
+        {
+            root.styleSheets.Add(styleSheet);
+        }
+        else
+        {
+            LogError("無法加載 ShipUI 的樣式表！");
+            return;
+        }
+
+        UIPanel = UIHelper.InitializeElement<VisualElement>(root, "UIPanel");
+        if (UIPanel == null)
+        {
+            LogError("找不到名為 'Panel' 的 VisualElement！");
+            return;
+        }
+
+        InitializeSpeedLabels();
+        InitializeRotationLabels();
+        InitializeWeaponListContainer();
+        InitializeLevelAndExperienceLabels();
+        InitializeHealthAndFuelLabels();
+        InitializeCancelFollowButton();
+        InitializeDrawButton();
+        InitializeCloseUIButton();
+        InitializeFleetCombatModeButton();
+        InitializeToggleCombatModeButton();
+        InitializeFormFleetButton();
+        RegisterPointerEvents();
+    }
+    #endregion
 }
