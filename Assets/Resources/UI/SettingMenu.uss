@@ -55,3 +55,22 @@
 .menu-button:active {
     background-color: #555;
 }
+
+.text-size-row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    gap: 12px;
+}
+
+.text-size-label {
+    color: #fff;
+    font-size: 16px;
+    min-width: 70px;
+}
+
+.text-size-slider {
+    width: 140px;
+    margin-left: 8px;
+}

@@ -4,6 +4,11 @@
     <ui:VisualElement name="menu-container" class="menu-container" style="translate: -50% -50%;">
         <ui:VisualElement name="menu-panel" class="menu-panel" style="position: relative; top: 0; left: 0;">
             <ui:Label text="遊戲選單" class="menu-title" />
+            <!-- 新增：文字大小調整區塊 -->
+            <ui:VisualElement class="text-size-row">
+                <ui:Label text="文字大小" class="text-size-label" />
+                <ui:Slider name="textSizeSlider" class="text-size-slider" low-value="14" high-value="36" value="24" />
+            </ui:VisualElement>
             <ui:Button text="繼續遊戲" name="continueButton" class="menu-button" />
             <ui:Button text="開始新遊戲" name="newGameButton" class="menu-button" />
             <ui:Button text="儲存遊戲" name="saveGameButton" class="menu-button" />

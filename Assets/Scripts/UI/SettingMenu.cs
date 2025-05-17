@@ -10,6 +10,7 @@ public class SettingMenu : MonoBehaviour
     private Button loadGameButton;
     private Button exitGameButton;
     private Button newGameButton; // 新增
+    private Slider textSizeSlider; // 新增：Slider 欄位
 
     void Awake()
     {
@@ -32,6 +33,9 @@ public class SettingMenu : MonoBehaviour
     void OnDestroy()
     {
         UnregisterButtonCallbacks();
+        // 新增：解除 Slider callback
+        if (textSizeSlider != null)
+            textSizeSlider.UnregisterValueChangedCallback(OnTextSizeSliderChanged);
     }
 
     private void InitializeUI()
@@ -57,8 +61,18 @@ public class SettingMenu : MonoBehaviour
             loadGameButton = UIHelper.InitializeElement<Button>(root, "loadGameButton");
             exitGameButton = UIHelper.InitializeElement<Button>(root, "exitGameButton");
             newGameButton = UIHelper.InitializeElement<Button>(root, "newGameButton"); // 新增
+            textSizeSlider = UIHelper.InitializeElement<Slider>(root, "textSizeSlider"); // 新增：Slider 初始化
 
             RegisterButtonCallbacks();
+
+            // 新增：註冊 Slider callback
+            if (textSizeSlider != null)
+            {
+                textSizeSlider.RegisterValueChangedCallback(OnTextSizeSliderChanged);
+                // 預設初始化一次
+                UpdateMenuTextSize((int)textSizeSlider.value);
+            }
+
             PopupManager.Instance.RegisterPopup("SettingMenu", gameObject);
             Debug.Log("[SettingMenu] UI初始化成功");
         }
@@ -211,5 +225,28 @@ public class SettingMenu : MonoBehaviour
     private void OnCloseButtonClicked()
     {
         HideSettingsMenu();
+    }
+
+    // 新增：Slider callback
+    private void OnTextSizeSliderChanged(ChangeEvent<float> evt)
+    {
+        UpdateMenuTextSize((int)evt.newValue);
+    }
+
+    // 新增：調整所有 menu 內 Label 與 Button 的字體大小
+    private void UpdateMenuTextSize(int fontSize)
+    {
+        if (root == null) return;
+        Debug.Log($"[SettingMenu] Slider value changed: {fontSize}");
+        var labels = root.Query<Label>().ToList();
+        foreach (var label in labels)
+        {
+            label.style.fontSize = fontSize;
+        }
+        var buttons = root.Query<Button>().ToList();
+        foreach (var button in buttons)
+        {
+            button.style.fontSize = fontSize;
+        }
     }
 }
