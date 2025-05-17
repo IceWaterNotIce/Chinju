@@ -27,7 +27,7 @@
     color: white;
     margin-bottom: 5px;
     margin-top: 10px;
-    text-align: left;
+    -unity-text-align: left;
 }
 
 /* 新增：武器圖示樣式 */
@@ -61,7 +61,7 @@
 
 /* 新增：標題樣式 */
 .title {
-    font-weight: bold;
+    -unity-font-style: bold;
     font-size: 16px;
     margin-bottom: 10px;
 }
@@ -86,9 +86,9 @@
     color: white;
     font-size: 16px;
     border-radius: 5px;
-    border: none;
-    text-align: center;
-    cursor: pointer;
+    border-width: 0;
+    -unity-text-align: center;
+    cursor: link;
 }
 
 .draw-button:hover {
@@ -115,9 +115,9 @@
     color: white;
     font-size: 14px;
     border-radius: 5px;
-    border: none;
-    text-align: center;
-    cursor: pointer;
+    border-width: 0;
+    -unity-text-align: center;
+    cursor: link;
 }
 
 .close-ui-btn:hover {
@@ -132,9 +132,9 @@
     color: white;
     font-size: 14px;
     border-radius: 5px;
-    border: none;
-    text-align: center;
-    cursor: pointer;
+    border-width: 0;
+    -unity-text-align: center;
+    cursor: link;
 }
 
 .combat-mode-btn:hover {
@@ -142,25 +142,25 @@
 }
 
 /* 新增：健康、燃料、經驗值滑桿樣式 */
-#sliderHealth, #sliderFuel, #sliderExperience {
+.sliderHealth, .sliderFuel, .sliderExperience {
     margin-top: 2px;
     margin-bottom: 8px;
     width: 180px;
     height: 18px;
 }
 
-#sliderHealth {
+.sliderHealth {
     --unity-slider-background: #222;
     --unity-slider-fill: #e74c3c;
     transition: background-color 0.2s, color 0.2s;
 }
 
-#sliderFuel {
+.sliderFuel {
     --unity-slider-background: #222;
     --unity-slider-fill: #3498db;
 }
 
-#sliderExperience {
+.sliderExperience {
     --unity-slider-background: #222;
     --unity-slider-fill: #f1c40f;
 }

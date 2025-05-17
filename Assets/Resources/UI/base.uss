@@ -32,7 +32,8 @@
 /* 通用輸入欄樣式 */
 TextField, .input, .input-field, IntegerField, FloatField {
     background-color: #222;
-    color: #fff;
+    color: #fff; /* 調整為白色，提升對比 */
+    font-weight: bold; /* 可選：加粗字體提升可讀性 */
     border-radius: 4px;
     border: 1px solid #444;
     padding: 6px 10px;

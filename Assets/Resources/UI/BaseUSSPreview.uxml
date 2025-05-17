@@ -1,0 +1,33 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False" style="Assets/Resources/UI/base.uss">
+    <Style src="project://database/Assets/Resources/UI/base.uss?fileID=7433441132597879392&amp;guid=941833fb84a940c47bce98d1493bc006&amp;type=3#base" />
+    <engine:VisualElement class="panel" style="flex-direction: column; gap: 12px; width: 400px; padding: 16px;">
+        <engine:Label text="Button (Button)" />
+        <engine:Button text="Button 樣式" />
+        <engine:Label text="Button (.btn)" />
+        <engine:Button text="Class .btn" class="btn" />
+        <engine:Label text="Label (Label)" />
+        <engine:Label text="這是 Label 樣式" />
+        <engine:Label text="Label (.label)" class="label" />
+        <engine:Label text="TextField (TextField)" />
+        <engine:TextField value="TextField 樣式" />
+        <engine:Label text="TextField (.input)" />
+        <engine:TextField value="Class .input" class="input" style="background-color: rgb(255, 255, 255); color: rgb(192, 57, 57);" />
+        <engine:Label text="TextField (.input-field)" />
+        <engine:TextField value="Class .input-field" class="input-field" />
+        <engine:Label text="IntegerField" />
+        <engine:IntegerField value="123" />
+        <engine:Label text="FloatField" />
+        <engine:FloatField value="3.14" />
+        <engine:Label text="DropdownField" />
+        <engine:DropdownField choices="A,B,C" value="A" />
+        <engine:Label text="DropdownField (.dropdown)" />
+        <engine:DropdownField choices="X,Y,Z" value="X" class="dropdown" />
+        <engine:Label text="Panel (.panel)" />
+        <engine:VisualElement class="panel" style="padding: 8px;" />
+        <engine:Label text="Container (.container)" />
+        <engine:VisualElement class="container" style="padding: 8px;" />
+        <engine:Label text="間距範例" />
+        <engine:VisualElement class="mt-8 mb-8 p-8" style="background-color: rgb(51, 51, 51);" />
+        <engine:VisualElement class="mt-16 mb-16 p-16" style="background-color: rgb(51, 51, 51);" />
+    </engine:VisualElement>
+</engine:UXML>
