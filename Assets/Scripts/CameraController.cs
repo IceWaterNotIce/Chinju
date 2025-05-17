@@ -82,9 +82,10 @@ public class CameraBound2D : MonoBehaviour
     {
         if (followTarget != null)
         {
-            // 如果有跟隨目標，將攝影機平滑移動到目標位置
+            // 改用 Lerp 以獲得更平滑的跟隨效果
             Vector3 targetPosition = new Vector3(followTarget.position.x, followTarget.position.y, transform.position.z);
-            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+            float lerpSpeed = 8f; // 可依需求調整
+            transform.position = Vector3.Lerp(transform.position, targetPosition, lerpSpeed * Time.deltaTime);
             return;
         }
 
