@@ -59,6 +59,9 @@ public class ShipUI : Singleton<ShipUI>
 
     private Button btnFleetCombatMode; // 新增：編輯船隊戰鬥模式按鈕
     private VisualElement rectContainer; // <-- 移到這裡
+    private Slider sliderHealth; // 新增：顯示健康值的 Slider
+    private Slider sliderFuel;   // 新增：顯示燃料的 Slider
+    private Slider sliderExperience; // 新增：顯示經驗值的 Slider
     #endregion
 
     #region Unity Methods
@@ -510,8 +513,29 @@ public class ShipUI : Singleton<ShipUI>
 
     private void InitializeHealthAndFuelLabels()
     {
-        lblHealth = InitializeLabel("lblHealth", 10);
-        lblFuel = InitializeLabel("lblFuel", 5);
+        // 移除舊的 Label 初始化，改為 Slider
+        sliderHealth = InitializeSlider("sliderHealth", 100, 10);
+        sliderFuel = InitializeSlider("sliderFuel", 100, 5);
+        sliderExperience = InitializeSlider("sliderExperience", 10, 5);
+    }
+
+    private Slider InitializeSlider(string name, float maxValue, int marginTop)
+    {
+        var slider = UIPanel.Q<Slider>(name);
+        if (slider == null)
+        {
+            slider = new Slider(0, maxValue);
+            slider.name = name;
+            slider.style.marginTop = marginTop;
+            slider.style.width = 180;
+            slider.style.height = 18;
+            slider.style.unityTextAlign = TextAnchor.MiddleLeft;
+            UIPanel.Add(slider);
+        }
+        slider.highValue = maxValue;
+        slider.value = 0;
+        slider.SetEnabled(false); // 只顯示，不允許用戶操作
+        return slider;
     }
 
     private Label InitializeLabel(string name, int marginTop)
@@ -666,7 +690,7 @@ public class ShipUI : Singleton<ShipUI>
                     leader.CombatMode = newCombatMode;
                     Debug.Log($"[ShipUI] 已將船隊所有船隻戰鬥模式設為: {(newCombatMode ? "開啟" : "關閉")}");
                     if (btnToggleCombatMode != null)
-                        btnToggleCombatMode.text = newCombatMode ? "退出戰鬥模式" : "進入戰鬥模式";
+                        btnToggleCombatMode.text = newCombatMode ? "退出戰鬥模式" : "進入戰鬤模式";
                 }
             };
         }
@@ -687,6 +711,11 @@ public class ShipUI : Singleton<ShipUI>
         {
             lblLevel.text = $"等級: {ship.Level}";
             lblExperience.text = $"經驗值: {ship.Experience}/{ship.Level * 10}";
+            if (sliderExperience != null)
+            {
+                sliderExperience.highValue = ship.Level * 10;
+                sliderExperience.value = ship.Experience;
+            }
         }
     }
 
@@ -696,6 +725,11 @@ public class ShipUI : Singleton<ShipUI>
         {
             lblHealth.text = $"健康值: {Mathf.RoundToInt(currentHealth)}/{Mathf.RoundToInt(maxHealth)}";
         }
+        if (sliderHealth != null)
+        {
+            sliderHealth.highValue = maxHealth;
+            sliderHealth.value = currentHealth;
+        }
     }
 
     private void UpdateFuel(float currentFuel, float maxFuel)
@@ -703,6 +737,11 @@ public class ShipUI : Singleton<ShipUI>
         if (lblFuel != null)
         {
             lblFuel.text = $"燃料: {Mathf.RoundToInt(currentFuel)}/{Mathf.RoundToInt(maxFuel)}";
+        }
+        if (sliderFuel != null)
+        {
+            sliderFuel.highValue = maxFuel;
+            sliderFuel.value = currentFuel;
         }
     }
 
@@ -886,6 +925,17 @@ public class ShipUI : Singleton<ShipUI>
         else
         {
             LogError("無法加載 ShipUI 的樣式表！");
+            return;
+        }
+
+        var baseStyleSheet = Resources.Load<StyleSheet>("UI/base");
+        if (baseStyleSheet != null)
+        {
+            root.styleSheets.Add(baseStyleSheet);
+        }
+        else
+        {
+            LogError("無法加載 BaseStyle 的樣式表！");
             return;
         }
 
