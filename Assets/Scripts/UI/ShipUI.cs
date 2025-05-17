@@ -789,9 +789,12 @@ public class ShipUI : Singleton<ShipUI>
                 var selectedShip = hit.collider.GetComponent<Ship>(); // 確保檢測到的是 Ship 類型
                 if (selectedShip != null && selectedShip != ship)
                 {
-                    // 建立 Fleet parent 物件
+                    // 建立 Fleet parent 物件，並設為 ShipCreationManager 的子物件
                     GameObject fleetParent = new GameObject("FleetGroup");
                     fleetParent.transform.position = selectedShip.transform.position;
+                    // 設定 fleetParent 為 ShipCreationManager 的子物件
+                    if (ShipCreationManager.Instance != null)
+                        fleetParent.transform.SetParent(ShipCreationManager.Instance.transform);
 
                     // 將 leader 船與被選擇船設為 parent 的子物件
                     selectedShip.transform.SetParent(fleetParent.transform);
@@ -804,7 +807,6 @@ public class ShipUI : Singleton<ShipUI>
 
                     // 設定跟隨狀態
                     ship.IsFollower = true;
-                    // 若有 LeaderShip 欄位，設為 selectedShip
                     ship.LeaderShip = selectedShip as PlayerShip;
 
                     Debug.Log($"[ShipUI] 已建立 FleetGroup 並將 {selectedShip.name} 和 {ship.name} 加入船隊");
