@@ -7,10 +7,10 @@
                 <engine:VisualElement style="flex-direction: column; flex-grow: 1; justify-content: space-between; height: 70px; width: auto;">
                     <engine:VisualElement style="flex-grow: 1; flex-direction: row; max-height: 15px; justify-content: space-between; width: 150px;">
                         <engine:VisualElement style="flex-grow: 1; flex-direction: row;">
-                            <engine:VisualElement name="ShipTypeIcon" style="flex-grow: 1; width: 15px; height: 15px; max-width: 15px; max-height: 15px; min-width: 15px; min-height: 15px; background-image: resource(&apos;Images/Ship/Ship&apos;); background-position-x: center 0; -unity-background-scale-mode: scale-to-fit; transform-origin: center; rotate: 0;" />
-                            <engine:Label text="Name" name="lblName" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 10px; -unity-text-align: middle-left;" />
+                            <engine:VisualElement name="ShipTypeIcon" class="ship-type-icon" />
+                            <engine:Label text="Name" name="lblName" class="ship-name-label" />
                         </engine:VisualElement>
-                        <engine:Label name="lblLevel" text="等級: 1" style="padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 10px; -unity-text-align: middle-left;" />
+                        <engine:Label name="lblLevel" text="等級: 1" class="ship-level-label" />
                     </engine:VisualElement>
                     <engine:VisualElement name="expBarContainer" class="progress-bar-container">
                         <engine:VisualElement name="expBar" class="progress-bar" style="background-color: rgb(162, 214, 80);" />
