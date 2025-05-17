@@ -737,7 +737,7 @@ public class ShipUI : Singleton<ShipUI>
             {
                 float percent = (ship.Level * 10 > 0) ? (float)ship.Experience / (ship.Level * 10) : 0f;
                 expBar.style.width = Length.Percent(Mathf.Clamp01(percent) * 100f);
-                expBar.style.backgroundColor = new Color(0.2f, 0.6f, 1f, 1f); // 藍色
+                // expBar.style.backgroundColor = new Color(0.2f, 0.6f, 1f, 1f); // 藍色（移除）
             }
         }
     }
@@ -753,15 +753,15 @@ public class ShipUI : Singleton<ShipUI>
             float percent = (maxHealth > 0) ? currentHealth / maxHealth : 0f;
             healthBar.style.width = Length.Percent(Mathf.Clamp01(percent) * 100f);
 
-            // 動態顏色：高綠中黃低紅
-            Color color;
-            if (percent > 0.6f)
-                color = Color.green;
-            else if (percent > 0.3f)
-                color = Color.yellow;
-            else
-                color = Color.red;
-            healthBar.style.backgroundColor = color;
+            // 動態顏色（移除，交由 USS 控制）
+            // Color color;
+            // if (percent > 0.6f)
+            //     color = Color.green;
+            // else if (percent > 0.3f)
+            //     color = Color.yellow;
+            // else
+            //     color = Color.red;
+            // healthBar.style.backgroundColor = color;
         }
     }
 
@@ -775,7 +775,7 @@ public class ShipUI : Singleton<ShipUI>
         {
             float percent = (maxFuel > 0) ? currentFuel / maxFuel : 0f;
             fuelBar.style.width = Length.Percent(Mathf.Clamp01(percent) * 100f);
-            fuelBar.style.backgroundColor = new Color(1f, 0.8f, 0.2f, 1f); // 橘黃色
+            // fuelBar.style.backgroundColor = new Color(1f, 0.8f, 0.2f, 1f); // 橘黃色（移除）
         }
     }
 
@@ -909,7 +909,7 @@ public class ShipUI : Singleton<ShipUI>
     private void OnShipCombatModeChanged(bool isCombatMode)
     {
         if (btnToggleCombatMode != null)
-            btnToggleCombatMode.text = isCombatMode ? "退出戰鬥模式" : "進入戰鬥模式";
+            btnToggleCombatMode.text = isCombatMode ? "退出戰鬥模式" : "進入戰鬤模式";
     }
     #endregion
 
