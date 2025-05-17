@@ -4,5 +4,6 @@
     <ui:VisualElement name="VisualElement" class="chinju-ui-root">
         <ui:Button name="btnOpenWeaponCreatePanel" text="武器製造" class="chinju-ui-btn" />
         <ui:Button name="btnOpenShipCreatePanel" text="船艦製造" class="chinju-ui-btn" />
+        <ui:Button name="btnFillAllFuel" text="全部加滿燃料" class="chinju-ui-btn" />
     </ui:VisualElement>
 </ui:UXML>
