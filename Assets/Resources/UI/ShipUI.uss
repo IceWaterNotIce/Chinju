@@ -152,6 +152,7 @@
 #sliderHealth {
     --unity-slider-background: #222;
     --unity-slider-fill: #e74c3c;
+    transition: background-color 0.2s, color 0.2s;
 }
 
 #sliderFuel {

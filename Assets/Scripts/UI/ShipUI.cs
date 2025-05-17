@@ -746,6 +746,19 @@ public class ShipUI : Singleton<ShipUI>
         {
             sliderHealth.highValue = maxHealth;
             sliderHealth.value = currentHealth;
+
+            // 動態顏色：高綠中黃低紅
+            float ratio = maxHealth > 0 ? currentHealth / maxHealth : 0f;
+            Color color;
+            if (ratio > 0.6f)
+                color = Color.green;
+            else if (ratio > 0.3f)
+                color = Color.yellow;
+            else
+                color = Color.red;
+
+            // 正確方式：用 backgroundColor 設定滑桿填充顏色
+            sliderHealth.style.backgroundColor = color;
         }
     }
 
