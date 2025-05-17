@@ -10,6 +10,7 @@
 .progress-bar {
     height: 100%;
     background-color: #00ff00;
-    width: 0%; /* 初始進度為 0 */
+    width: 100%; /* 預設 100%，由 C# 控制實際寬度 */
     transition: width 0.1s linear;
+    border-radius: 10px;
 }

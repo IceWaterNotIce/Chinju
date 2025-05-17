@@ -59,9 +59,9 @@ public class ShipUI : Singleton<ShipUI>
 
     private Button btnFleetCombatMode; // 新增：編輯船隊戰鬥模式按鈕
     private VisualElement rectContainer; // <-- 移到這裡
-    private Slider sliderHealth; // 新增：顯示健康值的 Slider
-    private Slider sliderFuel;   // 新增：顯示燃料的 Slider
-    private Slider sliderExperience; // 新增：顯示經驗值的 Slider
+    private VisualElement healthBar; // 新增
+    private VisualElement fuelBar;   // 新增
+    private VisualElement expBar;    // 新增
     #endregion
 
     #region Unity Methods
@@ -530,10 +530,15 @@ public class ShipUI : Singleton<ShipUI>
 
     private void InitializeHealthAndFuelLabels()
     {
-        // 移除舊的 Label 初始化，改為 Slider
-        sliderHealth = InitializeSlider("sliderHealth", 100, 10);
-        sliderFuel = InitializeSlider("sliderFuel", 100, 5);
-        sliderExperience = InitializeSlider("sliderExperience", 10, 5);
+        // 刪除/註解掉 Slider 相關初始化
+        // sliderHealth = InitializeSlider("sliderHealth", 100, 10);
+        // sliderFuel = InitializeSlider("sliderFuel", 100, 5);
+        // sliderExperience = InitializeSlider("sliderExperience", 10, 5);
+
+        // 新增：取得 progress bar VisualElement
+        healthBar = UIPanel.Q<VisualElement>("healthBar");
+        fuelBar = UIPanel.Q<VisualElement>("fuelBar");
+        expBar = UIPanel.Q<VisualElement>("expBar");
     }
 
     private Slider InitializeSlider(string name, float maxValue, int marginTop)
@@ -728,10 +733,11 @@ public class ShipUI : Singleton<ShipUI>
         {
             lblLevel.text = $"等級: {ship.Level}";
             lblExperience.text = $"經驗值: {ship.Experience}/{ship.Level * 10}";
-            if (sliderExperience != null)
+            if (expBar != null)
             {
-                sliderExperience.highValue = ship.Level * 10;
-                sliderExperience.value = ship.Experience;
+                float percent = (ship.Level * 10 > 0) ? (float)ship.Experience / (ship.Level * 10) : 0f;
+                expBar.style.width = Length.Percent(Mathf.Clamp01(percent) * 100f);
+                expBar.style.backgroundColor = new Color(0.2f, 0.6f, 1f, 1f); // 藍色
             }
         }
     }
@@ -742,23 +748,20 @@ public class ShipUI : Singleton<ShipUI>
         {
             lblHealth.text = $"健康值: {Mathf.RoundToInt(currentHealth)}/{Mathf.RoundToInt(maxHealth)}";
         }
-        if (sliderHealth != null)
+        if (healthBar != null)
         {
-            sliderHealth.highValue = maxHealth;
-            sliderHealth.value = currentHealth;
+            float percent = (maxHealth > 0) ? currentHealth / maxHealth : 0f;
+            healthBar.style.width = Length.Percent(Mathf.Clamp01(percent) * 100f);
 
             // 動態顏色：高綠中黃低紅
-            float ratio = maxHealth > 0 ? currentHealth / maxHealth : 0f;
             Color color;
-            if (ratio > 0.6f)
+            if (percent > 0.6f)
                 color = Color.green;
-            else if (ratio > 0.3f)
+            else if (percent > 0.3f)
                 color = Color.yellow;
             else
                 color = Color.red;
-
-            // 正確方式：用 backgroundColor 設定滑桿填充顏色
-            sliderHealth.style.backgroundColor = color;
+            healthBar.style.backgroundColor = color;
         }
     }
 
@@ -768,10 +771,11 @@ public class ShipUI : Singleton<ShipUI>
         {
             lblFuel.text = $"燃料: {Mathf.RoundToInt(currentFuel)}/{Mathf.RoundToInt(maxFuel)}";
         }
-        if (sliderFuel != null)
+        if (fuelBar != null)
         {
-            sliderFuel.highValue = maxFuel;
-            sliderFuel.value = currentFuel;
+            float percent = (maxFuel > 0) ? currentFuel / maxFuel : 0f;
+            fuelBar.style.width = Length.Percent(Mathf.Clamp01(percent) * 100f);
+            fuelBar.style.backgroundColor = new Color(1f, 0.8f, 0.2f, 1f); // 橘黃色
         }
     }
 

@@ -4,6 +4,20 @@
         <engine:VisualElement name="rectContainer" style="flex-grow: 1; width: 0; max-width: 0; min-width: 0; max-height: 0; min-height: 0; height: 0; position: absolute; top: 0; left: 0;" />
         <engine:VisualElement name="UIPanel" style="width: 420px; flex-direction: column; padding: 10px;">
             <engine:VisualElement style="flex-direction: row; justify-content: space-between;">
+                <engine:VisualElement style="flex-direction: column; flex-grow: 1; justify-content: space-between; height: 35px;">
+                    <engine:VisualElement name="expBarContainer" class="progress-bar-container">
+                        <engine:VisualElement name="expBar" class="progress-bar" style="background-color: rgb(162, 214, 80);" />
+                        <engine:Label name="lblExperience" text="0/10" style="position: absolute; right: 0; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 6px; -unity-text-align: middle-left;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="healthBarContainer" class="progress-bar-container">
+                        <engine:VisualElement name="healthBar" class="progress-bar" style="background-color: rgb(255, 0, 0);" />
+                        <engine:Label name="lblHealth" text="100/100" style="position: absolute; right: 0; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 6px; -unity-text-align: middle-left;" />
+                    </engine:VisualElement>
+                    <engine:VisualElement name="fuelBarContainer" class="progress-bar-container">
+                        <engine:VisualElement name="fuelBar" class="progress-bar" style="position: absolute; background-color: rgb(70, 75, 70);" />
+                        <engine:Label name="lblFuel" text="100/100" style="position: absolute; right: 0; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 6px; -unity-text-align: middle-left;" />
+                    </engine:VisualElement>
+                </engine:VisualElement>
                 <engine:VisualElement style="flex-direction: column; margin-right: 10px;">
                     <engine:Label text="速度" class="title" />
                     <engine:Label text="Full" name="lblSpeedFrontFull" />
@@ -20,17 +34,6 @@
                     <engine:Label text="Stop" name="lblRotationStop" />
                     <engine:Label text="1/2" name="lblRotationRightHalf" />
                     <engine:Label text="Full" name="lblRotationRightFull" />
-                </engine:VisualElement>
-                <engine:VisualElement style="flex-direction: column; flex-grow: 1;">
-                    <engine:Label text="燃料" />
-                    <engine:Label name="lblFuel" text="燃料: 100/100" />
-                    <engine:Slider name="sliderFuel" low-value="0" high-value="100" value="100" class="sliderFuel" style="width: 180px; margin-bottom: 5px; background-color: rgba(0, 0, 0, 0);" />
-                    <engine:Label text="健康" />
-                    <engine:Label name="lblHealth" text="健康值: 100/100" />
-                    <engine:Slider name="sliderHealth" low-value="0" high-value="100" value="100" class="sliderHealth" style="width: 180px; margin-bottom: 5px;" />
-                    <engine:Label name="lblLevel" text="等級: 1" />
-                    <engine:Label name="lblExperience" text="經驗值: 0/10" />
-                    <engine:Slider name="sliderExperience" low-value="0" high-value="10" value="0" class="sliderExperience" style="width: 180px; margin-bottom: 5px;" />
                 </engine:VisualElement>
             </engine:VisualElement>
             <engine:VisualElement style="flex-direction: row; align-items: center; margin-top: 10px;">
