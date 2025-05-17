@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3216380124224694994}
   - component: {fileID: 5343018971910227091}
   - component: {fileID: 1607758159362755293}
+  - component: {fileID: -237913541237367616}
   m_Layer: 3
   m_Name: Destroyer
   m_TagString: Player
@@ -102,10 +103,10 @@ CircleCollider2D:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 32
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -153,17 +154,53 @@ MonoBehaviour:
   m_rotationSpeed: 0
   tilemap: {fileID: 0}
   oceanTile: {fileID: 11400000, guid: bf72caf695ff12947b165e724fdb9748, type: 2}
+  IsFollower: 0
+  LeaderShip: {fileID: 0}
   m_detectionDistance: 50
   m_combatMode: 0
   m_weaponLimit: 2
   weapons: []
   m_level: 1
   m_experience: 0
+  OnLevelChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnExperienceChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  OnCombatModeChanged:
+    m_PersistentCalls:
+      m_Calls: []
   m_navigationArea:
     serializedVersion: 2
     x: 0
     y: 0
     width: 0
     height: 0
-  LeaderShip: {fileID: 0}
-  IsFollower: 0
+--- !u!50 &-237913541237367616
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 33835131033531580}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 8
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 32
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0

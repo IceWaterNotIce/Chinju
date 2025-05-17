@@ -617,7 +617,7 @@ public class ShipUI : Singleton<ShipUI>
             {
                 if (rectContainer != null && rectContainer.childCount > 0)
                 {
-                                  
+
                     // Clear existing rectangles and reset PlayerShip data
                     ClearRectAndData();
                     startDrawButton.text = "Start Draw"; // Update button text
@@ -821,9 +821,51 @@ public class ShipUI : Singleton<ShipUI>
 
             if (hit.collider != null)
             {
-                var selectedShip = hit.collider.GetComponent<Ship>(); // 確保檢測到的是 Ship 類型
+                var selectedShip = hit.collider.GetComponent<Warship>(); // 確保檢測到的是 Ship 類型
                 if (selectedShip != null && selectedShip != ship)
                 {
+                    if (selectedShip.IsFollower)
+                    {
+                        Debug.Log($"[ShipUI] {selectedShip.name} 已經是船隊成員，無法再次選擇。");
+                        //debug ship parent
+                        Debug.Log($"[ShipUI] {selectedShip.name} 的父物件: {selectedShip.transform.parent.name}");
+                        // check if parent is Fleet
+                        if (selectedShip.transform.parent != null && selectedShip.transform.parent.GetComponent<Fleet>() != null)
+                        {
+                            Debug.Log($"[ShipUI] {selectedShip.name} 的父物件是 Fleet");
+
+                            // get leader
+                            PlayerShip leader = selectedShip.transform.parent.GetComponent<Fleet>().followers[0] as PlayerShip;
+                            if (leader != null)
+                            {
+                                Debug.Log($"[ShipUI] {selectedShip.name} 的領導者是: {leader.name}");
+                                // 取消選擇
+                                ship.transform.SetParent(selectedShip.transform.parent.transform);
+                                ship.IsFollower = true;
+                                ship.LeaderShip = leader;
+                                selectedShip.transform.parent.GetComponent<Fleet>().followers.Add(ship);
+                                Debug.Log($"[ShipUI] {ship.name} 已加入 {selectedShip.name} 的船隊");
+                                isSelectingShipForLine = false; // 停止選擇模式
+                                                                // 關閉 UI
+                                Destroy(gameObject);
+                                Debug.Log("[ShipUI] Ship UI 已關閉。");
+
+                                return;
+                                
+                            }
+                            else
+                            {
+                                Debug.LogWarning("[ShipUI] 無法獲取 Fleet 的領導者");
+                                return;
+                            }
+
+                        }
+                    }
+                    if (selectedShip == null)
+                    {
+                        Debug.LogWarning("[ShipUI] 選擇的物件不是船隻");
+                        return;
+                    }
                     // 建立 Fleet parent 物件，並設為 ShipCreationManager 的子物件
                     GameObject fleetParent = new GameObject("FleetGroup");
                     fleetParent.transform.position = selectedShip.transform.position;
