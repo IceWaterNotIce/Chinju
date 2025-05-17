@@ -3,19 +3,19 @@
     <engine:VisualElement name="root" style="position: absolute; align-content: auto; align-items: flex-start; flex-direction: row; justify-content: flex-start; top: 0; width: 100%; height: 100%;">
         <engine:VisualElement name="rectContainer" style="flex-grow: 1; width: 0; max-width: 0; min-width: 0; max-height: 0; min-height: 0; height: 0; position: absolute; top: 0; left: 0;" />
         <engine:VisualElement name="UIPanel" style="width: 420px; flex-direction: column; padding: 10px;">
-            <engine:VisualElement style="flex-direction: row; justify-content: space-between;">
-                <engine:VisualElement style="flex-direction: column; flex-grow: 1; justify-content: space-between; height: 35px;">
-                    <engine:VisualElement name="expBarContainer" class="progress-bar-container">
+            <engine:VisualElement style="flex-direction: row; justify-content: space-between; height: 15px;">
+                <engine:VisualElement style="flex-direction: column; flex-grow: 1; justify-content: space-between; height: 50px; width: auto;">
+                    <engine:VisualElement name="expBarContainer" class="progress-bar-container" style="background-size: 100px 100%; width: 150px; background-color: rgb(255, 255, 255); height: 15px;">
                         <engine:VisualElement name="expBar" class="progress-bar" style="background-color: rgb(162, 214, 80);" />
-                        <engine:Label name="lblExperience" text="0/10" style="position: absolute; right: 0; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 6px; -unity-text-align: middle-left;" />
+                        <engine:Label name="lblExperience" text="0/10" style="position: absolute; right: 0; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 10px; -unity-text-align: middle-left;" />
                     </engine:VisualElement>
-                    <engine:VisualElement name="healthBarContainer" class="progress-bar-container">
+                    <engine:VisualElement name="healthBarContainer" class="progress-bar-container" style="width: 150px; background-color: rgb(255, 255, 255); height: 15px;">
                         <engine:VisualElement name="healthBar" class="progress-bar" style="background-color: rgb(255, 0, 0);" />
-                        <engine:Label name="lblHealth" text="100/100" style="position: absolute; right: 0; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 6px; -unity-text-align: middle-left;" />
+                        <engine:Label name="lblHealth" text="100/100" style="position: absolute; right: 0; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 10px; -unity-text-align: middle-left;" />
                     </engine:VisualElement>
-                    <engine:VisualElement name="fuelBarContainer" class="progress-bar-container">
+                    <engine:VisualElement name="fuelBarContainer" class="progress-bar-container" style="width: 150px; background-color: rgb(255, 255, 255); height: 15px;">
                         <engine:VisualElement name="fuelBar" class="progress-bar" style="position: absolute; background-color: rgb(70, 75, 70);" />
-                        <engine:Label name="lblFuel" text="100/100" style="position: absolute; right: 0; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 6px; -unity-text-align: middle-left;" />
+                        <engine:Label name="lblFuel" text="100/100" style="position: absolute; right: 0; height: 100%; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; font-size: 10px; -unity-text-align: middle-left;" />
                     </engine:VisualElement>
                 </engine:VisualElement>
                 <engine:VisualElement style="flex-direction: column; margin-right: 10px;">
@@ -36,11 +36,7 @@
                     <engine:Label text="Full" name="lblRotationRightFull" />
                 </engine:VisualElement>
             </engine:VisualElement>
-            <engine:VisualElement style="flex-direction: row; align-items: center; margin-top: 10px;">
-                <engine:Label text="武器" class="title" style="margin-right: 10px;" />
-                <engine:VisualElement name="weaponListContainer" style="flex-direction: row;" />
-            </engine:VisualElement>
-            <engine:VisualElement style="flex-direction: row; flex-wrap: wrap; margin-top: 10px;">
+            <engine:VisualElement style="flex-direction: row; flex-wrap: wrap; margin-top: 10px; top: 127px;">
                 <engine:Button name="btnCancelFollow" text="取消跟隨" class="cancel-follow-btn" style="width: 130px; margin-right: 8px;" />
                 <engine:Button name="StartDrawButton" text="Start Draw" class="draw-button" style="margin-right: 8px;" />
                 <engine:Button name="btnToggleCombatMode" text="進入戰鬥模式" class="combat-mode-btn" style="width: 150px; margin-right: 8px;" />
