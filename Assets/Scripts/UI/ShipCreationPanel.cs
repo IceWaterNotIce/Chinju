@@ -144,15 +144,6 @@ public class ShipCreationPanel : MonoBehaviour
     }
 
     /// <summary>
-    /// 重置面板狀態
-    /// </summary>
-    private void ResetPanel()
-    {
-        createShipBtn.SetEnabled(false);
-        UpdateCostDisplay(0, 0, 0);
-    }
-
-    /// <summary>
     /// 更新資源消耗顯示
     /// </summary>
     private void UpdateCostDisplay(int gold, int oil, int cube)
@@ -176,7 +167,6 @@ public class ShipCreationPanel : MonoBehaviour
 
         PlayerShip newShip = ShipCreationManager.Instance.TryCreateRandomShip(goldInputField.value, oilInputField.value, cubeInputField.value);
 
-
         if (newShip != null)
         {
             newShip.AddRandomWeapon();
@@ -186,7 +176,9 @@ public class ShipCreationPanel : MonoBehaviour
             Debug.LogError("[ShipCreationPanel] 無法創建船隻，請檢查資源或其他條件");
         }
 
-        ResetPanel();
+        // 建造後重設為 10, 10, 1
+        UpdateCostDisplay(10, 10, 1);
+        createShipBtn.SetEnabled(false);
     }
 
     // 新增：資源加減方法

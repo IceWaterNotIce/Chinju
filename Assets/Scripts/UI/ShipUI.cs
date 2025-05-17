@@ -801,6 +801,10 @@ public class ShipUI : Singleton<ShipUI>
                     ship.LeaderShip = selectedShip.gameObject.GetComponent<PlayerShip>();
                     Debug.Log($"[ShipUI] 已將船隻 {selectedShip.name} 添加到船隊");
                     isSelectingShipForLine = false; // 停止選擇模式
+
+                    // close the UI
+                    Destroy(gameObject); // 銷毀 ShipUI
+                    Debug.Log("[ShipUI] Ship UI 已關閉。");
                 }
                 else
                 {
