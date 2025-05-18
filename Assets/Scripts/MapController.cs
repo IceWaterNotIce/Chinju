@@ -33,6 +33,8 @@ public class MapController : MonoBehaviour
     // 新增：記錄目前已渲染的 tile
     private HashSet<Vector3Int> renderedTiles = new HashSet<Vector3Int>();
 
+    private Vector3 lastCameraPosition; // 新增：記錄上次攝影機位置
+
     void Start()
     {
         if (useRandomSeed)
@@ -64,6 +66,10 @@ public class MapController : MonoBehaviour
             cameraController.targetTilemap = tilemap;
             cameraController.RefreshBounds();
         }
+
+        // 初始化 lastCameraPosition
+        if (mainCamera != null)
+            lastCameraPosition = mainCamera.transform.position;
 
         StartCoroutine(FocusOnChinjuTileAfterMapGeneration());
     }
@@ -107,8 +113,12 @@ public class MapController : MonoBehaviour
 
     private void Update()
     {
-        // 攝影機移動時動態生成地圖
-        UpdateVisibleChunks();
+        // 僅當攝影機移動時才更新可見區塊
+        if (mainCamera != null && mainCamera.transform.position != lastCameraPosition)
+        {
+            UpdateVisibleChunks();
+            lastCameraPosition = mainCamera.transform.position;
+        }
 
         // 檢測滑鼠左鍵點擊
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
