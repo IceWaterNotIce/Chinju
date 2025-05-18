@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Linq;
+using System;
 using System.Collections.Generic;
+using UnityEngine.Tilemaps;
 
 public class Warship : Ship
 {
@@ -25,6 +27,9 @@ public class Warship : Ship
     [SerializeField] private int m_level = 1;
     [SerializeField] private float m_experience = 0f;
 
+    public event Action<float> OnExperienceChanged;
+    public event Action<int> OnLevelChanged;
+
     public int Level { get => m_level; private set => m_level = Mathf.Max(1, value); }
     public float Experience { get => m_experience; private set => m_experience = Mathf.Max(0, value); }
 
@@ -38,6 +43,8 @@ public class Warship : Ship
             Level++;
             upgradeNeed = Level * 10f;
         }
+        OnExperienceChanged?.Invoke(Experience);
+        OnLevelChanged?.Invoke(Level);
     }
     #endregion
 
@@ -89,7 +96,7 @@ public class Warship : Ship
 
     public void AttackTarget(GameObject target)
     {
-        weapons.ForEach(weapon => 
+        weapons.ForEach(weapon =>
         {
             if (weapon != null && target != null) weapon.StartAttack(target);
         });
@@ -106,18 +113,18 @@ public class Warship : Ship
     public void AddRandomWeapon()
     {
         if (weapons.Count >= WeaponLimit) return;
-        
+
         var availableWeapons = Resources.LoadAll<Weapon>("Prefabs/Weapon");
         if (availableWeapons.Length == 0) return;
-        
+
         var newWeapon = Instantiate(
-            availableWeapons[Random.Range(0, availableWeapons.Length)], 
+            availableWeapons[UnityEngine.Random.Range(0, availableWeapons.Length)],
             transform
         );
         weapons.Add(newWeapon);
     }
 
-       public override GameData.ShipData SaveShipData()
+    public override GameData.ShipData SaveShipData()
     {
         var data = base.SaveShipData();
         data.Experience = Experience;

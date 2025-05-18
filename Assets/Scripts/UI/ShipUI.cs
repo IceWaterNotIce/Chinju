@@ -76,21 +76,50 @@ public class ShipUI : Singleton<ShipUI>
         InitializeUI();
     }
 
+    void UpdateExperience(float exp,int level)
+    {
+        if (lblExperience != null)
+        {
+            lblExperience.text = $"經驗值: {exp}/{level*10}";
+        }
+        if (expBar != null)
+        {
+            expBar.style.width = new StyleLength(new Length(exp / level * 100, LengthUnit.Percent));
+        }
+    }
+
+    void UpdateLevel(int level)
+    {
+        if (lblLevel != null)
+        {
+            lblLevel.text = $"等級: {level}";
+        }
+    }
+
+    void UpdateCombatMode(bool isInCombat)
+    {
+        if (btnToggleCombatMode != null)
+        {
+            btnToggleCombatMode.text = isInCombat ? "退出戰鬥模式" : "進入戰鬥模式";
+        }
+    }
+
     public void Initial(PlayerShip s)
     {
         ship = s;
         InitializeUI();
-        // 立即更新等級與經驗值顯示
-        UpdateLevelAndExperienceUI();
+
         UpdateHealth(ship.Health, ship.MaxHealth);
         UpdateFuel(ship.CurrentFuel, ship.MaxFuel);
 
         // 訂閱事件
         ship.OnHealthChanged += health => UpdateHealth(health, ship.MaxHealth);
         ship.OnFuelChanged += fuel => UpdateFuel(fuel, ship.MaxFuel);
+        ship.gameObject.GetComponent<Warship>().OnExperienceChanged += exp => UpdateExperience(exp, ship.gameObject.GetComponent<Warship>().Level);
+        ship.gameObject.GetComponent<Warship>().OnLevelChanged += level => UpdateLevel(level);
 
         // 新增：訂閱等級、經驗值、戰鬥模式變化事件
-        SubscribeShipEvents();
+        ship.OnCombatModeChanged.AddListener(isInCombat => UpdateCombatMode(isInCombat));
 
         SetUIPosition();
 
@@ -112,7 +141,6 @@ public class ShipUI : Singleton<ShipUI>
 
     void Update()
     {
-        UpdateLevelAndExperienceUI(); // 每幀更新等級和經驗值的顯示
         SetUIPosition(); // 每幀更新 UI 位置
         SetRectPosition(); // 每幀更新矩形位置
         UpdateShipName(); // 每幀同步船名
@@ -786,24 +814,7 @@ public class ShipUI : Singleton<ShipUI>
     #endregion
 
     #region UI Update & Position
-    private void UpdateLevelAndExperienceUI()
-    {
-        if (ship != null)
-        {
-            // 顯示等級
-            if (lblLevel != null)
-                lblLevel.text = $"等級: {ship.Level}";
-            // 顯示經驗值
-            if (lblExperience != null)
-                lblExperience.text = $"{ship.Experience}/{ship.Level * 10}";
-            // 經驗條
-            if (expBar != null)
-            {
-                float percent = (ship.Level * 10 > 0) ? (float)ship.Experience / (ship.Level * 10) : 0f;
-                expBar.style.width = Length.Percent(Mathf.Clamp01(percent) * 100f);
-            }
-        }
-    }
+
 
     private void UpdateHealth(float currentHealth, float maxHealth)
     {
@@ -1003,46 +1014,7 @@ public class ShipUI : Singleton<ShipUI>
     #endregion
 
     #region UnityEvent Subscription
-    private void SubscribeShipEvents()
-    {
-        // 假設 PlayerShip 有 UnityEvent<int> OnLevelChanged, UnityEvent<float> OnExperienceChanged, UnityEvent<bool> OnCombatModeChanged
-        // 若沒有請在 PlayerShip 裡加上
-        if (ship != null)
-        {
-            // 等級變化
-            if (ship.OnLevelChanged != null)
-                ship.OnLevelChanged.AddListener(OnShipLevelChanged);
-            // 經驗值變化
-            if (ship.OnExperienceChanged != null)
-                ship.OnExperienceChanged.AddListener(OnShipExperienceChanged);
-            // 戰鬥模式變化
-            if (ship.OnCombatModeChanged != null)
-                ship.OnCombatModeChanged.AddListener(OnShipCombatModeChanged);
-        }
-    }
-
-    private void UnsubscribeShipEvents()
-    {
-        if (ship != null)
-        {
-            if (ship.OnLevelChanged != null)
-                ship.OnLevelChanged.RemoveListener(OnShipLevelChanged);
-            if (ship.OnExperienceChanged != null)
-                ship.OnExperienceChanged.RemoveListener(OnShipExperienceChanged);
-            if (ship.OnCombatModeChanged != null)
-                ship.OnCombatModeChanged.RemoveListener(OnShipCombatModeChanged);
-        }
-    }
-
-    private void OnShipLevelChanged(int newLevel)
-    {
-        UpdateLevelAndExperienceUI();
-    }
-
-    private void OnShipExperienceChanged(float newExp)
-    {
-        UpdateLevelAndExperienceUI();
-    }
+ 
 
     private void OnShipCombatModeChanged(bool isCombatMode)
     {
@@ -1060,7 +1032,6 @@ public class ShipUI : Singleton<ShipUI>
 
     private void OnDestroy()
     {
-        UnsubscribeShipEvents(); // 解除事件訂閱
         Debug.Log("[ShipUI] 銷毀 ShipUI");
         //Debug where call this destroy
         // Debug.Log(new System.Diagnostics.StackTrace().ToString());
