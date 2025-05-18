@@ -67,6 +67,7 @@ public class ShipUI : Singleton<ShipUI>
     private Button btnDrawWaypoint; // 新增：切換繪製 waypoint 模式按鈕
     private bool IsDrawingWaypoint = false; // 新增：繪製 waypoint 模式狀態
     private List<VisualElement> waypointMarkers = new List<VisualElement>(); // 新增：waypoint 標記列表
+    private Label lblName; // 新增：顯示船名的 Label
     #endregion
 
     #region Unity Methods
@@ -103,6 +104,9 @@ public class ShipUI : Singleton<ShipUI>
         {
             btnToggleCombatMode.text = ship.CombatMode ? "退出戰鬥模式" : "進入戰鬥模式";
         }
+
+        // 新增：顯示船名
+        UpdateShipName();
     }
 
     void Update()
@@ -110,6 +114,7 @@ public class ShipUI : Singleton<ShipUI>
         UpdateLevelAndExperienceUI(); // 每幀更新等級和經驗值的顯示
         SetUIPosition(); // 每幀更新 UI 位置
         SetRectPosition(); // 每幀更新矩形位置
+        UpdateShipName(); // 每幀同步船名
     }
     #endregion
 
@@ -1113,6 +1118,16 @@ public class ShipUI : Singleton<ShipUI>
         lblHealth = UIHelper.InitializeElement<Label>(UIPanel, "lblHealth");
         lblLevel = UIHelper.InitializeElement<Label>(UIPanel, "lblLevel");
         lblExperience = UIHelper.InitializeElement<Label>(UIPanel, "lblExperience");
+        lblName = UIHelper.InitializeElement<Label>(UIPanel, "lblName"); // 新增：初始化 lblName
     }
     #endregion
+
+    // 新增：更新船名顯示
+    private void UpdateShipName()
+    {
+        if (lblName != null && ship != null)
+        {
+            lblName.text = $"名稱: {ship.name}";
+        }
+    }
 }
