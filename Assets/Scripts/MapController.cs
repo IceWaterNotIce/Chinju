@@ -35,11 +35,15 @@ public class MapController : MonoBehaviour
 
     private Vector3 lastCameraPosition; // 新增：記錄上次攝影機位置
 
+    private Coroutine chunkRenderCoroutine;
+    private HashSet<Vector3Int> pendingTiles = new HashSet<Vector3Int>();
+    private const int TilesPerFrame = 128; // 每幀生成的 tile 數量
+
     void Start()
     {
         if (useRandomSeed)
         {
-            
+
             seed = Random.Range(0, int.MaxValue);
         }
         Random.InitState(seed); // 初始化隨機數生成器
@@ -154,30 +158,19 @@ public class MapController : MonoBehaviour
                         shouldRender.Add(pos);
                         if (!renderedTiles.Contains(pos))
                         {
-                            // 只生成未渲染過的 tile
-                            if (!generatedTiles.ContainsKey(pos))
-                            {
-                                TileType type = GetTileTypeAt(pos.x, pos.y);
-                                generatedTiles[pos] = type;
-                            }
-                            TileBase tile = null;
-                            switch (generatedTiles[pos])
-                            {
-                                case TileType.Ocean: tile = oceanTile; break;
-                                case TileType.Grass: tile = grassTile; break;
-                                case TileType.Oil: tile = oilTile; break;
-                                case TileType.Chinju: tile = chinjuTile; break;
-                            }
-                            if (tile != null)
-                            {
-                                tilemap.SetTile(pos, tile);
-                            }
-                            renderedTiles.Add(pos);
+                            pendingTiles.Add(pos);
                         }
                     }
                 }
             }
         }
+
+        // 啟動/重啟分幀渲染協程
+        if (chunkRenderCoroutine != null)
+        {
+            StopCoroutine(chunkRenderCoroutine);
+        }
+        chunkRenderCoroutine = StartCoroutine(RenderTilesCoroutine());
 
         // 移除視野外的 tile
         var toRemove = new List<Vector3Int>();
@@ -192,6 +185,42 @@ public class MapController : MonoBehaviour
         foreach (var pos in toRemove)
         {
             renderedTiles.Remove(pos);
+        }
+    }
+
+    private IEnumerator RenderTilesCoroutine()
+    {
+        var tilesToRender = new List<Vector3Int>(pendingTiles);
+        pendingTiles.Clear();
+
+        int count = 0;
+        foreach (var pos in tilesToRender)
+        {
+            if (!generatedTiles.ContainsKey(pos))
+            {
+                TileType type = GetTileTypeAt(pos.x, pos.y);
+                generatedTiles[pos] = type;
+            }
+            TileBase tile = null;
+            switch (generatedTiles[pos])
+            {
+                case TileType.Ocean: tile = oceanTile; break;
+                case TileType.Grass: tile = grassTile; break;
+                case TileType.Oil: tile = oilTile; break;
+                case TileType.Chinju: tile = chinjuTile; break;
+            }
+            if (tile != null)
+            {
+                tilemap.SetTile(pos, tile);
+            }
+            renderedTiles.Add(pos);
+
+            count++;
+            if (count >= TilesPerFrame)
+            {
+                count = 0;
+                yield return null; // 等待下一幀
+            }
         }
     }
 
