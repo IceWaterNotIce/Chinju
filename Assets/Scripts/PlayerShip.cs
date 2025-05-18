@@ -21,6 +21,7 @@ public class PlayerShip : Warship, IPointerClickHandler
     [Header("Player Settings")]
     [SerializeField] private Rect m_navigationArea;
     private float m_healthRegenTimer = 0f; // 用於計時的變數
+    private float m_navigationUpdateTimer = 0f; // 新增：導航更新計時器
     #endregion
 
     #region Properties
@@ -98,8 +99,10 @@ public class PlayerShip : Warship, IPointerClickHandler
     #region Movement Logic
     protected override void Move()
     {
-        if (!IsFollower)
+        m_navigationUpdateTimer += Time.deltaTime;
+        if (!IsFollower && m_navigationUpdateTimer >= 0.2f)
         {
+            m_navigationUpdateTimer = 0f;
             if (m_waypoints.Count > 0)
             {
                 NavigateToWaypoint();

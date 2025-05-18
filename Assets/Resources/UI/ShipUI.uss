@@ -87,6 +87,27 @@
     background-color: rgb(69, 160, 73);
 }
 
+.draw-waypoint-btn {
+    background-color: #3a7;
+    color: #fff;
+    font-size: 15px;
+    border-radius: 5px;
+    border: none;
+    margin: 0 8px 0 0;
+    width: 130px;
+    height: 32px;
+}
+
+.waypoint-marker {
+    background-color: #ff0;
+    border-radius: 50%;
+    border: 2px solid #f80;
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    z-index: 100;
+}
+
 .rect {
     background-color: rgba(0, 255, 0, 0.5);
     border-top-width: 10px;

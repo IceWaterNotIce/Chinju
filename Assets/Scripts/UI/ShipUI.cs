@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.Events; // 新增
+using System.Collections.Generic;
 
 public class ShipUI : Singleton<ShipUI>
 {
@@ -62,6 +63,10 @@ public class ShipUI : Singleton<ShipUI>
     private VisualElement healthBar; // 新增
     private VisualElement fuelBar;   // 新增
     private VisualElement expBar;    // 新增
+
+    private Button btnDrawWaypoint; // 新增：切換繪製 waypoint 模式按鈕
+    private bool IsDrawingWaypoint = false; // 新增：繪製 waypoint 模式狀態
+    private List<VisualElement> waypointMarkers = new List<VisualElement>(); // 新增：waypoint 標記列表
     #endregion
 
     #region Unity Methods
@@ -724,6 +729,53 @@ public class ShipUI : Singleton<ShipUI>
                 existBtn.RemoveFromHierarchy();
         }
     }
+
+    private void InitializeDrawWaypointButton()
+    {
+        btnDrawWaypoint = UIHelper.InitializeElement<Button>(UIPanel, "btnDrawWaypoint");
+        if (btnDrawWaypoint == null)
+        {
+            btnDrawWaypoint = new Button() { name = "btnDrawWaypoint", text = "繪製航點" };
+            UIPanel.Add(btnDrawWaypoint);
+        }
+        btnDrawWaypoint.clicked += ToggleDrawWaypointMode;
+        UpdateDrawWaypointButtonState();
+    }
+
+    private void UpdateDrawWaypointButtonState()
+    {
+        bool canDraw = true;
+        if (ship != null && ship.transform.parent != null)
+        {
+            Fleet fleet = ship.transform.parent.GetComponent<Fleet>();
+            if (fleet != null && fleet.followers.Count > 0 && fleet.followers[0] != ship)
+            {
+                canDraw = false;
+            }
+        }
+        btnDrawWaypoint.SetEnabled(canDraw);
+        btnDrawWaypoint.text = IsDrawingWaypoint ? "結束繪製航點" : "繪製航點";
+    }
+
+    private void ToggleDrawWaypointMode()
+    {
+        IsDrawingWaypoint = !IsDrawingWaypoint;
+        btnDrawWaypoint.text = IsDrawingWaypoint ? "結束繪製航點" : "繪製航點";
+        if (!IsDrawingWaypoint)
+        {
+            ClearWaypointMarkers();
+        }
+    }
+
+    private void ClearWaypointMarkers()
+    {
+        foreach (var marker in waypointMarkers)
+        {
+            marker.RemoveFromHierarchy();
+        }
+        waypointMarkers.Clear();
+        ship?.ClearWaypoints();
+    }
     #endregion
 
     #region UI Update & Position
@@ -809,6 +861,7 @@ public class ShipUI : Singleton<ShipUI>
         root.RegisterCallback<PointerMoveEvent>(OnPointerMove); // 修正為 PointerMoveEvent
         root.RegisterCallback<PointerUpEvent>(OnPointerUp);     // 修正為 PointerUpEvent
         root.RegisterCallback<PointerDownEvent>(HandleShipSelectionForLine); // 新增處理船隻選擇的事件
+        root.RegisterCallback<PointerDownEvent>(OnWaypointPointerDown); // 新增：繪製 waypoint 模式下的 pointer event
     }
 
     private void HandleShipSelectionForLine(PointerDownEvent evt)
@@ -904,6 +957,37 @@ public class ShipUI : Singleton<ShipUI>
             }
         }
         Debug.Log("[ShipUI] Ship selection for line ended");
+    }
+
+    private void OnWaypointPointerDown(PointerDownEvent evt)
+    {
+        if (!IsDrawingWaypoint || evt.button != 0) return;
+        // 取得滑鼠點擊的螢幕座標
+        Vector2 screenPos = evt.position;
+        // 轉換為世界座標
+        Vector3 worldPos = Camera.main.ScreenToWorldPoint(new Vector3(screenPos.x, Screen.height - screenPos.y, 0));
+        worldPos.z = 0;
+        // 傳給 PlayerShip
+        ship?.AddWaypoint(worldPos);
+        // 畫一個 waypoint 標記
+        DrawWaypointMarker(worldPos);
+    }
+
+    private void DrawWaypointMarker(Vector3 worldPos)
+    {
+        var root = GetComponent<UIDocument>().rootVisualElement;
+        var marker = new VisualElement();
+        marker.AddToClassList("waypoint-marker");
+        // 世界座標轉螢幕座標
+        Vector2 screenPos = Camera.main.WorldToScreenPoint(worldPos);
+        // UI Toolkit Y 軸反向
+        marker.style.position = Position.Absolute;
+        marker.style.left = screenPos.x - 8; // 8 為圖示半徑
+        marker.style.top = Screen.height - screenPos.y - 8;
+        marker.style.width = 16;
+        marker.style.height = 16;
+        root.Add(marker);
+        waypointMarkers.Add(marker);
     }
     #endregion
 
@@ -1022,6 +1106,7 @@ public class ShipUI : Singleton<ShipUI>
         InitializeFleetCombatModeButton();
         InitializeToggleCombatModeButton();
         InitializeFormFleetButton();
+        InitializeDrawWaypointButton(); // 新增
         RegisterPointerEvents();
 
         lblFuel = UIHelper.InitializeElement<Label>(UIPanel, "lblFuel");

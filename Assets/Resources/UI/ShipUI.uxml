@@ -50,6 +50,7 @@
                 <engine:Button name="btnFleetCombatMode" text="編輯船隊戰鬥模式" style="width: 150px; display: none; margin-right: 8px;" />
                 <engine:Button name="btnCloseUI" text="關閉 UI" class="close-ui-btn" style="margin-right: 8px;" />
                 <engine:Button name="btnFormFleet" text="形成船隊" class="form-shipline-btn" style="width: 130px;" />
+                <engine:Button name="btnDrawWaypoint" text="繪製航點" class="draw-waypoint-btn" style="width: 130px; margin-right: 8px;" />
             </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>
