@@ -159,7 +159,8 @@ public class MapController : MonoBehaviour
                 {
                     Vector3Int pos = new Vector3Int(cx * chunkSize + x, cy * chunkSize + y, 0);
                     shouldRender.Add(pos);
-                    if (!renderedTiles.Contains(pos))
+                    // 僅將未渲染過的 tile 加入 pendingTiles
+                    if (!renderedTiles.Contains(pos) && !pendingTiles.Contains(pos))
                     {
                         pendingTiles.Add(pos);
                     }
