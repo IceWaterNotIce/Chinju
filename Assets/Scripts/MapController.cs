@@ -224,11 +224,14 @@ public class MapController : MonoBehaviour
             return TileType.Chinju;
         }
 
-        float noiseValue = Mathf.PerlinNoise((x + seed) * 0.1f, (y + seed) * 0.1f);
+        // 讓草地 tile 必定以 2x2 區塊生成
+        int gx = x / 2;
+        int gy = y / 2;
+        float noiseValue = Mathf.PerlinNoise((gx + seed) * 0.1f, (gy + seed) * 0.1f);
         if (noiseValue > 1f - islandDensity)
         {
             // 草地
-            float oilNoise = Mathf.PerlinNoise((x + seed) * 0.2f, (y + seed) * 0.2f);
+            float oilNoise = Mathf.PerlinNoise((gx + seed) * 0.2f, (gy + seed) * 0.2f);
             if (oilNoise > 0.7f)
                 return TileType.Oil;
             return TileType.Grass;
