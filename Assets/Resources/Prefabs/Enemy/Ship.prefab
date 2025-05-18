@@ -156,7 +156,7 @@ MonoBehaviour:
   oceanTile: {fileID: 0}
   IsFollower: 0
   LeaderShip: {fileID: 0}
-  m_detectionDistance: 10
+  m_detectionDistance: 20
   m_combatMode: 0
   m_weaponLimit: 2
   weapons: []

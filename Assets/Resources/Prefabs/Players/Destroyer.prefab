@@ -157,7 +157,7 @@ MonoBehaviour:
   IsFollower: 0
   LeaderShip: {fileID: 0}
   m_detectionDistance: 50
-  m_combatMode: 0
+  m_combatMode: 1
   m_weaponLimit: 2
   weapons: []
   m_level: 1
