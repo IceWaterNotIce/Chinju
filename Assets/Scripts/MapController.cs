@@ -227,7 +227,7 @@ public class MapController : MonoBehaviour
         // 讓草地 tile 必定以 2x2 區塊生成
         int gx = x / 2;
         int gy = y / 2;
-        float noiseValue = Mathf.PerlinNoise((gx + seed) * 0.1f, (gy + seed) * 0.1f);
+        float noiseValue = Mathf.PerlinNoise((gx * 0.1f + seed * 0.1f), (gy * 0.1f + seed * 0.1f));
         if (noiseValue > 1f - islandDensity)
         {
             // 草地
@@ -252,51 +252,40 @@ public class MapController : MonoBehaviour
 
         // 獲取滑鼠位置並轉換為世界座標
         Vector2 mousePosition = Mouse.current.position.ReadValue();
-        Vector3 worldPoint = mainCamera.ScreenToWorldPoint(mousePosition);
+        Vector3 worldPoint = mainCamera.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, -mainCamera.transform.position.z));
 
-        // 執行 Raycast
-        RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.down);
+        // 直接用 tilemap 取得點擊的 tile
+        Vector3Int tilePosition = tilemap.WorldToCell(worldPoint);
+        TileBase tile = tilemap.GetTile(tilePosition);
 
-        if (hit.collider != null)
+        if (tile != null)
         {
-            Debug.Log("[MapController] 點擊在 " + hit.collider.name);
-            Debug.Log("[MapController] 點擊位置: " + hit.point);
-
-            // 將世界座標轉換為 tilemap 的網格座標
-            Vector3Int tilePosition = tilemap.WorldToCell(hit.point);
-
-            // 嘗試獲取該位置的 tile
-            TileBase tile = tilemap.GetTile(tilePosition);
-
-            if (tile != null)
+            if (tile == oceanTile)
             {
-                if (tile == oceanTile)
-                {
-                    Debug.Log("[MapController] 這是海洋 Tile");
-                }
-                else if (tile == grassTile)
-                {
-                    Debug.Log("[MapController] 這是草地 Tile");
-                }
-                else if (tile == chinjuTile)
-                {
-                    Debug.Log("[MapController] 這是神獸 Tile");
+                Debug.Log("[MapController] 這是海洋 Tile");
+            }
+            else if (tile == grassTile)
+            {
+                Debug.Log("[MapController] 這是草地 Tile");
+            }
+            else if (tile == chinjuTile)
+            {
+                Debug.Log("[MapController] 這是神獸 Tile");
 
-                    if (PopupManager.Instance.IsAllPopupsHidden())
-                    {
-                        Debug.Log("[MapController] 正在開啟 Chinju UI 面板...");
-                        PopupManager.Instance.ShowPopup("ChinjuUI");
-                    }
-                    else
-                    {
-                        PopupManager.Instance.HidePopup("ChinjuUI");
-                    }
-                }
-                else if (tile == oilTile)
+                if (PopupManager.Instance.IsAllPopupsHidden())
                 {
-                    Debug.Log("[MapController] 這是石油 Tile");
-                    HandleOilTileClick(tilePosition);
+                    Debug.Log("[MapController] 正在開啟 Chinju UI 面板...");
+                    PopupManager.Instance.ShowPopup("ChinjuUI");
                 }
+                else
+                {
+                    PopupManager.Instance.HidePopup("ChinjuUI");
+                }
+            }
+            else if (tile == oilTile)
+            {
+                Debug.Log("[MapController] 這是石油 Tile");
+                HandleOilTileClick(tilePosition);
             }
         }
     }
