@@ -39,6 +39,8 @@ public class MapController : MonoBehaviour
     private HashSet<Vector3Int> pendingTiles = new HashSet<Vector3Int>();
     private const int TilesPerFrame = 128; // 每幀生成的 tile 數量
 
+    private Queue<GameObject> oilShipPool = new Queue<GameObject>();
+
     void Start()
     {
         if (useRandomSeed)
@@ -367,7 +369,7 @@ public class MapController : MonoBehaviour
 
                 if (spawnPosition != Vector3.zero && oilShipPrefab != null)
                 {
-                    GameObject oilShip = Instantiate(oilShipPrefab, spawnPosition, Quaternion.identity);
+                    GameObject oilShip = GetOilShip(spawnPosition);
                     StartCoroutine(MoveOilShipToChinju(oilShip, oilTileWorldPosition));
                     Debug.Log("[MapController] 石油船已生成並開始運輸石油！");
                 }
@@ -402,7 +404,7 @@ public class MapController : MonoBehaviour
         // 石油船到達神獸 Tile
         if (oilShip != null)
         {
-            Destroy(oilShip); // 銷毀石油船
+            ReturnOilShip(oilShip); // 使用物件池回收
             var gameData = GameDataController.Instance?.CurrentGameData;
             if (gameData?.playerData != null)
             {
@@ -411,6 +413,24 @@ public class MapController : MonoBehaviour
                 Debug.Log("[MapController] 石油船到達神獸 Tile，+20 石油！");
             }
         }
+    }
+
+    private GameObject GetOilShip(Vector3 position)
+    {
+        if (oilShipPool.Count > 0)
+        {
+            var ship = oilShipPool.Dequeue();
+            ship.transform.position = position;
+            ship.SetActive(true);
+            return ship;
+        }
+        return Instantiate(oilShipPrefab, position, Quaternion.identity);
+    }
+
+    private void ReturnOilShip(GameObject ship)
+    {
+        ship.SetActive(false);
+        oilShipPool.Enqueue(ship);
     }
 
     /// <summary>
