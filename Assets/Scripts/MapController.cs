@@ -144,24 +144,24 @@ public class MapController : MonoBehaviour
         int chunkX = Mathf.FloorToInt((float)camCell.x / chunkSize);
         int chunkY = Mathf.FloorToInt((float)camCell.y / chunkSize);
 
+        // 依照順時針順序取得 chunk offset
+        List<Vector2Int> chunkOffsets = GetClockwiseChunkOffsets(renderRadius);
+
         // 計算本次應該顯示的 tile 範圍
         HashSet<Vector3Int> shouldRender = new HashSet<Vector3Int>();
-        for (int dx = -renderRadius; dx <= renderRadius; dx++)
+        foreach (var offset in chunkOffsets)
         {
-            for (int dy = -renderRadius; dy <= renderRadius; dy++)
+            int cx = chunkX + offset.x;
+            int cy = chunkY + offset.y;
+            for (int x = 0; x < chunkSize; x++)
             {
-                int cx = chunkX + dx;
-                int cy = chunkY + dy;
-                for (int x = 0; x < chunkSize; x++)
+                for (int y = 0; y < chunkSize; y++)
                 {
-                    for (int y = 0; y < chunkSize; y++)
+                    Vector3Int pos = new Vector3Int(cx * chunkSize + x, cy * chunkSize + y, 0);
+                    shouldRender.Add(pos);
+                    if (!renderedTiles.Contains(pos))
                     {
-                        Vector3Int pos = new Vector3Int(cx * chunkSize + x, cy * chunkSize + y, 0);
-                        shouldRender.Add(pos);
-                        if (!renderedTiles.Contains(pos))
-                        {
-                            pendingTiles.Add(pos);
-                        }
+                        pendingTiles.Add(pos);
                     }
                 }
             }
@@ -172,7 +172,7 @@ public class MapController : MonoBehaviour
         {
             StopCoroutine(chunkRenderCoroutine);
         }
-        chunkRenderCoroutine = StartCoroutine(RenderTilesCoroutine());
+        chunkRenderCoroutine = StartCoroutine(RenderTilesCoroutine(chunkOffsets, chunkX, chunkY));
 
         // 移除視野外的 tile
         var toRemove = new List<Vector3Int>();
@@ -190,13 +190,53 @@ public class MapController : MonoBehaviour
         }
     }
 
-    private IEnumerator RenderTilesCoroutine()
+    // 取得以中心為起點，順時針 spiral 的 chunk offset 序列
+    private List<Vector2Int> GetClockwiseChunkOffsets(int radius)
     {
-        var tilesToRender = new List<Vector3Int>(pendingTiles);
+        List<Vector2Int> offsets = new List<Vector2Int>();
+        offsets.Add(Vector2Int.zero); // 先加中心
+
+        for (int r = 1; r <= radius; r++)
+        {
+            int x = -r, y = -r;
+            // 上
+            for (int i = 0; i < 2 * r; i++) offsets.Add(new Vector2Int(x + i, y));
+            // 右
+            for (int i = 1; i < 2 * r; i++) offsets.Add(new Vector2Int(x + 2 * r - 1, y + i));
+            // 下
+            for (int i = 1; i < 2 * r; i++) offsets.Add(new Vector2Int(x + 2 * r - 1 - i, y + 2 * r - 1));
+            // 左
+            for (int i = 1; i < 2 * r - 1; i++) offsets.Add(new Vector2Int(x, y + 2 * r - 1 - i));
+        }
+        return offsets;
+    }
+
+    // 調整協程，依照 chunkOffsets 順序渲染
+    private IEnumerator RenderTilesCoroutine(List<Vector2Int> chunkOffsets, int centerChunkX, int centerChunkY)
+    {
+        List<Vector3Int> orderedTiles = new List<Vector3Int>();
+        HashSet<Vector3Int> added = new HashSet<Vector3Int>();
+        foreach (var offset in chunkOffsets)
+        {
+            int cx = centerChunkX + offset.x;
+            int cy = centerChunkY + offset.y;
+            for (int x = 0; x < chunkSize; x++)
+            {
+                for (int y = 0; y < chunkSize; y++)
+                {
+                    Vector3Int pos = new Vector3Int(cx * chunkSize + x, cy * chunkSize + y, 0);
+                    if (pendingTiles.Contains(pos) && !added.Contains(pos))
+                    {
+                        orderedTiles.Add(pos);
+                        added.Add(pos);
+                    }
+                }
+            }
+        }
         pendingTiles.Clear();
 
         int count = 0;
-        foreach (var pos in tilesToRender)
+        foreach (var pos in orderedTiles)
         {
             if (!generatedTiles.ContainsKey(pos))
             {
