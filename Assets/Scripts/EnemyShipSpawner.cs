@@ -42,7 +42,7 @@ public class EnemyShipSpawner : MonoBehaviour
         {
             Debug.LogError("Tilemap not found in the scene!", this);
         }
-        oceanTile = Resources.Load<TileBase>("Tilemap/OceanTile");
+        oceanTile = Resources.Load<TileBase>("Tiles/OceanTile");
         if (oceanTile == null)
         {
             Debug.LogError("Ocean Tile not found in Resources!", this);
