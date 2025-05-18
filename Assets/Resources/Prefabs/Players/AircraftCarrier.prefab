@@ -153,7 +153,7 @@ MonoBehaviour:
   m_targetRotationSpeed: 0
   m_rotationSpeed: 0
   tilemap: {fileID: 0}
-  oceanTile: {fileID: 11400000, guid: bf72caf695ff12947b165e724fdb9748, type: 2}
+  oceanTile: {fileID: 11400000, guid: eebb48b0c18a5314b8bf7ee79b56cdc9, type: 2}
   IsFollower: 0
   LeaderShip: {fileID: 0}
   m_detectionDistance: 50

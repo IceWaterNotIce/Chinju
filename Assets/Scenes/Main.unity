@@ -1304,8 +1304,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tilemap: {fileID: 1920876237}
-  oceanTile: {fileID: 11400000, guid: bf72caf695ff12947b165e724fdb9748, type: 2}
-  grassTile: {fileID: 11400000, guid: acd5b796bb9037e4ab5d82bcd02ff446, type: 2}
+  oceanTile: {fileID: 11400000, guid: eebb48b0c18a5314b8bf7ee79b56cdc9, type: 2}
+  grassTile: {fileID: 11400000, guid: b306ad7cb7c9cc44280d8a71f116a2d3, type: 2}
   chinjuTile: {fileID: 11400000, guid: dd2b4b2c1d45e6743a8978e499247e12, type: 2}
   oilTile: {fileID: 11400000, guid: 6c79396beaa4f514a8997b471e435bab, type: 2}
   islandDensity: 0.2
@@ -1394,10 +1394,10 @@ TilemapCollider2D:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 32
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2

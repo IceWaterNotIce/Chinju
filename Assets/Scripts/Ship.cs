@@ -90,7 +90,7 @@ public class Ship : MonoBehaviour
     public virtual void Start()
     {
         tilemap = FindFirstObjectByType<Tilemap>();
-        oceanTile = Resources.Load<TileBase>("Tilemap/OceanTile");
+        oceanTile = Resources.Load<TileBase>("Tiles/OceanTile");
         if (tilemap == null || oceanTile == null)
             Debug.LogError("Tilemap or Ocean Tile not found!", this);
     }
