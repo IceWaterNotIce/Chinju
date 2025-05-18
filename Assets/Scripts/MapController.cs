@@ -425,19 +425,13 @@ public class MapController : MonoBehaviour
         foreach (var direction in directions)
         {
             Vector3Int neighborTile = referenceTile + direction;
-            if (IsOceanTile(neighborTile))
+            if (tilemap.GetTile(neighborTile) == oceanTile)
             {
                 return tilemap.GetCellCenterWorld(neighborTile);
             }
         }
 
         return Vector3.zero;
-    }
-
-    private bool IsOceanTile(Vector3Int tilePosition)
-    {
-        TileBase tile = tilemap.GetTile(tilePosition);
-        return tile == oceanTile;
     }
 
     public Vector3 GetChinjuTileWorldPosition()
