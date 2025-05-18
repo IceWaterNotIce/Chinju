@@ -80,6 +80,7 @@ public class ShipUI : Singleton<ShipUI>
     {
         ship = s;
         InitializeUI();
+        // 立即更新等級與經驗值顯示
         UpdateLevelAndExperienceUI();
         UpdateHealth(ship.Health, ship.MaxHealth);
         UpdateFuel(ship.CurrentFuel, ship.MaxFuel);
@@ -534,8 +535,9 @@ public class ShipUI : Singleton<ShipUI>
 
     private void InitializeLevelAndExperienceLabels()
     {
-        lblLevel = InitializeLabel("lblLevel", 10);
-        lblExperience = InitializeLabel("lblExperience", 5);
+        // 確保只初始化一次，不重複建立
+        lblLevel = UIHelper.InitializeElement<Label>(UIPanel, "lblLevel");
+        lblExperience = UIHelper.InitializeElement<Label>(UIPanel, "lblExperience");
     }
 
     private void InitializeHealthAndFuelLabels()
@@ -546,9 +548,9 @@ public class ShipUI : Singleton<ShipUI>
         // sliderExperience = InitializeSlider("sliderExperience", 10, 5);
 
         // 新增：取得 progress bar VisualElement
-        healthBar = UIPanel.Q<VisualElement>("healthBar");
-        fuelBar = UIPanel.Q<VisualElement>("fuelBar");
-        expBar = UIPanel.Q<VisualElement>("expBar");
+        healthBar = UIHelper.InitializeElement<VisualElement>(UIPanel, "healthBar");
+        fuelBar = UIHelper.InitializeElement<VisualElement>(UIPanel, "fuelBar");
+        expBar = UIHelper.InitializeElement<VisualElement>(UIPanel, "expBar");
     }
 
     private Slider InitializeSlider(string name, float maxValue, int marginTop)
@@ -788,13 +790,17 @@ public class ShipUI : Singleton<ShipUI>
     {
         if (ship != null)
         {
-            lblLevel.text = $"等級: {ship.Level}";
-            lblExperience.text = $"{ship.Experience}/{ship.Level * 10}";
+            // 顯示等級
+            if (lblLevel != null)
+                lblLevel.text = $"等級: {ship.Level}";
+            // 顯示經驗值
+            if (lblExperience != null)
+                lblExperience.text = $"{ship.Experience}/{ship.Level * 10}";
+            // 經驗條
             if (expBar != null)
             {
                 float percent = (ship.Level * 10 > 0) ? (float)ship.Experience / (ship.Level * 10) : 0f;
                 expBar.style.width = Length.Percent(Mathf.Clamp01(percent) * 100f);
-                // expBar.style.backgroundColor = new Color(0.2f, 0.6f, 1f, 1f); // 藍色（移除）
             }
         }
     }
@@ -1103,7 +1109,7 @@ public class ShipUI : Singleton<ShipUI>
         InitializeSpeedLabels();
         InitializeRotationLabels();
         InitializeWeaponListContainer();
-        InitializeLevelAndExperienceLabels();
+        InitializeLevelAndExperienceLabels(); // 確保初始化
         InitializeHealthAndFuelLabels();
         InitializeCancelFollowButton();
         InitializeDrawButton();

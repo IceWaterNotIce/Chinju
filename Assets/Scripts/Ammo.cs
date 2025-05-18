@@ -37,6 +37,7 @@ public class Ammo : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
+        Debug.Log($"[Ammo] 彈藥與 {collision.gameObject.name} 發生碰撞。");
         // 嘗試獲取 PlayerShip 或 EnemyShip 類型的物件
         var playerShip = collision.gameObject.GetComponent<PlayerShip>();
         var enemyShip = collision.gameObject.GetComponent<EnemyShip>();
@@ -46,6 +47,11 @@ public class Ammo : MonoBehaviour
             // 處理傷害
             if (playerShip != null)
             {
+                if ( playerShip.gameObject == owner)
+                {
+                    Debug.Log($"[Ammo] 彈藥命中玩家船隻 {playerShip.name}，但沒有造成傷害。");
+                    return; // 如果是自己的船隻，則不造成傷害
+                }
                 Debug.Log($"[Ammo] 彈藥命中玩家船隻 {playerShip.name}，但沒有造成傷害。");
             }
             else if (enemyShip != null)

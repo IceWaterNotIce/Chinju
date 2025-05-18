@@ -195,7 +195,7 @@ GameObject:
   - component: {fileID: 130904848}
   m_Layer: 0
   m_Name: AmmoManager
-  m_TagString: Untagged
+  m_TagString: Ammo
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1397,7 +1397,7 @@ TilemapCollider2D:
     m_Bits: 32
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 72
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -1672,7 +1672,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetTilemap: {fileID: 1920876237}
   padding: 0.5
-  baseMoveSpeed: 500
+  baseMoveSpeed: 200
   smoothTime: 0.2
   zoomSpeed: 500
   minZoom: 3
