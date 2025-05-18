@@ -8,36 +8,34 @@ using System.Threading.Tasks;
 
 public class MapController : MonoBehaviour
 {
-    private const string MapCacheFilePath = "map_cache"; // 不需要副檔名
+    private const string MapCacheFilePath = "map_cache";
 
-    [SerializeField] private Tilemap tilemap;  // 通過 Inspector 引用
+    [SerializeField] private Tilemap tilemap;
     public TileBase oceanTile, grassTile;
-    public TileBase chinjuTile; // 新增Chinju Tile
-    public TileBase oilTile; // 新增石油 Tile
+    public TileBase chinjuTile;
+    public TileBase oilTile;
     public float islandDensity = 0.1f;
 
     [Header("Random Seed")]
-    public int seed = 12345; // 預設種子
-    public bool useRandomSeed = true; // 是否每次隨機生成
+    public int seed = 12345;
+    public bool useRandomSeed = true;
 
-    public Camera mainCamera; // 新增主攝影機引用
-    public CameraBound2D cameraController; // 新增 CameraController 引用
-    public GameObject oilShipPrefab; // 新增：石油船的預製物
+    public Camera mainCamera;
+    public CameraBound2D cameraController;
+    public GameObject oilShipPrefab;
 
-    // 新增：無限地圖資料結構
     private Dictionary<Vector3Int, TileType> generatedTiles = new Dictionary<Vector3Int, TileType>();
     private HashSet<Vector3Int> chinjuTilePositions = new HashSet<Vector3Int>();
-    private int chunkSize = 32; // 每次生成的區塊大小
-    private int renderRadius = 3; // 以攝影機為中心，渲染多少個 chunk
+    private int chunkSize = 32;
+    private int renderRadius = 3;
 
-    // 新增：記錄目前已渲染的 tile
     private HashSet<Vector3Int> renderedTiles = new HashSet<Vector3Int>();
 
-    private Vector3 lastCameraPosition; // 新增：記錄上次攝影機位置
+    private Vector3 lastCameraPosition;
 
     private Coroutine chunkRenderCoroutine;
     private HashSet<Vector3Int> pendingTiles = new HashSet<Vector3Int>();
-    private const int TilesPerFrame = 128; // 每幀生成的 tile 數量
+    private const int TilesPerFrame = 128;
 
     private Queue<GameObject> oilShipPool = new Queue<GameObject>();
 
@@ -45,35 +43,29 @@ public class MapController : MonoBehaviour
     {
         if (useRandomSeed)
         {
-
             seed = Random.Range(0, int.MaxValue);
         }
-        Random.InitState(seed); // 初始化隨機數生成器
+        Random.InitState(seed);
 
-        // 不再載入/儲存地圖檔案，直接動態生成
-        // 初始化中心區塊
         UpdateVisibleChunks();
 
-        // 確保石油船預製物已設置
         if (oilShipPrefab == null)
         {
-            oilShipPrefab = Resources.Load<GameObject>("Prefabs/Ship"); // 加載石油船預製物
+            oilShipPrefab = Resources.Load<GameObject>("Prefabs/Ship");
             if (oilShipPrefab == null)
             {
                 Debug.LogError("[MapController] 無法加載石油船預製物，請確保 'Prefabs/Ship' 存在！");
             }
         }
 
-        GameDataController.Instance.OnMapDataChanged += OnMapDataChanged; // 訂閱地圖數據變更事件
+        GameDataController.Instance.OnMapDataChanged += OnMapDataChanged;
 
-        // 確保攝影機控制器的 Tilemap 已初始化並刷新邊界
         if (cameraController != null)
         {
             cameraController.targetTilemap = tilemap;
             cameraController.RefreshBounds();
         }
 
-        // 初始化 lastCameraPosition
         if (mainCamera != null)
             lastCameraPosition = mainCamera.transform.position;
 
@@ -82,16 +74,15 @@ public class MapController : MonoBehaviour
 
     private IEnumerator FocusOnChinjuTileAfterMapGeneration()
     {
-        // 等待地圖生成完成
         yield return new WaitUntil(() => tilemap != null && tilemap.GetUsedTilesCount() > 0);
 
         Vector3 chinjuTileWorldPosition = GetChinjuTileWorldPosition();
         if (chinjuTileWorldPosition != Vector3.zero && cameraController != null)
         {
-            cameraController.FollowTarget(null); // 停止任何目標跟隨
+            cameraController.FollowTarget(null);
             Debug.Log($"[MapController] 聚焦到神獸 Tile 位置: {chinjuTileWorldPosition}");
             cameraController.transform.position = new Vector3(chinjuTileWorldPosition.x, chinjuTileWorldPosition.y, cameraController.transform.position.z);
-            cameraController.RefreshCameraPosition(); // 使用公開方法刷新攝影機位置
+            cameraController.RefreshCameraPosition();
         }
         else
         {
@@ -103,7 +94,7 @@ public class MapController : MonoBehaviour
     {
         if (GameDataController.Instance != null)
         {
-            GameDataController.Instance.OnMapDataChanged -= OnMapDataChanged; // 取消訂閱
+            GameDataController.Instance.OnMapDataChanged -= OnMapDataChanged;
         }
     }
 
@@ -112,28 +103,24 @@ public class MapController : MonoBehaviour
         var mapData = GameDataController.Instance.CurrentGameData?.mapData;
         if (mapData != null)
         {
-            // LoadMap(mapData); // 已無此方法，直接刷新可見區塊
             UpdateVisibleChunks();
         }
     }
 
     private void Update()
     {
-        // 僅當攝影機移動時才更新可見區塊
         if (mainCamera != null && mainCamera.transform.position != lastCameraPosition)
         {
             UpdateVisibleChunks();
             lastCameraPosition = mainCamera.transform.position;
         }
 
-        // 檢測滑鼠左鍵點擊
         if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
             HandleMouseClick();
         }
     }
 
-    // 動態生成並渲染攝影機附近的 chunk，並自動銷毀視野外的 tile
     private void UpdateVisibleChunks()
     {
         if (mainCamera == null || tilemap == null) return;
@@ -144,10 +131,8 @@ public class MapController : MonoBehaviour
         int chunkX = Mathf.FloorToInt((float)camCell.x / chunkSize);
         int chunkY = Mathf.FloorToInt((float)camCell.y / chunkSize);
 
-        // 依照順時針順序取得 chunk offset
         List<Vector2Int> chunkOffsets = GetClockwiseChunkOffsets(renderRadius);
 
-        // 計算本次應該顯示的 tile 範圍
         HashSet<Vector3Int> shouldRender = new HashSet<Vector3Int>();
         foreach (var offset in chunkOffsets)
         {
@@ -159,7 +144,6 @@ public class MapController : MonoBehaviour
                 {
                     Vector3Int pos = new Vector3Int(cx * chunkSize + x, cy * chunkSize + y, 0);
                     shouldRender.Add(pos);
-                    // 僅將未渲染過的 tile 加入 pendingTiles
                     if (!renderedTiles.Contains(pos) && !pendingTiles.Contains(pos))
                     {
                         pendingTiles.Add(pos);
@@ -168,14 +152,12 @@ public class MapController : MonoBehaviour
             }
         }
 
-        // 啟動/重啟分幀渲染協程
         if (chunkRenderCoroutine != null)
         {
             StopCoroutine(chunkRenderCoroutine);
         }
         chunkRenderCoroutine = StartCoroutine(RenderTilesCoroutine(chunkOffsets, chunkX, chunkY));
 
-        // 移除視野外的 tile
         var toRemove = new List<Vector3Int>();
         foreach (var pos in renderedTiles)
         {
@@ -191,28 +173,22 @@ public class MapController : MonoBehaviour
         }
     }
 
-    // 取得以中心為起點，順時針 spiral 的 chunk offset 序列
     private List<Vector2Int> GetClockwiseChunkOffsets(int radius)
     {
         List<Vector2Int> offsets = new List<Vector2Int>();
-        offsets.Add(Vector2Int.zero); // 先加中心
+        offsets.Add(Vector2Int.zero);
 
         for (int r = 1; r <= radius; r++)
         {
             int x = -r, y = -r;
-            // 上
             for (int i = 0; i < 2 * r; i++) offsets.Add(new Vector2Int(x + i, y));
-            // 右
             for (int i = 1; i < 2 * r; i++) offsets.Add(new Vector2Int(x + 2 * r - 1, y + i));
-            // 下
             for (int i = 1; i < 2 * r; i++) offsets.Add(new Vector2Int(x + 2 * r - 1 - i, y + 2 * r - 1));
-            // 左
             for (int i = 1; i < 2 * r - 1; i++) offsets.Add(new Vector2Int(x, y + 2 * r - 1 - i));
         }
         return offsets;
     }
 
-    // 調整協程，依照 chunkOffsets 順序渲染
     private IEnumerator RenderTilesCoroutine(List<Vector2Int> chunkOffsets, int centerChunkX, int centerChunkY)
     {
         List<Vector3Int> orderedTiles = new List<Vector3Int>();
@@ -262,57 +238,24 @@ public class MapController : MonoBehaviour
             if (count >= TilesPerFrame)
             {
                 count = 0;
-                yield return null; // 等待下一幀
+                yield return null;
             }
         }
     }
 
-    // 生成一個 chunk
-    private void GenerateChunk(int chunkX, int chunkY)
+      private TileType GetTileTypeAt(int x, int y)
     {
-        for (int x = 0; x < chunkSize; x++)
-        {
-            for (int y = 0; y < chunkSize; y++)
-            {
-                Vector3Int pos = new Vector3Int(chunkX * chunkSize + x, chunkY * chunkSize + y, 0);
-                if (generatedTiles.ContainsKey(pos)) continue;
-
-                TileType type = GetTileTypeAt(pos.x, pos.y);
-                generatedTiles[pos] = type;
-
-                TileBase tile = null;
-                switch (type)
-                {
-                    case TileType.Ocean: tile = oceanTile; break;
-                    case TileType.Grass: tile = grassTile; break;
-                    case TileType.Oil: tile = oilTile; break;
-                    case TileType.Chinju: tile = chinjuTile; break;
-                }
-                if (tile != null)
-                {
-                    tilemap.SetTile(pos, tile);
-                }
-            }
-        }
-    }
-
-    // 根據座標與 seed 決定 tile 類型
-    private TileType GetTileTypeAt(int x, int y)
-    {
-        // 神獸 tile 固定在 (0,0)
         if (x == 0 && y == 0)
         {
             chinjuTilePositions.Add(new Vector3Int(x, y, 0));
             return TileType.Chinju;
         }
 
-        // 讓草地 tile 必定以 2x2 區塊生成
         int gx = x / 2;
         int gy = y / 2;
         float noiseValue = Mathf.PerlinNoise((gx * 0.1f + seed * 0.1f), (gy * 0.1f + seed * 0.1f));
         if (noiseValue > 1f - islandDensity)
         {
-            // 草地
             float oilNoise = Mathf.PerlinNoise((gx + seed) * 0.2f, (gy + seed) * 0.2f);
             if (oilNoise > 0.7f)
                 return TileType.Oil;
@@ -321,9 +264,6 @@ public class MapController : MonoBehaviour
         return TileType.Ocean;
     }
 
-    /// <summary>
-    /// 處理滑鼠點擊事件
-    /// </summary>
     private void HandleMouseClick()
     {
         if (mainCamera == null)
@@ -332,11 +272,9 @@ public class MapController : MonoBehaviour
             return;
         }
 
-        // 獲取滑鼠位置並轉換為世界座標
         Vector2 mousePosition = Mouse.current.position.ReadValue();
         Vector3 worldPoint = mainCamera.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, -mainCamera.transform.position.z));
 
-        // 直接用 tilemap 取得點擊的 tile
         Vector3Int tilePosition = tilemap.WorldToCell(worldPoint);
         TileBase tile = tilemap.GetTile(tilePosition);
 
@@ -399,12 +337,11 @@ public class MapController : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(120f); // 每 2 分鐘生成一次石油船
+            yield return new WaitForSeconds(120f);
 
             var gameData = GameDataController.Instance?.CurrentGameData;
             if (gameData?.playerData != null)
             {
-                // 在石油圖塊附近生成石油船
                 Vector3 oilTileWorldPosition = tilemap.GetCellCenterWorld(oilTilePosition);
                 Vector3 spawnPosition = FindNearestOceanTile(oilTileWorldPosition);
 
@@ -431,25 +368,24 @@ public class MapController : MonoBehaviour
             yield break;
         }
 
-        float travelTime = 30f; // 石油船移動到神獸 Tile 的時間
+        float travelTime = 30f;
         float elapsedTime = 0f;
 
         while (elapsedTime < travelTime)
         {
-            if (oilShip == null) yield break; // 如果石油船被銷毀則停止
+            if (oilShip == null) yield break;
             oilShip.transform.position = Vector3.Lerp(oilTileWorldPosition, chinjuTileWorldPosition, elapsedTime / travelTime);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
 
-        // 石油船到達神獸 Tile
         if (oilShip != null)
         {
-            ReturnOilShip(oilShip); // 使用物件池回收
+            ReturnOilShip(oilShip);
             var gameData = GameDataController.Instance?.CurrentGameData;
             if (gameData?.playerData != null)
             {
-                gameData.playerData.Oils += 20; // 每次運輸 20 單位石油
+                gameData.playerData.Oils += 20;
                 gameData.playerData.OnResourceChanged?.Invoke();
                 Debug.Log("[MapController] 石油船到達神獸 Tile，+20 石油！");
             }
@@ -474,17 +410,14 @@ public class MapController : MonoBehaviour
         oilShipPool.Enqueue(ship);
     }
 
-    /// <summary>
-    /// 找到最近的海洋格子
-    /// </summary>
     public Vector3 FindNearestOceanTile(Vector3 referencePoint)
     {
         Vector3Int[] directions = new Vector3Int[]
         {
-            new Vector3Int(0, 1, 0),  // 上
-            new Vector3Int(0, -1, 0), // 下
-            new Vector3Int(-1, 0, 0), // 左
-            new Vector3Int(1, 0, 0)   // 右
+            new Vector3Int(0, 1, 0),
+            new Vector3Int(0, -1, 0),
+            new Vector3Int(-1, 0, 0),
+            new Vector3Int(1, 0, 0)
         };
 
         Vector3Int referenceTile = tilemap.WorldToCell(referencePoint);
@@ -498,24 +431,17 @@ public class MapController : MonoBehaviour
             }
         }
 
-        return Vector3.zero; // 找不到海洋格子
+        return Vector3.zero;
     }
 
-    /// <summary>
-    /// 檢查某個位置是否是海洋格子
-    /// </summary>
     private bool IsOceanTile(Vector3Int tilePosition)
     {
         TileBase tile = tilemap.GetTile(tilePosition);
         return tile == oceanTile;
     }
 
-    /// <summary>
-    /// 獲取 Chinju Tile 的世界位置
-    /// </summary>
     public Vector3 GetChinjuTileWorldPosition()
     {
-        // 神獸 tile 固定在 (0,0)
         return tilemap.GetCellCenterWorld(Vector3Int.zero);
     }
 }
