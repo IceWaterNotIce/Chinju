@@ -1,0 +1,6 @@
+.damage-text {
+    font-size: 20px;
+    color: red;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+}

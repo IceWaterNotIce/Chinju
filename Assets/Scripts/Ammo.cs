@@ -62,18 +62,12 @@ public class Ammo : MonoBehaviour
 
                 // 顯示傷害數字
                 // 假設 DamageTextController 是一個管理傷害數字顯示的類別
-                var Canvas = GameObject.Find("Canvas");
-                if (Canvas == null)
-                {
-                    Debug.LogError("[Ammo] 找不到 Canvas 物件，無法顯示傷害數字。");
-                    return;
-                }
-                var damageTextPrefab = Resources.Load<GameObject>("Prefabs/DamageText");
-                var hitPosition = collision.transform.position;
-
-                GameObject damageText = Instantiate(damageTextPrefab, hitPosition, Quaternion.identity);
-                damageText.transform.SetParent(Canvas.transform, false); // 設置為 Canvas 的子物件
-                damageText.GetComponent<DamagePopup>().Setup(Damage);
+                // 範例：當攻擊命中時
+                DamagePopupManager.Instance.CreateDamagePopup(
+                    damage: 25,
+                    worldPos: enemyShip.transform.position,
+                    isCritical: Random.Range(0, 100) < 30
+                );
             }
             Destroy(gameObject);
         }
