@@ -47,7 +47,7 @@ public class Ammo : MonoBehaviour
             // 處理傷害
             if (playerShip != null)
             {
-                if ( playerShip.gameObject == owner)
+                if (playerShip.gameObject == owner)
                 {
                     Debug.Log($"[Ammo] 彈藥命中玩家船隻 {playerShip.name}，但沒有造成傷害。");
                     return; // 如果是自己的船隻，則不造成傷害
@@ -59,6 +59,21 @@ public class Ammo : MonoBehaviour
                 enemyShip.Health -= Damage;
                 owner.GetComponent<Warship>().AddExperience(Damage); // 增加經驗值
                 Debug.Log($"[Ammo] 彈藥命中敵方船隻 {enemyShip.name}，造成 {Damage} 傷害。");
+
+                // 顯示傷害數字
+                // 假設 DamageTextController 是一個管理傷害數字顯示的類別
+                var Canvas = GameObject.Find("Canvas");
+                if (Canvas == null)
+                {
+                    Debug.LogError("[Ammo] 找不到 Canvas 物件，無法顯示傷害數字。");
+                    return;
+                }
+                var damageTextPrefab = Resources.Load<GameObject>("Prefabs/DamageText");
+                var hitPosition = collision.transform.position;
+
+                GameObject damageText = Instantiate(damageTextPrefab, hitPosition, Quaternion.identity);
+                damageText.transform.SetParent(Canvas.transform, false); // 設置為 Canvas 的子物件
+                damageText.GetComponent<DamagePopup>().Setup(Damage);
             }
             Destroy(gameObject);
         }
@@ -66,7 +81,7 @@ public class Ammo : MonoBehaviour
         {
             Debug.Log($"[Ammo] 彈藥與 {collision.gameObject.name} 發生觸發碰撞，但沒有造成傷害。");
         }
-        
+
     }
 
     void OnDestroy()
