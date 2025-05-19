@@ -158,19 +158,20 @@ public class MapController : MonoBehaviour
         }
         chunkRenderCoroutine = StartCoroutine(RenderTilesCoroutine(chunkOffsets, chunkX, chunkY));
 
-        var toRemove = new List<Vector3Int>();
-        foreach (var pos in renderedTiles)
-        {
-            if (!shouldRender.Contains(pos))
-            {
-                tilemap.SetTile(pos, null);
-                toRemove.Add(pos);
-            }
-        }
-        foreach (var pos in toRemove)
-        {
-            renderedTiles.Remove(pos);
-        }
+        // 不再移除視野外的 tile
+        // var toRemove = new List<Vector3Int>();
+        // foreach (var pos in renderedTiles)
+        // {
+        //     if (!shouldRender.Contains(pos))
+        //     {
+        //         tilemap.SetTile(pos, null);
+        //         toRemove.Add(pos);
+        //     }
+        // }
+        // foreach (var pos in toRemove)
+        // {
+        //     renderedTiles.Remove(pos);
+        // }
     }
 
     private List<Vector2Int> GetClockwiseChunkOffsets(int radius)
