@@ -45,6 +45,9 @@ public class EnemyShip : Warship
     private float randomAngle = 0f;
     private Vector2 lastPosition;
 
+    private int level = 1;
+    public int Level => level;
+
     new void Start()
     {
         base.Start();
@@ -174,6 +177,15 @@ public class EnemyShip : Warship
     public List<Weapon> GetWeapons()
     {
         return weapons; // 假設 `weapons` 是 Warship 類別中的武器列表
+    }
+
+    public void SetLevel(int newLevel)
+    {
+        level = newLevel;
+        // 根據等級調整屬性（可自訂）
+        damage = 10 + (level - 1) * 5;
+        base.Health = 100 + (level - 1) * 20;
+        Debug.Log($"[EnemyShip] {name} 設定為等級 {level}，攻擊力 {damage}，生命值 {base.Health}");
     }
 
     // 新增：靠近時組成 Fleet

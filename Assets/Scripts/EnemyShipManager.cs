@@ -97,6 +97,9 @@ public class EnemyShipManager : MonoBehaviour
             return;
         }
 
+        // 根據遊戲時間決定敵人等級
+        int enemyLevel = GetEnemyLevelByGameTime();
+
         for (int attempt = 0; attempt < 10; attempt++)
         {
             float x = Random.Range(spawnAreaMin.x, spawnAreaMax.x);
@@ -112,10 +115,29 @@ public class EnemyShipManager : MonoBehaviour
                 // 設置為 EnemyShipManager 的子物件
                 enemyShip.transform.SetParent(this.transform);
 
-                Debug.Log($"[EnemyShipManager] 成功生成敵方船隻於位置: {spawnPos}");
+                // 設定敵艦等級
+                var enemyComp = enemyShip.GetComponent<EnemyShip>();
+                if (enemyComp != null)
+                {
+                    enemyComp.SetLevel(enemyLevel);
+                }
+
+                Debug.Log($"[EnemyShipManager] 成功生成等級 {enemyLevel} 敵方船隻於位置: {spawnPos}");
                 break;
             }
         }
+    }
+
+    // 根據遊戲時間計算敵人等級
+    private int GetEnemyLevelByGameTime()
+    {
+        // 取得遊戲經過的年份
+        float gameTime = GameManager.Instance != null ? GameManager.Instance.GetGameTimeSeconds() : 0f;
+        int totalGameSeconds = Mathf.FloorToInt(gameTime);
+        int years = (totalGameSeconds / (86400 * 30 * 12)) + 1; // 1-based year
+
+        // 你可以根據需要調整等級算法
+        return years;
     }
 
     public void SpawnEnemyFromData(GameData.ShipData shipData)

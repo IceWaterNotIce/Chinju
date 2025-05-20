@@ -256,6 +256,11 @@ public class GameManager : Singleton<GameManager>
         return $"{seconds:D2}:{minutes:D2}:{days:D2}:{months:D2}:{years:D4}";
     }
 
+    public float GetGameTimeSeconds()
+    {
+        return gameTime;
+    }
+
     private void OnApplicationQuit()
     {
         if (GameDataController.Instance != null)
