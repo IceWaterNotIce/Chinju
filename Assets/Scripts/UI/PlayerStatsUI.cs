@@ -159,7 +159,8 @@ public class PlayerStatsUI : MonoBehaviour
     {
         if (gameTimeLabel != null)
         {
-            gameTimeLabel.text = $"遊戲時間: {GameManager.Instance.GetFormattedGameTime()}";
+            // 只顯示格式化時間，不加前綴
+            gameTimeLabel.text = GameManager.Instance.GetFormattedGameTime();
         }
     }
 }

@@ -13,6 +13,10 @@ public class GameManager : Singleton<GameManager>
     private string saveFilePath;
     private float gameTime; // 遊戲時間（秒）
 
+    // 遊戲內一天的秒數（現實 20 分鐘 = 遊戲 1 天，10 分鐘 = 12 小時）
+    private const float RealSecondsPerGameDay = 600f * 2; // 1200 秒 = 1 天
+    private const int GameSecondsPerDay = 24 * 60 * 60; // 86400 秒 = 1 天
+
     public delegate void GameEvent();
     public static event GameEvent OnGameSaved;
     public static event GameEvent OnGameLoaded;
@@ -39,7 +43,9 @@ public class GameManager : Singleton<GameManager>
 
     void Update()
     {
-        gameTime += Time.deltaTime; // 累加遊戲時間
+        // 讓現實 10 分鐘等於遊戲 12 小時
+        float gameSecondsPerRealSecond = (GameSecondsPerDay / RealSecondsPerGameDay);
+        gameTime += Time.deltaTime * gameSecondsPerRealSecond;
     }
 
     private void InitializeGameData()
@@ -236,10 +242,18 @@ public class GameManager : Singleton<GameManager>
 
     public string GetFormattedGameTime()
     {
-        int hours = Mathf.FloorToInt(gameTime / 3600);
-        int minutes = Mathf.FloorToInt((gameTime % 3600) / 60);
-        int seconds = Mathf.FloorToInt(gameTime % 60);
-        return $"{hours:D2}:{minutes:D2}:{seconds:D2}";
+        // 將遊戲時間轉換為年月日時分秒
+        int totalGameSeconds = Mathf.FloorToInt(gameTime);
+
+        int seconds = totalGameSeconds % 60;
+        int minutes = (totalGameSeconds / 60) % 60;
+        int hours = (totalGameSeconds / 3600) % 24;
+        int days = (totalGameSeconds / 86400) % 30 + 1; // 1-based day
+        int months = (totalGameSeconds / (86400 * 30)) % 12 + 1; // 1-based month
+        int years = (totalGameSeconds / (86400 * 30 * 12)) + 1; // 1-based year
+
+        // 格式 ss:mm:dd:MM:YYYY
+        return $"{seconds:D2}:{minutes:D2}:{days:D2}:{months:D2}:{years:D4}";
     }
 
     private void OnApplicationQuit()
