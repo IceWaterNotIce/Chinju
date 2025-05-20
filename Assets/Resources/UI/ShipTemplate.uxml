@@ -1,0 +1,8 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="ShipContainer" style="flex-grow: 1; height: 100px; width: 100px; justify-content: center; align-items: stretch; align-content: flex-start; align-self: flex-end; max-height: 100px; min-height: 100px; max-width: 100px; min-width: 100px; flex-direction: row;">
+        <engine:VisualElement name="LabelContainer" style="flex-grow: 1; flex-direction: row; bottom: 1px; flex-wrap: nowrap; width: auto; align-self: flex-start; justify-content: center; position: absolute; left: auto; align-items: flex-start;">
+            <engine:Label text="Ship" name="lblName" style="justify-content: flex-start; bottom: auto; position: relative; align-items: auto;" />
+            <engine:Label text="Lv.1" name="lblLevel" />
+        </engine:VisualElement>
+    </engine:VisualElement>
+</engine:UXML>
