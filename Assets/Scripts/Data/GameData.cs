@@ -7,6 +7,9 @@ public class GameData
     public PlayerData playerData; // 修正命名
     public MapData mapData;       // 修正命名
 
+    // 新增：遊戲時間（秒）
+    public float gameTime;
+
     // 新增：敵方船隻數據
     public List<ShipData> enemyShips = new List<ShipData>();
 

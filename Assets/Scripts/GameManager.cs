@@ -105,6 +105,9 @@ public class GameManager : Singleton<GameManager>
                         data.enemyShips.Add(shipData);
                     }
 
+                    // 保存遊戲時間
+                    data.gameTime = gameTime;
+
                     string json = JsonUtility.ToJson(data, true);
                     File.WriteAllText(saveFilePath, json);
                     Debug.Log($"[GameManager] 遊戲已保存至 {saveFilePath}");
@@ -175,6 +178,9 @@ public class GameManager : Singleton<GameManager>
                             Debug.LogError("[GameManager] EnemyShipSpawner 未初始化，無法生成敵人！");
                         }
                     }
+
+                    // 載入遊戲時間
+                    gameTime = data.gameTime;
 
                     GameDataController.Instance.TriggerResourceChanged();
                     OnGameLoaded?.Invoke(); // 發送載入事件
