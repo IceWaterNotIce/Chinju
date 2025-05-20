@@ -1,11 +1,19 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <engine:Template name="ShipTemplate" src="project://database/Assets/Resources/UI/ShipTemplate.uxml?fileID=9197481963319205126&amp;guid=dab9ae19c3b8a8a438c771ebc7805323&amp;type=3#ShipTemplate" />
     <Style src="project://database/Assets/Resources/UI/base.uss?fileID=7433441132597879392&amp;guid=941833fb84a940c47bce98d1493bc006&amp;type=3#base" />
-    <engine:Button name="CloseButton" text="Close" />
-    <engine:VisualElement name="ShipListContainer" style="flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-self: stretch; align-content: stretch; align-items: stretch; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; height: 482px;">
-        <engine:Instance template="ShipTemplate" />
-        <engine:Instance template="ShipTemplate" />
-        <engine:Instance template="ShipTemplate" />
-        <engine:Instance template="ShipTemplate" />
+    <engine:VisualElement name="root" style="flex-grow: 1; flex-direction: row; justify-content: center;">
+        <engine:Button name="CloseButton" text="Close" style="position: absolute; left: 0; top: 0;" />
+        <engine:VisualElement name="GridContainer" style="flex-direction: row; flex-wrap: wrap; justify-content: flex-start; align-self: auto; align-content: auto; align-items: stretch; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; height: 100%; width: 1500px;">
+            <engine:Instance template="ShipTemplate" />
+            <engine:Instance template="ShipTemplate" />
+            <engine:Instance template="ShipTemplate" />
+            <engine:Instance template="ShipTemplate" />
+            <engine:Instance template="ShipTemplate" />
+            <engine:Instance template="ShipTemplate" />
+            <engine:Instance template="ShipTemplate" />
+            <engine:Instance template="ShipTemplate" />
+            <engine:Instance template="ShipTemplate" />
+        </engine:VisualElement>
+        <engine:Scroller high-value="100" direction="Vertical" value="42" />
     </engine:VisualElement>
 </engine:UXML>
