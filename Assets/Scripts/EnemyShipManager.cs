@@ -2,9 +2,9 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 
-public class EnemyShipSpawner : MonoBehaviour
+public class EnemyShipManager : MonoBehaviour
 {
-    public static EnemyShipSpawner Instance { get; private set; }
+    public static EnemyShipManager Instance { get; private set; }
 
     [Header("Spawn Settings")]
     public float spawnInterval = 2f;
@@ -81,7 +81,7 @@ public class EnemyShipSpawner : MonoBehaviour
                 spawnInterval = originalSpawnInterval; // 恢復到原始生成間隔
                 isSpeedBoosted = false;
                 speedBoostTimer = 0f;
-                Debug.Log($"[EnemyShipSpawner] Spawn interval reset to original: {spawnInterval} seconds.");
+                Debug.Log($"[EnemyShipManager] Spawn interval reset to original: {spawnInterval} seconds.");
             }
         }
 
@@ -93,7 +93,7 @@ public class EnemyShipSpawner : MonoBehaviour
         int currentEnemyCount = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None).Length;
         if (currentEnemyCount >= maxEnemyShips)
         {
-            Debug.Log($"[EnemyShipSpawner] 當前敵方船隻數量已達上限 ({maxEnemyShips})，停止生成。");
+            Debug.Log($"[EnemyShipManager] 當前敵方船隻數量已達上限 ({maxEnemyShips})，停止生成。");
             return;
         }
 
@@ -109,10 +109,10 @@ public class EnemyShipSpawner : MonoBehaviour
                 enemyShip.transform.position = spawnPos;
                 enemyShip.transform.rotation = Quaternion.identity;
 
-                // 設置為 EnemyShipSpawner 的子物件
+                // 設置為 EnemyShipManager 的子物件
                 enemyShip.transform.SetParent(this.transform);
 
-                Debug.Log($"[EnemyShipSpawner] 成功生成敵方船隻於位置: {spawnPos}");
+                Debug.Log($"[EnemyShipManager] 成功生成敵方船隻於位置: {spawnPos}");
                 break;
             }
         }
@@ -122,7 +122,7 @@ public class EnemyShipSpawner : MonoBehaviour
     {
         if (shipData == null)
         {
-            Debug.LogWarning("[EnemyShipSpawner] ShipData 為 null，無法生成敵人！");
+            Debug.LogWarning("[EnemyShipManager] ShipData 為 null，無法生成敵人！");
             return;
         }
 
@@ -148,30 +148,30 @@ public class EnemyShipSpawner : MonoBehaviour
                             if (weapon.TryGetComponent<Weapon>(out Weapon weaponComponent))
                             {
                                 enemyComp.AddWeapon(weaponComponent);
-                                Debug.Log($"[EnemyShipSpawner] 已為敵方船隻載入武器: {weaponData.Name}");
+                                Debug.Log($"[EnemyShipManager] 已為敵方船隻載入武器: {weaponData.Name}");
                             }
                             else
                             {
-                                Debug.LogWarning($"[EnemyShipSpawner] 武器預製件 {weaponData.PrefabName} 缺少 Weapon 組件！");
+                                Debug.LogWarning($"[EnemyShipManager] 武器預製件 {weaponData.PrefabName} 缺少 Weapon 組件！");
                             }
                         }
                         else
                         {
-                            Debug.LogWarning($"[EnemyShipSpawner] 無法找到武器預製件: {weaponData.PrefabName}");
+                            Debug.LogWarning($"[EnemyShipManager] 無法找到武器預製件: {weaponData.PrefabName}");
                         }
                     }
                 }
 
-                Debug.Log($"[EnemyShipSpawner] 已成功生成敵人: {shipData.PrefabName}");
+                Debug.Log($"[EnemyShipManager] 已成功生成敵人: {shipData.PrefabName}");
             }
             else
             {
-                Debug.LogWarning("[EnemyShipSpawner] 生成的物件缺少 EnemyShip 組件！");
+                Debug.LogWarning("[EnemyShipManager] 生成的物件缺少 EnemyShip 組件！");
             }
         }
         else
         {
-            Debug.LogWarning("[EnemyShipSpawner] 無法生成敵人！");
+            Debug.LogWarning("[EnemyShipManager] 無法生成敵人！");
         }
     }
 
@@ -196,7 +196,7 @@ public class EnemyShipSpawner : MonoBehaviour
 
         if (progressBar == null)
         {
-            Debug.LogError("[EnemyShipSpawner] Progress bar not found in UI!");
+            Debug.LogError("[EnemyShipManager] Progress bar not found in UI!");
         }
     }
 
@@ -214,7 +214,7 @@ public class EnemyShipSpawner : MonoBehaviour
             {
                 spawnInterval = Mathf.Max(1f, spawnInterval - 5f); // 每次減少 5 秒，最低為 1 秒
                 isSpeedBoosted = true; // 設置為加速狀態
-                Debug.Log($"[EnemyShipSpawner] Spawn interval decreased to {spawnInterval} seconds.");
+                Debug.Log($"[EnemyShipManager] Spawn interval decreased to {spawnInterval} seconds.");
             }
             progressBarTimer = 0f; // 重置進度條計時器
         }
@@ -223,6 +223,6 @@ public class EnemyShipSpawner : MonoBehaviour
     private void HandleProgressComplete()
     {
         spawnInterval = Mathf.Max(1f, spawnInterval - 5f); // 每次減少 5 秒，最低為 1 秒
-        Debug.Log($"[EnemyShipSpawner] Spawn interval decreased to {spawnInterval} seconds.");
+        Debug.Log($"[EnemyShipManager] Spawn interval decreased to {spawnInterval} seconds.");
     }
 }
