@@ -160,9 +160,9 @@ public class GameManager : Singleton<GameManager>
                     // 使用 EnemyShipSpawner 載入敵人數據並生成敵人
                     foreach (var shipData in data.enemyShips)
                     {
-                        if (EnemyShipSpawner.Instance != null)
+                        if (EnemyShipManager.Instance != null)
                         {
-                            EnemyShipSpawner.Instance.SpawnEnemyFromData(shipData);
+                            EnemyShipManager.Instance.SpawnEnemyFromData(shipData);
                         }
                         else
                         {
