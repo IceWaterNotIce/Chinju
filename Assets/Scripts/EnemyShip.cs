@@ -188,11 +188,11 @@ public class EnemyShip : Warship
         Debug.Log($"[EnemyShip] {name} 設定為等級 {level}，攻擊力 {damage}，生命值 {base.Health}");
     }
 
-    // 新增：靠近時組成 Fleet
+    // 新增：靠近時自動組成 Fleet（自動組隊優化）
     private void TryFormFleetWithNearbyEnemies()
     {
         // 若自己或父物件已有 Fleet 則略過
-        if (GetComponent<Fleet>() != null || transform.parent != null && transform.parent.GetComponent<Fleet>() != null)
+        if (GetComponent<Fleet>() != null || (transform.parent != null && transform.parent.GetComponent<Fleet>() != null))
             return;
 
         // 找到所有敵艦
@@ -200,14 +200,31 @@ public class EnemyShip : Warship
         foreach (var other in allEnemies)
         {
             if (other == this) continue;
-            if (other.GetComponent<Fleet>() != null) continue; // 已有 Fleet 的略過
+            // 只要雙方都沒有 Fleet 組件才組隊
+            if (other.GetComponent<Fleet>() != null || (other.transform.parent != null && other.transform.parent.GetComponent<Fleet>() != null))
+                continue;
 
             float dist = Vector3.Distance(transform.position, other.transform.position);
             if (dist < 3f)
             {
-                // 決定誰當 leader（用 name 排序）
-                EnemyShip leader = string.CompareOrdinal(this.name, other.name) < 0 ? this : other;
-                EnemyShip follower = leader == this ? other : this;
+                // 決定誰當 leader（用 name 排序，或用 GetInstanceID 保證唯一）
+                EnemyShip leader, follower;
+                if (string.CompareOrdinal(this.name, other.name) < 0)
+                {
+                    leader = this;
+                    follower = other;
+                }
+                else if (string.CompareOrdinal(this.name, other.name) > 0)
+                {
+                    leader = other;
+                    follower = this;
+                }
+                else
+                {
+                    // 若名稱一樣，用 InstanceID
+                    leader = this.GetInstanceID() < other.GetInstanceID() ? this : other;
+                    follower = leader == this ? other : this;
+                }
 
                 // leader 建立 Fleet
                 Fleet line = leader.gameObject.AddComponent<Fleet>();
@@ -216,7 +233,7 @@ public class EnemyShip : Warship
                 // follower 設定 parent 方便管理
                 follower.transform.SetParent(leader.transform);
 
-                Debug.Log($"[EnemyShip] {leader.name} 與 {follower.name} 組成 Fleet");
+                Debug.Log($"[EnemyShip] {leader.name} 與 {follower.name} 自動組成 Fleet");
                 break;
             }
         }
