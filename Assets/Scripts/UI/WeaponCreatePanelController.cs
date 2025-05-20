@@ -98,7 +98,7 @@ public class WeaponCreatePanelController : MonoBehaviour
     void LoadWeaponPrefabs()
     {
         weaponPrefabs.Clear();
-        var loadedPrefabs = Resources.LoadAll<Weapon>("Prefabs/Weapon");
+        var loadedPrefabs = Resources.LoadAll<Weapon>("Prefabs/Weapons");
         weaponPrefabs.AddRange(loadedPrefabs);
     }
 }

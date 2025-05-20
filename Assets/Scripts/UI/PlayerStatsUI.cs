@@ -62,6 +62,8 @@ public class PlayerStatsUI : MonoBehaviour
     private void OnGameDataChanged(GameData newData)
     {
         SetGameDataFromController();
+        // 新增：立即刷新遊戲時間
+        UpdateGameTimeUI();
     }
 
     /// <summary>
@@ -81,6 +83,7 @@ public class PlayerStatsUI : MonoBehaviour
 
             // 新增：立即更新 UI
             UpdateAllResourcesFromData();
+            UpdateGameTimeUI(); // 新增：立即刷新遊戲時間
         }
     }
 
@@ -143,6 +146,7 @@ public class PlayerStatsUI : MonoBehaviour
                 Mathf.RoundToInt(gameData.playerData.Oils),
                 gameData.playerData.Cube
             );
+            UpdateGameTimeUI(); // 新增：同步刷新遊戲時間
         }
     }
 
@@ -152,6 +156,15 @@ public class PlayerStatsUI : MonoBehaviour
         if (oilTransportLabel != null)
         {
             oilTransportLabel.text = progress;
+        }
+    }
+
+    // 新增：刷新遊戲時間 UI
+    private void UpdateGameTimeUI()
+    {
+        if (gameTimeLabel != null)
+        {
+            gameTimeLabel.text = GameManager.Instance.GetFormattedGameTime();
         }
     }
 

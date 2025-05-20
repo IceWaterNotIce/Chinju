@@ -1,0 +1,9 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <engine:VisualElement name="WeaponContainer" style="flex-direction: row; align-items: center; height: 40px; margin-bottom: 4px;">
+        <engine:Label name="lblWeaponName" text="武器名稱" style="width: 100px;"/>
+        <engine:Label name="lblDamage" text="傷害" style="width: 60px;"/>
+        <engine:Label name="lblRange" text="範圍" style="width: 100px;"/>
+        <engine:Label name="lblSpeed" text="攻速" style="width: 80px;"/>
+        <engine:Label name="lblCooldown" text="冷卻" style="width: 80px;"/>
+    </engine:VisualElement>
+</engine:UXML>

@@ -1,21 +1,24 @@
 using System.Collections;
-using System.ComponentModel.Design.Serialization;
 using UnityEngine;
 using UnityEngine.UIElements;
 
 public class WeaponPanelController : MonoBehaviour
 {
     public VisualElement root;
+    public ScrollView weaponList;
+    [SerializeField] private VisualTreeAsset weaponTemplate;
 
-    private void Start()
+    private void Awake()
     {
-        root = GetComponent<UIDocument>().rootVisualElement;
+        var uiDocument = GetComponent<UIDocument>();
+        root = uiDocument.rootVisualElement;
+        weaponList = root.Q<ScrollView>("weapon-list");
+
         PopupManager.Instance.RegisterPopup("WeaponPanel", gameObject);
     }
+
     void OnEnable()
     {
-        Debug.Log("[WeaponPanelController] Start 方法執行。");
-
         StartCoroutine(WaitForGameDataControllerInitialization());
     }
 
@@ -23,42 +26,48 @@ public class WeaponPanelController : MonoBehaviour
     {
         while (GameDataController.Instance == null || GameDataController.Instance.CurrentGameData == null)
         {
-            Debug.LogWarning("[WeaponPanelController] 等待 GameDataController 初始化...");
-            yield return null; // 等待下一幀
+            yield return null;
         }
-
-        var root = GetComponent<UIDocument>().rootVisualElement;
-
-        var weaponList = UIHelper.InitializeElement<ScrollView>(root, "weapon-list");
-        if (weaponList == null) yield break;
-
-        weaponList.Clear(); // 清空清單
 
         var playerData = GameDataController.Instance.CurrentGameData.playerData;
-        if (playerData != null && playerData.Weapons != null)
+        InitializeWeaponList(playerData);
+    }
+
+    private void InitializeWeaponList(GameData.PlayerData playerData)
+    {
+        weaponList.Clear();
+
+        if (playerData == null || playerData.Weapons == null || playerData.Weapons.Count == 0)
         {
-            Debug.Log($"[WeaponPanelController] 玩家武器數量: {playerData.Weapons.Count}");
-            if (playerData.Weapons.Count > 0)
-            {
-                foreach (var weapon in playerData.Weapons)
-                {
-                    Debug.Log($"[WeaponPanelController] 武器: {weapon.Name}, 傷害: {weapon.Damage}");
-                    var item = new Label($"{weapon.Name} (傷害: {weapon.Damage}, 最大範圍: {weapon.MaxAttackDistance}, 最小範圍: {weapon.MinAttackDistance}, 攻擊速度: {weapon.AttackSpeed}, 冷卻時間: {weapon.CooldownTime})");
-                    item.AddToClassList("weapon-item");
-                    weaponList.Add(item);
-                }
-            }
-            else
-            {
-                Debug.LogWarning("[WeaponPanelController] 玩家沒有武器。");
-                var noWeaponLabel = new Label("目前沒有武器可顯示。");
-                noWeaponLabel.AddToClassList("no-weapon-item");
-                weaponList.Add(noWeaponLabel);
-            }
+            var noWeaponLabel = new Label("目前沒有武器可顯示。");
+            noWeaponLabel.AddToClassList("no-weapon-item");
+            weaponList.Add(noWeaponLabel);
+            return;
         }
-        else
+
+        foreach (var weapon in playerData.Weapons)
         {
-            Debug.LogError("[WeaponPanelController] 玩家資料或武器清單為空。");
+            if (weaponTemplate == null)
+            {
+                Debug.LogError("[WeaponPanelController] 找不到 WeaponTemplate.uxml");
+                continue;
+            }
+            VisualElement weaponElement = weaponTemplate.Instantiate();
+
+            var nameLabel = weaponElement.Q<Label>("lblWeaponName");
+            var damageLabel = weaponElement.Q<Label>("lblDamage");
+            var rangeLabel = weaponElement.Q<Label>("lblRange");
+            var speedLabel = weaponElement.Q<Label>("lblSpeed");
+            var cooldownLabel = weaponElement.Q<Label>("lblCooldown");
+
+            if (nameLabel != null) nameLabel.text = weapon.Name;
+            if (damageLabel != null) damageLabel.text = $"傷害: {weapon.Damage}";
+            if (rangeLabel != null) rangeLabel.text = $"範圍: {weapon.MinAttackDistance}-{weapon.MaxAttackDistance}";
+            if (speedLabel != null) speedLabel.text = $"攻速: {weapon.AttackSpeed}";
+            if (cooldownLabel != null) cooldownLabel.text = $"冷卻: {weapon.CooldownTime}";
+
+            weaponElement.AddToClassList("weapon-item");
+            weaponList.Add(weaponElement);
         }
     }
 }

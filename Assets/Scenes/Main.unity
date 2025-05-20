@@ -412,7 +412,7 @@ GameObject:
   - component: {fileID: 436570986}
   - component: {fileID: 436570987}
   m_Layer: 0
-  m_Name: Weapon
+  m_Name: WeaponListPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -464,6 +464,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1991ac0ca7026c94b83433e713a92275, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  weaponTemplate: {fileID: 9197481963319205126, guid: 9a6fb462d52f02441b41d0dceadd0cc0, type: 3}
 --- !u!1 &451232344
 GameObject:
   m_ObjectHideFlags: 0
@@ -493,8 +494,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 933149503}
   - {fileID: 80820162}
+  - {fileID: 933149503}
   - {fileID: 2001442111}
   - {fileID: 2133639859}
   - {fileID: 436570985}
@@ -558,6 +559,7 @@ MonoBehaviour:
       Height: 0
       IslandDensity: 0
       ChinjuTiles: []
+    gameTime: 0
     enemyShips: []
 --- !u!1 &586510287
 GameObject:
