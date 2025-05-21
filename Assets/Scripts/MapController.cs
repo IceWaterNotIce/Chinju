@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 public class MapController : MonoBehaviour
 {
+
+    /*
+    *  1 tile length = 1 海里
+    */
     private const string MapCacheFilePath = "map_cache";
 
     [SerializeField] private Tilemap tilemap;

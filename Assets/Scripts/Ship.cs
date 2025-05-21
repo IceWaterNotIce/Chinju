@@ -57,6 +57,9 @@ public class Ship : MonoBehaviour
     #endregion
 
     #region Movement & Rotation
+    /*
+     * Unit : 每小時海里數
+     */
     [Header("Movement Settings")]
     [SerializeField] protected float m_maxSpeed = 10f;
     [SerializeField] protected float m_acceleration = 2f;
