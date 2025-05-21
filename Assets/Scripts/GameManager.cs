@@ -94,9 +94,7 @@ public class GameManager : Singleton<GameManager>
                                 Name = weapon.name,
                                 Damage = (int)weapon.Damage,
                                 MaxAttackDistance = weapon.MaxAttackDistance,
-                                MinAttackDistance = weapon.MinAttackDistance,
                                 AttackSpeed = weapon.AttackSpeed,
-                                CooldownTime = weapon.CooldownTime,
                                 PrefabName = weapon.Name
                             };
                             shipData.Weapons.Add(weaponData);

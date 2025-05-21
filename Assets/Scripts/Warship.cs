@@ -89,6 +89,7 @@ public class Warship : Ship
                 nearestEnemy = enemy;
             }
         }
+        Debug.Log($"[Warship] Nearest enemy: {nearestEnemy?.name}, Distance: {minDistance}");
         return nearestEnemy;
     }
 
@@ -114,10 +115,10 @@ public class Warship : Ship
     {
         if (weapons.Count >= WeaponLimit) return;
 
-        var availableWeapons = Resources.LoadAll<Weapon>("Prefabs/Weapon");
+        var availableWeapons = Resources.LoadAll<Weapon>("Prefabs/Weapons");
         if (availableWeapons.Length == 0) return;
 
-        var newWeapon = Instantiate(
+        var newWeapon = Instantiate(    
             availableWeapons[UnityEngine.Random.Range(0, availableWeapons.Length)],
             transform
         );

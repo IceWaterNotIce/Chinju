@@ -90,5 +90,9 @@ public class GameData
 
         // 新增：保存武器的預製物名稱
         public string PrefabName;
+
+        public int AmmoPerShot;
+
+
     }
 }

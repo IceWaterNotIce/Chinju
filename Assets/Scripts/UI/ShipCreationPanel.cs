@@ -165,13 +165,11 @@ public class ShipCreationPanel : MonoBehaviour
             return;
         }
 
+
+        
         PlayerShip newShip = ShipCreationManager.Instance.TryCreateRandomShip(goldInputField.value, oilInputField.value, cubeInputField.value);
 
-        if (newShip != null)
-        {
-            newShip.AddRandomWeapon();
-        }
-        else
+        if (newShip == null)
         {
             Debug.LogError("[ShipCreationPanel] 無法創建船隻，請檢查資源或其他條件");
         }

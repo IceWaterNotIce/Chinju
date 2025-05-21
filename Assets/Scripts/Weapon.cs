@@ -3,15 +3,67 @@ using System.Collections;
 
 public class Weapon : MonoBehaviour
 {
-    public string Name; // 改為字段，允許在檢查器中編輯
-    public int Cost; // 新增：武器的花費
-    public float Damage;
-    public float AttackSpeed = 1f;
-    public float CooldownTime = 1f; // 統一命名
+    [Tooltip("武器名稱，可於檢查器中編輯")]
+    [SerializeField] private string _name;
+    public string Name
+    {
+        get => _name;
+        set => _name = value;
+    }
 
-    public float MaxAttackDistance = 10f;
-    public float MinAttackDistance = 1f;
+   
+
+    [Tooltip("攻擊速度（每分鐘攻擊次數）")]
+    [SerializeField] private float _attackSpeed = 1f;
+    public float AttackSpeed
+    {
+        get => _attackSpeed;
+        set => _attackSpeed = value;
+    }
+
+    [Tooltip("最大攻擊距離（單位：km），超過此距離無法攻擊目標")]
+    [SerializeField] private float _maxAttackDistance = 10f;
+    public float MaxAttackDistance
+    {
+        get => _maxAttackDistance;
+        set
+        {
+            if (value < 0)
+            {
+                Debug.LogWarning("[Weapon] 最大攻擊距離不能為負數，設置為 0。");
+                _maxAttackDistance = 0;
+            }
+            else
+            {
+                _maxAttackDistance = value;
+            }
+        }
+    }
+
+ [Tooltip("武器的花費")]
+    [SerializeField] private int _cost;
+    public int Cost
+    {
+        get => _cost;
+        set => _cost = value;
+    }
+
+    [Tooltip("武器傷害值")]
+    [SerializeField] private float _damage;
+    public float Damage
+    {
+        get => _damage;
+        set => _damage = value;
+    }
     public GameObject AmmoPrefab;
+
+    [Tooltip("每次攻擊發射的彈藥數量")]
+    [SerializeField] private int _ammoPerShot = 1;
+    public int AmmoPerShot
+    {
+        get => _ammoPerShot;
+        set => _ammoPerShot = Mathf.Max(1, value);
+    }
 
     private bool isAttacking = false;
     private GameObject currentTarget;
@@ -27,54 +79,63 @@ public class Weapon : MonoBehaviour
 
         if (target == null) return;
 
-        Vector3 direction = (target.transform.position - transform.position).normalized;
+        Vector3 baseDirection = (target.transform.position - transform.position).normalized;
 
-        // 計算攻擊成功率
         var ownerShip = GetComponentInParent<Warship>();
         float successRate = 20f + (ownerShip != null ? Mathf.Min(ownerShip.Level / 2f, 79f) : 0f); // 最大 99%
-        bool isSuccessful = Random.Range(0f, 100f) <= successRate;
 
-        if (!isSuccessful)
+        // 多發彈藥處理
+        for (int i = 0; i < AmmoPerShot; i++)
         {
-            // 如果攻擊不成功，添加一個小的隨機方向偏移
-            float randomAngle = Random.Range(-10f, 10f); // 隨機角度偏移
-            Quaternion rotation = Quaternion.Euler(0, 0, randomAngle);
-            direction = rotation * direction;
-        }
+            Vector3 direction = baseDirection;
 
-        // 計算彈藥的生成位置，設置為船隻與目標之間的位置
-        Vector3 spawnPosition = transform.position + direction * MinAttackDistance;
+            // 計算攻擊成功率
+            bool isSuccessful = Random.Range(0f, 100f) <= successRate;
 
-        GameObject ammoObj = AmmoManager.Instance.GetAmmo();
-        if (ammoObj == null)
-        {
-            Debug.LogError("[Weapon] 無法從 AmmoManager 獲取有效的彈藥物件！");
-            return;
-        }
-
-        ammoObj.transform.position = spawnPosition;
-        ammoObj.transform.rotation = Quaternion.identity;
-        ammoObj.transform.SetParent(AmmoManager.Instance.transform); // 設置為 AmmoManager 的子物件
-
-        Ammo ammo = ammoObj.GetComponent<Ammo>();
-        if (ammo != null)
-        {
-            ammo.SetDirection(direction);
-
-            // 設置彈藥的擁有者為武器所屬的船隻
-            if (ownerShip != null)
+            float angleOffset = 0f;
+            if (!isSuccessful)
             {
-                ammo.SetOwner(ownerShip.gameObject);
-                Debug.Log($"[Weapon] 彈藥生成成功，設置擁有者為 {ownerShip.name}");
+                // 如果攻擊不成功，添加一個小的隨機方向偏移
+                angleOffset = Random.Range(-10f, 10f);
+            }
+            // 多發彈藥時，每發有微小角度偏移
+            float spread = Mathf.Lerp(-5f, 5f, (AmmoPerShot == 1) ? 0.5f : (float)i / (AmmoPerShot - 1));
+            float totalAngle = angleOffset + spread;
+            Quaternion rotation = Quaternion.Euler(0, 0, totalAngle);
+            direction = rotation * baseDirection;
+
+            Vector3 spawnPosition = transform.position + direction;
+
+            GameObject ammoObj = AmmoManager.Instance.GetAmmo();
+            if (ammoObj == null)
+            {
+                Debug.LogError("[Weapon] 無法從 AmmoManager 獲取有效的彈藥物件！");
+                continue;
+            }
+
+            ammoObj.transform.position = spawnPosition;
+            ammoObj.transform.rotation = Quaternion.identity;
+            ammoObj.transform.SetParent(AmmoManager.Instance.transform);
+
+            Ammo ammo = ammoObj.GetComponent<Ammo>();
+            if (ammo != null)
+            {
+                ammo.SetDirection(direction);
+
+                if (ownerShip != null)
+                {
+                    ammo.SetOwner(ownerShip.gameObject);
+                    Debug.Log($"[Weapon] 彈藥生成成功，設置擁有者為 {ownerShip.name}");
+                }
+                else
+                {
+                    Debug.LogWarning("[Weapon] 無法找到武器的擁有者船隻，請檢查武器的層級結構！");
+                }
             }
             else
             {
-                Debug.LogWarning("[Weapon] 無法找到武器的擁有者船隻，請檢查武器的層級結構！");
+                Debug.LogError("[Weapon] 無法找到 Ammo 組件，請檢查 AmmoPrefab 是否正確設置！");
             }
-        }
-        else
-        {
-            Debug.LogError("[Weapon] 無法找到 Ammo 組件，請檢查 AmmoPrefab 是否正確設置！");
         }
     }
 
@@ -114,11 +175,11 @@ public class Weapon : MonoBehaviour
         while (isAttacking && currentTarget != null)
         {
             float distance = Vector3.Distance(transform.position, currentTarget.transform.position);
-            if (distance <= MaxAttackDistance && distance >= MinAttackDistance)
+            if (distance <= MaxAttackDistance)
             {
                 Attack(currentTarget);
             }
-            yield return new WaitForSeconds(CooldownTime); // 使用統一的 CooldownTime
+            yield return new WaitForSeconds(1f / AttackSpeed); // 根據攻擊速度計算攻擊間隔
         }
     }
 
@@ -129,10 +190,11 @@ public class Weapon : MonoBehaviour
             Name = this.Name,
             Damage = (int)this.Damage, // 顯式轉換 Damage 為 int
             MaxAttackDistance = this.MaxAttackDistance,
-            MinAttackDistance = this.MinAttackDistance,
+   
             AttackSpeed = this.AttackSpeed,
-            CooldownTime = this.CooldownTime,
-            PrefabName = this.gameObject.name.Replace("(Clone)", "").Trim() // 保存武器的預製物名稱
+            PrefabName = this.gameObject.name.Replace("(Clone)", "").Trim(), // 保存武器的預製物名稱
+            // 若 GameData.WeaponData 有 AmmoPerShot 屬性，這裡也要保存
+            AmmoPerShot = this.AmmoPerShot
         };
     }
 
@@ -147,8 +209,8 @@ public class Weapon : MonoBehaviour
         this.name = weaponData.Name;
         this.Damage = weaponData.Damage;
         this.AttackSpeed = weaponData.AttackSpeed;
-        this.CooldownTime = weaponData.CooldownTime;
-        this.MaxAttackDistance = weaponData.MaxAttackDistance;
-        this.MinAttackDistance = weaponData.MinAttackDistance;
+        this._maxAttackDistance = weaponData.MaxAttackDistance;
+        // 若 GameData.WeaponData 有 AmmoPerShot 屬性，這裡也要加載
+        this.AmmoPerShot = weaponData.AmmoPerShot;
     }
 }

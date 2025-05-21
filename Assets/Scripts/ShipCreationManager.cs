@@ -6,18 +6,6 @@ public class ShipCreationManager : MonoBehaviour
 
     [SerializeField] private GameObject[] shipPrefabs = new GameObject[5];
 
-
-    [SerializeField]
-    // 船隻建造所需資源成本 
-    // { 金幣, 油, 方塊 }
-    public int[,] shipCosts = {
-        { 800, 400, 2 }, // 航空母艦
-        { 500, 200, 2 }, // 戰艦
-        { 300, 120, 1 },  // 巡洋艦
-        { 10, 10, 1 },   // 驅逐艦
-        { 150, 60, 1 }    // 潛艦
-    };
-
     [SerializeField] private MapController mapController;
 
     private void Awake()
@@ -28,60 +16,40 @@ public class ShipCreationManager : MonoBehaviour
 
     public PlayerShip TryCreateRandomShip(int inputGold, int inputOil, int inputCube)
     {
-        System.Collections.Generic.List<int> candidates = new System.Collections.Generic.List<int>();
-        System.Collections.Generic.List<int> weights = new System.Collections.Generic.List<int>();
 
-        for (int i = 0; i < shipPrefabs.Length; i++)
+        // check if resources are enough
+        GameDataController gameDataController = GameDataController.Instance;
+        if (gameDataController == null)
         {
-            if (GameDataController.Instance?.HasEnoughResources(shipCosts[i, 0], shipCosts[i, 1], shipCosts[i, 2]) ?? false)
-            {
-                int dist = Mathf.Abs(inputGold - shipCosts[i, 0]) +
-                           Mathf.Abs(inputOil - shipCosts[i, 1]) +
-                           Mathf.Abs(inputCube - shipCosts[i, 2]);
-                int weight = Mathf.Max(1, 100 - dist);
-                candidates.Add(i);
-                weights.Add(weight);
-            }
+            Debug.LogError("[ShipCreationPanel] GameDataController 為 null，無法建造船隻");
+            return null;
+
         }
+        GameData.PlayerData playerData = gameDataController.CurrentGameData?.playerData;
 
-        if (candidates.Count == 0)
+        if (playerData == null)
         {
-            Debug.LogWarning("[ShipCreationManager] 沒有任何船型可隨機建造！");
+            Debug.LogError("[ShipCreationPanel] PlayerData 為 null，無法建造船隻");
+            return null;
+        }
+        if (playerData.Gold < inputGold || playerData.Oils < inputOil || playerData.Cube < inputCube)
+        {
+            Debug.LogError("[ShipCreationPanel] 資源不足，無法建造船隻");
             return null;
         }
 
-        int totalWeight = 0;
-        foreach (var w in weights) totalWeight += w;
-        int rand = Random.Range(0, totalWeight);
-        int chosenIdx = 0;
-        for (int i = 0; i < weights.Count; i++)
-        {
-            if (rand < weights[i])
-            {
-                chosenIdx = i;
-                break;
-            }
-            rand -= weights[i];
-        }
-        int shipType = candidates[chosenIdx];
+        // 隨機選擇一個船隻類型
+        int shipTypeIdx = Random.Range(0, shipPrefabs.Length);
 
-        if (GameDataController.Instance?.ConsumeResources(shipCosts[shipType, 0], shipCosts[shipType, 1], shipCosts[shipType, 2]) ?? false)
-        {
+        // 扣除資源
+        playerData.Gold -= inputGold;
+        playerData.Oils -= inputOil;
+        playerData.Cube -= inputCube;
+        gameDataController.TriggerResourceChanged();
 
-            var ship = InstantiateShip(shipType);
-            if (ship != null)
-            {
-                // 分配隨機武器
-                AssignRandomWeapon(ship.gameObject);
-            }
-            Debug.Log($"[ShipCreationManager] 隨機建造了船隻：{shipPrefabs[shipType].name}，消耗資源：{shipCosts[shipType, 0]}金幣, {shipCosts[shipType, 1]}油, {shipCosts[shipType, 2]}方塊");
-            return ship;
-        }
-        else
-        {
-            Debug.LogWarning("[ShipCreationManager] 資源不足，無法建造戰艦！");
-            return null;
-        }
+        // 實例化船隻
+        PlayerShip newShip = InstantiateShip(shipTypeIdx);
+        return newShip;
 
     }
 

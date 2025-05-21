@@ -363,8 +363,6 @@ public class ShipUI : Singleton<ShipUI>
         weaponDetailPopup.Add(title);
 
         weaponDetailPopup.Add(new Label($"最大攻擊距離: {weapon.MaxAttackDistance}"));
-        weaponDetailPopup.Add(new Label($"最小攻擊距離: {weapon.MinAttackDistance}"));
-        weaponDetailPopup.Add(new Label($"攻擊冷卻: {weapon.CooldownTime} 秒"));
         weaponDetailPopup.Add(new Label($"彈藥預製體: {(weapon.AmmoPrefab != null ? weapon.AmmoPrefab.name : "無")}"));
 
         Button closeBtn = new Button(() => weaponDetailPopup.RemoveFromHierarchy()) { text = "關閉" };
@@ -456,9 +454,7 @@ public class ShipUI : Singleton<ShipUI>
                         Name = weaponData.Name,
                         Damage = weaponData.Damage,
                         MaxAttackDistance = weaponData.MaxAttackDistance,
-                        MinAttackDistance = weaponData.MinAttackDistance,
                         AttackSpeed = weaponData.AttackSpeed,
-                        CooldownTime = weaponData.CooldownTime
                     };
 
                     ship.weapons[slotIndex] = weapon; // 插入武器到指定槽位

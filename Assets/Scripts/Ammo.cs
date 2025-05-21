@@ -3,6 +3,8 @@ using UnityEngine;
 public class Ammo : MonoBehaviour
 {
     public float Damage = 10f;
+
+    [Tooltip("彈藥速度（公尺／秒），1 scene 單位 = 1 公里")]
     public float Speed = 1f;
     private GameObject owner; // 記錄發射彈藥的船隻
     private Vector3 direction;
@@ -32,7 +34,7 @@ public class Ammo : MonoBehaviour
             return;
         }
 
-        transform.position += direction * Speed * Time.deltaTime;
+        transform.position += direction * Speed / 1000 * Time.deltaTime; // 將速度轉換為公尺／秒
     }
 
     void OnTriggerEnter2D(Collider2D collision)
