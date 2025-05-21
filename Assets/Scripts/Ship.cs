@@ -58,7 +58,9 @@ public class Ship : MonoBehaviour
 
     #region Movement & Rotation
     /*
-     * Unit : 每小時海里數
+     * Unit : 每小時海里數 (knots)
+     * 場景單位：1 = 1km
+     * 實際移動時需將速度轉換為每秒公里數：km/s = knots * 1.852 / 3600
      */
     [Header("Movement Settings")]
     [SerializeField] protected float m_maxSpeed = 10f;
@@ -127,7 +129,10 @@ public class Ship : MonoBehaviour
         if (CurrentFuel <= 0) return;
 
         m_speed = Mathf.MoveTowards(m_speed, m_targetSpeed, m_acceleration * Time.deltaTime);
-        Vector3 newPosition = transform.position + transform.right * m_speed * Time.deltaTime;
+
+        // 將速度從每小時海里數(knots)轉換為每秒公里數(km/s)
+        float kmPerSecond = m_speed * 1.852f / 3600f;
+        Vector3 newPosition = transform.position + transform.right * kmPerSecond * Time.deltaTime * GameManager.RealGameTimeScale;
 
         Vector3Int tilePosition = tilemap.WorldToCell(newPosition);
         if (tilemap.GetTile(tilePosition) == oceanTile)

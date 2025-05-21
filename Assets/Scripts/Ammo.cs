@@ -34,7 +34,7 @@ public class Ammo : MonoBehaviour
             return;
         }
 
-        transform.position += direction * Speed / 1000 * Time.deltaTime; // 將速度轉換為公尺／秒
+        transform.position += direction * Speed / 1000 * Time.deltaTime * GameManager.RealGameTimeScale;
     }
 
     void OnTriggerEnter2D(Collider2D collision)

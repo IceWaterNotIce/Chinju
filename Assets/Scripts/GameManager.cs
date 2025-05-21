@@ -14,8 +14,10 @@ public class GameManager : Singleton<GameManager>
     private float gameTime; // 遊戲時間（秒）
 
     // 遊戲內一天的秒數（現實 20 分鐘 = 遊戲 1 天，10 分鐘 = 12 小時）
-    private const float RealSecondsPerGameDay = 600f * 2; // 1200 秒 = 1 天
+    public const float RealSecondsPerGameDay = 600f * 2; // 1200 秒 = 1 天
     private const int GameSecondsPerDay = 24 * 60 * 60; // 86400 秒 = 1 天
+
+    public const float RealGameTimeScale = 1200f;
 
     public delegate void GameEvent();
     public static event GameEvent OnGameSaved;
