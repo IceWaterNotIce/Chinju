@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+  <ui:VisualElement name="distance-marker" style="flex-direction: row; align-items: center;">
+    <ui:VisualElement name="distance-line" style="height: 4px; background-color: #fff; margin-right: 8px;" />
+    <ui:Label name="distance-label" text="1 km" style="color: #fff; font-size: 16px;" />
+  </ui:VisualElement>
+</ui:UXML>
