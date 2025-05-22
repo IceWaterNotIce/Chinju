@@ -16,14 +16,12 @@ public class ShipListPanelController : MonoBehaviour
         // 獲取根元素
         var uiDocument = GetComponent<UIDocument>();
         root = uiDocument.rootVisualElement;
-        shipListContainer = root.Q<VisualElement>("ShipListContainer");
-        closeButton = root.Q<Button>("CloseButton");
+        shipListContainer = UIHelper.InitializeElement<VisualElement>(root, "GridContainer");
+        closeButton = UIHelper.InitializeElement<Button>(root, "CloseButton");
 
         // 註冊面板到 PopupManager
-        PopupManager.Instance.RegisterPopup("ShipListPanel", gameObject);
+        PopupManager.Instance.RegisterPopup("ShipPanel", gameObject);
 
-        // 註冊關閉按鈕事件
-        closeButton.RegisterCallback<ClickEvent>(ev => PopupManager.Instance.HidePopup("ShipListPanel"));
     }
 
     void OnEnable()
@@ -42,8 +40,10 @@ public class ShipListPanelController : MonoBehaviour
         // 重新取得UI元素（若有動態生成UI的情境）
         var uiDocument = GetComponent<UIDocument>();
         root = uiDocument.rootVisualElement;
-        shipListContainer = root.Q<VisualElement>("ShipListContainer");
+        shipListContainer = UIHelper.InitializeElement<VisualElement>(root, "GridContainer");
 
+        closeButton = UIHelper.InitializeElement<Button>(root, "CloseButton");
+        closeButton.RegisterCallback<ClickEvent>(ev => PopupManager.Instance.HidePopup("ShipPanel"));
         InitializeShipList();
     }
 
