@@ -21,7 +21,7 @@ public class ShipCreationManager : MonoBehaviour
         GameDataController gameDataController = GameDataController.Instance;
         if (gameDataController == null)
         {
-            Debug.LogError("[ShipCreationPanel] GameDataController 為 null，無法建造船隻");
+            Debug.LogError("[ShipCreatePanel] GameDataController 為 null，無法建造船隻");
             return null;
 
         }
@@ -29,12 +29,12 @@ public class ShipCreationManager : MonoBehaviour
 
         if (playerData == null)
         {
-            Debug.LogError("[ShipCreationPanel] PlayerData 為 null，無法建造船隻");
+            Debug.LogError("[ShipCreatePanel] PlayerData 為 null，無法建造船隻");
             return null;
         }
         if (playerData.Gold < inputGold || playerData.Oils < inputOil || playerData.Cube < inputCube)
         {
-            Debug.LogError("[ShipCreationPanel] 資源不足，無法建造船隻");
+            Debug.LogError("[ShipCreatePanel] 資源不足，無法建造船隻");
             return null;
         }
 

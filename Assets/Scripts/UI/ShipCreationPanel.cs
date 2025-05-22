@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 /// <summary>
 /// 控制船隻建造面板的行為
 /// </summary>
-public class ShipCreationPanel : MonoBehaviour
+public class ShipCreatePanel : MonoBehaviour
 {
     private UIDocument uiDocument;
     private VisualElement root; // 修改為 root
@@ -22,7 +22,7 @@ public class ShipCreationPanel : MonoBehaviour
 
     void Awake()
     {
-        PopupManager.Instance.RegisterPopup("ShipCreationPanel", gameObject);
+        PopupManager.Instance.RegisterPopup("ShipCreatePanel", gameObject);
     }
 
     void OnEnable()
@@ -37,7 +37,7 @@ public class ShipCreationPanel : MonoBehaviour
 
     private void InitializeUI()
     {
-        Debug.Log("[ShipCreationPanel] 初始化船隻建造面板...");
+        Debug.Log("[ShipCreatePanel] 初始化船隻建造面板...");
 
         // 獲取 UIDocument
         uiDocument = GetComponent<UIDocument>();
@@ -104,7 +104,7 @@ public class ShipCreationPanel : MonoBehaviour
         {
             closeBtn = new Button(() => 
             {
-               PopupManager.Instance.HidePopup("ShipCreationPanel");
+               PopupManager.Instance.HidePopup("ShipCreatePanel");
             }) { text = "關閉" };
             closeBtn.name = "close-ship-panel-btn";
             closeBtn.style.marginTop = 8;
@@ -114,15 +114,15 @@ public class ShipCreationPanel : MonoBehaviour
         {
             closeBtn.clicked += () => 
             {
-                PopupManager.Instance.HidePopup("ShipCreationPanel");
+                PopupManager.Instance.HidePopup("ShipCreatePanel");
             };
         }
 
         // 初始化面板狀態
-        PopupManager.Instance.RegisterPopup("ShipCreationPanel", gameObject);
+        PopupManager.Instance.RegisterPopup("ShipCreatePanel", gameObject);
         UpdateCostDisplay(10, 10, 1);
 
-        Debug.Log("[ShipCreationPanel] 船隻建造面板初始化完成");
+        Debug.Log("[ShipCreatePanel] 船隻建造面板初始化完成");
     }
 
 
@@ -157,11 +157,11 @@ public class ShipCreationPanel : MonoBehaviour
 
     private void OnBuildButtonClicked()
     {
-        Debug.Log("[ShipCreationPanel] 點擊建造按鈕");
+        Debug.Log("[ShipCreatePanel] 點擊建造按鈕");
 
         if (ShipCreationManager.Instance == null)
         {
-            Debug.LogError("[ShipCreationPanel] ShipCreationManager.Instance 為 null，無法建造船隻");
+            Debug.LogError("[ShipCreatePanel] ShipCreationManager.Instance 為 null，無法建造船隻");
             return;
         }
 
@@ -171,7 +171,7 @@ public class ShipCreationPanel : MonoBehaviour
 
         if (newShip == null)
         {
-            Debug.LogError("[ShipCreationPanel] 無法創建船隻，請檢查資源或其他條件");
+            Debug.LogError("[ShipCreatePanel] 無法創建船隻，請檢查資源或其他條件");
         }
 
         // 建造後重設為 10, 10, 1

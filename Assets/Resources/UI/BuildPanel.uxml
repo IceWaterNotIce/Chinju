@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False" style="Assets/Resources/UI/BuildPanel.uss">
+    <Style src="project://database/Assets/Resources/UI/BuildPanel.uss" />
+    <ui:VisualElement name="BuildPanelRoot" class="build-panel-root">
+        <ui:Button name="btnBuildShip" text="建造船艦" class="build-panel-btn" />
+        <ui:Button name="btnBuildWeapon" text="建造武器" class="build-panel-btn" />
+        <ui:Button name="btnCloseBuildPanel" text="關閉" class="build-panel-btn" />
+    </ui:VisualElement>
+</ui:UXML>

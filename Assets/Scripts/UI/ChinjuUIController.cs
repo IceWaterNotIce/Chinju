@@ -3,8 +3,6 @@ using UnityEngine.UIElements;
 
 public class ChinjuUIController : MonoBehaviour
 {
-    public WeaponCreatePanelController weaponCreatePanelController;
-    public ShipCreationPanel shipCreationPanel;
     private VisualElement chinjuRoot;
 
     private void Awake()
@@ -22,20 +20,7 @@ public class ChinjuUIController : MonoBehaviour
         var uiDoc = GetComponent<UIDocument>();
         chinjuRoot = uiDoc?.rootVisualElement;
 
-        var btnOpenWeaponCreatePanel = UIHelper.InitializeElement<Button>(chinjuRoot, "btnOpenWeaponCreatePanel");
-        if (btnOpenWeaponCreatePanel != null) btnOpenWeaponCreatePanel.clicked += () =>
-        {
-            PopupManager.Instance.ShowPopup("WeaponCreatePanel");
-            PopupManager.Instance.HidePopup("ChinjuUI");
-        };
-        var btnOpenShipCreatePanel = UIHelper.InitializeElement<Button>(chinjuRoot, "btnOpenShipCreatePanel");
-        if (btnOpenShipCreatePanel != null) btnOpenShipCreatePanel.clicked += () =>
-        {
-            PopupManager.Instance.ShowPopup("ShipCreationPanel");
-            PopupManager.Instance.HidePopup("ChinjuUI");
-        };
-
-        // 新增：全部加滿燃料按鈕
+        // 僅初始化全部加滿燃料按鈕
         var btnFillAllFuel = UIHelper.InitializeElement<Button>(chinjuRoot, "btnFillAllFuel");
         if (btnFillAllFuel != null) btnFillAllFuel.clicked += FillAllPlayerShipFuel;
 
