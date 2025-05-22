@@ -16,7 +16,7 @@ public class SettingMenu : MonoBehaviour
 
     void Awake()
     {
-        PopupManager.Instance.RegisterPopup("SettingMenu", gameObject);
+        PopupManager.Instance.RegisterPopup("SettingPanel", gameObject);
     }
 
     void Update()
@@ -51,14 +51,14 @@ public class SettingMenu : MonoBehaviour
             var menuDocument = GetComponent<UIDocument>();
             if (menuDocument == null)
             {
-                Debug.LogError("[SettingMenu] 無法找到 UIDocument 組件");
+                Debug.LogError("[SettingPanel] 無法找到 UIDocument 組件");
                 return;
             }
 
             root = menuDocument.rootVisualElement; // 確保 root 被正確初始化
             if (root == null)
             {
-                Debug.LogError("[SettingMenu] 無法初始化 root 元素");
+                Debug.LogError("[SettingPanel] 無法初始化 root 元素");
                 return;
             }
 
@@ -94,11 +94,11 @@ public class SettingMenu : MonoBehaviour
             }
 
             PopupManager.Instance.RegisterPopup("SettingMenu", gameObject);
-            Debug.Log("[SettingMenu] UI初始化成功");
+            Debug.Log("[SettingPanel] UI初始化成功");
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"[SettingMenu] UI初始化失敗: {e.Message}\n{e.StackTrace}");
+            Debug.LogError($"[SettingPanel] UI初始化失敗: {e.Message}\n{e.StackTrace}");
             return; // 新增：初始化失敗直接 return
         }
     }
@@ -131,7 +131,7 @@ public class SettingMenu : MonoBehaviour
     {
         if (root == null)
         {
-            Debug.LogError("[SettingMenu] root 未初始化");
+            Debug.LogError("[SettingPanel] root 未初始化");
             return;
         }
 
@@ -149,61 +149,61 @@ public class SettingMenu : MonoBehaviour
     {
         if (root == null)
         {
-            Debug.LogError("[SettingMenu] 無法顯示選單：選單引用丟失");
+            Debug.LogError("[SettingPanel] 無法顯示選單：選單引用丟失");
             return;
         }
 
         PopupManager.Instance.ShowPopup("SettingMenu");
         Time.timeScale = 0f; // 暫停遊戲
-        Debug.Log("[SettingMenu] 顯示遊戲選單並暫停遊戲");
+        Debug.Log("[SettingPanel] 顯示遊戲選單並暫停遊戲");
     }
 
     public void HideGameMenu()
     {
         if (root == null)
         {
-            Debug.LogError("[SettingMenu] 無法隱藏選單：選單引用丟失");
+            Debug.LogError("[SettingPanel] 無法隱藏選單：選單引用丟失");
             return;
         }
 
         PopupManager.Instance.HidePopup("SettingMenu");
         Time.timeScale = 1f; // 恢復遊戲
-        Debug.Log("[SettingMenu] 隱藏遊戲選單並恢復遊戲");
+        Debug.Log("[SettingPanel] 隱藏遊戲選單並恢復遊戲");
     }
 
     private void OnContinueButtonClicked()
     {
-        Debug.Log("[SettingMenu] 繼續遊戲");
+        Debug.Log("[SettingPanel] 繼續遊戲");
         HideGameMenu();
     }
 
     private void OnSaveGameButtonClicked()
     {
-        Debug.Log("[SettingMenu] 儲存遊戲");
+        Debug.Log("[SettingPanel] 儲存遊戲");
         if (GameDataController.Instance != null)
             GameManager.Instance.SaveGame(); // Adjusted to match the method signature
     }
 
     private void OnLoadGameButtonClicked()
     {
-        Debug.Log("[SettingMenu] 載入遊戲");
+        Debug.Log("[SettingPanel] 載入遊戲");
         var loadedData = GameManager.Instance.LoadGame();
         if (loadedData != null)
         {
             if (GameDataController.Instance != null)
                 GameDataController.Instance.CurrentGameData = loadedData;
-            Debug.Log("[SettingMenu] 遊戲載入成功");
+            Debug.Log("[SettingPanel] 遊戲載入成功");
             HideGameMenu();
         }
         else
         {
-            Debug.LogWarning("[SettingMenu] 沒有找到儲存的遊戲數據");
+            Debug.LogWarning("[SettingPanel] 沒有找到儲存的遊戲數據");
         }
     }
 
     private void OnExitGameButtonClicked()
     {
-        Debug.Log("[SettingMenu] 退出遊戲");
+        Debug.Log("[SettingPanel] 退出遊戲");
         #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
         #else
@@ -213,7 +213,7 @@ public class SettingMenu : MonoBehaviour
 
     private void OnNewGameButtonClicked()
     {
-        Debug.Log("[SettingMenu] 開始新遊戲");
+        Debug.Log("[SettingPanel] 開始新遊戲");
         GameManager.Instance.StartNewGame();
         HideGameMenu();
     }
@@ -222,24 +222,24 @@ public class SettingMenu : MonoBehaviour
     {
         if (root == null)
         {
-            Debug.LogError("[SettingMenu] 無法顯示設定選單：選單引用丟失");
+            Debug.LogError("[SettingPanel] 無法顯示設定選單：選單引用丟失");
             return;
         }
 
         PopupManager.Instance.ShowPopup("SettingMenu");
-        Debug.Log("[SettingMenu] 顯示設定選單");
+        Debug.Log("[SettingPanel] 顯示設定選單");
     }
 
     public void HideSettingsMenu()
     {
         if (root == null)
         {
-            Debug.LogError("[SettingMenu] 無法隱藏設定選單：選單引用丟失");
+            Debug.LogError("[SettingPanel] 無法隱藏設定選單：選單引用丟失");
             return;
         }
 
         PopupManager.Instance.HidePopup("SettingMenu");
-        Debug.Log("[SettingMenu] 隱藏設定選單");
+        Debug.Log("[SettingPanel] 隱藏設定選單");
     }
 
     private void OnCloseButtonClicked()
@@ -257,7 +257,7 @@ public class SettingMenu : MonoBehaviour
     private void UpdateMenuTextSize(int fontSize)
     {
         if (root == null) return;
-        Debug.Log($"[SettingMenu] Slider value changed: {fontSize}");
+        Debug.Log($"[SettingPanel] Slider value changed: {fontSize}");
         var labels = root.Query<Label>().ToList();
         foreach (var label in labels)
         {
@@ -285,7 +285,7 @@ public class SettingMenu : MonoBehaviour
     // 新增：實際調整 BGM 音量
     private void SetBGMVolume(float volume)
     {
-        Debug.Log($"[SettingMenu] BGM 音量調整: {volume}");
+        Debug.Log($"[SettingPanel] BGM 音量調整: {volume}");
         if (AudioManager.Instance != null)
             AudioManager.Instance.SetBGMVolume(volume);
         // 若無 AudioManager，請自行實作
@@ -294,7 +294,7 @@ public class SettingMenu : MonoBehaviour
     // 新增：實際調整 SFX 音量
     private void SetSFXVolume(float volume)
     {
-        Debug.Log($"[SettingMenu] SFX 音量調整: {volume}");
+        Debug.Log($"[SettingPanel] SFX 音量調整: {volume}");
         if (AudioManager.Instance != null)
             AudioManager.Instance.SetSFXVolume(volume);
         // 若無 AudioManager，請自行實作
