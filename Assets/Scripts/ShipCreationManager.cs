@@ -1,10 +1,11 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class ShipCreationManager : MonoBehaviour
 {
     public static ShipCreationManager Instance { get; private set; }
 
-    [SerializeField] private GameObject[] shipPrefabs = new GameObject[5];
+    private List<GameObject> shipPrefabs = new List<GameObject>();
 
     [SerializeField] private MapController mapController;
 
@@ -12,6 +13,11 @@ public class ShipCreationManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+
+        // 自動載入 Resources/Prefabs/Player 下所有船隻預製物
+        var loadedPrefabs = Resources.LoadAll<GameObject>("Prefabs/PlayerShips");
+        shipPrefabs = new List<GameObject>(loadedPrefabs);
+        Debug.Log($"[ShipCreationManager] 已自動載入 {shipPrefabs.Count} 個船隻預製物");
     }
 
     public PlayerShip TryCreateRandomShip(int inputGold, int inputOil, int inputCube)
@@ -39,7 +45,12 @@ public class ShipCreationManager : MonoBehaviour
         }
 
         // 隨機選擇一個船隻類型
-        int shipTypeIdx = Random.Range(0, shipPrefabs.Length);
+        if (shipPrefabs == null || shipPrefabs.Count == 0)
+        {
+            Debug.LogError("[ShipCreationManager] 沒有可用的船隻預製物！");
+            return null;
+        }
+        int shipTypeIdx = Random.Range(0, shipPrefabs.Count);
 
         // 扣除資源
         playerData.Gold -= inputGold;
@@ -55,7 +66,7 @@ public class ShipCreationManager : MonoBehaviour
 
     private PlayerShip InstantiateShip(int shipTypeIdx)
     {
-        if (shipTypeIdx < 0 || shipTypeIdx >= shipPrefabs.Length)
+        if (shipTypeIdx < 0 || shipTypeIdx >= shipPrefabs.Count)
         {
             Debug.LogError($"無效的船型索引：{shipTypeIdx}");
             return null;
@@ -131,7 +142,7 @@ public class ShipCreationManager : MonoBehaviour
 
     public GameObject AssignRandomWeapon(GameObject ship)
     {
-        if (shipPrefabs == null || shipPrefabs.Length == 0)
+        if (shipPrefabs == null || shipPrefabs.Count == 0)
         {
             Debug.LogWarning("[ShipCreationManager] 沒有可用的武器預製件！");
             return null;
