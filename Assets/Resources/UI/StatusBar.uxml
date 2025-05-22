@@ -7,6 +7,8 @@
             <ui:Label name="oilLabel" text="石油: 0" class="resource-label" />
             <ui:Label name="cubeLabel" text="方塊: 0" class="resource-label" />
             <ui:Label name="oilTransportLabel" text="石油運輸: 未開始" class="resource-label" />
+            <ui:Label name="playerLevelLabel" text="等級: 1" class="resource-label" /> <!-- 新增等級顯示 -->
+            <ui:Label name="playerExpLabel" text="經驗: 0/10" class="resource-label" /> <!-- 新增經驗顯示 -->
             <ui:Label name="gameTimeLabel" text="00:00:01:01:0001" class="status-label" />
         </ui:VisualElement>
     </ui:VisualElement>

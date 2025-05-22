@@ -13,6 +13,8 @@ public class PlayerStatsUI : MonoBehaviour
     private Label cubeLabel;
     private Label oilTransportLabel; // 新增石油運輸進度的 Label
     private Label gameTimeLabel; // 新增遊戲時間的 Label
+    private Label playerLevelLabel; // 新增玩家等級的 Label
+    private Label playerExpLabel;   // 新增玩家經驗的 Label
 
     // 移除 public GameData gameData;
     private GameData gameData;
@@ -28,6 +30,8 @@ public class PlayerStatsUI : MonoBehaviour
         cubeLabel = UIHelper.InitializeElement<Label>(root, "cubeLabel");
         oilTransportLabel = UIHelper.InitializeElement<Label>(root, "oilTransportLabel"); // 確保 UXML 中有對應的 Label
         gameTimeLabel = UIHelper.InitializeElement<Label>(root, "gameTimeLabel"); // 確保 UXML 中有對應的 Label
+        playerLevelLabel = UIHelper.InitializeElement<Label>(root, "playerLevelLabel"); // 新增
+        playerExpLabel = UIHelper.InitializeElement<Label>(root, "playerExpLabel");     // 新增
 
         // 等待 GameDataController 初始化完成
         StartCoroutine(WaitForGameDataControllerInitialization());
@@ -84,6 +88,7 @@ public class PlayerStatsUI : MonoBehaviour
             // 新增：立即更新 UI
             UpdateAllResourcesFromData();
             UpdateGameTimeUI(); // 新增：立即刷新遊戲時間
+            UpdatePlayerLevelAndExpUI(); // 新增：立即刷新等級與經驗
         }
     }
 
@@ -147,6 +152,7 @@ public class PlayerStatsUI : MonoBehaviour
                 gameData.playerData.Cube
             );
             UpdateGameTimeUI(); // 新增：同步刷新遊戲時間
+            UpdatePlayerLevelAndExpUI(); // 新增：同步刷新等級與經驗
         }
     }
 
@@ -165,6 +171,22 @@ public class PlayerStatsUI : MonoBehaviour
         if (gameTimeLabel != null)
         {
             gameTimeLabel.text = GameManager.Instance.GetFormattedGameTime();
+        }
+    }
+
+    // 新增：刷新玩家等級與經驗 UI
+    private void UpdatePlayerLevelAndExpUI()
+    {
+        if (gameData != null && gameData.playerData != null)
+        {
+            if (playerLevelLabel != null)
+                playerLevelLabel.text = $"等級: {gameData.playerData.Level}";
+
+            if (playerExpLabel != null)
+            {
+                int nextLevelExp = gameData.playerData.Level * 10;
+                playerExpLabel.text = $"經驗: {Mathf.FloorToInt(gameData.playerData.Exp)}/{nextLevelExp}";
+            }
         }
     }
 
