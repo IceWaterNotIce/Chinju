@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/MissionPanel.uss?fileID=7433441132597879392&amp;guid=c4ffde0c24cfa23418d73e6dab93e0db&amp;type=3#MissionPanel" />
+    <ui:VisualElement name="MissionPanel" class="mission-panel" style="flex-grow: 1; align-items: stretch; align-self: center;">
+        <ui:Label text="任務列表" class="mission-title" />
+        <ui:ScrollView name="MissionListContainer" class="mission-list-container" />
+    </ui:VisualElement>
+</ui:UXML>

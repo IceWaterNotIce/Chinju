@@ -1,0 +1,22 @@
+.mission-panel {
+    width: 400px;
+    height: 600px;
+    background-color: rgba(34,34,34,0.8);
+    padding: 16px;
+    border-radius: 8px;
+}
+.mission-title {
+    font-size: 24px;
+    color: #fff;
+    margin-bottom: 12px;
+}
+.mission-list-container {
+    background-color: rgba(51,51,51,0.7);
+    border-radius: 4px;
+    padding: 8px;
+}
+.mission-item {
+    font-size: 18px;
+    color: #fff;
+    margin-bottom: 8px;
+}

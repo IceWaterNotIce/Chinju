@@ -20,6 +20,10 @@ public class GameData
         public float Gold;
         public int Cube;
 
+        // 新增：玩家等級與經驗值
+        public int Level;
+        public float Exp;
+
         // 玩家擁有的船隻數據
         public List<ShipData> Ships = new List<ShipData>();
 
@@ -32,6 +36,17 @@ public class GameData
         public PlayerData()
         {
             OnResourceChanged = delegate { };
+        }
+
+        // 嘗試升級：經驗值大於等於 Level * 10 時升級
+        public void TryLevelUp()
+        {
+            while (Exp >= Level * 10)
+            {
+                Exp -= Level * 10;
+                Level++;
+                // 可在此加入升級時的額外處理
+            }
         }
     }
 
