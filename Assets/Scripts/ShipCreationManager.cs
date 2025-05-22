@@ -51,6 +51,22 @@ public class ShipCreationManager : MonoBehaviour
             return null;
         }
         int shipTypeIdx = Random.Range(0, shipPrefabs.Count);
+        GameObject shipPrefab = shipPrefabs[shipTypeIdx];
+        string shipName = shipPrefab.name;
+
+        // 檢查是否已擁有同名船隻
+        var existShip = playerData.Ships.Find(s => s.Name == shipName);
+        if (existShip != null)
+        {
+            existShip.Level += 1;
+            Debug.Log($"[ShipCreationManager] 玩家已擁有 {shipName}，等級提升至 {existShip.Level}");
+            // 扣除資源
+            playerData.Gold -= inputGold;
+            playerData.Oils -= inputOil;
+            playerData.Cube -= inputCube;
+            gameDataController.TriggerResourceChanged();
+            return null; // 不再生成新船
+        }
 
         // 扣除資源
         playerData.Gold -= inputGold;
@@ -175,16 +191,24 @@ public class ShipCreationManager : MonoBehaviour
         var data = GameDataController.Instance.CurrentGameData;
         if (data != null && data.playerData != null)
         {
+            // 取得最後一個生成的 prefab 名稱
+            string prefabName = "";
+            if (shipPrefabs != null && shipPrefabs.Count > 0)
+            {
+                prefabName = shipPrefabs[shipPrefabs.Count - 1].name;
+            }
             var shipData = new GameData.ShipData
             {
-                Name = "戰艦",
+                Name = prefabName,
                 Health = 100,
                 AttackPower = 20,
                 Defense = 10,
                 Position = position,
                 CurrentFuel = 100,
                 Speed = 5,
-                Rotation = 0
+                Rotation = 0,
+                Level = 1,
+                PrefabName = prefabName
             };
             data.playerData.Ships.Add(shipData);
             Debug.Log("[ShipCreationManager] 已將新戰艦資料存入 GameData");
