@@ -74,6 +74,25 @@ public class ShipListPanelController : MonoBehaviour
             if (nameLabel != null) nameLabel.text = ship.Name;
             if (levelLabel != null) levelLabel.text = $"Lv.{ship.Level}";
 
+            // 新增：點擊 shipElement 讓攝影機跟隨該船
+            shipElement.RegisterCallback<ClickEvent>(ev =>
+            {
+                // 嘗試尋找場景中的船 GameObject（假設名稱與 ship.Name 相同）
+                var shipObj = GameObject.Find(ship.Name);
+                if (shipObj != null)
+                {
+                    var cameraController = Camera.main.GetComponent<CameraBound2D>();
+                    if (cameraController != null)
+                    {
+                        cameraController.FollowTarget(shipObj.transform);
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"[ShipListPanelController] 場景中找不到名稱為 {ship.Name} 的船 GameObject。");
+                }
+            });
+
             shipListContainer.Add(shipElement);
             shipElement.AddToClassList("ship-item");
         }
