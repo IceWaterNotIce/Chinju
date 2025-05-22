@@ -18,13 +18,14 @@ public class UIDistanceMarker : MonoBehaviour
             return;
         }
         root = uiDoc.rootVisualElement;
-        line = root.Q<VisualElement>("distance-line");
-        label = root.Q<Label>("distance-label");
+        // 使用 UIHelper 取得 UI 元素
+        line = UIHelper.InitializeElement<VisualElement>(root, "distance-line");
+        label = UIHelper.InitializeElement<Label>(root, "distance-label");
         UpdateMarker();
     }
 
     void Update()
-    {
+    { 
         UpdateMarker();
     }
 

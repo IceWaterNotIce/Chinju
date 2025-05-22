@@ -45,9 +45,6 @@ public class EnemyShip : Warship
     private float randomAngle = 0f;
     private Vector2 lastPosition;
 
-    private int level = 1;
-    public int Level => level;
-
     new void Start()
     {
         base.Start();
@@ -181,11 +178,12 @@ public class EnemyShip : Warship
 
     public void SetLevel(int newLevel)
     {
-        level = newLevel;
+        //set the level to warship
+        Level = newLevel;
         // 根據等級調整屬性（可自訂）
-        damage = 10 + (level - 1) * 5;
-        base.Health = 100 + (level - 1) * 20;
-        Debug.Log($"[EnemyShip] {name} 設定為等級 {level}，攻擊力 {damage}，生命值 {base.Health}");
+        damage = 10 + (Level - 1) * 5;
+        base.Health = 100 + (Level - 1) * 20;
+        Debug.Log($"[EnemyShip] {name} 設定為等級 {Level}，攻擊力 {damage}，生命值 {base.Health}");
     }
 
     // 新增：靠近時自動組成 Fleet（自動組隊優化）

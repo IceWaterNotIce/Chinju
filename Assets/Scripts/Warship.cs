@@ -30,7 +30,7 @@ public class Warship : Ship
     public event Action<float> OnExperienceChanged;
     public event Action<int> OnLevelChanged;
 
-    public int Level { get => m_level; private set => m_level = Mathf.Max(1, value); }
+    public int Level { get => m_level; protected set => m_level = Mathf.Max(1, value); }
     public float Experience { get => m_experience; private set => m_experience = Mathf.Max(0, value); }
 
     public void AddExperience(float exp)
