@@ -1,7 +1,9 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Resources/UI/UIDistanceMarker.uss?fileID=7433441132597879392&amp;guid=bfc489f6455fd9e42b9c698a38aad4dd&amp;type=3#UIDistanceMarker" />
     <ui:VisualElement name="distance-marker" style="flex-direction: row; align-items: center;">
-        <ui:VisualElement name="distance-line" style="height: 4px; background-color: rgb(255, 255, 255); margin-right: 8px;" />
+        <ui:VisualElement name="distance-line-container" class="distance-line-container" style="flex-grow: initial; height: 50%; width: auto; margin-right: 8px; flex-shrink: 1;">
+            <ui:VisualElement name="distance-line" style="height: 4px; background-color: rgb(255, 255, 255); margin-right: 0; width: 131px; margin-top: 0; margin-bottom: 0; margin-left: 0;" />
+        </ui:VisualElement>
         <ui:Label name="distance-label" text="1 km" style="color: rgb(255, 255, 255); font-size: 16px;" />
     </ui:VisualElement>
 </ui:UXML>
