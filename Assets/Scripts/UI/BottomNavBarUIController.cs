@@ -3,81 +3,82 @@ using UnityEngine.UIElements;
 
 public class BottomNavBarUIController : MonoBehaviour
 {
-    private Button toggleWeaponPanelButton; // 切換武器面板按鈕
-    private Button toggleShipListPanelButton; // 切換船隻列表面板按鈕
-    private Button toggleSettingMenuButton; // 新增：切換設定選單按鈕
+    private Button shopButton;
+    private Button fleetButton;
+    private Button shipButton;
+    private Button weaponButton;
+    private Button missionButton;
+    private Button buildButton;
+    private Button settingButton;
 
     void Start()
     {
         var root = GetComponent<UIDocument>().rootVisualElement;
 
-        toggleWeaponPanelButton = root.Q<Button>("ToggleWeaponPanelButton");
-        if (toggleWeaponPanelButton != null)
-        {
-            toggleWeaponPanelButton.clicked += ToggleWeaponPanel;
-        }
-        else
-        {
-            Debug.LogError("[BottomNavBarUIController] 找不到 'ToggleWeaponPanelButton' 按鈕。");
-        }
+        shopButton = root.Q<Button>("ShopButton");
+        if (shopButton != null)
+            shopButton.clicked += ToggleShopPanel;
 
-        toggleShipListPanelButton = root.Q<Button>("ToggleShipListPanelButton");
-        if (toggleShipListPanelButton != null)
-        {
-            toggleShipListPanelButton.clicked += ToggleShipListPanel;
-        }
-        else
-        {
-            Debug.LogError("[BottomNavBarUIController] 找不到 'ToggleShipListPanelButton' 按鈕。");
-        }
+        fleetButton = root.Q<Button>("FleetButton");
+        if (fleetButton != null)
+            fleetButton.clicked += ToggleFleetPanel;
 
-        // 新增：綁定切換設定選單按鈕
-        toggleSettingMenuButton = root.Q<Button>("ToggleSettingMenuButton");
-        if (toggleSettingMenuButton != null)
-        {
-            toggleSettingMenuButton.clicked += ToggleSettingMenu;
-        }
-        else
-        {
-            Debug.LogError("[BottomNavBarUIController] 找不到 'ToggleSettingMenuButton' 按鈕。");
-        }
+        shipButton = root.Q<Button>("ShipButton");
+        if (shipButton != null)
+            shipButton.clicked += ToggleShipPanel;
+
+        weaponButton = root.Q<Button>("WeaponButton");
+        if (weaponButton != null)
+            weaponButton.clicked += ToggleWeaponPanel;
+
+        missionButton = root.Q<Button>("MissionButton");
+        if (missionButton != null)
+            missionButton.clicked += ToggleMissionPanel;
+
+        buildButton = root.Q<Button>("BuildButton");
+        if (buildButton != null)
+            buildButton.clicked += ToggleBuildPanel;
+
+        settingButton = root.Q<Button>("SettingButton");
+        if (settingButton != null)
+            settingButton.clicked += ToggleSettingPanel;
     }
 
+    private void ToggleShopPanel()
+    {
+        TogglePanel("ShopPanel");
+    }
+    private void ToggleFleetPanel()
+    {
+        TogglePanel("FleetPanel");
+    }
+    private void ToggleShipPanel()
+    {
+        TogglePanel("ShipPanel");
+    }
     private void ToggleWeaponPanel()
     {
-        if (PopupManager.Instance.IsPopupVisible("WeaponPanel"))
-        {
-            PopupManager.Instance.HidePopup("WeaponPanel");
-        }
-        else
-        {
-            PopupManager.Instance.ShowPopup("WeaponPanel");
-        }
+        TogglePanel("WeaponPanel");
+    }
+    private void ToggleMissionPanel()
+    {
+        TogglePanel("MissionPanel");
+    }
+    private void ToggleBuildPanel()
+    {
+        TogglePanel("BuildPanel");
+    }
+    private void ToggleSettingPanel()
+    {
+        TogglePanel("SettingPanel");
     }
 
-    private void ToggleShipListPanel()
+    private void TogglePanel(string panelName)
     {
-        if (PopupManager.Instance.IsPopupVisible("ShipListPanel"))
-        {
-            PopupManager.Instance.HidePopup("ShipListPanel");
-        }
+        if (PopupManager.Instance.IsPopupVisible(panelName))
+            PopupManager.Instance.HidePopup(panelName);
         else
-        {
-            PopupManager.Instance.ShowPopup("ShipListPanel");
-        }
-    }
-
-    // 新增：切換設定選單
-    private void ToggleSettingMenu()
-    {
-        if (PopupManager.Instance.IsPopupVisible("SettingMenu"))
-        {
-            PopupManager.Instance.HidePopup("SettingMenu");
-        }
-        else
-        {
-            PopupManager.Instance.ShowPopup("SettingMenu");
-        }
+            PopupManager.Instance.ShowPopup(panelName);
     }
 
     // Update is called once per frame

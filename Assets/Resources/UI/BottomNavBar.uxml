@@ -2,8 +2,12 @@
     <Style src="project://database/Assets/Resources/UI/BottomNavBar.uss?fileID=7433441132597879392&amp;guid=9b3e6aeb8ba70a54599c74af7b21b377&amp;type=3#BottomNavBar" />
     <Style src="project://database/Assets/Resources/UI/base.uss?fileID=7433441132597879392&amp;guid=941833fb84a940c47bce98d1493bc006&amp;type=3#base" />
     <engine:VisualElement style="flex-grow: 1; flex-direction: row; align-items: stretch; align-self: auto; align-content: auto; justify-content: flex-start; bottom: 0; height: 100px; max-height: 100px; min-height: 100px; position: absolute;">
-        <engine:Button name="ToggleWeaponPanelButton" text="切換武器面板" class="bottom-nav-btn" />
-        <engine:Button name="ToggleShipListPanelButton" text="切換船隻列表面板" class="bottom-nav-btn" />
-        <engine:Button name="ToggleSettingMenuButton" text="切換設定選單" class="bottom-nav-btn" />
+        <engine:Button name="ShopButton" text="商店" class="bottom-nav-btn" />
+        <engine:Button name="FleetButton" text="艦隊" class="bottom-nav-btn" />
+        <engine:Button name="ShipButton" text="船艦" class="bottom-nav-btn" />
+        <engine:Button name="WeaponButton" text="武器" class="bottom-nav-btn" />
+        <engine:Button name="MissionButton" text="任務" class="bottom-nav-btn" />
+        <engine:Button name="BuildButton" text="建造" class="bottom-nav-btn" />
+        <engine:Button name="SettingButton" text="設定" class="bottom-nav-btn" />
     </engine:VisualElement>
 </engine:UXML>
