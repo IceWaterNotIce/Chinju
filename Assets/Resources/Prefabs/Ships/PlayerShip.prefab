@@ -1,0 +1,117 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &3230531107603521573
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 536107173747031640, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 536107173747031640, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 536107173747031640, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 536107173747031640, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 536107173747031640, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 536107173747031640, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 536107173747031640, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 536107173747031640, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 536107173747031640, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 536107173747031640, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1414975581038501931, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+      propertyPath: m_Name
+      value: PlayerShip
+      objectReference: {fileID: 0}
+    - target: {fileID: 1414975581038501931, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+      propertyPath: m_TagString
+      value: Player
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 1668260386874277926, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1414975581038501931, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+      insertIndex: 2
+      addedObject: {fileID: 2785915550193183026}
+  m_SourcePrefab: {fileID: 100100000, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+--- !u!1 &4572884418056175630 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1414975581038501931, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
+  m_PrefabInstance: {fileID: 3230531107603521573}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2785915550193183026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4572884418056175630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c2b9af466d68884c95f84aeba77a0f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_maxHealth: 100
+  m_health: 100
+  m_maxFuel: 100
+  m_fuel: 100
+  m_fuelConsumption: 0.1
+  m_maxSpeed: 10
+  m_acceleration: 2
+  m_targetSpeed: 0
+  m_speed: 0
+  m_maxRotationSpeed: 90
+  m_rotationAcceleration: 45
+  m_targetRotation: 0
+  m_targetRotationSpeed: 0
+  m_rotationSpeed: 0
+  tilemap: {fileID: 0}
+  oceanTile: {fileID: 0}
+  IsFollower: 0
+  LeaderShip: {fileID: 0}
+  m_detectionDistance: 50
+  m_combatMode: 0
+  m_weaponLimit: 2
+  weapons: []
+  m_level: 1
+  m_experience: 0
+  OnCombatModeChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_navigationArea:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
