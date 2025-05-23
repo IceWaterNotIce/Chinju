@@ -10,7 +10,7 @@ public class GameManager : Singleton<GameManager>
     public const string serverUrl = "https://icewaternotice.com/games/Word Curse/";
     public const string githubUrl = "https://raw.githubusercontent.com/IceWaterNotIce/Word-Curse/main/";
 
-    private string saveFilePath;
+    private string currentSaveFileName = "savegame.json";
     private float gameTime; // 遊戲時間（秒）
 
     // 遊戲內一天的秒數（現實 20 分鐘 = 遊戲 1 天，10 分鐘 = 12 小時）
@@ -36,11 +36,12 @@ public class GameManager : Singleton<GameManager>
         }
 
         Debug.Log("[GameManager] 初始化開始");
-        saveFilePath = Path.Combine(Application.persistentDataPath, "savegame.json");
-
+        // 預設存檔名稱
+        currentSaveFileName = "savegame.json";
+        // 不再直接設定 saveFilePath，改用方法動態取得
         Debug.Log("[GameManager] 初始化完成");
 
-        LoadGame();
+        LoadGame(); // 預設載入主存檔
     }
 
     void Update()
@@ -56,7 +57,29 @@ public class GameManager : Singleton<GameManager>
         GameDataController.Instance.TriggerResourceChanged();
     }
 
-    public void SaveGame()
+    /// <summary>
+    /// 設定目前操作的存檔檔名（含副檔名 .json）
+    /// </summary>
+    public void SetCurrentSaveFileName(string fileName)
+    {
+        if (!fileName.EndsWith(".json"))
+            fileName += ".json";
+        currentSaveFileName = fileName;
+    }
+
+    /// <summary>
+    /// 取得目前存檔的完整路徑
+    /// </summary>
+    private string GetSaveFilePath(string fileName = null)
+    {
+        string name = fileName ?? currentSaveFileName;
+        return Path.Combine(Application.persistentDataPath, name);
+    }
+
+    /// <summary>
+    /// 儲存遊戲，可指定檔名
+    /// </summary>
+    public void SaveGame(string fileName = null)
     {
         if (GameDataController.Instance != null)
         {
@@ -109,8 +132,9 @@ public class GameManager : Singleton<GameManager>
                     data.gameTime = gameTime;
 
                     string json = JsonUtility.ToJson(data, true);
-                    File.WriteAllText(saveFilePath, json);
-                    Debug.Log($"[GameManager] 遊戲已保存至 {saveFilePath}");
+                    string path = GetSaveFilePath(fileName);
+                    File.WriteAllText(path, json);
+                    Debug.Log($"[GameManager] 遊戲已保存至 {path}");
                     OnGameSaved?.Invoke(); // 發送保存事件
                 }
                 catch (IOException ex)
@@ -129,13 +153,17 @@ public class GameManager : Singleton<GameManager>
         }
     }
 
-    public GameData LoadGame()
+    /// <summary>
+    /// 載入遊戲，可指定檔名
+    /// </summary>
+    public GameData LoadGame(string fileName = null)
     {
-        if (File.Exists(saveFilePath))
+        string path = GetSaveFilePath(fileName);
+        if (File.Exists(path))
         {
             try
             {
-                string json = File.ReadAllText(saveFilePath);
+                string json = File.ReadAllText(path);
                 GameData data = JsonUtility.FromJson<GameData>(json);
 
                 if (data != null)
@@ -203,22 +231,55 @@ public class GameManager : Singleton<GameManager>
         }
         else
         {
-            Debug.LogWarning($"[GameManager] 找不到存檔文件: {saveFilePath}");
+            Debug.LogWarning($"[GameManager] 找不到存檔文件: {path}");
         }
 
         return null;
     }
 
-    public void StartNewGame()
+    /// <summary>
+    /// 取得所有現有存檔檔名（*.json）
+    /// </summary>
+    public List<string> GetAllSaveFiles()
     {
-        // 清除現有船隻
+        var files = Directory.GetFiles(Application.persistentDataPath, "*.json");
+        return files.Select(f => Path.GetFileName(f)).ToList();
+    }
+
+    /// <summary>
+    /// 開始新遊戲，會先儲存目前遊戲，再建立新遊戲資料並切換新檔案
+    /// </summary>
+    /// <param name="newSaveFileName">新遊戲存檔名稱（可為 null，預設自動產生）</param>
+    public void StartNewGame(string newSaveFileName = null)
+    {
+        // 1. 儲存目前遊戲（如果有資料）
+        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData != null)
+        {
+            SaveGame(); // 儲存到目前檔案
+        }
+
+        // 2. 產生新檔名
+        if (string.IsNullOrEmpty(newSaveFileName))
+        {
+            string timestamp = System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            newSaveFileName = $"savegame_{timestamp}.json";
+        }
+        else if (!newSaveFileName.EndsWith(".json"))
+        {
+            newSaveFileName += ".json";
+        }
+
+        // 3. 切換目前存檔名稱
+        SetCurrentSaveFileName(newSaveFileName);
+
+        // 4. 清除現有船隻
         var existingShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
         foreach (var ship in existingShips)
         {
             GameObject.Destroy(ship.gameObject);
         }
 
-        // 重置遊戲數據
+        // 5. 重置遊戲數據
         var newGameData = new GameData
         {
             playerData = new GameData.PlayerData
@@ -238,12 +299,16 @@ public class GameManager : Singleton<GameManager>
             }
         };
 
-        // 設定到 GameDataController
+        // 6. 設定到 GameDataController
         if (GameDataController.Instance != null)
             GameDataController.Instance.CurrentGameData = newGameData;
 
         GameDataController.Instance.TriggerResourceChanged();
-        Debug.Log("[GameManager] 新遊戲已開始");
+
+        // 7. 立即儲存新遊戲檔案
+        SaveGame();
+
+        Debug.Log($"[GameManager] 新遊戲已開始，並儲存於 {newSaveFileName}");
     }
 
     public string GetFormattedGameTime()
@@ -270,7 +335,7 @@ public class GameManager : Singleton<GameManager>
     private void OnApplicationQuit()
     {
         if (GameDataController.Instance != null)
-            SaveGame();
+            SaveGame(); // 預設存檔
         Debug.Log("[GameManager] 遊戲數據已在退出時保存");
     }
 }
