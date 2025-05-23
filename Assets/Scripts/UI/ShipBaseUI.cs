@@ -28,48 +28,11 @@ public class ShipBaseUI : MonoBehaviour
             Debug.LogError("UIDocument component is missing!");
             return;
         }
-
-        // 創建基礎 UI 結構
-        root = new VisualElement();
-        root.name = "base-ship-ui";
-        root.style.flexDirection = FlexDirection.Column;
-        root.style.alignItems = Align.Center;
-        root.style.position = Position.Absolute;
-        
-        // 名稱標籤
-        nameLabel = new Label();
-        nameLabel.name = "ship-name";
-        nameLabel.style.unityFontStyleAndWeight = FontStyle.Bold;
-        nameLabel.style.fontSize = 14;
-        nameLabel.style.color = Color.white;
-        root.Add(nameLabel);
-        
-        // 等級標籤
-        levelLabel = new Label();
-        levelLabel.name = "ship-level";
-        levelLabel.style.fontSize = 12;
-        levelLabel.style.color = new Color(0.8f, 0.8f, 0.8f);
-        root.Add(levelLabel);
-        
-        // 生命值條
-        healthBar = new VisualElement();
-        healthBar.name = "health-bar";
-        healthBar.style.width = 60;
-        healthBar.style.height = 6;
-        healthBar.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.7f);
-        healthBar.style.marginTop = 2;
-        
-        healthBarFill = new VisualElement();
-        healthBarFill.name = "health-bar-fill";
-        healthBarFill.style.width = Length.Percent(100);
-        healthBarFill.style.height = Length.Percent(100);
-        healthBarFill.style.backgroundColor = Color.green;
-        healthBar.Add(healthBarFill);
-        
-        root.Add(healthBar);
-        
-        // 添加到 UIDocument
-        uiDocument.rootVisualElement.Add(root);
+        root = uiDocument.rootVisualElement;
+        nameLabel = UIHelper.InitializeElement<Label>(uiDocument.rootVisualElement, "ship-name");
+        levelLabel = UIHelper.InitializeElement<Label>(uiDocument.rootVisualElement, "ship-level");
+        healthBar = UIHelper.InitializeElement<VisualElement>(uiDocument.rootVisualElement, "health-bar");
+        healthBarFill = UIHelper.InitializeElement<VisualElement>(uiDocument.rootVisualElement, "health-bar-fill");
     }
 
     public void SetShip(Ship targetShip)
@@ -119,15 +82,17 @@ public class ShipBaseUI : MonoBehaviour
     private void UpdateHealth(float current, float max)
     {
         float percent = Mathf.Clamp01(current / max);
+        // 只更新 width，顏色交由 USS 控制
         healthBarFill.style.width = Length.Percent(percent * 100);
-        
-        // 根據生命值百分比改變顏色
+        // 若仍需根據血量改變顏色，可保留下方程式，否則移除
+        /*
         if (percent > 0.6f)
             healthBarFill.style.backgroundColor = Color.green;
         else if (percent > 0.3f)
             healthBarFill.style.backgroundColor = Color.yellow;
         else
             healthBarFill.style.backgroundColor = Color.red;
+        */
     }
 
     private void Update()
@@ -143,6 +108,30 @@ public class ShipBaseUI : MonoBehaviour
                 1.5f // 可根據需求調整 Y 偏移
             );
         }
+
+        // 動態調整字體大小與血條寬度
+        AdjustUISizeByCamera();
+    }
+
+    private void AdjustUISizeByCamera()
+    {
+        var cam = Camera.main;
+        if (cam == null) return;
+
+        float baseOrtho = 20f; // 基準視野
+        float scale = cam.orthographicSize / baseOrtho;
+
+        // 動態字體大小
+        int baseNameFontSize = 14;
+        int baseLevelFontSize = 12;
+        int minFontSize = 8, maxFontSize = 32;
+        nameLabel.style.fontSize = Mathf.Clamp(Mathf.RoundToInt(baseNameFontSize * scale), minFontSize, maxFontSize);
+        levelLabel.style.fontSize = Mathf.Clamp(Mathf.RoundToInt(baseLevelFontSize * scale), minFontSize, maxFontSize);
+
+        // 動態血條
+        float baseBarHeight = 10f;
+        float minBarHeight = 5f, maxBarHeight = 20f;
+        healthBar.style.height = Mathf.Clamp(baseBarHeight * scale, minBarHeight, maxBarHeight);
     }
 
     private void OnDestroy()
