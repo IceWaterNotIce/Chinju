@@ -47,10 +47,10 @@ public class Ship : MonoBehaviour
     protected virtual void OnDeath()
     {
         Destroy(gameObject);
-        if (this is PlayerShip && ShipUI.Instance != null)
+        if (this is PlayerShip && ShipDetailPanel.Instance != null)
         {
-            Destroy(ShipUI.Instance.gameObject); // 銷毀 ShipUI
-            Debug.Log("[Ship] ShipUI 已銷毀");
+            Destroy(ShipDetailPanel.Instance.gameObject); // 銷毀 ShipDetailPanel
+            Debug.Log("[Ship] ShipDetailPanel 已銷毀");
         }
     }
     protected void StopMovement() => Speed = TargetSpeed = 0;

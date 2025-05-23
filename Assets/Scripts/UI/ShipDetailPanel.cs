@@ -4,7 +4,7 @@ using UnityEngine.Events; // 新增
 using System.Collections.Generic;
 using System; // <--- 加入這行
 
-public class ShipUI : Singleton<ShipUI>
+public class ShipDetailPanel : Singleton<ShipDetailPanel>
 {
     #region Fields
     public PlayerShip ship;
@@ -196,25 +196,25 @@ public class ShipUI : Singleton<ShipUI>
         if (ship != null)
         {
             ship.NavigationArea = new Rect(); // 重置矩形數據
-            Debug.Log("[ShipUI] 矩形和數據已清除");
+            Debug.Log("[ShipDetailPanel] 矩形和數據已清除");
         }
     }
 
     private void EnableDrawing()
     {
         canDraw = true; // 啟用繪製功能
-        Debug.Log("[ShipUI] 繪製功能已啟用");
+        Debug.Log("[ShipDetailPanel] 繪製功能已啟用");
     }
 
     private void OnPointerDown(PointerDownEvent evt)
     {
-        Debug.Log("[ShipUI] PointerDownEvent");
+        Debug.Log("[ShipDetailPanel] PointerDownEvent");
         if (rectContainer == null)
         {
             rectContainer = GetComponent<UIDocument>().rootVisualElement.Q<VisualElement>("rectContainer");
             if (rectContainer == null)
             {
-                Debug.LogError("[ShipUI] 找不到名為 'rectContainer' 的 VisualElement！");
+                Debug.LogError("[ShipDetailPanel] 找不到名為 'rectContainer' 的 VisualElement！");
                 return;
             }
         }
@@ -232,7 +232,7 @@ public class ShipUI : Singleton<ShipUI>
         currentRect.style.top = startPos.y;
         rectContainer.Add(currentRect); // Add to rectContainer instead of Panel
         isDrawing = true;
-        Debug.Log("[ShipUI] 開始繪製矩形");
+        Debug.Log("[ShipDetailPanel] 開始繪製矩形");
     }
 
     private void OnPointerMove(PointerMoveEvent evt)
@@ -287,7 +287,7 @@ public class ShipUI : Singleton<ShipUI>
                 if (ship != null)
                 {
                     ship.NavigationArea = worldRect;
-                    Debug.Log($"[ShipUI] 矩形區域已保存到船隻: {worldRect}");
+                    Debug.Log($"[ShipDetailPanel] 矩形區域已保存到船隻: {worldRect}");
                 }
 
                 currentRect = null; // 重置 currentRect 狀態
@@ -295,7 +295,7 @@ public class ShipUI : Singleton<ShipUI>
                 rectContainer.Clear();
             }
 
-            Debug.Log("[ShipUI] 繪製結束");
+            Debug.Log("[ShipDetailPanel] 繪製結束");
         }
     }
 
@@ -315,7 +315,7 @@ public class ShipUI : Singleton<ShipUI>
 
         rectContainer.Add(savedRectElement);
         UpdateSavedRectPosition(rect); // 初始化位置
-        Debug.Log($"[ShipUI] 繪製保存的矩形區域: {rect}");
+        Debug.Log($"[ShipDetailPanel] 繪製保存的矩形區域: {rect}");
     }
 
     private void UpdateSavedRectPosition(Rect rect)
@@ -638,7 +638,7 @@ public class ShipUI : Singleton<ShipUI>
                 if (cameraController != null)
                 {
                     cameraController.StopFollowing();
-                    Debug.Log("[ShipUI] 已取消攝影機跟隨。");
+                    Debug.Log("[ShipDetailPanel] 已取消攝影機跟隨。");
                 }
             };
         }
@@ -681,8 +681,8 @@ public class ShipUI : Singleton<ShipUI>
         {
             btnCloseUI.clicked += () =>
             {
-                Destroy(gameObject); // 銷毀 ShipUI
-                Debug.Log("[ShipUI] Ship UI 已關閉。");
+                Destroy(gameObject); // 銷毀 ShipDetailPanel
+                Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
             };
         }
     }
@@ -700,7 +700,7 @@ public class ShipUI : Singleton<ShipUI>
                     var mode = ship.Mode;
                     mode = (CombatMode)(((int)mode + 1) % Enum.GetValues(typeof(CombatMode)).Length);
                     ship.Mode = mode;
-                    Debug.Log($"[ShipUI] 戰鬥模式切換為: {mode}");
+                    Debug.Log($"[ShipDetailPanel] 戰鬥模式切換為: {mode}");
                     btnToggleCombatMode.text = $"戰鬥模式: {mode}";
                 }
             };
@@ -715,7 +715,7 @@ public class ShipUI : Singleton<ShipUI>
             btnFormFleet.clicked += () =>
             {
                 isSelectingShipForLine = true; // 啟用選擇船隻模式
-                Debug.Log("[ShipUI] 選擇船隻以形成船隊模式啟用");
+                Debug.Log("[ShipDetailPanel] 選擇船隻以形成船隊模式啟用");
             };
         }
     }
@@ -753,7 +753,7 @@ public class ShipUI : Singleton<ShipUI>
                         }
                     }
                     leader.Mode = nextMode;
-                    Debug.Log($"[ShipUI] 已將船隊所有船隻戰鬥模式設為: {nextMode}");
+                    Debug.Log($"[ShipDetailPanel] 已將船隊所有船隻戰鬥模式設為: {nextMode}");
                     if (btnToggleCombatMode != null)
                         btnToggleCombatMode.text = $"戰鬥模式: {nextMode}";
                 }
@@ -844,7 +844,7 @@ public class ShipUI : Singleton<ShipUI>
 
     private void UpdateFuel(float currentFuel, float maxFuel)
     {
-        Debug.Log($"[ShipUI] 更新燃料: {currentFuel}/{maxFuel}");
+        Debug.Log($"[ShipDetailPanel] 更新燃料: {currentFuel}/{maxFuel}");
         if (lblFuel != null)
         {
             lblFuel.text = $"{Mathf.RoundToInt(currentFuel)}/{Mathf.RoundToInt(maxFuel)}";
@@ -869,7 +869,7 @@ public class ShipUI : Singleton<ShipUI>
         Vector2 shipScreenPosition = Camera.main.WorldToScreenPoint(ship.transform.position);
         UIPanel.style.left = shipScreenPosition.x;
         UIPanel.style.top = Screen.height - shipScreenPosition.y; // 修正為屏幕坐標系
-        //Debug.Log($"[ShipUI] 設定 UI 位置為: {shipScreenPosition}");
+        //Debug.Log($"[ShipDetailPanel] 設定 UI 位置為: {shipScreenPosition}");
     }
 
     private void SetRectPosition()
@@ -891,7 +891,7 @@ public class ShipUI : Singleton<ShipUI>
 
     private void HandleShipSelectionForLine(PointerDownEvent evt)
     {
-        Debug.Log("[ShipUI] HandleShipSelectionForLine");
+        Debug.Log("[ShipDetailPanel] HandleShipSelectionForLine");
         if (isSelectingShipForLine && evt.button == 0) // 左鍵點擊
         {
             Vector2 worldPoint = Camera.main.ScreenToWorldPoint(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
@@ -904,36 +904,36 @@ public class ShipUI : Singleton<ShipUI>
                 {
                     if (selectedShip.IsFollower)
                     {
-                        Debug.Log($"[ShipUI] {selectedShip.name} 已經是船隊成員，無法再次選擇。");
+                        Debug.Log($"[ShipDetailPanel] {selectedShip.name} 已經是船隊成員，無法再次選擇。");
                         //debug ship parent
-                        Debug.Log($"[ShipUI] {selectedShip.name} 的父物件: {selectedShip.transform.parent.name}");
+                        Debug.Log($"[ShipDetailPanel] {selectedShip.name} 的父物件: {selectedShip.transform.parent.name}");
                         // check if parent is Fleet
                         if (selectedShip.transform.parent != null && selectedShip.transform.parent.GetComponent<Fleet>() != null)
                         {
-                            Debug.Log($"[ShipUI] {selectedShip.name} 的父物件是 Fleet");
+                            Debug.Log($"[ShipDetailPanel] {selectedShip.name} 的父物件是 Fleet");
 
                             // get leader
                             PlayerShip leader = selectedShip.transform.parent.GetComponent<Fleet>().followers[0] as PlayerShip;
                             if (leader != null)
                             {
-                                Debug.Log($"[ShipUI] {selectedShip.name} 的領導者是: {leader.name}");
+                                Debug.Log($"[ShipDetailPanel] {selectedShip.name} 的領導者是: {leader.name}");
                                 // 取消選擇
                                 ship.transform.SetParent(selectedShip.transform.parent.transform);
                                 ship.IsFollower = true;
                                 ship.LeaderShip = leader;
                                 selectedShip.transform.parent.GetComponent<Fleet>().followers.Add(ship);
-                                Debug.Log($"[ShipUI] {ship.name} 已加入 {selectedShip.name} 的船隊");
+                                Debug.Log($"[ShipDetailPanel] {ship.name} 已加入 {selectedShip.name} 的船隊");
                                 isSelectingShipForLine = false; // 停止選擇模式
                                                                 // 關閉 UI
                                 Destroy(gameObject);
-                                Debug.Log("[ShipUI] Ship UI 已關閉。");
+                                Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
 
                                 return;
                                 
                             }
                             else
                             {
-                                Debug.LogWarning("[ShipUI] 無法獲取 Fleet 的領導者");
+                                Debug.LogWarning("[ShipDetailPanel] 無法獲取 Fleet 的領導者");
                                 return;
                             }
 
@@ -941,7 +941,7 @@ public class ShipUI : Singleton<ShipUI>
                     }
                     if (selectedShip == null)
                     {
-                        Debug.LogWarning("[ShipUI] 選擇的物件不是船隻");
+                        Debug.LogWarning("[ShipDetailPanel] 選擇的物件不是船隻");
                         return;
                     }
                     // 建立 Fleet parent 物件，並設為 ShipCreationManager 的子物件
@@ -964,24 +964,24 @@ public class ShipUI : Singleton<ShipUI>
                     ship.IsFollower = true;
                     ship.LeaderShip = selectedShip as PlayerShip;
 
-                    Debug.Log($"[ShipUI] 已建立 FleetGroup 並將 {selectedShip.name} 和 {ship.name} 加入船隊");
+                    Debug.Log($"[ShipDetailPanel] 已建立 FleetGroup 並將 {selectedShip.name} 和 {ship.name} 加入船隊");
                     isSelectingShipForLine = false; // 停止選擇模式
 
                     // 關閉 UI
                     Destroy(gameObject);
-                    Debug.Log("[ShipUI] Ship UI 已關閉。");
+                    Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
                 }
                 else
                 {
-                    Debug.Log($"[ShipUI] 點擊的物件不是船隻或是自己: {hit.collider.gameObject.name}");
+                    Debug.Log($"[ShipDetailPanel] 點擊的物件不是船隻或是自己: {hit.collider.gameObject.name}");
                 }
             }
             else
             {
-                Debug.LogWarning("[ShipUI] Raycast 未檢測到任何物件");
+                Debug.LogWarning("[ShipDetailPanel] Raycast 未檢測到任何物件");
             }
         }
-        Debug.Log("[ShipUI] Ship selection for line ended");
+        Debug.Log("[ShipDetailPanel] Ship selection for line ended");
     }
 
     private void OnWaypointPointerDown(PointerDownEvent evt)
@@ -1030,12 +1030,12 @@ public class ShipUI : Singleton<ShipUI>
     private void LogError(string message)
     {
         // Replace Debug.LogError with centralized logging
-        Debug.LogError($"[ShipUI] {message}");
+        Debug.LogError($"[ShipDetailPanel] {message}");
     }
 
     private void OnDestroy()
     {
-        Debug.Log("[ShipUI] 銷毀 ShipUI");
+        Debug.Log("[ShipDetailPanel] 銷毀 ShipDetailPanel");
         //Debug where call this destroy
         // Debug.Log(new System.Diagnostics.StackTrace().ToString());
     }
@@ -1059,10 +1059,10 @@ public class ShipUI : Singleton<ShipUI>
             return;
         }
 
-        uiDoc.visualTreeAsset = Resources.Load<VisualTreeAsset>("UI/ShipUI");
+        uiDoc.visualTreeAsset = Resources.Load<VisualTreeAsset>("UI/ShipDetailPanel");
         if (uiDoc.visualTreeAsset == null)
         {
-            LogError("無法加載 ShipUI 資源！");
+            LogError("無法加載 ShipDetailPanel 資源！");
             return;
         }
 

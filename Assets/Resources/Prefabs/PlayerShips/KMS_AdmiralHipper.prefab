@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 6133355114029773059}
   - component: {fileID: -7631610877439843082}
   - component: {fileID: 2772926536322105916}
+  - component: {fileID: 5111571334831539854}
+  - component: {fileID: 3267440168908177810}
   m_Layer: 3
   m_Name: KMS_AdmiralHipper
   m_TagString: Player
@@ -206,6 +208,37 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &5111571334831539854
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108854950027416566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ebc96bf76eb23564c93a03a15a92a64e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3267440168908177810
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2108854950027416566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: c40b9c23258200645b26f1b0c0ae963d, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 0f21939be4840d142b26ad525f3912eb, type: 3}
+  m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!1001 &925339856682154056
 PrefabInstance:
   m_ObjectHideFlags: 0

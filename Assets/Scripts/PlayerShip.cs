@@ -12,7 +12,7 @@ public class PlayerShip : Warship, IPointerClickHandler
     #endregion
 
     #region UI References
-    private ShipUI UI => ShipUI.Instance;
+    private ShipDetailPanel UI => ShipDetailPanel.Instance;
     #endregion
 
     #region Player Settings
@@ -164,7 +164,7 @@ public class PlayerShip : Warship, IPointerClickHandler
     {
         if (UI == null)
         {
-            Debug.LogError("ShipUI.Instance is null!");
+            Debug.LogError("ShipDetailPanel.Instance is null!");
             return;
         }
 

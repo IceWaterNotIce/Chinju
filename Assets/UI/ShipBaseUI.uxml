@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/ShipBaseUI.uss?fileID=7433441132597879392&amp;guid=f3542b46d74813242bc4a119b9259ed4&amp;type=3#ShipBaseUI" />
+    <ui:VisualElement name="base-ship-ui" style="flex-direction: column; align-items: center; position: absolute;">
+        <ui:Label name="ship-name" class="ship-name" />
+        <ui:Label name="ship-level" class="ship-level" />
+        <ui:VisualElement name="health-bar" class="health-bar">
+            <ui:VisualElement name="health-bar-fill" class="health-bar-fill" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
