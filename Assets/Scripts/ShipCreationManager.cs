@@ -15,7 +15,7 @@ public class ShipCreationManager : MonoBehaviour
         else Destroy(gameObject);
 
         // 自動載入 Resources/Prefabs/Player 下所有船隻預製物
-        var loadedPrefabs = Resources.LoadAll<GameObject>("Prefabs/PlayerShips");
+        var loadedPrefabs = Resources.LoadAll<GameObject>("Prefabs/Ships/Warships");
         shipPrefabs = new List<GameObject>(loadedPrefabs);
         Debug.Log($"[ShipCreationManager] 已自動載入 {shipPrefabs.Count} 個船隻預製物");
     }

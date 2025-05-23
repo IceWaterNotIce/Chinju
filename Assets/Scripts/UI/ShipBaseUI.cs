@@ -99,13 +99,19 @@ public class ShipBaseUI : MonoBehaviour
     {
         if (ship != null)
         {
+            Collider2D collider = ship.GetComponent<Collider2D>();
+            float yOffset = 0.1f;
+            if (collider != null)
+            {
+                yOffset = collider.bounds.extents.y;
+            }
             // 使用 UIHelper 綁定 UI 到世界座標
             UIHelper.BindToWorldPosition(
                 root,
                 ship.transform.position,
                 Camera.main,
                 true,
-                1.5f // 可根據需求調整 Y 偏移
+                yOffset
             );
         }
 

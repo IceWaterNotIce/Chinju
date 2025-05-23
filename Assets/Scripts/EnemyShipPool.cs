@@ -5,7 +5,7 @@ public class EnemyShipPool : MonoBehaviour
 {
     public static EnemyShipPool Instance { get; private set; }
 
-    [SerializeField] private List<GameObject> enemyShipPrefabs; // 支持多個預製物
+    private List<GameObject> enemyShipPrefabs = new List<GameObject>(); // 自動載入
     [SerializeField] private int initialPoolSize = 10;
 
     private Queue<GameObject> pool = new Queue<GameObject>();
@@ -15,11 +15,24 @@ public class EnemyShipPool : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            LoadEnemyShipPrefabs();
             InitializePool();
         }
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void LoadEnemyShipPrefabs()
+    {
+        // 從 Resources/Prefabs/Ship/Enemys 載入所有 prefab
+        var loadedPrefabs = Resources.LoadAll<GameObject>("Prefabs/Ships/Enemies");
+        enemyShipPrefabs.Clear();
+        enemyShipPrefabs.AddRange(loadedPrefabs);
+        if (enemyShipPrefabs.Count == 0)
+        {
+            Debug.LogError("[EnemyShipPool] 無法從 Resources/Prefabs/Ships/Enemies 載入任何敵艦預製物！");
         }
     }
 

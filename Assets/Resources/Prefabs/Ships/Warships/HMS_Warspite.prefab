@@ -236,6 +236,10 @@ PrefabInstance:
       value: 14250
       objectReference: {fileID: 0}
     - target: {fileID: 2785915550193183026, guid: 0653c0f6eb075854b8d42b9b4223c5dd, type: 3}
+      propertyPath: m_weaponLimit
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2785915550193183026, guid: 0653c0f6eb075854b8d42b9b4223c5dd, type: 3}
       propertyPath: weapons.Array.size
       value: 4
       objectReference: {fileID: 0}
