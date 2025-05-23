@@ -1,0 +1,8 @@
+<UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/Resources/UI/GameDataSelectPanel.uss?fileID=7433441132597879392&amp;guid=2cd8227d9a9b9424c85ac7ba5986d87d&amp;type=3#GameDataSelectPanel" />
+    <ui:VisualElement name="root" style="flex-direction: column; align-items: center; justify-content: flex-start; width: 400px; background-color: rgb(34, 34, 34); padding: 20px; border-radius: 10px; -unity-text-align: upper-left; align-self: center; align-content: auto; translate: -50% -50%; position: absolute; top: 50%; left: 50%;">
+        <ui:Label text="選擇要載入的存檔" style="font-size: 20px; color: white; margin-bottom: 16px;" />
+        <ui:ScrollView name="fileListContainer" style="height: 200px; width: 100%; margin-bottom: 16px;" />
+        <ui:Button name="closeButton" text="關閉" style="width: 100px; align-self: center;" />
+    </ui:VisualElement>
+</UXML>

@@ -10,6 +10,7 @@ public class SettingMenu : MonoBehaviour
     private Button loadGameButton;
     private Button exitGameButton;
     private Button newGameButton; // 新增
+    private Button selectGameDataButton; // 新增
     private Slider textSizeSlider; // 新增：Slider 欄位
     private Slider BGMSlider; // 新增
     private Slider SFXSlider; // 新增
@@ -67,6 +68,7 @@ public class SettingMenu : MonoBehaviour
             loadGameButton = UIHelper.InitializeElement<Button>(root, "loadGameButton");
             exitGameButton = UIHelper.InitializeElement<Button>(root, "exitGameButton");
             newGameButton = UIHelper.InitializeElement<Button>(root, "newGameButton"); // 新增
+            selectGameDataButton = UIHelper.InitializeElement<Button>(root, "selectGameDataButton"); // 新增
             textSizeSlider = UIHelper.InitializeElement<Slider>(root, "textSizeSlider"); // 新增：Slider 初始化
             BGMSlider = UIHelper.InitializeElement<Slider>(root, "BGMSlider"); // 新增
             SFXSlider = UIHelper.InitializeElement<Slider>(root, "SFXSlider"); // 新增
@@ -110,6 +112,7 @@ public class SettingMenu : MonoBehaviour
         if (loadGameButton != null) loadGameButton.clicked += OnLoadGameButtonClicked;
         if (exitGameButton != null) exitGameButton.clicked += OnExitGameButtonClicked;
         if (newGameButton != null) newGameButton.clicked += OnNewGameButtonClicked;
+        if (selectGameDataButton != null) selectGameDataButton.clicked += OnSelectGameDataButtonClicked;
         // 若有 closeButton，這裡也註冊
         // var closeButton = root.Q<Button>("closeButton");
         // if (closeButton != null) closeButton.clicked += OnCloseButtonClicked;
@@ -122,6 +125,7 @@ public class SettingMenu : MonoBehaviour
         if (loadGameButton != null) loadGameButton.clicked -= OnLoadGameButtonClicked;
         if (exitGameButton != null) exitGameButton.clicked -= OnExitGameButtonClicked;
         if (newGameButton != null) newGameButton.clicked -= OnNewGameButtonClicked;
+        if (selectGameDataButton != null) selectGameDataButton.clicked -= OnSelectGameDataButtonClicked;
         // 若有 closeButton，這裡也解除
         // var closeButton = root.Q<Button>("closeButton");
         // if (closeButton != null) closeButton.clicked -= OnCloseButtonClicked;
@@ -216,6 +220,11 @@ public class SettingMenu : MonoBehaviour
         Debug.Log("[SettingPanel] 開始新遊戲");
         GameManager.Instance.StartNewGame();
         HideGameMenu();
+    }
+
+    private void OnSelectGameDataButtonClicked()
+    {
+        PopupManager.Instance.ShowPopup("GameDataSelectPanel");
     }
 
     public void ShowSettingsMenu()
