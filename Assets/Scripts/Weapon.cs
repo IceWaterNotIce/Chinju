@@ -104,7 +104,7 @@ public class Weapon : MonoBehaviour
             Quaternion rotation = Quaternion.Euler(0, 0, totalAngle);
             direction = rotation * baseDirection;
 
-            Vector3 spawnPosition = transform.position + direction;
+            Vector3 spawnPosition = transform.position;
 
             GameObject ammoObj = AmmoManager.Instance.GetAmmo();
             if (ammoObj == null)

@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 
 public class TimeControlBar : MonoBehaviour
 {
-    private float[] timeScales = { 0f, 0.5f, 1f, 2f, 3f }; // 支援的時間倍率
+    private float[] timeScales = { 0f, 0.1f, 1f, 2f, 3f }; // 支援的時間倍率
     private int currentScaleIndex = 2; // 預設為正常速度 (1x)
     private UIDocument uiDocument;
 
