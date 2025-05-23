@@ -225,6 +225,7 @@ public class SettingMenu : MonoBehaviour
     private void OnSelectGameDataButtonClicked()
     {
         PopupManager.Instance.ShowPopup("GameDataSelectPanel");
+        PopupManager.Instance.HidePopup("SettingMenu");
     }
 
     public void ShowSettingsMenu()
@@ -237,23 +238,6 @@ public class SettingMenu : MonoBehaviour
 
         PopupManager.Instance.ShowPopup("SettingMenu");
         Debug.Log("[SettingPanel] 顯示設定選單");
-    }
-
-    public void HideSettingsMenu()
-    {
-        if (root == null)
-        {
-            Debug.LogError("[SettingPanel] 無法隱藏設定選單：選單引用丟失");
-            return;
-        }
-
-        PopupManager.Instance.HidePopup("SettingMenu");
-        Debug.Log("[SettingPanel] 隱藏設定選單");
-    }
-
-    private void OnCloseButtonClicked()
-    {
-        HideSettingsMenu();
     }
 
     // 新增：Slider callback
