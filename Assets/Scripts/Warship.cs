@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.Tilemaps;
 
+// 全域定義 CombatMode 枚舉
+public enum CombatMode { Peaceful, Defensive, Aggressive }
+
 public class Warship : Ship
 {
     // 新增：標記是否為跟隨者
@@ -13,12 +16,12 @@ public class Warship : Ship
     #region Combat Settings
     [Header("Combat Settings")]
     [SerializeField] private float m_detectionDistance = 50f;
-    [SerializeField] private bool m_combatMode = false;
+    [SerializeField] private CombatMode m_combatMode = CombatMode.Peaceful;
     [SerializeField] private int m_weaponLimit = 2;
     [SerializeField] public List<Weapon> weapons = new List<Weapon>();
 
     public float DetectionDistance { get => m_detectionDistance; set => m_detectionDistance = Mathf.Max(0, value); }
-    public bool CombatMode { get => m_combatMode; set => m_combatMode = value; }
+    public CombatMode Mode { get => m_combatMode; set => m_combatMode = value; }
     public int WeaponLimit { get => m_weaponLimit; set => m_weaponLimit = Mathf.Max(0, value); }
     #endregion
 
@@ -51,7 +54,7 @@ public class Warship : Ship
     public override void Update()
     {
         base.Update();
-        if (CombatMode) DetectAndAttackTarget();
+        if (m_combatMode != CombatMode.Peaceful) DetectAndAttackTarget();
     }
 
     private void DetectAndAttackTarget()
@@ -130,7 +133,8 @@ public class Warship : Ship
         var data = base.SaveShipData();
         data.Experience = Experience;
         data.Level = Level;
-        data.CombatMode = CombatMode;
+        // 儲存為枚舉
+        data.Mode = (GameData.ShipData.CombatMode)m_combatMode;
         data.WeaponLimit = WeaponLimit;
         return data;
     }

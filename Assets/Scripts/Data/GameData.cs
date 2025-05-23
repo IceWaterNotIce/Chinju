@@ -16,13 +16,43 @@ public class GameData
     [System.Serializable]
     public class PlayerData
     {
-        public float Oils;
-        public float Gold;
-        public int Cube;
+        // 數值型欄位默認值
+        private float _oils = 0;
+        public float Oils
+        {
+            get => _oils;
+            set
+            {
+                _oils = Mathf.Max(0, value); // 確保不為負
+                OnResourceChanged();
+            }
+        }
 
-        // 新增：玩家等級與經驗值
-        public int Level;
-        public float Exp;
+        private float _gold = 0;
+        public float Gold
+        {
+            get => _gold;
+            set
+            {
+                _gold = Mathf.Max(0, value); // 確保不為負
+                OnResourceChanged();
+            }
+        }
+
+        private int _cube = 0;
+        public int Cube
+        {
+            get => _cube;
+            set
+            {
+                _cube = Mathf.Max(0, value); // 確保不為負
+                OnResourceChanged();
+            }
+        }
+
+        // 默認從1級開始
+        public int Level = 1;
+        public float Exp = 0;
 
         // 玩家擁有的船隻數據
         public List<ShipData> Ships = new List<ShipData>();
@@ -36,6 +66,11 @@ public class GameData
         public PlayerData()
         {
             OnResourceChanged = delegate { };
+            _oils = 0;
+            _gold = 0;
+            _cube = 0;
+            Level = 1;
+            Exp = 0;
         }
 
         // 嘗試升級：經驗值大於等於 Level * 10 時升級
@@ -65,49 +100,55 @@ public class GameData
     [System.Serializable]
     public class ShipData
     {
+        // 改為全域枚舉
+        public enum CombatMode { Peaceful, Defensive, Aggressive }
+        public CombatMode Mode; // 使用新的枚舉
+
         public string Name;
         public int Health;
         public int AttackPower;
         public int Defense;
         public Vector3 Position;
-        public float MaxFuel; // 新增：保存船隻的最大燃料
+        public float MaxFuel;
         public float CurrentFuel;
-
-        public float FuelConsumptionRate; // 新增：保存船隻的燃料消耗率
+        public float FuelConsumptionRate;
         public float Speed;
         public float Rotation;
-
-
-
-        public bool CombatMode; // 新增：保存船隻的戰鬥模式
         public int WeaponLimit;
-
-        public int Level; // 新增：保存船隻等級
-        public float Experience; // 新增：保存船隻經驗值
-
+        public int Level;
+        public float Experience;
         public List<WeaponData> Weapons = new List<WeaponData>();
-
-        // 新增：保存船隻的預製物名稱
         public string PrefabName;
+        public Rect NavigationArea;
 
-        public Rect NavigationArea; // 新增：保存矩形區域
+        // 燃料百分比屬性
+        public float FuelPercent => MaxFuel > 0 ? CurrentFuel / MaxFuel : 0;
+
+        // 狀態檢查
+        public bool CanMove() => CurrentFuel > 0 && Health > 0;
     }
 
     [System.Serializable]
     public class WeaponData
     {
+        public enum WeaponType { Primary, Secondary, Special }
+        public WeaponType Type;
+
         public string Name;
         public int Damage;
-        public float MaxAttackDistance; // 新增
-        public float MinAttackDistance; // 新增
+        public float MaxAttackDistance;
+        public float MinAttackDistance;
         public float AttackSpeed;
         public float CooldownTime;
-
-        // 新增：保存武器的預製物名稱
         public string PrefabName;
-
         public int AmmoPerShot;
 
-
+        public int MaxAmmo;
+        private int _currentAmmo;
+        public int CurrentAmmo
+        {
+            get => _currentAmmo;
+            set => _currentAmmo = Mathf.Clamp(value, 0, MaxAmmo);
+        }
     }
 }

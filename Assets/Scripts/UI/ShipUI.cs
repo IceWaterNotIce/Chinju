@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.Events; // 新增
 using System.Collections.Generic;
+using System; // <--- 加入這行
 
 public class ShipUI : Singleton<ShipUI>
 {
@@ -100,7 +101,8 @@ public class ShipUI : Singleton<ShipUI>
     {
         if (btnToggleCombatMode != null)
         {
-            btnToggleCombatMode.text = isInCombat ? "退出戰鬥模式" : "進入戰鬥模式";
+            // 改為顯示枚舉狀態
+            btnToggleCombatMode.text = $"戰鬥模式: {ship.Mode}";
         }
     }
 
@@ -132,7 +134,7 @@ public class ShipUI : Singleton<ShipUI>
         // 修正：根據 CombatMode 狀態設定按鈕文字
         if (btnToggleCombatMode != null)
         {
-            btnToggleCombatMode.text = ship.CombatMode ? "退出戰鬥模式" : "進入戰鬥模式";
+            btnToggleCombatMode.text = $"戰鬥模式: {ship.Mode}";
         }
 
         // 新增：顯示船名
@@ -694,9 +696,12 @@ public class ShipUI : Singleton<ShipUI>
             {
                 if (ship != null)
                 {
-                    ship.CombatMode = !ship.CombatMode;
-                    Debug.Log($"[ShipUI] 戰鬥模式切換為: {(ship.CombatMode ? "開啟" : "關閉")}");
-                    btnToggleCombatMode.text = ship.CombatMode ? "退出戰鬥模式" : "進入戰鬥模式";
+                    // 切換枚舉狀態
+                    var mode = ship.Mode;
+                    mode = (CombatMode)(((int)mode + 1) % Enum.GetValues(typeof(CombatMode)).Length);
+                    ship.Mode = mode;
+                    Debug.Log($"[ShipUI] 戰鬥模式切換為: {mode}");
+                    btnToggleCombatMode.text = $"戰鬥模式: {mode}";
                 }
             };
         }
@@ -736,19 +741,21 @@ public class ShipUI : Singleton<ShipUI>
                 Fleet fleet = leader.GetComponent<Fleet>();
                 if (fleet != null && fleet.followers != null)
                 {
-                    bool newCombatMode = !leader.CombatMode;
+                    // 統一切換到下一個模式
+                    var currentMode = leader.Mode;
+                    var nextMode = (CombatMode)(((int)currentMode + 1) % Enum.GetValues(typeof(CombatMode)).Length);
                     foreach (var follower in fleet.followers)
                     {
                         PlayerShip ps = follower as PlayerShip;
                         if (ps != null)
                         {
-                            ps.CombatMode = newCombatMode;
+                            ps.Mode = nextMode;
                         }
                     }
-                    leader.CombatMode = newCombatMode;
-                    Debug.Log($"[ShipUI] 已將船隊所有船隻戰鬥模式設為: {(newCombatMode ? "開啟" : "關閉")}");
+                    leader.Mode = nextMode;
+                    Debug.Log($"[ShipUI] 已將船隊所有船隻戰鬥模式設為: {nextMode}");
                     if (btnToggleCombatMode != null)
-                        btnToggleCombatMode.text = newCombatMode ? "退出戰鬥模式" : "進入戰鬤模式";
+                        btnToggleCombatMode.text = $"戰鬥模式: {nextMode}";
                 }
             };
         }
@@ -1015,7 +1022,7 @@ public class ShipUI : Singleton<ShipUI>
     private void OnShipCombatModeChanged(bool isCombatMode)
     {
         if (btnToggleCombatMode != null)
-            btnToggleCombatMode.text = isCombatMode ? "退出戰鬥模式" : "進入戰鬤模式";
+            btnToggleCombatMode.text = $"戰鬥模式: {ship.Mode}";
     }
     #endregion
 
