@@ -7,7 +7,6 @@ public class SettingMenu : MonoBehaviour
     private VisualElement root;
     private Button continueButton;
     private Button saveGameButton;
-    private Button loadGameButton;
     private Button exitGameButton;
     private Button newGameButton; // 新增
     private Button selectGameDataButton; // 新增
@@ -65,7 +64,6 @@ public class SettingMenu : MonoBehaviour
 
             continueButton = UIHelper.InitializeElement<Button>(root, "continueButton");
             saveGameButton = UIHelper.InitializeElement<Button>(root, "saveGameButton");
-            loadGameButton = UIHelper.InitializeElement<Button>(root, "loadGameButton");
             exitGameButton = UIHelper.InitializeElement<Button>(root, "exitGameButton");
             newGameButton = UIHelper.InitializeElement<Button>(root, "newGameButton"); // 新增
             selectGameDataButton = UIHelper.InitializeElement<Button>(root, "selectGameDataButton"); // 新增
@@ -109,7 +107,6 @@ public class SettingMenu : MonoBehaviour
     {
         if (continueButton != null) continueButton.clicked += OnContinueButtonClicked;
         if (saveGameButton != null) saveGameButton.clicked += OnSaveGameButtonClicked;
-        if (loadGameButton != null) loadGameButton.clicked += OnLoadGameButtonClicked;
         if (exitGameButton != null) exitGameButton.clicked += OnExitGameButtonClicked;
         if (newGameButton != null) newGameButton.clicked += OnNewGameButtonClicked;
         if (selectGameDataButton != null) selectGameDataButton.clicked += OnSelectGameDataButtonClicked;
@@ -122,7 +119,6 @@ public class SettingMenu : MonoBehaviour
     {
         if (continueButton != null) continueButton.clicked -= OnContinueButtonClicked;
         if (saveGameButton != null) saveGameButton.clicked -= OnSaveGameButtonClicked;
-        if (loadGameButton != null) loadGameButton.clicked -= OnLoadGameButtonClicked;
         if (exitGameButton != null) exitGameButton.clicked -= OnExitGameButtonClicked;
         if (newGameButton != null) newGameButton.clicked -= OnNewGameButtonClicked;
         if (selectGameDataButton != null) selectGameDataButton.clicked -= OnSelectGameDataButtonClicked;
@@ -186,23 +182,6 @@ public class SettingMenu : MonoBehaviour
         Debug.Log("[SettingPanel] 儲存遊戲");
         if (GameDataController.Instance != null)
             GameManager.Instance.SaveGame(); // Adjusted to match the method signature
-    }
-
-    private void OnLoadGameButtonClicked()
-    {
-        Debug.Log("[SettingPanel] 載入遊戲");
-        var loadedData = GameManager.Instance.LoadGame();
-        if (loadedData != null)
-        {
-            if (GameDataController.Instance != null)
-                GameDataController.Instance.CurrentGameData = loadedData;
-            Debug.Log("[SettingPanel] 遊戲載入成功");
-            HideGameMenu();
-        }
-        else
-        {
-            Debug.LogWarning("[SettingPanel] 沒有找到儲存的遊戲數據");
-        }
     }
 
     private void OnExitGameButtonClicked()

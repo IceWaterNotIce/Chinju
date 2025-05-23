@@ -23,7 +23,6 @@
             <ui:Button text="開始新遊戲" name="newGameButton" class="menu-button" />
             <ui:Button text="選擇存檔" name="selectGameDataButton" class="menu-button" /> <!-- 新增 -->
             <ui:Button text="儲存遊戲" name="saveGameButton" class="menu-button" />
-            <ui:Button text="載入遊戲" name="loadGameButton" class="menu-button" />
             <ui:Button text="退出遊戲" name="exitGameButton" class="menu-button" />
         </ui:VisualElement>
     </ui:VisualElement>
