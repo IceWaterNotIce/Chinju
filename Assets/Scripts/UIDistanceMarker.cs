@@ -46,9 +46,5 @@ public class UIDistanceMarker : MonoBehaviour
         // 設定 UI 線條長度
         line.style.width = pixelLength;
         label.text = "1 km";
-
-        // 可選：根據需求調整 UI 位置
-        root.style.left = 20;
-        root.style.bottom = 40;
     }
 }
