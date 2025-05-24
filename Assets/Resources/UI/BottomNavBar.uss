@@ -6,4 +6,5 @@
     align-self: auto;
     justify-content: flex-start;
     flex-grow: 1;
+    height: auto;
 }
