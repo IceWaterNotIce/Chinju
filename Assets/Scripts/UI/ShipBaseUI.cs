@@ -112,15 +112,29 @@ public class ShipBaseUI : MonoBehaviour
                 {
                     yOffset = collider.bounds.extents.y + 0.01f; // 確保 UI 在船隻上方
                 }
-                // 使用 UIHelper 綁定 UI 到世界座標
-                UIHelper.BindToWorldPosition(
-                    root,
-                    ship.transform.position,
-                    cam,
-                    true,
-                    yOffset
-                );
-                root.style.visibility = Visibility.Visible;
+
+                // 判斷船隻是否在螢幕內
+                Vector3 screenPos = cam.WorldToViewportPoint(ship.transform.position);
+                bool isOnScreen = screenPos.z > 0 &&
+                                  screenPos.x >= 0 && screenPos.x <= 1 &&
+                                  screenPos.y >= 0 && screenPos.y <= 1;
+
+                if (isOnScreen)
+                {
+                    // 使用 UIHelper 綁定 UI 到世界座標
+                    UIHelper.BindToWorldPosition(
+                        root,
+                        ship.transform.position,
+                        cam,
+                        true,
+                        yOffset
+                    );
+                    root.style.visibility = Visibility.Visible;
+                }
+                else
+                {
+                    root.style.visibility = Visibility.Hidden;
+                }
             }
         }
 
