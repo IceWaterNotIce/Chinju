@@ -97,22 +97,31 @@ public class ShipBaseUI : MonoBehaviour
 
     private void Update()
     {
-        if (ship != null)
+        var cam = Camera.main;
+        if (ship != null && cam != null)
         {
-            Collider2D collider = ship.GetComponent<Collider2D>();
-            float yOffset = 0.1f;
-            if (collider != null)
+            if (cam.orthographicSize > 30f)
             {
-                yOffset = collider.bounds.extents.y;
+                root.style.visibility = Visibility.Hidden;
             }
-            // 使用 UIHelper 綁定 UI 到世界座標
-            UIHelper.BindToWorldPosition(
-                root,
-                ship.transform.position,
-                Camera.main,
-                true,
-                yOffset
-            );
+            else
+            {
+                Collider2D collider = ship.GetComponent<Collider2D>();
+                float yOffset = 0.1f;
+                if (collider != null)
+                {
+                    yOffset = collider.bounds.extents.y + 0.01f; // 確保 UI 在船隻上方
+                }
+                // 使用 UIHelper 綁定 UI 到世界座標
+                UIHelper.BindToWorldPosition(
+                    root,
+                    ship.transform.position,
+                    cam,
+                    true,
+                    yOffset
+                );
+                root.style.visibility = Visibility.Visible;
+            }
         }
 
         // 動態調整字體大小與血條寬度

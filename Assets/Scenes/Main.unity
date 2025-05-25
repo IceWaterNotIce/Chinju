@@ -1616,13 +1616,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1984032767}
-  - component: {fileID: 1984032772}
   - component: {fileID: 1984032768}
   - component: {fileID: 1984032771}
   - component: {fileID: 1984032770}
   - component: {fileID: 1984032769}
   - component: {fileID: 1984032773}
   - component: {fileID: 1984032774}
+  - component: {fileID: 1984032772}
   m_Layer: 0
   m_Name: BackgroundUI
   m_TagString: Untagged
@@ -1877,7 +1877,7 @@ MonoBehaviour:
   padding: 0.5
   baseMoveSpeed: 200
   smoothTime: 0.2
-  zoomSpeed: 500
+  zoomSpeed: 1000
   minZoom: 1
   maxZoom: 30
   zoomSmoothTime: 0.2
