@@ -224,12 +224,17 @@ public class EnemyShip : Warship
                     follower = leader == this ? other : this;
                 }
 
-                // leader 建立 Fleet
-                Fleet line = leader.gameObject.AddComponent<Fleet>();
+                // 建立空 GameObject 作為 Fleet 容器
+                GameObject fleetObj = new GameObject("Fleet");
+                fleetObj.transform.position = leader.transform.position;
+                // 將 leader/follower 設為 fleetObj 的子物件
+                leader.transform.SetParent(fleetObj.transform);
+                follower.transform.SetParent(fleetObj.transform);
+
+                // 在空物件上加 Fleet 組件
+                Fleet line = fleetObj.AddComponent<Fleet>();
                 line.followers.Add(leader.GetComponent<Ship>());
                 line.followers.Add(follower.GetComponent<Ship>());
-                // follower 設定 parent 方便管理
-                follower.transform.SetParent(leader.transform);
 
                 Debug.Log($"[EnemyShip] {leader.name} 與 {follower.name} 自動組成 Fleet");
                 break;
