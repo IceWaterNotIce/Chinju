@@ -1,1 +1,1 @@
-android
+window_intel64
