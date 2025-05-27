@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:VisualElement class="fleet-list-panel" style="align-items: stretch; align-self: center; justify-content: center; top: 435px;">
+        <ui:Label text="艦隊列表" class="fleet-list-title" />
+        <ui:ListView name="FleetListView" class="fleet-list-view" />
+    </ui:VisualElement>
+</ui:UXML>

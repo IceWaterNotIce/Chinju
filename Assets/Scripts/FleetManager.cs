@@ -1,3 +1,5 @@
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class FleetManager : Singleton<FleetManager>
@@ -21,13 +23,13 @@ public class FleetManager : Singleton<FleetManager>
             fleet.followers.Add(ship);
             if (i == 0)
             {
-            ship.IsFollower = false;
-            ship.LeaderShip = null;
+                ship.IsFollower = false;
+                ship.LeaderShip = null;
             }
             else
             {
-            ship.IsFollower = true;
-            ship.LeaderShip = warships[0] as PlayerShip;
+                ship.IsFollower = true;
+                ship.LeaderShip = warships[0] as PlayerShip;
             }
         }
 
@@ -49,6 +51,12 @@ public class FleetManager : Singleton<FleetManager>
         Fleet fleet = ship.transform.parent != null ? ship.transform.parent.GetComponent<Fleet>() : null;
         if (fleet == null || ship == null) return false;
         return fleet.followers.Count > 0 && fleet.followers[0] == ship;
+    }
+
+    // a void to get all player fleets
+    public Fleet[] GetAllPlayerFleets()
+    {
+        return FindObjectsByType<Fleet>(FindObjectsSortMode.None).Where(f => f.followers.Count > 0 && f.followers[0] is PlayerShip).ToArray();
     }
 
     // ...可擴充更多管理功能...

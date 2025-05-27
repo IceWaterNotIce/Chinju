@@ -1,0 +1,18 @@
+.fleet-list-panel {
+    flex-direction: column;
+    padding: 16px;
+    background-color: #222C;
+    width: 300px;
+}
+
+.fleet-list-title {
+    font-size: 20px;
+    color: #fff;
+    margin-bottom: 12px;
+}
+
+.fleet-list-view {
+    height: 200px;
+    background-color: #333A;
+    border-radius: 6px;
+}
