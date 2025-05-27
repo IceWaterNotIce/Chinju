@@ -272,9 +272,24 @@ public class GameManager : Singleton<GameManager>
         // 3. 切換目前存檔名稱
         SetCurrentSaveFileName(newSaveFileName);
 
-        // 4. 清除現有船隻
+        // 4. 清除現有船隻（玩家與敵人）
+        var existingFleets = GameObject.FindObjectsByType<Fleet>(FindObjectsSortMode.None);
+        foreach (var fleet in existingFleets)
+        {
+            GameObject.Destroy(fleet.gameObject);
+        }
         var existingShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
         foreach (var ship in existingShips)
+        {
+            GameObject.Destroy(ship.gameObject);
+        }
+        var playerShips = GameObject.FindObjectsByType<PlayerShip>(FindObjectsSortMode.None);
+        foreach (var ship in playerShips)
+        {
+            GameObject.Destroy(ship.gameObject);
+        }
+        var enemyShips = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None);
+        foreach (var ship in enemyShips)
         {
             GameObject.Destroy(ship.gameObject);
         }
