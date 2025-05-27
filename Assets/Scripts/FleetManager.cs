@@ -8,7 +8,18 @@ public class FleetManager : Singleton<FleetManager>
     public void CreateFleet(Warship[] warships)
     {
         GameObject fleetParent = new GameObject("FleetGroup");
-        fleetParent.transform.SetParent(ShipCreationManager.Instance.transform);
+        // get the first ship parent
+        var firstShip = warships.FirstOrDefault();
+        var parentTransform = firstShip != null ? firstShip.transform.parent : null;
+        if (parentTransform != null)
+        {
+            fleetParent.transform.SetParent(parentTransform);
+        }
+        else
+        {
+            fleetParent.transform.position = Vector3.zero; // 如果沒有父物件，則放在世界原點
+        }
+
 
         foreach (var ship in warships)
         {
