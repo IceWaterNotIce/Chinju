@@ -70,12 +70,17 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     private List<VisualElement> waypointMarkers = new List<VisualElement>(); // 新增：waypoint 標記列表
     private VisualElement waypointsContainer; // 新增：waypoint 標記的容器
     private Label lblName; // 新增：顯示船名的 Label
+
+    private VisualElement cachedRoot; // 緩存 rootVisualElement
+    private Camera cachedCamera;      // 緩存 Camera.main
     #endregion
 
     #region Unity Methods
     void Start()
     {
         InitializeUI();
+        // 緩存 Camera.main
+        cachedCamera = Camera.main;
     }
 
     void UpdateExperience(float exp,int level)
@@ -148,6 +153,10 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         SetRectPosition(); // 每幀更新矩形位置
         UpdateShipName(); // 每幀同步船名
         UpdateWaypointMarkersPosition(); // 新增：每幀同步 waypoint 標記位置
+
+        // 若 Camera.main 可能會變動，可每幀檢查
+        if (cachedCamera == null)
+            cachedCamera = Camera.main;
     }
     #endregion
 
@@ -213,7 +222,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         Debug.Log("[ShipDetailPanel] PointerDownEvent");
         if (rectContainer == null)
         {
-            rectContainer = GetComponent<UIDocument>().rootVisualElement.Q<VisualElement>("rectContainer");
+            rectContainer = cachedRoot.Q<VisualElement>("rectContainer");
             if (rectContainer == null)
             {
                 Debug.LogError("[ShipDetailPanel] 找不到名為 'rectContainer' 的 VisualElement！");
@@ -304,7 +313,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     private void DrawSavedRect(Rect rect)
     {
         if (rect == Rect.zero) return; // 如果矩形為零，則不繪製
-        var rectContainer = GetComponent<UIDocument>().rootVisualElement.Q<VisualElement>("rectContainer");
+        var rectContainer = cachedRoot.Q<VisualElement>("rectContainer");
 
         if (savedRectElement != null)
         {
@@ -328,23 +337,20 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         Vector3 worldA = new Vector3(rect.xMin, rect.yMin, 0);
         Vector3 worldB = new Vector3(rect.xMax, rect.yMax, 0);
 
-        // 轉螢幕座標
-        Vector2 screenA = Camera.main.WorldToScreenPoint(worldA);
-        Vector2 screenB = Camera.main.WorldToScreenPoint(worldB);
+        // 使用 UIHelper 轉換螢幕座標
+        Vector2 screenA = cachedCamera.WorldToScreenPoint(worldA);
+        Vector2 screenB = cachedCamera.WorldToScreenPoint(worldB);
 
-        // 取螢幕座標最小最大，確保方向正確
         float left = Mathf.Min(screenA.x, screenB.x);
         float right = Mathf.Max(screenA.x, screenB.x);
         float bottom = Mathf.Min(screenA.y, screenB.y);
         float top = Mathf.Max(screenA.y, screenB.y);
 
-        // UI Toolkit Y 軸反向
         float uiLeft = left;
         float uiTop = Screen.height - top;
         float width = right - left;
         float height = top - bottom;
 
-        // 綁定左上角
         savedRectElement.style.left = uiLeft;
         savedRectElement.style.top = uiTop;
         savedRectElement.style.width = Mathf.Abs(width);
@@ -865,11 +871,8 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
             return;
         }
 
-        // 根據船隻的位置更新 UI 的位置
-        Vector2 shipScreenPosition = Camera.main.WorldToScreenPoint(ship.transform.position);
-        UIPanel.style.left = shipScreenPosition.x;
-        UIPanel.style.top = Screen.height - shipScreenPosition.y; // 修正為屏幕坐標系
-        //Debug.Log($"[ShipDetailPanel] 設定 UI 位置為: {shipScreenPosition}");
+        // 使用 UIHelper 綁定 UI 到世界座標
+        UIHelper.BindToWorldPosition(UIPanel, ship.transform.position, cachedCamera, true);
     }
 
     private void SetRectPosition()
@@ -881,7 +884,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     #region Pointer & Selection Events
     private void RegisterPointerEvents()
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
+        var root = cachedRoot;
         root.RegisterCallback<PointerDownEvent>(OnPointerDown); // 修正為 PointerDownEvent
         root.RegisterCallback<PointerMoveEvent>(OnPointerMove); // 修正為 PointerMoveEvent
         root.RegisterCallback<PointerUpEvent>(OnPointerUp);     // 修正為 PointerUpEvent
@@ -894,7 +897,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         Debug.Log("[ShipDetailPanel] HandleShipSelectionForLine");
         if (isSelectingShipForLine && evt.button == 0) // 左鍵點擊
         {
-            Vector2 worldPoint = Camera.main.ScreenToWorldPoint(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
+            Vector2 worldPoint = cachedCamera.ScreenToWorldPoint(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
             RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.down, LayerMask.GetMask("Ship")); // 使用射線檢測
 
             if (hit.collider != null)
@@ -990,7 +993,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         // 取得滑鼠點擊的螢幕座標
         Vector2 screenPos = evt.position;
         // 轉換為世界座標
-        Vector3 worldPos = Camera.main.ScreenToWorldPoint(new Vector3(screenPos.x, Screen.height - screenPos.y, 0));
+        Vector3 worldPos = cachedCamera.ScreenToWorldPoint(new Vector3(screenPos.x, Screen.height - screenPos.y, 0));
         worldPos.z = 0;
         // 傳給 PlayerShip
         ship?.AddWaypoint(worldPos);
@@ -1002,7 +1005,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     {
         if (waypointsContainer == null)
         {
-            var root = GetComponent<UIDocument>().rootVisualElement;
+            var root = cachedRoot;
             waypointsContainer = UIHelper.InitializeElement<VisualElement>(root, "waypointsContainer");
             if (waypointsContainer == null)
             {
@@ -1022,12 +1025,12 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         SetWaypointMarkerPosition(marker, worldPos);
     }
 
-    // 新增：根據世界座標設定 waypoint marker 的 UI 位置（參考 rect 畫法）
+    // 根據世界座標設定 waypoint marker 的 UI 位置（改用 UIHelper）
     private void SetWaypointMarkerPosition(VisualElement marker, Vector3 worldPos)
     {
-        Vector2 screenPos = Camera.main.WorldToScreenPoint(worldPos);
-        marker.style.left = screenPos.x - 8;
-        marker.style.top = Screen.height - screenPos.y - 8;
+        UIHelper.BindToWorldPosition(marker, worldPos, cachedCamera, true);
+        marker.style.left = marker.resolvedStyle.left - 8;
+        marker.style.top = marker.resolvedStyle.top - 8;
     }
 
     // 新增：每幀更新所有 waypoint marker 的位置
@@ -1092,7 +1095,8 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
             return;
         }
 
-        var root = uiDoc.rootVisualElement;
+        cachedRoot = uiDoc.rootVisualElement; // 緩存 rootVisualElement
+        var root = cachedRoot;
         if (root == null)
         {
             LogError("UIDocument 的 rootVisualElement 為 null！");
