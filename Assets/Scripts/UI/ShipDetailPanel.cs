@@ -774,7 +774,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     private void UpdateDrawWaypointButtonState()
     {
         bool canDraw = true;
-        if (ship != null && ship.transform.parent != null)
+        if (ship != null && ship.transform.parent != null && ship.transform.parent.GetComponent<Fleet>() != null)
         {
             canDraw = FleetManager.Instance.IsFleetLeader(ship);
         }
