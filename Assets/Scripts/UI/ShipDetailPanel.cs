@@ -861,11 +861,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         }
 
         UIPanel = UIHelper.InitializeElement<VisualElement>(root, "UIPanel");
-        if (UIPanel == null)
-        {
-            LogError("找不到名為 'Panel' 的 VisualElement！");
-            return;
-        }
+        // 不再檢查 UIPanel == null
 
         // --- Inline InitializeSpeedLabels ---
         lblSpeedFrontFull = InitializeSpeedLabel("lblSpeedFrontFull", 1.0f);
@@ -906,18 +902,15 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
 
         // --- Inline InitializeCancelFollowButton ---
         btnCancelFollow = UIHelper.InitializeElement<Button>(UIPanel, "btnCancelFollow");
-        if (btnCancelFollow != null)
+        btnCancelFollow.clicked += () =>
         {
-            btnCancelFollow.clicked += () =>
+            var cameraController = Camera.main?.GetComponent<CameraBound2D>();
+            if (cameraController != null)
             {
-                var cameraController = Camera.main?.GetComponent<CameraBound2D>();
-                if (cameraController != null)
-                {
-                    cameraController.StopFollowing();
-                    Debug.Log("[ShipDetailPanel] 已取消攝影機跟隨。");
-                }
-            };
-        }
+                cameraController.StopFollowing();
+                Debug.Log("[ShipDetailPanel] 已取消攝影機跟隨。");
+            }
+        };
 
         // --- Inline InitializeDrawButton ---
         var rootDoc = GetComponent<UIDocument>().rootVisualElement;
@@ -948,14 +941,11 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
 
         // --- Inline InitializeCloseUIButton ---
         btnCloseUI = UIHelper.InitializeElement<Button>(UIPanel, "btnCloseUI");
-        if (btnCloseUI != null)
+        btnCloseUI.clicked += () =>
         {
-            btnCloseUI.clicked += () =>
-            {
-                Destroy(gameObject); // 銷毀 ShipDetailPanel
-                Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
-            };
-        }
+            Destroy(gameObject); // 銷毀 ShipDetailPanel
+            Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
+        };
 
         // --- Inline InitializeFleetCombatModeButton ---
         if (ship != null && (ship.IsFollower || ship.LeaderShip != null))
@@ -1003,32 +993,26 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
 
         // --- Inline InitializeToggleCombatModeButton ---
         btnToggleCombatMode = UIHelper.InitializeElement<Button>(UIPanel, "btnToggleCombatMode");
-        if (btnToggleCombatMode != null)
+        btnToggleCombatMode.clicked += () =>
         {
-            btnToggleCombatMode.clicked += () =>
+            if (ship != null)
             {
-                if (ship != null)
-                {
-                    // 切換枚舉狀態
-                    var mode = ship.Mode;
-                    mode = (CombatMode)(((int)mode + 1) % Enum.GetValues(typeof(CombatMode)).Length);
-                    ship.Mode = mode;
-                    Debug.Log($"[ShipDetailPanel] 戰鬥模式切換為: {mode}");
-                    btnToggleCombatMode.text = $"戰鬥模式: {mode}";
-                }
-            };
-        }
+                // 切換枚舉狀態
+                var mode = ship.Mode;
+                mode = (CombatMode)(((int)mode + 1) % Enum.GetValues(typeof(CombatMode)).Length);
+                ship.Mode = mode;
+                Debug.Log($"[ShipDetailPanel] 戰鬥模式切換為: {mode}");
+                btnToggleCombatMode.text = $"戰鬥模式: {mode}";
+            }
+        };
 
         // --- Inline InitializeFormFleetButton ---
         btnFormFleet = UIHelper.InitializeElement<Button>(UIPanel, "btnFormFleet");
-        if (btnFormFleet != null)
+        btnFormFleet.clicked += () =>
         {
-            btnFormFleet.clicked += () =>
-            {
-                isSelectingShipForLine = true; // 啟用選擇船隻模式
-                Debug.Log("[ShipDetailPanel] 選擇船隻以形成船隊模式啟用");
-            };
-        }
+            isSelectingShipForLine = true; // 啟用選擇船隻模式
+            Debug.Log("[ShipDetailPanel] 選擇船隻以形成船隊模式啟用");
+        };
 
         // --- Inline InitializeDrawWaypointButton ---
         btnDrawWaypoint = UIHelper.InitializeElement<Button>(UIPanel, "btnDrawWaypoint");
