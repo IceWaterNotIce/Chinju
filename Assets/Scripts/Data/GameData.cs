@@ -17,7 +17,7 @@ public class GameData
     public class PlayerData
     {
         // 數值型欄位默認值
-        public int Oils = 0;
+        public float Oils = 0;
         public int Gold = 0;
         public int Cube = 0;
 
@@ -41,7 +41,7 @@ public class GameData
             Oils = 0;
             Gold = 0;
             Cube = 0;
-            
+
             Level = 1;
             Exp = 0;
         }
