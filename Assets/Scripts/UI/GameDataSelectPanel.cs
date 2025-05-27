@@ -11,9 +11,13 @@ public class GameDataSelectPanel : MonoBehaviour
 
     private string saveFolderPath;
 
+    private VisualTreeAsset gameDataListItemTemplate;
+
     void Awake()
     {
         PopupManager.Instance.RegisterPopup("GameDataSelectPanel", gameObject);
+        // 載入 UXML 模板
+        gameDataListItemTemplate = Resources.Load<VisualTreeAsset>("UI/GameDataListItem");
     }
 
     void OnEnable()
@@ -41,9 +45,34 @@ public class GameDataSelectPanel : MonoBehaviour
         foreach (var file in files)
         {
             string fileName = Path.GetFileName(file);
-            var btn = new Button(() => OnSelectFile(file)) { text = fileName };
-            btn.AddToClassList("save-file-btn");
-            fileListContainer.Add(btn);
+
+            // 使用 UXML 模板建立項目
+            VisualElement row;
+            if (gameDataListItemTemplate != null)
+                row = gameDataListItemTemplate.Instantiate();
+            else
+                row = new VisualElement(); // fallback
+
+            // 綁定 Label
+            var fileNameLabel = row.Q<Label>("fileNameLabel");
+            if (fileNameLabel != null)
+                fileNameLabel.text = fileName;
+
+            // 綁定載入按鈕
+            var loadBtn = row.Q<Button>("loadButton");
+            if (loadBtn != null)
+            {
+                loadBtn.clicked += () => OnSelectFile(file);
+            }
+
+            // 綁定刪除按鈕
+            var delBtn = row.Q<Button>("deleteButton");
+            if (delBtn != null)
+            {
+                delBtn.clicked += () => OnDeleteFile(file);
+            }
+
+            fileListContainer.Add(row);
         }
     }
 
@@ -61,6 +90,20 @@ public class GameDataSelectPanel : MonoBehaviour
         else
         {
             Debug.LogWarning($"[GameDataSelectPanel] 載入失敗: {filePath}");
+        }
+    }
+
+    // 新增刪除檔案的方法
+    private void OnDeleteFile(string filePath)
+    {
+        if (File.Exists(filePath))
+        {
+            File.Delete(filePath);
+            RefreshFileList();
+        }
+        else
+        {
+            Debug.LogWarning($"[GameDataSelectPanel] 檔案不存在: {filePath}");
         }
     }
 }

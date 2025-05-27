@@ -1,0 +1,7 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns="UnityEngine.UIElements" editor-extension-mode="False">
+    <ui:VisualElement class="game-data-list-item" style="flex-direction: row; align-items: center; padding: 4px; width: 500px;">
+        <ui:Label name="fileNameLabel" class="file-name-label" style="flex-grow: 1;" />
+        <ui:Button name="loadButton" text="載入" class="save-file-btn" style="margin-left: 8px;" />
+        <ui:Button name="deleteButton" text="刪除" class="delete-file-btn" style="margin-left: 8px;" />
+    </ui:VisualElement>
+</ui:UXML>
