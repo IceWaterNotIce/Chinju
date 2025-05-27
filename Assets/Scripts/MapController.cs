@@ -52,7 +52,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
     [Header("Debug")]
     public bool showOceanLevelText = true;
 
-    private Dictionary<Vector2Int, float> _noiseCache = new Dictionary<Vector2Int, float>();
+    protected Dictionary<Vector2Int, float> _noiseCache = new Dictionary<Vector2Int, float>();
 
     void Start()
     {
@@ -319,7 +319,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
         }
     }
 
-    private float GetCachedNoise(int x, int y)
+    protected float GetCachedNoise(int x, int y)
     {
         var key = new Vector2Int(x, y);
         if (!_noiseCache.TryGetValue(key, out float value))
@@ -330,7 +330,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
         return _noiseCache[key];
     }
 
-    private TileType GetTileTypeAt(int x, int y)
+    protected TileType GetTileTypeAt(int x, int y)
     {
         if (x == 0 && y == 0)
         {
