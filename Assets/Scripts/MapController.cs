@@ -31,7 +31,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
     private Dictionary<Vector3Int, TileType> generatedTiles = new Dictionary<Vector3Int, TileType>();
     private HashSet<Vector3Int> chinjuTilePositions = new HashSet<Vector3Int>();
     private int chunkSize = 16;
-    private int renderRadius = 3;
+    private int renderRadius = 4;
 
     private HashSet<Vector3Int> renderedTiles = new HashSet<Vector3Int>();
 
