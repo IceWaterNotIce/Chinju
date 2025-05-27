@@ -1036,15 +1036,8 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         lblLevel = UIHelper.InitializeElement<Label>(UIPanel, "lblLevel");
         lblExperience = UIHelper.InitializeElement<Label>(UIPanel, "lblExperience");
         lblName = UIHelper.InitializeElement<Label>(UIPanel, "lblName"); // 新增：初始化 lblName
-
         // 新增：初始化 waypointsContainer
         waypointsContainer = UIHelper.InitializeElement<VisualElement>(root, "waypointsContainer");
-        if (waypointsContainer == null)
-        {
-            // 若找不到則建立一個
-            waypointsContainer = new VisualElement { name = "waypointsContainer" };
-            root.Add(waypointsContainer);
-        }
     }
     #endregion
 }
