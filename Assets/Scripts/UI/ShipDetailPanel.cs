@@ -268,7 +268,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
             btnFleetCombatMode.clicked += () =>
             {
                 // 找到 fleet leader
-                PlayerShip leader = ship.LeaderShip != null ? ship.LeaderShip : ship;
+                PlayerShip leader = ship.LeaderShip != null ? ship.LeaderShip as PlayerShip : ship;
                 Fleet fleet = leader.GetComponent<Fleet>();
                 if (fleet != null && fleet.followers != null)
                 {

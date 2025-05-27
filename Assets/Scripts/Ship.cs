@@ -5,6 +5,36 @@ using System.Collections.Generic;
 
 public class Ship : MonoBehaviour
 {
+    // === Fleet/Follower 屬性（從 Warship 移動過來） ===
+    public bool IsFollower;
+    public Ship LeaderShip;
+
+    // === NavigationArea 與 Waypoints（從 PlayerShip 移動過來） ===
+    [Header("Navigation Settings")]
+    [SerializeField] private Rect m_navigationArea;
+    public Rect NavigationArea
+    {
+        get => m_navigationArea;
+        set
+        {
+            Debug.Log($"[Ship] NavigationArea set to {value}");
+            m_navigationArea = value;
+            if (m_navigationArea != Rect.zero)
+            {
+                TargetSpeed = 2f;
+            }
+            else
+            {
+                Debug.LogWarning("[Ship] NavigationArea is set to Rect.zero, navigation disabled.");
+            }
+        }
+    }
+
+    protected List<Vector3> m_waypoints = new List<Vector3>();
+    public IReadOnlyList<Vector3> Waypoints => m_waypoints.AsReadOnly();
+    public void AddWaypoint(Vector3 point) => m_waypoints.Add(point);
+    public void ClearWaypoints() => m_waypoints.Clear();
+
     #region Health & Fuel
     [Header("Health Settings")]
     [SerializeField] protected float m_maxHealth = 100f;

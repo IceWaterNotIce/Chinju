@@ -1,9 +1,8 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
-using System.Collections.Generic;
-using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
-using UnityEngine.Events; // 新增
+using UnityEngine.Events;
+using UnityEngine.Tilemaps; // ← 新增
 
 public class PlayerShip : Warship, IPointerClickHandler
 {
@@ -23,33 +22,23 @@ public class PlayerShip : Warship, IPointerClickHandler
     #endregion
 
     #region Properties
-    public Rect NavigationArea
-    {
-        get => m_navigationArea;
-        set
-        {
-            Debug.Log($"[PlayerShip] NavigationArea set to {value}");
-            m_navigationArea = value;
-
-            // 確保 NavigationArea 有效
-            if (m_navigationArea != Rect.zero)
-            {
-                TargetSpeed = 2f; // 自動導航速度
-            }
-            else
-            {
-                Debug.LogWarning("[PlayerShip] NavigationArea is set to Rect.zero, navigation disabled.");
-            }
-        }
-    }
-
-    #endregion
-
-    #region Waypoints
-    private List<Vector3> m_waypoints = new List<Vector3>();
-    public IReadOnlyList<Vector3> Waypoints => m_waypoints.AsReadOnly();
-    public void AddWaypoint(Vector3 point) => m_waypoints.Add(point);
-    public void ClearWaypoints() => m_waypoints.Clear();
+    // public Rect NavigationArea
+    // {
+    //     get => m_navigationArea;
+    //     set
+    //     {
+    //         Debug.Log($"[PlayerShip] NavigationArea set to {value}");
+    //         m_navigationArea = value;
+    //         if (m_navigationArea != Rect.zero)
+    //         {
+    //             TargetSpeed = 2f; // 自動導航速度
+    //         }
+    //         else
+    //         {
+    //             Debug.LogWarning("[PlayerShip] NavigationArea is set to Rect.zero, navigation disabled.");
+    //         }
+    //     }
+    // }
     #endregion
 
     #region Movement Logic

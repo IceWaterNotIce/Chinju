@@ -51,7 +51,7 @@ public class EnemyShip : Warship
     {
         base.Start();
         // 取得 MapController 實例
-        mapController = FindObjectOfType<MapController>();
+        mapController = FindFirstObjectByType<MapController>();
         PickNewRandomMove();
         lastPosition = transform.position;
     }
