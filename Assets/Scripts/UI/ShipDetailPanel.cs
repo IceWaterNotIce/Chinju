@@ -23,14 +23,9 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     private Label lblRotationRightHalf;
     private Label lblRotationRightFull;
 
-    private Button btnTriggerMap;
-
     // 新增：武器列表容器
     private VisualElement weaponListContainer;
     private VisualElement weaponDetailPopup;
-
-    // 新增：武器總覽面板
-    private VisualElement weaponsPanel;
 
     private Label lblLevel; // 新增：顯示等級的 Label
     private Label lblExperience; // 新增：顯示經驗值的 Label
@@ -44,10 +39,10 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     private Button btnCancelFollow; // 新增取消跟隨按鈕
 
     private Button startDrawButton;
-    [SerializeField]
+
     private bool canDraw = false;
 
-    [SerializeField]
+
     private bool isDrawing = false;
     private Vector2 startPos;
     private VisualElement currentRect;
@@ -60,7 +55,6 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
 
     private Button btnFormFleet; // 新增：形成船隊的按鈕
 
-    [SerializeField]
     private bool isSelectingShipForLine = false; // 狀態標誌，用於選擇船隻
 
     private Button btnFleetCombatMode; // 新增：編輯船隊戰鬥模式按鈕
@@ -70,8 +64,6 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     private VisualElement expBar;    // 新增
 
     private Button btnDrawWaypoint; // 新增：切換繪製 waypoint 模式按鈕
-
-    [SerializeField]
     private bool IsDrawingWaypoint = false; // 新增：繪製 waypoint 模式狀態
     private List<VisualElement> waypointMarkers = new List<VisualElement>(); // 新增：waypoint 標記列表
     private VisualElement waypointsContainer; // 新增：waypoint 標記的容器

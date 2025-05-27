@@ -6,7 +6,6 @@ public class FleetManager : Singleton<FleetManager>
     public void CreateFleet(Warship[] warships)
     {
         GameObject fleetParent = new GameObject("FleetGroup");
-        fleetParent.transform.position = warships[0].transform.position;
         fleetParent.transform.SetParent(ShipCreationManager.Instance.transform);
 
         foreach (var ship in warships)
