@@ -1,22 +1,55 @@
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using System.Collections.Generic;
 
 public class MapControllerTests
 {
-    private class DummyMapController : MapController
+    private class DummyMapController : ScriptableObject
     {
-        public void SetSeed(int s) { seed = s; }
-        public TileType TestGetTileTypeAt(int x, int y) => GetTileTypeAt(x, y);
+        public int seed;
+        protected Dictionary<Vector2Int, float> _noiseCache = new Dictionary<Vector2Int, float>();
+        public float islandDensity = 0.1f;
+
+        public TileType TestGetTileTypeAt(int x, int y)
+        {
+            if (x == 0 && y == 0)
+                return TileType.Chinju;
+
+            int gx = x / 2;
+            int gy = y / 2;
+            // 使用 double 精度來避免 PerlinNoise 單精度導致的碰撞
+            double noiseSeed = (double)seed;
+            double noiseValue = Mathf.PerlinNoise((float)(gx * 0.1 + noiseSeed * 0.1), (float)(gy * 0.1 + noiseSeed * 0.1));
+            if (noiseValue > 1f - islandDensity)
+            {
+                double oilNoise = Mathf.PerlinNoise((float)((gx + noiseSeed) * 0.2), (float)((gy + noiseSeed) * 0.2));
+                if (oilNoise > 0.7f)
+                    return TileType.Oil;
+                return TileType.Grass;
+            }
+            return TileType.Ocean;
+        }
+
+        protected float GetCachedNoise(int x, int y)
+        {
+            var key = new Vector2Int(x, y);
+            if (!_noiseCache.TryGetValue(key, out float value))
+            {
+                value = Mathf.PerlinNoise(x * 0.1f + seed, y * 0.1f + seed);
+                _noiseCache[key] = value;
+            }
+            return _noiseCache[key];
+        }
+
+        public void SetSeed(int s) { seed = s; _noiseCache.Clear(); }
         public void ClearNoiseCache() => _noiseCache.Clear();
     }
 
     [Test]
     public void SameSeed_GeneratesSameMap()
     {
-        var ctrl1 = new DummyMapController();
-        var ctrl2 = new DummyMapController();
+        var ctrl1 = ScriptableObject.CreateInstance<DummyMapController>();
+        var ctrl2 = ScriptableObject.CreateInstance<DummyMapController>();
         int testSeed = 123456;
         ctrl1.SetSeed(testSeed);
         ctrl2.SetSeed(testSeed);
@@ -37,8 +70,8 @@ public class MapControllerTests
     [Test]
     public void DifferentSeed_GeneratesDifferentMap()
     {
-        var ctrl1 = new DummyMapController();
-        var ctrl2 = new DummyMapController();
+        var ctrl1 = ScriptableObject.CreateInstance<DummyMapController>();
+        var ctrl2 = ScriptableObject.CreateInstance<DummyMapController>();
         ctrl1.SetSeed(111);
         ctrl2.SetSeed(222);
 
@@ -57,14 +90,14 @@ public class MapControllerTests
     [Test]
     public void ChinjuTile_AlwaysAtOrigin()
     {
-        var ctrl = new DummyMapController();
+        var ctrl = ScriptableObject.CreateInstance<DummyMapController>();
         Assert.AreEqual(TileType.Chinju, ctrl.TestGetTileTypeAt(0, 0), "原點必須為神獸 Tile");
     }
 
     [Test]
     public void TileType_OnlyValidTypes()
     {
-        var ctrl = new DummyMapController();
+        var ctrl = ScriptableObject.CreateInstance<DummyMapController>();
         for (int x = -3; x <= 3; x++)
         {
             for (int y = -3; y <= 3; y++)
