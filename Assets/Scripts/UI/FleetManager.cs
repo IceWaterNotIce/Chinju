@@ -21,6 +21,8 @@ public class FleetManager : Singleton<FleetManager>
             ship.IsFollower = true;
             ship.LeaderShip = warships[0] as PlayerShip;
         }
+
+        Debug.Log($"[FleetManager] Created fleet with {warships.Length} ships.");
     }
 
     public void AddShipToFleet(Warship ship, Fleet fleet)

@@ -44,8 +44,10 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     private Button btnCancelFollow; // 新增取消跟隨按鈕
 
     private Button startDrawButton;
-
+    [SerializeField]
     private bool canDraw = false;
+
+    [SerializeField]
     private bool isDrawing = false;
     private Vector2 startPos;
     private VisualElement currentRect;
@@ -57,6 +59,8 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     private Button btnToggleCombatMode; // 新增切換戰鬥模式的按鈕
 
     private Button btnFormFleet; // 新增：形成船隊的按鈕
+
+    [SerializeField]
     private bool isSelectingShipForLine = false; // 狀態標誌，用於選擇船隻
 
     private Button btnFleetCombatMode; // 新增：編輯船隊戰鬥模式按鈕
@@ -66,6 +70,8 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     private VisualElement expBar;    // 新增
 
     private Button btnDrawWaypoint; // 新增：切換繪製 waypoint 模式按鈕
+
+    [SerializeField]
     private bool IsDrawingWaypoint = false; // 新增：繪製 waypoint 模式狀態
     private List<VisualElement> waypointMarkers = new List<VisualElement>(); // 新增：waypoint 標記列表
     private VisualElement waypointsContainer; // 新增：waypoint 標記的容器
@@ -375,7 +381,6 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
 
     private void UpdateFuel(float currentFuel, float maxFuel)
     {
-        Debug.Log($"[ShipDetailPanel] 更新燃料: {currentFuel}/{maxFuel}");
         if (lblFuel != null)
         {
             lblFuel.text = $"{Mathf.RoundToInt(currentFuel)}/{Mathf.RoundToInt(maxFuel)}";
@@ -869,33 +874,25 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     #region Pointer & Selection Events
     private void HandleShipSelectionForLine(PointerDownEvent evt)
     {
+        Debug.Log("[ShipDetailPanel] HandleShipSelectionForLine called");
         if (!isSelectingShipForLine || evt.button != 0) return;
 
-        Vector2 worldPoint = MainCamera.ScreenToWorldPoint(evt.position);
-        RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.down, LayerMask.GetMask("Ship"));
+        Vector2 worldPoint = MainCamera.ScreenToWorldPoint(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
+        RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.down, Mathf.Infinity, LayerMask.GetMask("Ship"));
+        Debug.Log("[ShipDetailPanel] Raycast hit: " + hit.collider.name);
 
         if (hit.collider == null) return;
 
         var selectedShip = hit.collider.GetComponent<Warship>();
         if (selectedShip == null || selectedShip == ship) return;
 
-        if (selectedShip.IsFollower)
-        {
-            // 加入現有船隊
-            var fleet = selectedShip.transform.parent.GetComponent<Fleet>();
-            if (fleet != null)
-            {
-                FleetManager.Instance.AddShipToFleet(ship, fleet);
-            }
-        }
-        else
-        {
-            // 使用 CreateFleet 函數創建新船隊
-            FleetManager.Instance.CreateFleet(new Warship[] { selectedShip, ship });
-        }
+        if (selectedShip.IsFollower) FleetManager.Instance.AddShipToFleet(ship, selectedShip.transform.parent.GetComponent<Fleet>());
+        else FleetManager.Instance.CreateFleet(new Warship[] { selectedShip, ship });
 
         isSelectingShipForLine = false;
         Destroy(gameObject);
+
+        Debug.Log("[ShipDetailPanel] 已選擇船隻以形成船隊。");
     }
     #endregion
 
