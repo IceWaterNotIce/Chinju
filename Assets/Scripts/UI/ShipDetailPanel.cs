@@ -143,15 +143,18 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
             btnToggleCombatMode.text = $"戰鬥模式: {ship.Mode}";
         }
 
-        // 新增：顯示船名
-        UpdateShipName();
+        // 新增：顯示船名（只初始化一次）
+        if (lblName != null)
+        {
+            lblName.text = $"名稱: {ship.name}";
+        }
     }
 
     void Update()
     {
         SetUIPosition(); // 每幀更新 UI 位置
         SetRectPosition(); // 每幀更新矩形位置
-        UpdateShipName(); // 每幀同步船名
+        // 移除每幀 UpdateShipName()
         UpdateWaypointMarkersPosition(); // 新增：每幀同步 waypoint 標記位置
 
         // 若 Camera.main 可能會變動，可每幀檢查
@@ -1048,13 +1051,4 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         }
     }
     #endregion
-
-    // 新增：更新船名顯示
-    private void UpdateShipName()
-    {
-        if (lblName != null && ship != null)
-        {
-            lblName.text = $"名稱: {ship.name}";
-        }
-    }
 }
