@@ -870,6 +870,7 @@ MonoBehaviour:
   mainCamera: {fileID: 2019224608}
   cameraController: {fileID: 2019224605}
   oilShipPrefab: {fileID: 0}
+  showOceanLevelText: 0
 --- !u!1 &730569034
 GameObject:
   m_ObjectHideFlags: 0
@@ -1253,7 +1254,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnInterval: 2
-  maxEnemyShips: 15
+  maxEnemyShips: 30
   progressBarController: {fileID: 1984032773}
   progressBarDuration: 10
 --- !u!114 &937809618

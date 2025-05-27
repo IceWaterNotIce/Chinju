@@ -14,8 +14,8 @@ public class MapController : MonoBehaviour
     */
     private const string MapCacheFilePath = "map_cache";
 
-    [SerializeField] private Tilemap oceanTilemap;
-    [SerializeField] private Tilemap groundTilemap;
+    [SerializeField] public Tilemap oceanTilemap;
+    [SerializeField] public Tilemap groundTilemap;
     public TileBase oceanTile, grassTile;
     public TileBase chinjuTile;
     public TileBase oilTile;
@@ -45,10 +45,13 @@ public class MapController : MonoBehaviour
     private Queue<GameObject> oilShipPool = new Queue<GameObject>();
 
     // 新增：儲存每個海洋瓦片的層級
-    private Dictionary<Vector3Int, int> oceanTileLevels = new Dictionary<Vector3Int, int>();
+    public Dictionary<Vector3Int, int> oceanTileLevels = new Dictionary<Vector3Int, int>();
 
     // 新增：管理每個海洋層級文字顯示
     private Dictionary<Vector3Int, GameObject> oceanLevelTexts = new Dictionary<Vector3Int, GameObject>();
+
+    [Header("Debug")]
+    public bool showOceanLevelText = true;
 
     void Start()
     {
@@ -267,8 +270,6 @@ public class MapController : MonoBehaviour
         {
             ShowOceanLevelText(pos);
         }
-
-        // 新增：確保所有已繪製的海洋 tile 都有數字
         foreach (var pos in renderedTiles)
         {
             if (generatedTiles.TryGetValue(pos, out var type) && type == TileType.Ocean)
@@ -281,6 +282,11 @@ public class MapController : MonoBehaviour
     // 顯示海洋層級文字
     private void ShowOceanLevelText(Vector3Int pos)
     {
+        if (!showOceanLevelText)
+        {
+            HideOceanLevelText(pos);
+            return;
+        }
         int level = 0;
         if (!oceanTileLevels.TryGetValue(pos, out level)) level = 0;
 

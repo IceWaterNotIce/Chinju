@@ -45,9 +45,13 @@ public class EnemyShip : Warship
     private float randomAngle = 0f;
     private Vector2 lastPosition;
 
+    private MapController mapController; // 新增
+
     new void Start()
     {
         base.Start();
+        // 取得 MapController 實例
+        mapController = FindObjectOfType<MapController>();
         PickNewRandomMove();
         lastPosition = transform.position;
     }
@@ -139,9 +143,45 @@ public class EnemyShip : Warship
 
     private void PickNewRandomMove()
     {
-        randomMoveDistance = Random.Range(3f, 10f); // 每次隨機移動距離
-        randomSpeed = MaxSpeed * Random.Range(0.1f, 0.2f); // 隨機速度
-        randomAngle = Random.Range(0f, 360f); // 隨機方向
+        // 權重選擇最佳方向
+        int tryCount = 8;
+        float bestWeight = float.MinValue;
+        float bestAngle = 0f;
+        float bestSpeed = 0f;
+
+        Vector3 curPos = transform.position;
+
+        for (int i = 0; i < tryCount; i++)
+        {
+            float angle = Random.Range(0f, 360f);
+            float speed = MaxSpeed * Random.Range(0.1f, 0.2f);
+            float distance = Random.Range(3f, 10f);
+
+            // 預測移動後的位置
+            Vector3 dir = new Vector3(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad), 0);
+            Vector3 targetPos = curPos + dir * distance;
+
+            int oceanLevel = 0;
+            if (mapController != null && mapController.oceanTilemap != null)
+            {
+                Vector3Int cell = mapController.oceanTilemap.WorldToCell(targetPos);
+                mapController.oceanTileLevels.TryGetValue(cell, out oceanLevel);
+            }
+
+            // 權重：oceanLevel 越大越好，並加一點隨機性
+            float weight = oceanLevel + Random.Range(0f, 0.5f);
+
+            if (weight > bestWeight)
+            {
+                bestWeight = weight;
+                bestAngle = angle;
+                bestSpeed = speed;
+            }
+        }
+
+        randomMoveDistance = Random.Range(3f, 10f);
+        randomSpeed = bestSpeed;
+        randomAngle = bestAngle;
         movedDistance = 0f;
         lastPosition = transform.position;
     }
