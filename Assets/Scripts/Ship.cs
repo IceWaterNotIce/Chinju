@@ -72,8 +72,23 @@ public class Ship : MonoBehaviour
         }
     }
 
+    // === 記憶體與 GC 優化：重用 Vector3 變數 ===
+    private Vector3 m_cachedDirection;
+    private Vector3 m_cachedTarget;
+    private Vector3 m_cachedCenter;
+    private Vector3 m_cachedNextPosition;
+
+    // === 事件宣告（修正 CS0103） ===
     public event Action<float> OnHealthChanged;
     public event Action<float> OnFuelChanged;
+
+    // === 建議：事件回調改用方法註冊，減少 lambda 分配 ===
+    // 請於外部註冊時改為：
+    // OnHealthChanged += HandleHealthChanged;
+    // OnFuelChanged += HandleFuelChanged;
+    // 並實作對應方法
+    // protected virtual void HandleHealthChanged(float health) { ... }
+    // protected virtual void HandleFuelChanged(float fuel) { ... }
 
     protected virtual void OnDeath()
     {
@@ -157,19 +172,24 @@ public class Ship : MonoBehaviour
 
     protected virtual void Move()
     {
-        // --- 新增導航邏輯 ---
+        // --- 優化導航邏輯：分幀與動態間隔 ---
+        float updateInterval = (Speed < 0.1f) ? 1.0f : 0.2f;
         m_navigationUpdateTimer += Time.deltaTime;
-        if (!IsFollower && m_navigationUpdateTimer >= 0.2f)
+        // 分幀處理：每 10 幀分散處理不同船隻
+        if (!IsFollower && Time.frameCount % 10 == GetInstanceID() % 10)
         {
-            m_navigationUpdateTimer = 0f;
-            if (m_waypoints.Count > 0)
+            if (m_navigationUpdateTimer >= updateInterval)
             {
-                NavigateToWaypoint();
-            }
+                m_navigationUpdateTimer = 0f;
+                if (m_waypoints.Count > 0)
+                {
+                    NavigateToWaypoint();
+                }
 
-            if (NavigationArea != Rect.zero)
-            {
-                HandleNavigationArea();
+                if (NavigationArea != Rect.zero)
+                {
+                    HandleNavigationArea();
+                }
             }
         }
         // --- 原本的移動邏輯 ---
@@ -189,11 +209,15 @@ public class Ship : MonoBehaviour
     // --- 以下為從 PlayerShip 移動過來的導航相關方法 ---
     protected virtual void NavigateToWaypoint()
     {
-        Vector3 target = m_waypoints[0];
-        Vector3 direction = (target - transform.position).normalized;
-        SetNavigation(direction, 2f);
+        // Vector3 target = m_waypoints[0];
+        // Vector3 direction = (target - transform.position).normalized;
+        m_cachedTarget = m_waypoints[0];
+        m_cachedDirection = m_cachedTarget;
+        m_cachedDirection -= transform.position;
+        m_cachedDirection.Normalize();
+        SetNavigation(m_cachedDirection, 2f);
 
-        if ((transform.position - target).sqrMagnitude < 0.01f)
+        if ((transform.position - m_cachedTarget).sqrMagnitude < 0.01f)
         {
             m_waypoints.RemoveAt(0);
         }
@@ -210,14 +234,22 @@ public class Ship : MonoBehaviour
 
         if (IsOutOfNavigationBounds())
         {
-            Vector3 center = GetNavigationAreaCenter();
-            Vector3 direction = (center - transform.position).normalized;
-            SetNavigation(direction, 2f);
+            // Vector3 center = GetNavigationAreaCenter();
+            // Vector3 direction = (center - transform.position).normalized;
+            m_cachedCenter = GetNavigationAreaCenter();
+            m_cachedDirection = m_cachedCenter;
+            m_cachedDirection -= transform.position;
+            m_cachedDirection.Normalize();
+            SetNavigation(m_cachedDirection, 2f);
         }
         else if (tilemap != null && oceanTile != null && !IsNextPositionOceanTile())
         {
-            Vector3 direction = (transform.position - GetNextPosition()).normalized;
-            SetNavigation(direction, 2f);
+            // Vector3 direction = (transform.position - GetNextPosition()).normalized;
+            m_cachedNextPosition = GetNextPosition();
+            m_cachedDirection = transform.position;
+            m_cachedDirection -= m_cachedNextPosition;
+            m_cachedDirection.Normalize();
+            SetNavigation(m_cachedDirection, 2f);
         }
         else
         {
