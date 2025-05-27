@@ -16,119 +16,13 @@ public class PlayerShip : Warship, IPointerClickHandler
 
     #region Player Settings
     [Header("Player Settings")]
-    [SerializeField] private Rect m_navigationArea;
     private float m_healthRegenTimer = 0f; // 用於計時的變數
-    private float m_navigationUpdateTimer = 0f; // 新增：導航更新計時器
-    #endregion
-
-    #region Properties
-    // public Rect NavigationArea
-    // {
-    //     get => m_navigationArea;
-    //     set
-    //     {
-    //         Debug.Log($"[PlayerShip] NavigationArea set to {value}");
-    //         m_navigationArea = value;
-    //         if (m_navigationArea != Rect.zero)
-    //         {
-    //             TargetSpeed = 2f; // 自動導航速度
-    //         }
-    //         else
-    //         {
-    //             Debug.LogWarning("[PlayerShip] NavigationArea is set to Rect.zero, navigation disabled.");
-    //         }
-    //     }
-    // }
     #endregion
 
     #region Movement Logic
     protected override void Move()
     {
-        m_navigationUpdateTimer += Time.deltaTime;
-        if (!IsFollower && m_navigationUpdateTimer >= 0.2f)
-        {
-            m_navigationUpdateTimer = 0f;
-            if (m_waypoints.Count > 0)
-            {
-                NavigateToWaypoint();
-            }
-
-            if (NavigationArea != Rect.zero)
-            {
-                HandleNavigationArea();
-            }
-        }
-        base.Move(); // 使用基類的移動邏輯
-    }
-
-    private void NavigateToWaypoint()
-    {
-        Vector3 target = m_waypoints[0];
-        Vector3 direction = (target - transform.position).normalized;
-        SetNavigation(direction, 2f);
-
-        if ((transform.position - target).sqrMagnitude < 0.01f) // 使用平方距離比較
-        {
-            m_waypoints.RemoveAt(0); // 移除已到達的路徑點
-        }
-    }
-
-    private void HandleNavigationArea()
-    {
-        if (CurrentFuel <= 0)
-        {
-            Debug.LogWarning("[PlayerShip] Out of fuel, cannot navigate.");
-            TargetSpeed = 0f; // 停止移動
-            return;
-        }
-
-        if (IsOutOfNavigationBounds())
-        {
-            Vector3 center = GetNavigationAreaCenter();
-            Vector3 direction = (center - transform.position).normalized;
-            SetNavigation(direction, 2f);
-        }
-        else if (tilemap != null && oceanTile != null && !IsNextPositionOceanTile())
-        {
-            Vector3 direction = (transform.position - GetNextPosition()).normalized;
-            SetNavigation(direction, 2f);
-        }
-        else
-        {
-            TargetSpeed = 2f; // 設置導航速度
-        }
-
-        CurrentFuel -= FuelConsumptionRate * TargetSpeed * Time.deltaTime;
-        //Debug.Log($"[PlayerShip] Adjusted TargetSpeed: {TargetSpeed}, TargetRotation: {TargetRotation}, Remaining Fuel: {CurrentFuel}");
-    }
-
-    private bool IsOutOfNavigationBounds()
-    {
-        return transform.position.x < NavigationArea.xMin + 2 || transform.position.x > NavigationArea.xMax - 2 ||
-               transform.position.y < NavigationArea.yMin + 2 || transform.position.y > NavigationArea.yMax - 2;
-    }
-
-    private Vector3 GetNavigationAreaCenter()
-    {
-        return new Vector3((NavigationArea.xMin + NavigationArea.xMax) / 2, (NavigationArea.yMin + NavigationArea.yMax) / 2, 0);
-    }
-
-    private Vector3 GetNextPosition()
-    {
-        return transform.position + transform.right * Speed * Time.deltaTime;
-    }
-
-    private bool IsNextPositionOceanTile()
-    {
-        TileBase tile = tilemap.GetTile(tilemap.WorldToCell(GetNextPosition()));
-        return tile == oceanTile;
-    }
-
-    private void SetNavigation(Vector3 direction, float speed)
-    {
-        TargetRotation = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        TargetSpeed = speed;
-        Debug.Log($"[PlayerShip] Adjusted TargetSpeed: {TargetSpeed}, TargetRotation: {TargetRotation}");
+        base.Move(); // 僅呼叫基底
     }
     #endregion
 

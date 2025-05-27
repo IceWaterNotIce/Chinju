@@ -12,6 +12,7 @@ public class Ship : MonoBehaviour
     // === NavigationArea 與 Waypoints（從 PlayerShip 移動過來） ===
     [Header("Navigation Settings")]
     [SerializeField] private Rect m_navigationArea;
+    protected float m_navigationUpdateTimer = 0f; // 新增：導航更新計時器
     public Rect NavigationArea
     {
         get => m_navigationArea;
@@ -156,6 +157,22 @@ public class Ship : MonoBehaviour
 
     protected virtual void Move()
     {
+        // --- 新增導航邏輯 ---
+        m_navigationUpdateTimer += Time.deltaTime;
+        if (!IsFollower && m_navigationUpdateTimer >= 0.2f)
+        {
+            m_navigationUpdateTimer = 0f;
+            if (m_waypoints.Count > 0)
+            {
+                NavigateToWaypoint();
+            }
+
+            if (NavigationArea != Rect.zero)
+            {
+                HandleNavigationArea();
+            }
+        }
+        // --- 原本的移動邏輯 ---
         if (CurrentFuel <= 0) return;
 
         m_speed = Mathf.MoveTowards(m_speed, m_targetSpeed, m_acceleration * Time.deltaTime);
@@ -170,6 +187,76 @@ public class Ship : MonoBehaviour
             transform.position = newPosition;
             CurrentFuel -= FuelConsumptionRate * m_speed * Time.deltaTime;
         }
+    }
+
+    // --- 以下為從 PlayerShip 移動過來的導航相關方法 ---
+    protected virtual void NavigateToWaypoint()
+    {
+        Vector3 target = m_waypoints[0];
+        Vector3 direction = (target - transform.position).normalized;
+        SetNavigation(direction, 2f);
+
+        if ((transform.position - target).sqrMagnitude < 0.01f)
+        {
+            m_waypoints.RemoveAt(0);
+        }
+    }
+
+    protected virtual void HandleNavigationArea()
+    {
+        if (CurrentFuel <= 0)
+        {
+            Debug.LogWarning("[Ship] Out of fuel, cannot navigate.");
+            TargetSpeed = 0f;
+            return;
+        }
+
+        if (IsOutOfNavigationBounds())
+        {
+            Vector3 center = GetNavigationAreaCenter();
+            Vector3 direction = (center - transform.position).normalized;
+            SetNavigation(direction, 2f);
+        }
+        else if (tilemap != null && oceanTile != null && !IsNextPositionOceanTile())
+        {
+            Vector3 direction = (transform.position - GetNextPosition()).normalized;
+            SetNavigation(direction, 2f);
+        }
+        else
+        {
+            TargetSpeed = 2f;
+        }
+
+        CurrentFuel -= FuelConsumptionRate * TargetSpeed * Time.deltaTime;
+    }
+
+    protected virtual bool IsOutOfNavigationBounds()
+    {
+        return transform.position.x < NavigationArea.xMin + 2 || transform.position.x > NavigationArea.xMax - 2 ||
+               transform.position.y < NavigationArea.yMin + 2 || transform.position.y > NavigationArea.yMax - 2;
+    }
+
+    protected virtual Vector3 GetNavigationAreaCenter()
+    {
+        return new Vector3((NavigationArea.xMin + NavigationArea.xMax) / 2, (NavigationArea.yMin + NavigationArea.yMax) / 2, 0);
+    }
+
+    protected virtual Vector3 GetNextPosition()
+    {
+        return transform.position + transform.right * Speed * Time.deltaTime;
+    }
+
+    protected virtual bool IsNextPositionOceanTile()
+    {
+        TileBase tile = tilemap.GetTile(tilemap.WorldToCell(GetNextPosition()));
+        return tile == oceanTile;
+    }
+
+    protected virtual void SetNavigation(Vector3 direction, float speed)
+    {
+        TargetRotation = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        TargetSpeed = speed;
+        Debug.Log($"[Ship] Adjusted TargetSpeed: {TargetSpeed}, TargetRotation: {TargetRotation}");
     }
 
     public virtual GameData.ShipData SaveShipData()
