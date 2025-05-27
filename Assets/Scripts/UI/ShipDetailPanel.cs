@@ -68,6 +68,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     private Button btnDrawWaypoint; // 新增：切換繪製 waypoint 模式按鈕
     private bool IsDrawingWaypoint = false; // 新增：繪製 waypoint 模式狀態
     private List<VisualElement> waypointMarkers = new List<VisualElement>(); // 新增：waypoint 標記列表
+    private VisualElement waypointsContainer; // 新增：waypoint 標記的容器
     private Label lblName; // 新增：顯示船名的 Label
     #endregion
 
@@ -146,6 +147,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         SetUIPosition(); // 每幀更新 UI 位置
         SetRectPosition(); // 每幀更新矩形位置
         UpdateShipName(); // 每幀同步船名
+        UpdateWaypointMarkersPosition(); // 新增：每幀同步 waypoint 標記位置
     }
     #endregion
 
@@ -807,10 +809,8 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
 
     private void ClearWaypointMarkers()
     {
-        foreach (var marker in waypointMarkers)
-        {
-            marker.RemoveFromHierarchy();
-        }
+        if (waypointsContainer != null)
+            waypointsContainer.Clear();
         waypointMarkers.Clear();
         ship?.ClearWaypoints();
     }
@@ -1000,19 +1000,44 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
 
     private void DrawWaypointMarker(Vector3 worldPos)
     {
-        var root = GetComponent<UIDocument>().rootVisualElement;
+        if (waypointsContainer == null)
+        {
+            waypointsContainer = UIHelper.InitializeElement<VisualElement>(UIPanel, "waypointsContainer");
+            if (waypointsContainer == null)
+            {
+                Debug.LogWarning("[ShipDetailPanel] 找不到 waypointsContainer，無法繪製 waypoint 標記。");
+                return;
+            }
+        }
         var marker = new VisualElement();
         marker.AddToClassList("waypoint-marker");
-        // 世界座標轉螢幕座標
-        Vector2 screenPos = Camera.main.WorldToScreenPoint(worldPos);
-        // UI Toolkit Y 軸反向
         marker.style.position = Position.Absolute;
-        marker.style.left = screenPos.x - 8; // 8 為圖示半徑
-        marker.style.top = Screen.height - screenPos.y - 8;
         marker.style.width = 16;
         marker.style.height = 16;
-        root.Add(marker);
+        waypointsContainer.Add(marker);
         waypointMarkers.Add(marker);
+
+        // 設定初始位置
+        SetWaypointMarkerPosition(marker, worldPos);
+    }
+
+    // 新增：根據世界座標設定 waypoint marker 的 UI 位置（參考 rect 畫法）
+    private void SetWaypointMarkerPosition(VisualElement marker, Vector3 worldPos)
+    {
+        Vector2 screenPos = Camera.main.WorldToScreenPoint(worldPos);
+        marker.style.left = screenPos.x - 8;
+        marker.style.top = Screen.height - screenPos.y - 8;
+    }
+
+    // 新增：每幀更新所有 waypoint marker 的位置
+    private void UpdateWaypointMarkersPosition()
+    {
+        if (ship == null || ship.Waypoints == null) return;
+        int count = Mathf.Min(waypointMarkers.Count, ship.Waypoints.Count);
+        for (int i = 0; i < count; i++)
+        {
+            SetWaypointMarkerPosition(waypointMarkers[i], ship.Waypoints[i]);
+        }
     }
     #endregion
 
@@ -1099,6 +1124,15 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         lblLevel = UIHelper.InitializeElement<Label>(UIPanel, "lblLevel");
         lblExperience = UIHelper.InitializeElement<Label>(UIPanel, "lblExperience");
         lblName = UIHelper.InitializeElement<Label>(UIPanel, "lblName"); // 新增：初始化 lblName
+
+        // 新增：初始化 waypointsContainer
+        waypointsContainer = UIHelper.InitializeElement<VisualElement>(UIPanel, "waypointsContainer");
+        if (waypointsContainer == null)
+        {
+            // 若找不到則建立一個
+            waypointsContainer = new VisualElement { name = "waypointsContainer" };
+            UIPanel.Add(waypointsContainer);
+        }
     }
     #endregion
 

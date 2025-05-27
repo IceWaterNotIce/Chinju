@@ -22,14 +22,12 @@
     margin-top: 10px;
 }
 
-/* 新增：武器圖示樣式 */
 .weapon-icon {
     width: 32px;
     height: 32px;
     margin-right: 8px;
 }
 
-/* 新增：武器總覽面板樣式 */
 .weapons-panel {
     position: absolute;
     left: 200px;
@@ -40,7 +38,6 @@
     border-radius: 10px;
 }
 
-/* 新增：武器詳細資訊彈出視窗樣式 */
 .weapon-detail-popup {
     position: absolute;
     left: 100px;
@@ -51,14 +48,12 @@
     border-radius: 8px;
 }
 
-/* 新增：標題樣式 */
 .title {
     -unity-font-style: bold;
     font-size: 16px;
     margin-bottom: 10px;
 }
 
-/* 新增：武器選擇面板樣式 */
 .weapon-selection-popup {
     position: absolute;
     left: 100px;
@@ -69,7 +64,6 @@
     border-radius: 8px;
 }
 
-/* 新增：矩形繪製按鈕樣式 */
 .draw-button {
     width: 150px;
     height: 40px;
@@ -88,8 +82,8 @@
 }
 
 .draw-waypoint-btn {
-    background-color: #3a7;
-    color: #fff;
+    background-color: rgb(51, 170, 119);
+    color: rgb(255, 255, 255);
     font-size: 15px;
     border-radius: 5px;
     border: none;
@@ -99,9 +93,9 @@
 }
 
 .waypoint-marker {
-    background-color: #ff0;
+    background-color: rgb(255, 255, 0);
     border-radius: 50%;
-    border: 2px solid #f80;
+    border: 2px solid rgb(255, 136, 0);
     width: 16px;
     height: 16px;
     position: absolute;
@@ -153,6 +147,7 @@
 .combat-mode-btn:hover {
     background-color: rgb(0, 102, 204);
 }
+
 .progress-bar-container {
     width: 180px;
     height: 18px;
@@ -162,8 +157,8 @@
 
 .progress-bar {
     height: 100%;
-    background-color: #00ff00;
-    width: 100%; /* 預設 100%，由 C# 控制實際寬度 */
+    background-color: rgb(0, 255, 0);
+    width: 100%;
     transition: width 0.1s linear;
 }
 
@@ -222,4 +217,7 @@
     margin-left: 0;
     font-size: 14px;
     -unity-text-align: middle-left;
+}
+
+.cancel-follow-btn {
 }
