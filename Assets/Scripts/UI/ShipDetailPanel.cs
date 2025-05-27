@@ -123,8 +123,12 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         // 訂閱事件
         ship.OnHealthChanged += health => UpdateHealth(health, ship.MaxHealth);
         ship.OnFuelChanged += fuel => UpdateFuel(fuel, ship.MaxFuel);
-        ship.gameObject.GetComponent<Warship>().OnExperienceChanged += exp => UpdateExperience(exp, ship.gameObject.GetComponent<Warship>().Level);
-        ship.gameObject.GetComponent<Warship>().OnLevelChanged += level => UpdateLevel(level);
+        var warship = ship.gameObject.GetComponent<Warship>();
+        if (warship != null)
+        {
+            warship.OnExperienceChanged += exp => UpdateExperience(exp, warship.Level);
+            warship.OnLevelChanged += level => UpdateLevel(level);
+        }
 
         // 新增：訂閱等級、經驗值、戰鬥模式變化事件
         ship.OnCombatModeChanged.AddListener(isInCombat => UpdateCombatMode(isInCombat));
@@ -812,6 +816,14 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         Debug.Log("[ShipDetailPanel] 銷毀 ShipDetailPanel");
         //Debug where call this destroy
         // Debug.Log(new System.Diagnostics.StackTrace().ToString());
+
+        // 取消所有事件訂閱
+        if (ship != null)
+        {
+            // 這裡無法直接 -= lambda，僅能安全移除 UnityEvent
+            if (ship.OnCombatModeChanged != null)
+                ship.OnCombatModeChanged.RemoveListener(UpdateCombatMode);
+        }
     }
     #endregion
 
