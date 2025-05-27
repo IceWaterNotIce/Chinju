@@ -776,11 +776,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         bool canDraw = true;
         if (ship != null && ship.transform.parent != null)
         {
-            Fleet fleet = ship.transform.parent.GetComponent<Fleet>();
-            if (fleet != null && fleet.followers.Count > 0 && fleet.followers[0] != ship)
-            {
-                canDraw = false;
-            }
+            canDraw = FleetManager.Instance.IsFleetLeader(ship);
         }
         btnDrawWaypoint.SetEnabled(canDraw);
         btnDrawWaypoint.text = IsDrawingWaypoint ? "結束繪製航點" : "繪製航點";

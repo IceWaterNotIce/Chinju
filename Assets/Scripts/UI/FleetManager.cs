@@ -34,5 +34,12 @@ public class FleetManager : Singleton<FleetManager>
         ship.transform.SetParent(fleet.transform);
     }
 
+    public bool IsFleetLeader(Warship ship)
+    {
+        Fleet fleet = ship.transform.parent != null ? ship.transform.parent.GetComponent<Fleet>() : null;
+        if (fleet == null || ship == null) return false;
+        return fleet.followers.Count > 0 && fleet.followers[0] == ship;
+    }
+
     // ...可擴充更多管理功能...
 }
