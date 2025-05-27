@@ -30,7 +30,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
 
     private Dictionary<Vector3Int, TileType> generatedTiles = new Dictionary<Vector3Int, TileType>();
     private HashSet<Vector3Int> chinjuTilePositions = new HashSet<Vector3Int>();
-    private int chunkSize = 32;
+    private int chunkSize = 16;
     private int renderRadius = 3;
 
     private HashSet<Vector3Int> renderedTiles = new HashSet<Vector3Int>();
@@ -51,6 +51,8 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
 
     [Header("Debug")]
     public bool showOceanLevelText = true;
+
+    private Dictionary<Vector2Int, float> _noiseCache = new Dictionary<Vector2Int, float>();
 
     void Start()
     {
@@ -317,6 +319,17 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
         }
     }
 
+    private float GetCachedNoise(int x, int y)
+    {
+        var key = new Vector2Int(x, y);
+        if (!_noiseCache.TryGetValue(key, out float value))
+        {
+            value = Mathf.PerlinNoise(x * 0.1f + seed, y * 0.1f + seed);
+            _noiseCache[key] = value;
+        }
+        return _noiseCache[key];
+    }
+
     private TileType GetTileTypeAt(int x, int y)
     {
         if (x == 0 && y == 0)
@@ -327,7 +340,8 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
 
         int gx = x / 2;
         int gy = y / 2;
-        float noiseValue = Mathf.PerlinNoise((gx * 0.1f + seed * 0.1f), (gy * 0.1f + seed * 0.1f));
+        // 使用快取的柏林噪聲
+        float noiseValue = GetCachedNoise(gx, gy);
         if (noiseValue > 1f - islandDensity)
         {
             float oilNoise = Mathf.PerlinNoise((gx + seed) * 0.2f, (gy + seed) * 0.2f);
@@ -588,6 +602,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
         renderedTiles.Clear();
         pendingTiles.Clear();
         oceanTileLevels.Clear();
+        _noiseCache.Clear(); // 新增：清除噪聲快取
         // 清空 tilemap
         if (oceanTilemap != null) oceanTilemap.ClearAllTiles();
         if (groundTilemap != null) groundTilemap.ClearAllTiles();
@@ -614,6 +629,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
         renderedTiles.Clear();
         pendingTiles.Clear();
         oceanTileLevels.Clear();
+        _noiseCache.Clear(); // 新增：清除噪聲快取
 
         // 清空 tilemap
         if (oceanTilemap != null) oceanTilemap.ClearAllTiles();
