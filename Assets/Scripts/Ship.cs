@@ -181,12 +181,9 @@ public class Ship : MonoBehaviour
         float kmPerSecond = m_speed * 1.852f / 3600f;
         Vector3 newPosition = transform.position + transform.right * kmPerSecond * Time.deltaTime * GameManager.RealGameTimeScale;
 
-        Vector3Int tilePosition = tilemap.WorldToCell(newPosition);
-        if (tilemap.GetTile(tilePosition) == oceanTile)
-        {
-            transform.position = newPosition;
-            CurrentFuel -= FuelConsumptionRate * m_speed * Time.deltaTime;
-        }
+        // 直接移動，不再檢查 oceanTile
+        transform.position = newPosition;
+        CurrentFuel -= FuelConsumptionRate * m_speed * Time.deltaTime;
     }
 
     // --- 以下為從 PlayerShip 移動過來的導航相關方法 ---
