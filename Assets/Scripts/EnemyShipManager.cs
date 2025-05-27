@@ -244,7 +244,30 @@ public class EnemyShipManager : MonoBehaviour
 
     private void HandleProgressComplete()
     {
-        spawnInterval = Mathf.Max(1f, spawnInterval - 5f); // 每次減少 5 秒，最低為 1 秒
         Debug.Log($"[EnemyShipManager] Spawn interval decreased to {spawnInterval} seconds.");
+
+        // 新增：將所有現有敵艦的 NavigationArea 設為以神獸 tile 為中心的 5x5 區域
+        Vector3 chinjuCenter = Vector3.zero;
+        var mapController = FindFirstObjectByType<MapController>();
+        if (mapController != null)
+        {
+            chinjuCenter = mapController.GetChinjuTileWorldPosition();
+        }
+        else
+        {
+            Debug.LogWarning("[EnemyShipManager] 找不到 MapController，無法取得神獸 tile 位置！");
+            return;
+        }
+
+        float width = 5f;
+        float height = 5f;
+        Vector2 rectMin = new Vector2(chinjuCenter.x - width / 2f, chinjuCenter.y - height / 2f);
+
+        var allEnemies = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None);
+        foreach (var enemy in allEnemies)
+        {
+            enemy.NavigationArea = new Rect(rectMin, new Vector2(width, height));
+        }
+        Debug.Log($"[EnemyShipManager] 已將所有敵艦導航區域設為以神獸 tile 為中心的 5x5 區域。");
     }
 }
