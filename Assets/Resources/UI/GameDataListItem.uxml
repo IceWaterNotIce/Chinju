@@ -1,6 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns="UnityEngine.UIElements" editor-extension-mode="False">
-    <ui:VisualElement class="game-data-list-item" style="flex-direction: row; align-items: center; padding: 4px; width: 500px;">
-        <ui:Label name="fileNameLabel" class="file-name-label" style="flex-grow: 1;" />
+    <ui:VisualElement class="game-data-list-item" style="flex-direction: row; align-items: center; padding: 4px; width: 100%; color: rgb(0, 0, 0); max-width: 800px;">
+        <ui:Label name="fileNameLabel" text="Game" class="file-name-label" style="flex-grow: 1; display: flex; color: rgb(255, 255, 255); -unity-text-outline-width: 6px; -unity-font-definition: url(&quot;project://database/Assets/UI%20Toolkit/UnityThemes/UnityDefaultRuntimeTheme.tss?fileID=2230732570650464555&amp;guid=c3f7197cdf1393a4d9c21a9d67859f8c&amp;type=3#NotInter-Regular&quot;); -unity-font-style: bold; font-size: 27px;" />
         <ui:Button name="loadButton" text="載入" class="save-file-btn" style="margin-left: 8px;" />
         <ui:Button name="deleteButton" text="刪除" class="delete-file-btn" style="margin-left: 8px;" />
     </ui:VisualElement>

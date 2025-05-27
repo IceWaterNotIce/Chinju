@@ -1,13 +1,14 @@
 .save-file-btn {
-    width: 100%;
+    width: 15%;
     margin-bottom: 8px;
     font-size: 16px;
     color: white;
-    background-color: #333;
+    background-color: rgb(51, 51, 51);
     border-radius: 5px;
     border: none;
     padding: 8px 0;
 }
+
 .save-file-btn:hover {
-    background-color: #444;
+    background-color: rgb(68, 68, 68);
 }
