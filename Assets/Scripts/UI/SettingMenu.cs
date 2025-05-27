@@ -122,6 +122,7 @@ public class SettingMenu : MonoBehaviour
         if (exitGameButton != null) exitGameButton.clicked -= OnExitGameButtonClicked;
         if (newGameButton != null) newGameButton.clicked -= OnNewGameButtonClicked;
         if (selectGameDataButton != null) selectGameDataButton.clicked -= OnSelectGameDataButtonClicked;
+
         // 若有 closeButton，這裡也解除
         // var closeButton = root.Q<Button>("closeButton");
         // if (closeButton != null) closeButton.clicked -= OnCloseButtonClicked;
@@ -196,8 +197,8 @@ public class SettingMenu : MonoBehaviour
 
     private void OnNewGameButtonClicked()
     {
-        Debug.Log("[SettingPanel] 開始新遊戲");
-        GameManager.Instance.StartNewGame();
+        PopupManager.Instance.ShowPopup("GameDataCreatePanel");
+        PopupManager.Instance.HidePopup("SettingMenu");
         HideGameMenu();
     }
 
@@ -205,18 +206,6 @@ public class SettingMenu : MonoBehaviour
     {
         PopupManager.Instance.ShowPopup("GameDataSelectPanel");
         PopupManager.Instance.HidePopup("SettingMenu");
-    }
-
-    public void ShowSettingsMenu()
-    {
-        if (root == null)
-        {
-            Debug.LogError("[SettingPanel] 無法顯示設定選單：選單引用丟失");
-            return;
-        }
-
-        PopupManager.Instance.ShowPopup("SettingMenu");
-        Debug.Log("[SettingPanel] 顯示設定選單");
     }
 
     // 新增：Slider callback

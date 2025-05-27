@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/GameDataCreatePanel.uss?fileID=7433441132597879392&amp;guid=669b476a5e43a9041ae18be576b4e55d&amp;type=3#GameDataCreatePanel" />
+    <ui:VisualElement name="VisualElement" class="game-data-create-panel" style="align-items: flex-start; flex-direction: column; top: 50%; left: 50%; translate: -50% -50%;">
+        <ui:Label text="建立新遊戲存檔" class="title-label" />
+        <ui:TextField name="fileNameField" label="存檔名稱" class="input-field" />
+        <ui:TextField name="mapSeedField" label="地圖種子（可選，留空為隨機）" class="input-field" />
+        <ui:VisualElement class="button-row">
+            <ui:Button name="createButton" text="建立" class="main-button" />
+            <ui:Button name="cancelButton" text="取消" class="main-button" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

@@ -568,6 +568,7 @@ Transform:
   - {fileID: 279788742}
   - {fileID: 80820162}
   - {fileID: 1217360138}
+  - {fileID: 878290065}
   m_Father: {fileID: 794751195}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &572011470
@@ -1144,6 +1145,70 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   shipTemplate: {fileID: 9197481963319205126, guid: dab9ae19c3b8a8a438c771ebc7805323, type: 3}
+--- !u!1 &878290064
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 878290065}
+  - component: {fileID: 878290067}
+  - component: {fileID: 878290066}
+  m_Layer: 0
+  m_Name: GameDataCreatePanel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &878290065
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 878290064}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -9.680447, y: 10.11225, z: -61.444912}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 451232345}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &878290066
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 878290064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe271f8c20cadb94fba09735ea9c086f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &878290067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 878290064}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: c40b9c23258200645b26f1b0c0ae963d, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 8f782d5853af230449c08df87a5007fa, type: 3}
+  m_SortingOrder: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
 --- !u!1 &933149502
 GameObject:
   m_ObjectHideFlags: 0

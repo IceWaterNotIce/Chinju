@@ -277,7 +277,8 @@ public class GameManager : Singleton<GameManager>
     /// 開始新遊戲，會先儲存目前遊戲，再建立新遊戲資料並切換新檔案
     /// </summary>
     /// <param name="newSaveFileName">新遊戲存檔名稱（可為 null，預設自動產生）</param>
-    public void StartNewGame(string newSaveFileName = null)
+    /// <param name="mapSeed">地圖種子（可為 null，null 則隨機）</param>
+    public void StartNewGame(string newSaveFileName = null, int? mapSeed = null)
     {
         // 1. 儲存目前遊戲（如果有資料）
         if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData != null)
@@ -322,6 +323,7 @@ public class GameManager : Singleton<GameManager>
         }
 
         // 5. 重置遊戲數據
+        int seed = mapSeed ?? Random.Range(0, int.MaxValue); // 新增：使用指定或隨機種子
         var newGameData = new GameData
         {
             playerData = new GameData.PlayerData
@@ -333,7 +335,7 @@ public class GameManager : Singleton<GameManager>
             },
             mapData = new GameData.MapData
             {
-                Seed = Random.Range(0, int.MaxValue),
+                Seed = seed,
                 Width = 100,
                 Height = 100,
                 IslandDensity = 0.1f,
