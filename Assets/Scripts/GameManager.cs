@@ -239,6 +239,10 @@ public class GameManager : Singleton<GameManager>
 
                     GameDataController.Instance.TriggerResourceChanged();
                     OnGameLoaded?.Invoke(); // 發送載入事件
+
+                    // 新增：載入遊戲後重繪地圖
+                    if (MapController.Instance != null)
+                        MapController.Instance.RecalculateMap();
                 }
                 else
                 {
@@ -348,6 +352,10 @@ public class GameManager : Singleton<GameManager>
             GameDataController.Instance.CurrentGameData = newGameData;
 
         GameDataController.Instance.TriggerResourceChanged();
+
+        // 新增：新遊戲後重繪地圖
+        if (MapController.Instance != null)
+            MapController.Instance.RecalculateMap();
 
         // 7. 立即儲存新遊戲檔案
         SaveGame();

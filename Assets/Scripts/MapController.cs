@@ -6,7 +6,7 @@ using System.Collections;
 using System.IO;
 using System.Threading.Tasks;
 
-public class MapController : MonoBehaviour
+public class MapController : Singleton<MapController> // 改為繼承 Singleton
 {
 
     /*
@@ -23,7 +23,6 @@ public class MapController : MonoBehaviour
 
     [Header("Random Seed")]  
     public int seed = 12345;
-    public bool useRandomSeed = true;
 
     public Camera mainCamera;
     public CameraBound2D cameraController;
@@ -55,13 +54,7 @@ public class MapController : MonoBehaviour
 
     void Start()
     {
-        if (useRandomSeed)
-        {
-            seed = Random.Range(0, int.MaxValue);
-        }
-        Random.InitState(seed);
-
-        UpdateVisibleChunks();
+        RecalculateMap(); // 取代原本的初始化流程
 
         if (oilShipPrefab == null)
         {
@@ -585,5 +578,48 @@ public class MapController : MonoBehaviour
                 queue.Enqueue(neighborPos);
             }
         }
+    }
+
+    // 新增：重繪地圖方法，供 GameManager 呼叫
+    public void RenderMap()
+    {
+        // 清除已產生的地圖資料與已渲染區域
+        generatedTiles.Clear();
+        renderedTiles.Clear();
+        pendingTiles.Clear();
+        oceanTileLevels.Clear();
+        // 清空 tilemap
+        if (oceanTilemap != null) oceanTilemap.ClearAllTiles();
+        if (groundTilemap != null) groundTilemap.ClearAllTiles();
+        // 重新產生地圖
+        UpdateVisibleChunks();
+    }
+
+    /// <summary>
+    /// 重新計算地圖（可用於外部強制刷新地圖資料）
+    /// </summary>
+    public void RecalculateMap()
+    {
+        // 重新設定 seed（可依需求調整，這裡預設用 GameData 的 seed）
+        var mapData = GameDataController.Instance?.CurrentGameData?.mapData;
+        if (mapData != null)
+            seed = mapData.Seed;
+        else
+            seed = Random.Range(0, int.MaxValue);
+
+        Random.InitState(seed);
+
+        // 清除所有已產生資料
+        generatedTiles.Clear();
+        renderedTiles.Clear();
+        pendingTiles.Clear();
+        oceanTileLevels.Clear();
+
+        // 清空 tilemap
+        if (oceanTilemap != null) oceanTilemap.ClearAllTiles();
+        if (groundTilemap != null) groundTilemap.ClearAllTiles();
+
+        // 重新產生地圖
+        UpdateVisibleChunks();
     }
 }
