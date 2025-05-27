@@ -39,7 +39,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
 
     private Coroutine chunkRenderCoroutine;
     private HashSet<Vector3Int> pendingTiles = new HashSet<Vector3Int>();
-    private const int TilesPerFrame = 128;
+    private const int ChunksPerFrame = 1; // 每幀處理幾個 chunk
 
     private Queue<GameObject> oilShipPool = new Queue<GameObject>();
 
@@ -189,6 +189,8 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
     {
         List<Vector3Int> orderedTiles = new List<Vector3Int>();
         HashSet<Vector3Int> added = new HashSet<Vector3Int>();
+        int chunkCount = 0; // 新增
+
         foreach (var offset in chunkOffsets)
         {
             int cx = centerChunkX + offset.x;
@@ -205,11 +207,17 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
                     }
                 }
             }
+
+            chunkCount++;
+            if (chunkCount >= ChunksPerFrame)
+            {
+                chunkCount = 0;
+                yield return null;
+            }
         }
         pendingTiles.Clear();
 
-        int count = 0;
-        List<Vector3Int> oceanTilesToShow = new List<Vector3Int>(); // 新增
+        List<Vector3Int> oceanTilesToShow = new List<Vector3Int>();
 
         foreach (var pos in orderedTiles)
         {
@@ -219,7 +227,6 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
                 generatedTiles[pos] = type;
             }
             TileType tileType = generatedTiles[pos];
-            // 先清空兩層
             oceanTilemap.SetTile(pos, null);
             groundTilemap.SetTile(pos, null);
 
@@ -227,7 +234,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
             {
                 case TileType.Ocean:
                     oceanTilemap.SetTile(pos, oceanTile);
-                    oceanTilesToShow.Add(pos); // 延後顯示文字
+                    oceanTilesToShow.Add(pos);
                     break;
                 case TileType.Grass:
                     oceanTilemap.SetTile(pos, oceanTile);
@@ -246,13 +253,6 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
                     break;
             }
             renderedTiles.Add(pos);
-
-            count++;
-            if (count >= TilesPerFrame)
-            {
-                count = 0;
-                yield return null;
-            }
         }
 
         // 先計算層級
