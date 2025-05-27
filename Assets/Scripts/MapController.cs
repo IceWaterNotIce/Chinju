@@ -14,13 +14,14 @@ public class MapController : MonoBehaviour
     */
     private const string MapCacheFilePath = "map_cache";
 
-    [SerializeField] private Tilemap tilemap;
+    [SerializeField] private Tilemap oceanTilemap;
+    [SerializeField] private Tilemap groundTilemap;
     public TileBase oceanTile, grassTile;
     public TileBase chinjuTile;
     public TileBase oilTile;
     public float islandDensity = 0.1f;
 
-    [Header("Random Seed")]
+    [Header("Random Seed")]  
     public int seed = 12345;
     public bool useRandomSeed = true;
 
@@ -42,6 +43,12 @@ public class MapController : MonoBehaviour
     private const int TilesPerFrame = 128;
 
     private Queue<GameObject> oilShipPool = new Queue<GameObject>();
+
+    // 新增：儲存每個海洋瓦片的層級
+    private Dictionary<Vector3Int, int> oceanTileLevels = new Dictionary<Vector3Int, int>();
+
+    // 新增：管理每個海洋層級文字顯示
+    private Dictionary<Vector3Int, GameObject> oceanLevelTexts = new Dictionary<Vector3Int, GameObject>();
 
     void Start()
     {
@@ -66,7 +73,7 @@ public class MapController : MonoBehaviour
 
         if (cameraController != null)
         {
-            cameraController.targetTilemap = tilemap;
+            cameraController.targetTilemap = groundTilemap;
             cameraController.RefreshBounds();
         }
 
@@ -74,11 +81,14 @@ public class MapController : MonoBehaviour
             lastCameraPosition = mainCamera.transform.position;
 
         StartCoroutine(FocusOnChinjuTileAfterMapGeneration());
+
+        // 初始化海洋層級標記
+        InitializeTileLevels();
     }
 
     private IEnumerator FocusOnChinjuTileAfterMapGeneration()
     {
-        yield return new WaitUntil(() => tilemap != null && tilemap.GetUsedTilesCount() > 0);
+        yield return new WaitUntil(() => groundTilemap != null && groundTilemap.GetUsedTilesCount() > 0);
 
         Vector3 chinjuTileWorldPosition = GetChinjuTileWorldPosition();
         if (chinjuTileWorldPosition != Vector3.zero && cameraController != null)
@@ -127,10 +137,10 @@ public class MapController : MonoBehaviour
 
     private void UpdateVisibleChunks()
     {
-        if (mainCamera == null || tilemap == null) return;
+        if (mainCamera == null || oceanTilemap == null || groundTilemap == null) return;
 
         Vector3 camWorldPos = mainCamera.transform.position;
-        Vector3Int camCell = tilemap.WorldToCell(camWorldPos);
+        Vector3Int camCell = groundTilemap.WorldToCell(camWorldPos);
 
         int chunkX = Mathf.FloorToInt((float)camCell.x / chunkSize);
         int chunkY = Mathf.FloorToInt((float)camCell.y / chunkSize);
@@ -161,21 +171,6 @@ public class MapController : MonoBehaviour
             StopCoroutine(chunkRenderCoroutine);
         }
         chunkRenderCoroutine = StartCoroutine(RenderTilesCoroutine(chunkOffsets, chunkX, chunkY));
-
-        // 不再移除視野外的 tile
-        // var toRemove = new List<Vector3Int>();
-        // foreach (var pos in renderedTiles)
-        // {
-        //     if (!shouldRender.Contains(pos))
-        //     {
-        //         tilemap.SetTile(pos, null);
-        //         toRemove.Add(pos);
-        //     }
-        // }
-        // foreach (var pos in toRemove)
-        // {
-        //     renderedTiles.Remove(pos);
-        // }
     }
 
     private List<Vector2Int> GetClockwiseChunkOffsets(int radius)
@@ -218,6 +213,8 @@ public class MapController : MonoBehaviour
         pendingTiles.Clear();
 
         int count = 0;
+        List<Vector3Int> oceanTilesToShow = new List<Vector3Int>(); // 新增
+
         foreach (var pos in orderedTiles)
         {
             if (!generatedTiles.ContainsKey(pos))
@@ -225,17 +222,32 @@ public class MapController : MonoBehaviour
                 TileType type = GetTileTypeAt(pos.x, pos.y);
                 generatedTiles[pos] = type;
             }
-            TileBase tile = null;
-            switch (generatedTiles[pos])
+            TileType tileType = generatedTiles[pos];
+            // 先清空兩層
+            oceanTilemap.SetTile(pos, null);
+            groundTilemap.SetTile(pos, null);
+
+            switch (tileType)
             {
-                case TileType.Ocean: tile = oceanTile; break;
-                case TileType.Grass: tile = grassTile; break;
-                case TileType.Oil: tile = oilTile; break;
-                case TileType.Chinju: tile = chinjuTile; break;
-            }
-            if (tile != null)
-            {
-                tilemap.SetTile(pos, tile);
+                case TileType.Ocean:
+                    oceanTilemap.SetTile(pos, oceanTile);
+                    oceanTilesToShow.Add(pos); // 延後顯示文字
+                    break;
+                case TileType.Grass:
+                    oceanTilemap.SetTile(pos, oceanTile);
+                    groundTilemap.SetTile(pos, grassTile);
+                    HideOceanLevelText(pos);
+                    break;
+                case TileType.Oil:
+                    oceanTilemap.SetTile(pos, oceanTile);
+                    groundTilemap.SetTile(pos, oilTile);
+                    HideOceanLevelText(pos);
+                    break;
+                case TileType.Chinju:
+                    oceanTilemap.SetTile(pos, oceanTile);
+                    groundTilemap.SetTile(pos, chinjuTile);
+                    HideOceanLevelText(pos);
+                    break;
             }
             renderedTiles.Add(pos);
 
@@ -246,9 +258,67 @@ public class MapController : MonoBehaviour
                 yield return null;
             }
         }
+
+        // 先計算層級
+        CalculateOceanLevels();
+
+        // 顯示本次 chunk 的 ocean level 文字
+        foreach (var pos in oceanTilesToShow)
+        {
+            ShowOceanLevelText(pos);
+        }
+
+        // 新增：確保所有已繪製的海洋 tile 都有數字
+        foreach (var pos in renderedTiles)
+        {
+            if (generatedTiles.TryGetValue(pos, out var type) && type == TileType.Ocean)
+            {
+                ShowOceanLevelText(pos);
+            }
+        }
     }
 
-      private TileType GetTileTypeAt(int x, int y)
+    // 顯示海洋層級文字
+    private void ShowOceanLevelText(Vector3Int pos)
+    {
+        int level = 0;
+        if (!oceanTileLevels.TryGetValue(pos, out level)) level = 0;
+
+        GameObject textObj;
+        if (!oceanLevelTexts.TryGetValue(pos, out textObj) || textObj == null)
+        {
+            textObj = new GameObject($"OceanLevelText_{pos.x}_{pos.y}");
+            textObj.transform.SetParent(this.transform);
+            textObj.transform.position = oceanTilemap.GetCellCenterWorld(pos) + new Vector3(0, 0, -0.5f);
+
+            var textMesh = textObj.AddComponent<TextMesh>();
+            textMesh.fontSize = 32;
+            textMesh.characterSize = 0.2f;
+            textMesh.anchor = TextAnchor.MiddleCenter;
+            textMesh.alignment = TextAlignment.Center;
+            textMesh.color = Color.blue;
+            oceanLevelTexts[pos] = textObj;
+        }
+        else
+        {
+            textObj.SetActive(true);
+            textObj.transform.position = oceanTilemap.GetCellCenterWorld(pos) + new Vector3(0, 0, -0.5f);
+        }
+
+        var mesh = textObj.GetComponent<TextMesh>();
+        mesh.text = level.ToString();
+    }
+
+    // 隱藏或移除非海洋的層級文字
+    private void HideOceanLevelText(Vector3Int pos)
+    {
+        if (oceanLevelTexts.TryGetValue(pos, out var textObj) && textObj != null)
+        {
+            textObj.SetActive(false);
+        }
+    }
+
+    private TileType GetTileTypeAt(int x, int y)
     {
         if (x == 0 && y == 0)
         {
@@ -280,16 +350,12 @@ public class MapController : MonoBehaviour
         Vector2 mousePosition = Mouse.current.position.ReadValue();
         Vector3 worldPoint = mainCamera.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, -mainCamera.transform.position.z));
 
-        Vector3Int tilePosition = tilemap.WorldToCell(worldPoint);
-        TileBase tile = tilemap.GetTile(tilePosition);
+        Vector3Int tilePosition = groundTilemap.WorldToCell(worldPoint);
+        TileBase tile = groundTilemap.GetTile(tilePosition);
 
         if (tile != null)
         {
-            if (tile == oceanTile)
-            {
-                Debug.Log("[MapController] 這是海洋 Tile");
-            }
-            else if (tile == grassTile)
+            if (tile == grassTile)
             {
                 Debug.Log("[MapController] 這是草地 Tile");
             }
@@ -311,6 +377,15 @@ public class MapController : MonoBehaviour
             {
                 Debug.Log("[MapController] 這是石油 Tile");
                 HandleOilTileClick(tilePosition);
+            }
+        }
+        else
+        {
+            // 檢查是否為海洋
+            TileBase ocean = oceanTilemap.GetTile(tilePosition);
+            if (ocean == oceanTile)
+            {
+                Debug.Log("[MapController] 這是海洋 Tile");
             }
         }
     }
@@ -347,7 +422,7 @@ public class MapController : MonoBehaviour
             var gameData = GameDataController.Instance?.CurrentGameData;
             if (gameData?.playerData != null)
             {
-                Vector3 oilTileWorldPosition = tilemap.GetCellCenterWorld(oilTilePosition);
+                Vector3 oilTileWorldPosition = groundTilemap.GetCellCenterWorld(oilTilePosition);
                 Vector3 spawnPosition = FindNearestOceanTile(oilTileWorldPosition);
 
                 if (spawnPosition != Vector3.zero && oilShipPrefab != null)
@@ -425,14 +500,14 @@ public class MapController : MonoBehaviour
             new Vector3Int(1, 0, 0)
         };
 
-        Vector3Int referenceTile = tilemap.WorldToCell(referencePoint);
+        Vector3Int referenceTile = groundTilemap.WorldToCell(referencePoint);
 
         foreach (var direction in directions)
         {
             Vector3Int neighborTile = referenceTile + direction;
-            if (tilemap.GetTile(neighborTile) == oceanTile)
+            if (oceanTilemap.GetTile(neighborTile) == oceanTile)
             {
-                return tilemap.GetCellCenterWorld(neighborTile);
+                return oceanTilemap.GetCellCenterWorld(neighborTile);
             }
         }
 
@@ -441,6 +516,68 @@ public class MapController : MonoBehaviour
 
     public Vector3 GetChinjuTileWorldPosition()
     {
-        return tilemap.GetCellCenterWorld(Vector3Int.zero);
+        return groundTilemap.GetCellCenterWorld(Vector3Int.zero);
+    }
+
+    // 初始化所有海洋瓦片為 0，陸地瓦片為 -1
+    private void InitializeTileLevels()
+    {
+        oceanTileLevels.Clear();
+        // 標記海洋
+        foreach (var pos in oceanTilemap.cellBounds.allPositionsWithin)
+        {
+            if (oceanTilemap.HasTile(pos))
+            {
+                oceanTileLevels[pos] = 0;
+            }
+        }
+        // 標記陸地
+        foreach (var pos in groundTilemap.cellBounds.allPositionsWithin)
+        {
+            if (groundTilemap.HasTile(pos))
+            {
+                oceanTileLevels[pos] = -1;
+            }
+        }
+    }
+
+    // 計算每個海洋瓦片的層級
+    private void CalculateOceanLevels()
+    {
+        Queue<Vector3Int> queue = new Queue<Vector3Int>();
+        // 將所有陸地瓦片相鄰的海洋瓦片加入隊列（層級 1）
+        foreach (var pos in groundTilemap.cellBounds.allPositionsWithin)
+        {
+            if (groundTilemap.HasTile(pos))
+            {
+                MarkNeighborOceanTiles(pos, 1, queue);
+            }
+        }
+        // BFS 擴散
+        while (queue.Count > 0)
+        {
+            Vector3Int currentPos = queue.Dequeue();
+            int currentLevel = oceanTileLevels[currentPos];
+            MarkNeighborOceanTiles(currentPos, currentLevel + 1, queue);
+        }
+    }
+
+    // 標記相鄰的海洋瓦片
+    private void MarkNeighborOceanTiles(Vector3Int centerPos, int level, Queue<Vector3Int> queue)
+    {
+        Vector3Int[] directions = {
+            Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right
+        };
+        foreach (var dir in directions)
+        {
+            Vector3Int neighborPos = centerPos + dir;
+            // 如果是海洋瓦片且未被標記或標記值更大
+            if (oceanTilemap.HasTile(neighborPos) &&
+                (!oceanTileLevels.ContainsKey(neighborPos) || oceanTileLevels[neighborPos] > level))
+            {
+                oceanTileLevels[neighborPos] = level;
+                queue.Enqueue(neighborPos);
+            }
+        }
     }
 }
