@@ -580,6 +580,7 @@ GameObject:
   m_Component:
   - component: {fileID: 572011471}
   - component: {fileID: 572011472}
+  - component: {fileID: 572011473}
   m_Layer: 0
   m_Name: DataManager
   m_TagString: Untagged
@@ -628,6 +629,21 @@ MonoBehaviour:
       ChinjuTiles: []
     gameTime: 0
     enemyShips: []
+--- !u!114 &572011473
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 572011470}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d729262ceb62dfa488da4209627b9b00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GoldPerMinute: 3
+  OilPerMinute: 10
+  CubePerMinute: 1
 --- !u!1 &586510287
 GameObject:
   m_ObjectHideFlags: 0

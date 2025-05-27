@@ -23,6 +23,8 @@ public class GameManager : Singleton<GameManager>
     public static event GameEvent OnGameSaved;
     public static event GameEvent OnGameLoaded;
 
+    private const string LastSaveFileKey = "LastSaveFileName"; // 新增：PlayerPrefs key
+
     protected override void Awake()
     {
         base.Awake();
@@ -30,6 +32,10 @@ public class GameManager : Singleton<GameManager>
 
     void Start()
     {
+        // 新增：從 PlayerPrefs 讀取最後一次存檔檔名
+        string lastSaveFile = PlayerPrefs.GetString(LastSaveFileKey, "savegame.json");
+        SetCurrentSaveFileName(lastSaveFile);
+
         if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData == null)
         {
             InitializeGameData();
@@ -41,7 +47,8 @@ public class GameManager : Singleton<GameManager>
         // 不再直接設定 saveFilePath，改用方法動態取得
         Debug.Log("[GameManager] 初始化完成");
 
-        LoadGame(); // 預設載入主存檔
+        // 修改：載入最後一次存檔
+        LoadGame(currentSaveFileName);
     }
 
     void Update()
@@ -65,6 +72,9 @@ public class GameManager : Singleton<GameManager>
         if (!fileName.EndsWith(".json"))
             fileName += ".json";
         currentSaveFileName = fileName;
+        // 新增：儲存到 PlayerPrefs
+        PlayerPrefs.SetString(LastSaveFileKey, currentSaveFileName);
+        PlayerPrefs.Save();
     }
 
     /// <summary>
@@ -135,6 +145,8 @@ public class GameManager : Singleton<GameManager>
                     string path = GetSaveFilePath(fileName);
                     File.WriteAllText(path, json);
                     Debug.Log($"[GameManager] 遊戲已保存至 {path}");
+                    // 新增：儲存最後一次存檔檔名
+                    SetCurrentSaveFileName(Path.GetFileName(path));
                     OnGameSaved?.Invoke(); // 發送保存事件
                 }
                 catch (IOException ex)
