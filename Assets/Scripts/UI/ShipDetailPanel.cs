@@ -817,16 +817,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
 
     private void DrawWaypointMarker(Vector3 worldPos)
     {
-        if (waypointsContainer == null)
-        {
-            var root = this.root;
-            waypointsContainer = UIHelper.InitializeElement<VisualElement>(root, "waypointsContainer");
-            if (waypointsContainer == null)
-            {
-                Debug.LogWarning("[ShipDetailPanel] 找不到 waypointsContainer，無法繪製 waypoint 標記。");
-                return;
-            }
-        }
+        // 不再檢查 waypointsContainer == null
         var marker = new VisualElement();
         marker.AddToClassList("waypoint-marker");
         marker.style.position = Position.Absolute;
@@ -850,11 +841,20 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     // 新增：每幀更新所有 waypoint marker 的位置
     private void UpdateWaypointMarkersPosition()
     {
-        if (ship == null || ship.Waypoints == null) return;
-        int count = Mathf.Min(waypointMarkers.Count, ship.Waypoints.Count);
-        for (int i = 0; i < count; i++)
+        DrawSavedWaypointMarkers();
+    }
+
+    private void DrawSavedWaypointMarkers()
+    {
+        if (ship == null || ship.Waypoints == null || waypointsContainer == null) return;
+
+        // 清除現有的 waypoint 標記
+        waypointsContainer.Clear();
+        waypointMarkers.Clear();
+
+        foreach (var waypoint in ship.Waypoints)
         {
-            SetWaypointMarkerPosition(waypointMarkers[i], ship.Waypoints[i]);
+            DrawWaypointMarker(waypoint);
         }
     }
     #endregion
