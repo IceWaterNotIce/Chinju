@@ -79,39 +79,30 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     void Start()
     {
         InitializeUI();
-        // 緩存 Camera.main
         cachedCamera = Camera.main;
     }
 
-    void UpdateExperience(float exp, int level)
+    void Update()
     {
-        if (lblExperience != null)
-        {
-            lblExperience.text = $"經驗值: {exp}/{level * 10}";
-        }
-        if (expBar != null)
-        {
-            expBar.style.width = new StyleLength(new Length(exp / level * 100, LengthUnit.Percent));
-        }
+        SetUIPosition();
+        SetRectPosition();
+        UpdateWaypointMarkersPosition();
+        if (cachedCamera == null)
+            cachedCamera = Camera.main;
     }
 
-    void UpdateLevel(int level)
+    private void OnDestroy()
     {
-        if (lblLevel != null)
+        Debug.Log("[ShipDetailPanel] 銷毀 ShipDetailPanel");
+        if (ship != null)
         {
-            lblLevel.text = $"等級: {level}";
+            if (ship.OnCombatModeChanged != null)
+                ship.OnCombatModeChanged.RemoveListener(UpdateCombatMode);
         }
     }
+    #endregion
 
-    void UpdateCombatMode(bool isInCombat)
-    {
-        if (btnToggleCombatMode != null)
-        {
-            // 改為顯示枚舉狀態
-            btnToggleCombatMode.text = $"戰鬥模式: {ship.Mode}";
-        }
-    }
-
+    #region Initialization
     public void Initial(PlayerShip s)
     {
         ship = s;
@@ -120,7 +111,6 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         UpdateHealth(ship.Health, ship.MaxHealth);
         UpdateFuel(ship.CurrentFuel, ship.MaxFuel);
 
-        // 訂閱事件
         ship.OnHealthChanged += health => UpdateHealth(health, ship.MaxHealth);
         ship.OnFuelChanged += fuel => UpdateFuel(fuel, ship.MaxFuel);
         var warship = ship.gameObject.GetComponent<Warship>();
@@ -129,705 +119,24 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
             warship.OnExperienceChanged += exp => UpdateExperience(exp, warship.Level);
             warship.OnLevelChanged += level => UpdateLevel(level);
         }
-
-        // 新增：訂閱等級、經驗值、戰鬥模式變化事件
         ship.OnCombatModeChanged.AddListener(isInCombat => UpdateCombatMode(isInCombat));
 
         SetUIPosition();
 
-        // 如果船隻有保存的矩形區域，繪製矩形 UI
         if (ship.NavigationArea.width > 0 && ship.NavigationArea.height > 0)
         {
             DrawSavedRect(ship.NavigationArea);
         }
-
-        // 修正：根據 CombatMode 狀態設定按鈕文字
         if (btnToggleCombatMode != null)
         {
             btnToggleCombatMode.text = $"戰鬥模式: {ship.Mode}";
         }
-
-        // 新增：顯示船名（只初始化一次）
         if (lblName != null)
         {
             lblName.text = $"名稱: {ship.name}";
         }
     }
 
-    void Update()
-    {
-        SetUIPosition(); // 每幀更新 UI 位置
-        SetRectPosition(); // 每幀更新矩形位置
-        // 移除每幀 UpdateShipName()
-        UpdateWaypointMarkersPosition(); // 新增：每幀同步 waypoint 標記位置
-
-        // 若 Camera.main 可能會變動，可每幀檢查
-        if (cachedCamera == null)
-            cachedCamera = Camera.main;
-    }
-    #endregion
-
-    #region Speed & Rotation Control
-    void SpeedControll(float percentage)
-    {
-        if (ship == null)
-        {
-            LogError("ship speed control fail. Ship is not set.");
-            return;
-        }
-
-        ClearRectAndData();
-
-        float MaxSpeed = ship.MaxSpeed;
-        float TargetSpeed = MaxSpeed * percentage;
-        ship.TargetSpeed = TargetSpeed;
-        Debug.Log("Speed: " + TargetSpeed);
-
-
-    }
-
-    void RotationControll(float percentage)
-    {
-        if (ship == null)
-        {
-            LogError("ship rotation control fail. Ship is not set.");
-            return;
-        }
-        ClearRectAndData();
-
-        float MaxRotationSpeed = ship.MaxRotationSpeed;
-        float TargetRotationSpeed = MaxRotationSpeed * percentage;
-        ship.TargetRotationSpeed = TargetRotationSpeed;
-        Debug.Log("Rotation Speed: " + TargetRotationSpeed);
-
-    }
-    #endregion
-
-    #region Rect Drawing
-    private void ClearRectAndData()
-    {
-        if (rectContainer != null)
-        {
-            rectContainer.Clear(); // 清除所有矩形
-        }
-
-        if (ship != null)
-        {
-            ship.NavigationArea = new Rect(); // 重置矩形數據
-            Debug.Log("[ShipDetailPanel] 矩形和數據已清除");
-        }
-    }
-
-    private void EnableDrawing()
-    {
-        canDraw = true; // 啟用繪製功能
-        Debug.Log("[ShipDetailPanel] 繪製功能已啟用");
-    }
-
-    private void OnPointerDown(PointerDownEvent evt)
-    {
-        Debug.Log("[ShipDetailPanel] PointerDownEvent");
-        if (rectContainer == null)
-        {
-            rectContainer = cachedRoot.Q<VisualElement>("rectContainer");
-            if (rectContainer == null)
-            {
-                Debug.LogError("[ShipDetailPanel] 找不到名為 'rectContainer' 的 VisualElement！");
-                return;
-            }
-        }
-        if (!canDraw || evt.button != 0) return; // 檢查是否允許繪製
-        startPos = evt.localPosition;
-
-        // Adjust start position relative to the rectContainer
-        Vector2 containerPosition = rectContainer.worldBound.position;
-        startPos -= containerPosition;
-
-        currentRect = new VisualElement();
-        currentRect.AddToClassList("rect"); // 套用矩形樣式
-        currentRect.style.position = Position.Absolute;
-        currentRect.style.left = startPos.x;
-        currentRect.style.top = startPos.y;
-        rectContainer.Add(currentRect); // Add to rectContainer instead of Panel
-        isDrawing = true;
-        Debug.Log("[ShipDetailPanel] 開始繪製矩形");
-    }
-
-    private void OnPointerMove(PointerMoveEvent evt)
-    {
-        if (isDrawing && currentRect != null)
-        {
-            Vector2 mousePos = evt.localPosition;
-
-            // Adjust mouse position relative to the rectContainer
-            Vector2 containerPosition = rectContainer.worldBound.position;
-            mousePos -= containerPosition;
-
-            Vector2 size = mousePos - startPos;
-
-            // 設定矩形大小和位置
-            currentRect.style.width = Mathf.Abs(size.x);
-            currentRect.style.height = Mathf.Abs(size.y);
-            currentRect.style.left = Mathf.Min(startPos.x, mousePos.x);
-            currentRect.style.top = Mathf.Min(startPos.y, mousePos.y);
-        }
-    }
-
-    private void OnPointerUp(PointerUpEvent evt)
-    {
-        if (evt.button == 0 && isDrawing) // 左鍵
-        {
-            isDrawing = false;
-            canDraw = false; // 繪製完成後禁用繪製功能
-
-            if (currentRect != null)
-            {
-                // 計算矩形區域
-                Rect rect = new Rect(
-                    Mathf.Min(startPos.x, evt.localPosition.x),
-                    Mathf.Min(startPos.y, evt.localPosition.y),
-                    Mathf.Abs(evt.localPosition.x - startPos.x),
-                    Mathf.Abs(evt.localPosition.y - startPos.y)
-                );
-
-                // 將屏幕坐標轉換為世界空間坐標
-                Vector3 screenToWorldMin = Camera.main.ScreenToWorldPoint(new Vector3(rect.xMin, Screen.height - rect.yMax, 0));
-                Vector3 screenToWorldMax = Camera.main.ScreenToWorldPoint(new Vector3(rect.xMax, Screen.height - rect.yMin, 0));
-
-                Rect worldRect = new Rect(
-                    screenToWorldMin.x,
-                    screenToWorldMin.y,
-                    screenToWorldMax.x - screenToWorldMin.x,
-                    screenToWorldMax.y - screenToWorldMin.y
-                );
-
-                // 保存矩形區域到船隻數據
-                if (ship != null)
-                {
-                    ship.NavigationArea = worldRect;
-                    Debug.Log($"[ShipDetailPanel] 矩形區域已保存到船隻: {worldRect}");
-                }
-
-                currentRect = null; // 重置 currentRect 狀態
-                //delete all rects
-                rectContainer.Clear();
-            }
-
-            Debug.Log("[ShipDetailPanel] 繪製結束");
-        }
-    }
-
-    private void DrawSavedRect(Rect rect)
-    {
-        if (rect == Rect.zero) return; // 如果矩形為零，則不繪製
-        var rectContainer = cachedRoot.Q<VisualElement>("rectContainer");
-
-        if (savedRectElement != null)
-        {
-            savedRectElement.RemoveFromHierarchy();
-        }
-
-        savedRectElement = new VisualElement();
-        savedRectElement.AddToClassList("rect"); // 套用矩形樣式
-        savedRectElement.style.position = Position.Absolute;
-
-        rectContainer.Add(savedRectElement);
-        UpdateSavedRectPosition(rect); // 初始化位置
-        Debug.Log($"[ShipDetailPanel] 繪製保存的矩形區域: {rect}");
-    }
-
-    private void UpdateSavedRectPosition(Rect rect)
-    {
-        if (savedRectElement == null) return;
-
-        // 取世界座標的四個角
-        Vector3 worldA = new Vector3(rect.xMin, rect.yMin, 0);
-        Vector3 worldB = new Vector3(rect.xMax, rect.yMax, 0);
-
-        // 使用 UIHelper 轉換螢幕座標
-        Vector2 screenA = cachedCamera.WorldToScreenPoint(worldA);
-        Vector2 screenB = cachedCamera.WorldToScreenPoint(worldB);
-
-        float left = Mathf.Min(screenA.x, screenB.x);
-        float right = Mathf.Max(screenA.x, screenB.x);
-        float bottom = Mathf.Min(screenA.y, screenB.y);
-        float top = Mathf.Max(screenA.y, screenB.y);
-
-        float uiLeft = left;
-        float uiTop = Screen.height - top;
-        float width = right - left;
-        float height = top - bottom;
-
-        savedRectElement.style.left = uiLeft;
-        savedRectElement.style.top = uiTop;
-        savedRectElement.style.width = Mathf.Abs(width);
-        savedRectElement.style.height = Mathf.Abs(height);
-    }
-    #endregion
-
-    #region Weapon UI
-    private void ShowWeaponDetail(Weapon weapon)
-    {
-        if (weaponDetailPopup != null)
-        {
-            weaponDetailPopup.RemoveFromHierarchy();
-        }
-        weaponDetailPopup = new VisualElement();
-        weaponDetailPopup.AddToClassList("weapon-detail-popup");
-
-        Label title = new Label("武器資訊");
-        title.AddToClassList("title");
-        weaponDetailPopup.Add(title);
-
-        weaponDetailPopup.Add(new Label($"最大攻擊距離: {weapon.MaxAttackDistance}"));
-        weaponDetailPopup.Add(new Label($"彈藥預製體: {(weapon.AmmoPrefab != null ? weapon.AmmoPrefab.name : "無")}"));
-
-        Button closeBtn = new Button(() => weaponDetailPopup.RemoveFromHierarchy()) { text = "關閉" };
-        weaponDetailPopup.Add(closeBtn);
-
-        UIPanel.Add(weaponDetailPopup);
-    }
-
-    public void ShowWeaponsPanel()
-    {
-        if (weaponsPanel != null)
-        {
-            weaponsPanel.RemoveFromHierarchy();
-        }
-
-        weaponsPanel = new VisualElement();
-        weaponsPanel.AddToClassList("weapons-panel");
-
-        Label title = new Label("武器總覽");
-        title.AddToClassList("title");
-        weaponsPanel.Add(title);
-
-        int weaponSlotCount = ship.WeaponLimit;
-        for (int i = 0; i < weaponSlotCount; i++)
-        {
-            Weapon weapon = (ship.weapons != null && i < ship.weapons.Count) ? ship.weapons[i] : null;
-            VisualElement row = new VisualElement();
-            row.style.flexDirection = FlexDirection.Row;
-
-            VisualElement icon = new VisualElement();
-            icon.AddToClassList("weapon-icon");
-
-            if (weapon != null)
-            {
-                icon.style.backgroundColor = new Color(0.8f, 0.8f, 0.2f, 1f);
-                icon.tooltip = $"武器{i + 1}";
-                int weaponIndex = i;
-                icon.RegisterCallback<ClickEvent>(ev => ShowWeaponDetail(ship.weapons[weaponIndex]));
-            }
-            else
-            {
-                icon.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.3f);
-                icon.tooltip = $"空武器槽{i + 1}";
-            }
-            row.Add(icon);
-
-            Label label = new Label(weapon != null ? $"武器{i + 1}" : $"空武器槽{i + 1}");
-            row.Add(label);
-
-            weaponsPanel.Add(row);
-        }
-
-        Button closeBtn = new Button(() => weaponsPanel.RemoveFromHierarchy()) { text = "關閉" };
-        weaponsPanel.Add(closeBtn);
-
-        UIPanel.Add(weaponsPanel);
-    }
-
-    private void ShowWeaponSelectionPanel(int slotIndex)
-    {
-        if (weaponDetailPopup != null)
-        {
-            weaponDetailPopup.RemoveFromHierarchy();
-        }
-
-        weaponDetailPopup = new VisualElement();
-        weaponDetailPopup.AddToClassList("weapon-selection-popup");
-
-        // Dynamically calculate position
-        Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
-        weaponDetailPopup.style.left = screenCenter.x - PopupWidth / 2;
-        weaponDetailPopup.style.top = screenCenter.y - PopupWidth / 2;
-
-        Label title = new Label("選擇武器");
-        title.AddToClassList("title");
-        weaponDetailPopup.Add(title);
-
-        // 從玩家資料中獲取武器清單
-        var playerData = GameDataController.Instance.CurrentGameData.playerData;
-        if (playerData != null && playerData.Weapons != null)
-        {
-            foreach (var weaponData in playerData.Weapons)
-            {
-                Button weaponButton = new Button(() =>
-                {
-                    // 將 GameData.WeaponData 轉換為 Weapon
-                    Weapon weapon = new Weapon
-                    {
-                        Name = weaponData.Name,
-                        Damage = weaponData.Damage,
-                        MaxAttackDistance = weaponData.MaxAttackDistance,
-                        AttackSpeed = weaponData.AttackSpeed,
-                    };
-
-                    ship.weapons[slotIndex] = weapon; // 插入武器到指定槽位
-                    weaponDetailPopup.RemoveFromHierarchy(); // 關閉選擇面板
-                    RefreshWeaponList(); // 更新武器列表
-                })
-                {
-                    text = weaponData.Name
-                };
-                weaponButton.style.marginTop = 5;
-                weaponDetailPopup.Add(weaponButton);
-            }
-        }
-        else
-        {
-            Label noWeaponLabel = new Label("目前沒有可用的武器。");
-            noWeaponLabel.style.marginTop = 10;
-            weaponDetailPopup.Add(noWeaponLabel);
-        }
-
-        Button closeBtn = new Button(() => weaponDetailPopup.RemoveFromHierarchy()) { text = "關閉" };
-        closeBtn.style.marginTop = PopupPadding;
-        weaponDetailPopup.Add(closeBtn);
-
-        UIPanel.Add(weaponDetailPopup);
-    }
-
-    private void RefreshWeaponList()
-    {
-        if (ship == null || ship.weapons == null)
-        {
-            LogError("Ship or weapons list is null. Cannot refresh weapon list.");
-            return;
-        }
-
-        weaponListContainer.Clear();
-
-        int weaponSlotCount = ship.WeaponLimit;
-        for (int i = 0; i < weaponSlotCount; i++)
-        {
-            Weapon weapon = (i < ship.weapons.Count) ? ship.weapons[i] : null;
-            VisualElement weaponIcon = CreateWeaponIcon(weapon, i);
-            weaponListContainer.Add(weaponIcon);
-        }
-    }
-
-    private VisualElement CreateWeaponIcon(Weapon weapon, int index)
-    {
-        VisualElement weaponIcon = new VisualElement();
-        weaponIcon.AddToClassList("weapon-icon");
-
-        if (weapon != null)
-        {
-            weaponIcon.style.backgroundColor = new Color(0.8f, 0.8f, 0.2f, 1f);
-            weaponIcon.tooltip = $"武器{index + 1}";
-            weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponDetail(weapon));
-        }
-        else
-        {
-            weaponIcon.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.3f);
-            weaponIcon.tooltip = $"空武器槽{index + 1}";
-            weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponSelectionPanel(index));
-        }
-
-        return weaponIcon;
-    }
-    #endregion
-
-
-    private Label InitializeSpeedLabel(string name, float speedPercentage)
-    {
-        var label = UIHelper.InitializeElement<Label>(UIPanel, name);
-        label.RegisterCallback<ClickEvent>(ev => SpeedControll(speedPercentage));
-        return label;
-    }
-
-
-    private Label InitializeRotationLabel(string name, float rotationPercentage)
-    {
-        var label = UIHelper.InitializeElement<Label>(UIPanel, name);
-        label.RegisterCallback<ClickEvent>(ev => RotationControll(rotationPercentage));
-        return label;
-    }
-
-    private void UpdateDrawWaypointButtonState()
-    {
-        bool canDraw = true;
-        if (ship != null && ship.transform.parent != null)
-        {
-            Fleet fleet = ship.transform.parent.GetComponent<Fleet>();
-            if (fleet != null && fleet.followers.Count > 0 && fleet.followers[0] != ship)
-            {
-                canDraw = false;
-            }
-        }
-        btnDrawWaypoint.SetEnabled(canDraw);
-        btnDrawWaypoint.text = IsDrawingWaypoint ? "結束繪製航點" : "繪製航點";
-    }
-
-    private void ToggleDrawWaypointMode()
-    {
-        IsDrawingWaypoint = !IsDrawingWaypoint;
-        btnDrawWaypoint.text = IsDrawingWaypoint ? "結束繪製航點" : "繪製航點";
-        if (!IsDrawingWaypoint)
-        {
-            ClearWaypointMarkers();
-        }
-    }
-
-    private void ClearWaypointMarkers()
-    {
-        if (waypointsContainer != null)
-            waypointsContainer.Clear();
-        waypointMarkers.Clear();
-        ship?.ClearWaypoints();
-    }
-
-
-    #region UI Update & Position
-
-
-    private void UpdateHealth(float currentHealth, float maxHealth)
-    {
-        if (lblHealth != null)
-        {
-            lblHealth.text = $"{Mathf.RoundToInt(currentHealth)}/{Mathf.RoundToInt(maxHealth)}";
-        }
-        if (healthBar != null)
-        {
-            float percent = (maxHealth > 0) ? currentHealth / maxHealth : 0f;
-            healthBar.style.width = Length.Percent(Mathf.Clamp01(percent) * 100f);
-
-            // 動態顏色（移除，交由 USS 控制）
-            // Color color;
-            // if (percent > 0.6f)
-            //     color = Color.green;
-            // else if (percent > 0.3f)
-            //     color = Color.yellow;
-            // else
-            //     color = Color.red;
-            // healthBar.style.backgroundColor = color;
-        }
-    }
-
-    private void UpdateFuel(float currentFuel, float maxFuel)
-    {
-        Debug.Log($"[ShipDetailPanel] 更新燃料: {currentFuel}/{maxFuel}");
-        if (lblFuel != null)
-        {
-            lblFuel.text = $"{Mathf.RoundToInt(currentFuel)}/{Mathf.RoundToInt(maxFuel)}";
-        }
-        if (fuelBar != null)
-        {
-            float percent = (maxFuel > 0) ? currentFuel / maxFuel : 0f;
-            fuelBar.style.width = Length.Percent(Mathf.Clamp01(percent) * 100f);
-            // fuelBar.style.backgroundColor = new Color(1f, 0.8f, 0.2f, 1f); // 橘黃色（移除）
-        }
-    }
-
-    private void SetUIPosition()
-    {
-        if (ship == null)
-        {
-            LogError("Ship 為 null，無法設定 UI 位置！");
-            return;
-        }
-
-        // 使用 UIHelper 綁定 UI 到世界座標
-        UIHelper.BindToWorldPosition(UIPanel, ship.transform.position, cachedCamera, true);
-    }
-
-    private void SetRectPosition()
-    {
-        DrawSavedRect(ship.NavigationArea);
-    }
-    #endregion
-
-    #region Pointer & Selection Events
-
-    private void HandleShipSelectionForLine(PointerDownEvent evt)
-    {
-        Debug.Log("[ShipDetailPanel] HandleShipSelectionForLine");
-        if (isSelectingShipForLine && evt.button == 0) // 左鍵點擊
-        {
-            Vector2 worldPoint = cachedCamera.ScreenToWorldPoint(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
-            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.down, LayerMask.GetMask("Ship")); // 使用射線檢測
-
-            if (hit.collider != null)
-            {
-                var selectedShip = hit.collider.GetComponent<Warship>(); // 確保檢測到的是 Ship 類型
-                if (selectedShip != null && selectedShip != ship)
-                {
-                    if (selectedShip.IsFollower)
-                    {
-                        Debug.Log($"[ShipDetailPanel] {selectedShip.name} 已經是船隊成員，無法再次選擇。");
-                        //debug ship parent
-                        Debug.Log($"[ShipDetailPanel] {selectedShip.name} 的父物件: {selectedShip.transform.parent.name}");
-                        // check if parent is Fleet
-                        if (selectedShip.transform.parent != null && selectedShip.transform.parent.GetComponent<Fleet>() != null)
-                        {
-                            Debug.Log($"[ShipDetailPanel] {selectedShip.name} 的父物件是 Fleet");
-
-                            // get leader
-                            PlayerShip leader = selectedShip.transform.parent.GetComponent<Fleet>().followers[0] as PlayerShip;
-                            if (leader != null)
-                            {
-                                Debug.Log($"[ShipDetailPanel] {selectedShip.name} 的領導者是: {leader.name}");
-                                // 取消選擇
-                                ship.transform.SetParent(selectedShip.transform.parent.transform);
-                                ship.IsFollower = true;
-                                ship.LeaderShip = leader;
-                                selectedShip.transform.parent.GetComponent<Fleet>().followers.Add(ship);
-                                Debug.Log($"[ShipDetailPanel] {ship.name} 已加入 {selectedShip.name} 的船隊");
-                                isSelectingShipForLine = false; // 停止選擇模式
-                                                                // 關閉 UI
-                                Destroy(gameObject);
-                                Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
-
-                                return;
-
-                            }
-                            else
-                            {
-                                Debug.LogWarning("[ShipDetailPanel] 無法獲取 Fleet 的領導者");
-                                return;
-                            }
-
-                        }
-                    }
-                    if (selectedShip == null)
-                    {
-                        Debug.LogWarning("[ShipDetailPanel] 選擇的物件不是船隻");
-                        return;
-                    }
-                    // 建立 Fleet parent 物件，並設為 ShipCreationManager 的子物件
-                    GameObject fleetParent = new GameObject("FleetGroup");
-                    fleetParent.transform.position = selectedShip.transform.position;
-                    // 設定 fleetParent 為 ShipCreationManager 的子物件
-                    if (ShipCreationManager.Instance != null)
-                        fleetParent.transform.SetParent(ShipCreationManager.Instance.transform);
-
-                    // 將 leader 船與被選擇船設為 parent 的子物件
-                    selectedShip.transform.SetParent(fleetParent.transform);
-                    ship.transform.SetParent(fleetParent.transform);
-
-                    // 掛載 Fleet 組件到 parent
-                    var fleet = fleetParent.AddComponent<Fleet>();
-                    fleet.followers.Add(selectedShip);
-                    fleet.followers.Add(ship);
-
-                    // 設定跟隨狀態
-                    ship.IsFollower = true;
-                    ship.LeaderShip = selectedShip as PlayerShip;
-
-                    Debug.Log($"[ShipDetailPanel] 已建立 FleetGroup 並將 {selectedShip.name} 和 {ship.name} 加入船隊");
-                    isSelectingShipForLine = false; // 停止選擇模式
-
-                    // 關閉 UI
-                    Destroy(gameObject);
-                    Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
-                }
-                else
-                {
-                    Debug.Log($"[ShipDetailPanel] 點擊的物件不是船隻或是自己: {hit.collider.gameObject.name}");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("[ShipDetailPanel] Raycast 未檢測到任何物件");
-            }
-        }
-        Debug.Log("[ShipDetailPanel] Ship selection for line ended");
-    }
-
-    private void OnWaypointPointerDown(PointerDownEvent evt)
-    {
-        if (!IsDrawingWaypoint || evt.button != 0) return;
-        // 取得滑鼠點擊的螢幕座標
-        Vector2 screenPos = evt.position;
-        // 轉換為世界座標
-        Vector3 worldPos = cachedCamera.ScreenToWorldPoint(new Vector3(screenPos.x, Screen.height - screenPos.y, 0));
-        worldPos.z = 0;
-        // 傳給 PlayerShip
-        ship?.AddWaypoint(worldPos);
-        // 畫一個 waypoint 標記
-        DrawWaypointMarker(worldPos);
-    }
-
-    private void DrawWaypointMarker(Vector3 worldPos)
-    {
-        if (waypointsContainer == null)
-        {
-            var root = cachedRoot;
-            waypointsContainer = UIHelper.InitializeElement<VisualElement>(root, "waypointsContainer");
-            if (waypointsContainer == null)
-            {
-                Debug.LogWarning("[ShipDetailPanel] 找不到 waypointsContainer，無法繪製 waypoint 標記。");
-                return;
-            }
-        }
-        var marker = new VisualElement();
-        marker.AddToClassList("waypoint-marker");
-        marker.style.position = Position.Absolute;
-        marker.style.width = 16;
-        marker.style.height = 16;
-        waypointsContainer.Add(marker);
-        waypointMarkers.Add(marker);
-
-        // 設定初始位置
-        SetWaypointMarkerPosition(marker, worldPos);
-    }
-
-    // 根據世界座標設定 waypoint marker 的 UI 位置（改用 UIHelper）
-    private void SetWaypointMarkerPosition(VisualElement marker, Vector3 worldPos)
-    {
-        UIHelper.BindToWorldPosition(marker, worldPos, cachedCamera, true);
-        marker.style.left = marker.resolvedStyle.left - 8;
-        marker.style.top = marker.resolvedStyle.top - 8;
-    }
-
-    // 新增：每幀更新所有 waypoint marker 的位置
-    private void UpdateWaypointMarkersPosition()
-    {
-        if (ship == null || ship.Waypoints == null) return;
-        int count = Mathf.Min(waypointMarkers.Count, ship.Waypoints.Count);
-        for (int i = 0; i < count; i++)
-        {
-            SetWaypointMarkerPosition(waypointMarkers[i], ship.Waypoints[i]);
-        }
-    }
-    #endregion
-
-    #region Utility
-    private void LogError(string message)
-    {
-        // Replace Debug.LogError with centralized logging
-        Debug.LogError($"[ShipDetailPanel] {message}");
-    }
-
-    private void OnDestroy()
-    {
-        Debug.Log("[ShipDetailPanel] 銷毀 ShipDetailPanel");
-        //Debug where call this destroy
-        // Debug.Log(new System.Diagnostics.StackTrace().ToString());
-
-        // 取消所有事件訂閱
-        if (ship != null)
-        {
-            // 這裡無法直接 -= lambda，僅能安全移除 UnityEvent
-            if (ship.OnCombatModeChanged != null)
-                ship.OnCombatModeChanged.RemoveListener(UpdateCombatMode);
-        }
-    }
-    #endregion
-
-    #region UI Initialization
     private void InitializeUI()
     {
         // 載入 UI 資源
@@ -1038,6 +347,628 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         lblName = UIHelper.InitializeElement<Label>(UIPanel, "lblName"); // 新增：初始化 lblName
         // 新增：初始化 waypointsContainer
         waypointsContainer = UIHelper.InitializeElement<VisualElement>(root, "waypointsContainer");
+    }
+    #endregion
+
+    #region UI Update & Position
+    private void UpdateHealth(float currentHealth, float maxHealth)
+    {
+        if (lblHealth != null)
+        {
+            lblHealth.text = $"{Mathf.RoundToInt(currentHealth)}/{Mathf.RoundToInt(maxHealth)}";
+        }
+        if (healthBar != null)
+        {
+            float percent = (maxHealth > 0) ? currentHealth / maxHealth : 0f;
+            healthBar.style.width = Length.Percent(Mathf.Clamp01(percent) * 100f);
+
+            // 動態顏色（移除，交由 USS 控制）
+            // Color color;
+            // if (percent > 0.6f)
+            //     color = Color.green;
+            // else if (percent > 0.3f)
+            //     color = Color.yellow;
+            // else
+            //     color = Color.red;
+            // healthBar.style.backgroundColor = color;
+        }
+    }
+
+    private void UpdateFuel(float currentFuel, float maxFuel)
+    {
+        Debug.Log($"[ShipDetailPanel] 更新燃料: {currentFuel}/{maxFuel}");
+        if (lblFuel != null)
+        {
+            lblFuel.text = $"{Mathf.RoundToInt(currentFuel)}/{Mathf.RoundToInt(maxFuel)}";
+        }
+        if (fuelBar != null)
+        {
+            float percent = (maxFuel > 0) ? currentFuel / maxFuel : 0f;
+            fuelBar.style.width = Length.Percent(Mathf.Clamp01(percent) * 100f);
+            // fuelBar.style.backgroundColor = new Color(1f, 0.8f, 0.2f, 1f); // 橘黃色（移除）
+        }
+    }
+
+    void UpdateExperience(float exp, int level)
+    {
+        if (lblExperience != null)
+        {
+            lblExperience.text = $"經驗值: {exp}/{level * 10}";
+        }
+        if (expBar != null)
+        {
+            expBar.style.width = new StyleLength(new Length(exp / level * 100, LengthUnit.Percent));
+        }
+    }
+
+    void UpdateLevel(int level)
+    {
+        if (lblLevel != null)
+        {
+            lblLevel.text = $"等級: {level}";
+        }
+    }
+
+    void UpdateCombatMode(bool isInCombat)
+    {
+        if (btnToggleCombatMode != null)
+        {
+            // 改為顯示枚舉狀態
+            btnToggleCombatMode.text = $"戰鬥模式: {ship.Mode}";
+        }
+    }
+
+    private void SetUIPosition()
+    {
+        if (ship == null)
+        {
+            LogError("Ship 為 null，無法設定 UI 位置！");
+            return;
+        }
+
+        // 使用 UIHelper 綁定 UI 到世界座標
+        UIHelper.BindToWorldPosition(UIPanel, ship.transform.position, cachedCamera, true);
+    }
+
+    private void SetRectPosition()
+    {
+        DrawSavedRect(ship.NavigationArea);
+    }
+    #endregion
+
+    #region Speed & Rotation Control
+    void SpeedControll(float percentage)
+    {
+        if (ship == null)
+        {
+            LogError("ship speed control fail. Ship is not set.");
+            return;
+        }
+
+        ClearRectAndData();
+
+        float MaxSpeed = ship.MaxSpeed;
+        float TargetSpeed = MaxSpeed * percentage;
+        ship.TargetSpeed = TargetSpeed;
+        Debug.Log("Speed: " + TargetSpeed);
+
+
+    }
+
+    void RotationControll(float percentage)
+    {
+        if (ship == null)
+        {
+            LogError("ship rotation control fail. Ship is not set.");
+            return;
+        }
+        ClearRectAndData();
+
+        float MaxRotationSpeed = ship.MaxRotationSpeed;
+        float TargetRotationSpeed = MaxRotationSpeed * percentage;
+        ship.TargetRotationSpeed = TargetRotationSpeed;
+        Debug.Log("Rotation Speed: " + TargetRotationSpeed);
+
+    }
+
+    private Label InitializeSpeedLabel(string name, float speedPercentage)
+    {
+        var label = UIHelper.InitializeElement<Label>(UIPanel, name);
+        label.RegisterCallback<ClickEvent>(ev => SpeedControll(speedPercentage));
+        return label;
+    }
+
+
+    private Label InitializeRotationLabel(string name, float rotationPercentage)
+    {
+        var label = UIHelper.InitializeElement<Label>(UIPanel, name);
+        label.RegisterCallback<ClickEvent>(ev => RotationControll(rotationPercentage));
+        return label;
+    }
+    #endregion
+
+    #region Rect Drawing
+    private void ClearRectAndData()
+    {
+        if (rectContainer != null)
+        {
+            rectContainer.Clear(); // 清除所有矩形
+        }
+
+        if (ship != null)
+        {
+            ship.NavigationArea = new Rect(); // 重置矩形數據
+            Debug.Log("[ShipDetailPanel] 矩形和數據已清除");
+        }
+    }
+
+    private void EnableDrawing()
+    {
+        canDraw = true; // 啟用繪製功能
+        Debug.Log("[ShipDetailPanel] 繪製功能已啟用");
+    }
+
+    private void OnPointerDown(PointerDownEvent evt)
+    {
+        Debug.Log("[ShipDetailPanel] PointerDownEvent");
+        if (rectContainer == null)
+        {
+            rectContainer = cachedRoot.Q<VisualElement>("rectContainer");
+            if (rectContainer == null)
+            {
+                Debug.LogError("[ShipDetailPanel] 找不到名為 'rectContainer' 的 VisualElement！");
+                return;
+            }
+        }
+        if (!canDraw || evt.button != 0) return; // 檢查是否允許繪製
+        startPos = evt.localPosition;
+
+        // Adjust start position relative to the rectContainer
+        Vector2 containerPosition = rectContainer.worldBound.position;
+        startPos -= containerPosition;
+
+        currentRect = new VisualElement();
+        currentRect.AddToClassList("rect"); // 套用矩形樣式
+        currentRect.style.position = Position.Absolute;
+        currentRect.style.left = startPos.x;
+        currentRect.style.top = startPos.y;
+        rectContainer.Add(currentRect); // Add to rectContainer instead of Panel
+        isDrawing = true;
+        Debug.Log("[ShipDetailPanel] 開始繪製矩形");
+    }
+
+    private void OnPointerMove(PointerMoveEvent evt)
+    {
+        if (isDrawing && currentRect != null)
+        {
+            Vector2 mousePos = evt.localPosition;
+
+            // Adjust mouse position relative to the rectContainer
+            Vector2 containerPosition = rectContainer.worldBound.position;
+            mousePos -= containerPosition;
+
+            Vector2 size = mousePos - startPos;
+
+            // 設定矩形大小和位置
+            currentRect.style.width = Mathf.Abs(size.x);
+            currentRect.style.height = Mathf.Abs(size.y);
+            currentRect.style.left = Mathf.Min(startPos.x, mousePos.x);
+            currentRect.style.top = Mathf.Min(startPos.y, mousePos.y);
+        }
+    }
+
+    private void OnPointerUp(PointerUpEvent evt)
+    {
+        if (evt.button == 0 && isDrawing) // 左鍵
+        {
+            isDrawing = false;
+            canDraw = false; // 繪製完成後禁用繪製功能
+
+            if (currentRect != null)
+            {
+                // 計算矩形區域
+                Rect rect = new Rect(
+                    Mathf.Min(startPos.x, evt.localPosition.x),
+                    Mathf.Min(startPos.y, evt.localPosition.y),
+                    Mathf.Abs(evt.localPosition.x - startPos.x),
+                    Mathf.Abs(evt.localPosition.y - startPos.y)
+                );
+
+                // 將屏幕坐標轉換為世界空間坐標
+                Vector3 screenToWorldMin = Camera.main.ScreenToWorldPoint(new Vector3(rect.xMin, Screen.height - rect.yMax, 0));
+                Vector3 screenToWorldMax = Camera.main.ScreenToWorldPoint(new Vector3(rect.xMax, Screen.height - rect.yMin, 0));
+
+                Rect worldRect = new Rect(
+                    screenToWorldMin.x,
+                    screenToWorldMin.y,
+                    screenToWorldMax.x - screenToWorldMin.x,
+                    screenToWorldMax.y - screenToWorldMin.y
+                );
+
+                // 保存矩形區域到船隻數據
+                if (ship != null)
+                {
+                    ship.NavigationArea = worldRect;
+                    Debug.Log($"[ShipDetailPanel] 矩形區域已保存到船隻: {worldRect}");
+                }
+
+                currentRect = null; // 重置 currentRect 狀態
+                //delete all rects
+                rectContainer.Clear();
+            }
+
+            Debug.Log("[ShipDetailPanel] 繪製結束");
+        }
+    }
+
+    private void DrawSavedRect(Rect rect)
+    {
+        if (rect == Rect.zero) return; // 如果矩形為零，則不繪製
+        var rectContainer = cachedRoot.Q<VisualElement>("rectContainer");
+
+        if (savedRectElement != null)
+        {
+            savedRectElement.RemoveFromHierarchy();
+        }
+
+        savedRectElement = new VisualElement();
+        savedRectElement.AddToClassList("rect"); // 套用矩形樣式
+        savedRectElement.style.position = Position.Absolute;
+
+        rectContainer.Add(savedRectElement);
+        UpdateSavedRectPosition(rect); // 初始化位置
+        Debug.Log($"[ShipDetailPanel] 繪製保存的矩形區域: {rect}");
+    }
+
+    private void UpdateSavedRectPosition(Rect rect)
+    {
+        if (savedRectElement == null) return;
+
+        // 取世界座標的四個角
+        Vector3 worldA = new Vector3(rect.xMin, rect.yMin, 0);
+        Vector3 worldB = new Vector3(rect.xMax, rect.yMax, 0);
+
+        // 使用 UIHelper 轉換螢幕座標
+        Vector2 screenA = cachedCamera.WorldToScreenPoint(worldA);
+        Vector2 screenB = cachedCamera.WorldToScreenPoint(worldB);
+
+        float left = Mathf.Min(screenA.x, screenB.x);
+        float right = Mathf.Max(screenA.x, screenB.x);
+        float bottom = Mathf.Min(screenA.y, screenB.y);
+        float top = Mathf.Max(screenA.y, screenB.y);
+
+        float uiLeft = left;
+        float uiTop = Screen.height - top;
+        float width = right - left;
+        float height = top - bottom;
+
+        savedRectElement.style.left = uiLeft;
+        savedRectElement.style.top = uiTop;
+        savedRectElement.style.width = Mathf.Abs(width);
+        savedRectElement.style.height = Mathf.Abs(height);
+    }
+    #endregion
+
+    #region Weapon UI
+    private void ShowWeaponDetail(Weapon weapon)
+    {
+        if (weaponDetailPopup != null)
+        {
+            weaponDetailPopup.RemoveFromHierarchy();
+        }
+        weaponDetailPopup = new VisualElement();
+        weaponDetailPopup.AddToClassList("weapon-detail-popup");
+
+        Label title = new Label("武器資訊");
+        title.AddToClassList("title");
+        weaponDetailPopup.Add(title);
+
+        weaponDetailPopup.Add(new Label($"最大攻擊距離: {weapon.MaxAttackDistance}"));
+        weaponDetailPopup.Add(new Label($"彈藥預製體: {(weapon.AmmoPrefab != null ? weapon.AmmoPrefab.name : "無")}"));
+
+        Button closeBtn = new Button(() => weaponDetailPopup.RemoveFromHierarchy()) { text = "關閉" };
+        weaponDetailPopup.Add(closeBtn);
+
+        UIPanel.Add(weaponDetailPopup);
+    }
+
+    private void ShowWeaponSelectionPanel(int slotIndex)
+    {
+        if (weaponDetailPopup != null)
+        {
+            weaponDetailPopup.RemoveFromHierarchy();
+        }
+
+        weaponDetailPopup = new VisualElement();
+        weaponDetailPopup.AddToClassList("weapon-selection-popup");
+
+        // Dynamically calculate position
+        Vector2 screenCenter = new Vector2(Screen.width / 2, Screen.height / 2);
+        weaponDetailPopup.style.left = screenCenter.x - PopupWidth / 2;
+        weaponDetailPopup.style.top = screenCenter.y - PopupWidth / 2;
+
+        Label title = new Label("選擇武器");
+        title.AddToClassList("title");
+        weaponDetailPopup.Add(title);
+
+        // 從玩家資料中獲取武器清單
+        var playerData = GameDataController.Instance.CurrentGameData.playerData;
+        if (playerData != null && playerData.Weapons != null)
+        {
+            foreach (var weaponData in playerData.Weapons)
+            {
+                Button weaponButton = new Button(() =>
+                {
+                    // 將 GameData.WeaponData 轉換為 Weapon
+                    Weapon weapon = new Weapon
+                    {
+                        Name = weaponData.Name,
+                        Damage = weaponData.Damage,
+                        MaxAttackDistance = weaponData.MaxAttackDistance,
+                        AttackSpeed = weaponData.AttackSpeed,
+                    };
+
+                    ship.weapons[slotIndex] = weapon; // 插入武器到指定槽位
+                    weaponDetailPopup.RemoveFromHierarchy(); // 關閉選擇面板
+                    RefreshWeaponList(); // 更新武器列表
+                })
+                {
+                    text = weaponData.Name
+                };
+                weaponButton.style.marginTop = 5;
+                weaponDetailPopup.Add(weaponButton);
+            }
+        }
+        else
+        {
+            Label noWeaponLabel = new Label("目前沒有可用的武器。");
+            noWeaponLabel.style.marginTop = 10;
+            weaponDetailPopup.Add(noWeaponLabel);
+        }
+
+        Button closeBtn = new Button(() => weaponDetailPopup.RemoveFromHierarchy()) { text = "關閉" };
+        closeBtn.style.marginTop = PopupPadding;
+        weaponDetailPopup.Add(closeBtn);
+
+        UIPanel.Add(weaponDetailPopup);
+    }
+
+    private void RefreshWeaponList()
+    {
+        if (ship == null || ship.weapons == null)
+        {
+            LogError("Ship or weapons list is null. Cannot refresh weapon list.");
+            return;
+        }
+
+        weaponListContainer.Clear();
+
+        int weaponSlotCount = ship.WeaponLimit;
+        for (int i = 0; i < weaponSlotCount; i++)
+        {
+            Weapon weapon = (i < ship.weapons.Count) ? ship.weapons[i] : null;
+            VisualElement weaponIcon = CreateWeaponIcon(weapon, i);
+            weaponListContainer.Add(weaponIcon);
+        }
+    }
+
+    private VisualElement CreateWeaponIcon(Weapon weapon, int index)
+    {
+        VisualElement weaponIcon = new VisualElement();
+        weaponIcon.AddToClassList("weapon-icon");
+
+        if (weapon != null)
+        {
+            weaponIcon.style.backgroundColor = new Color(0.8f, 0.8f, 0.2f, 1f);
+            weaponIcon.tooltip = $"武器{index + 1}";
+            weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponDetail(weapon));
+        }
+        else
+        {
+            weaponIcon.style.backgroundColor = new Color(0.2f, 0.2f, 0.2f, 0.3f);
+            weaponIcon.tooltip = $"空武器槽{index + 1}";
+            weaponIcon.RegisterCallback<ClickEvent>(ev => ShowWeaponSelectionPanel(index));
+        }
+
+        return weaponIcon;
+    }
+    #endregion
+
+    #region Waypoint UI
+    private void UpdateDrawWaypointButtonState()
+    {
+        bool canDraw = true;
+        if (ship != null && ship.transform.parent != null)
+        {
+            Fleet fleet = ship.transform.parent.GetComponent<Fleet>();
+            if (fleet != null && fleet.followers.Count > 0 && fleet.followers[0] != ship)
+            {
+                canDraw = false;
+            }
+        }
+        btnDrawWaypoint.SetEnabled(canDraw);
+        btnDrawWaypoint.text = IsDrawingWaypoint ? "結束繪製航點" : "繪製航點";
+    }
+
+    private void ToggleDrawWaypointMode()
+    {
+        IsDrawingWaypoint = !IsDrawingWaypoint;
+        btnDrawWaypoint.text = IsDrawingWaypoint ? "結束繪製航點" : "繪製航點";
+        if (!IsDrawingWaypoint)
+        {
+            ClearWaypointMarkers();
+        }
+    }
+
+    private void ClearWaypointMarkers()
+    {
+        if (waypointsContainer != null)
+            waypointsContainer.Clear();
+        waypointMarkers.Clear();
+        ship?.ClearWaypoints();
+    }
+
+
+    private void OnWaypointPointerDown(PointerDownEvent evt)
+    {
+        if (!IsDrawingWaypoint || evt.button != 0) return;
+        // 取得滑鼠點擊的螢幕座標
+        Vector2 screenPos = evt.position;
+        // 轉換為世界座標
+        Vector3 worldPos = cachedCamera.ScreenToWorldPoint(new Vector3(screenPos.x, Screen.height - screenPos.y, 0));
+        worldPos.z = 0;
+        // 傳給 PlayerShip
+        ship?.AddWaypoint(worldPos);
+        // 畫一個 waypoint 標記
+        DrawWaypointMarker(worldPos);
+    }
+
+    private void DrawWaypointMarker(Vector3 worldPos)
+    {
+        if (waypointsContainer == null)
+        {
+            var root = cachedRoot;
+            waypointsContainer = UIHelper.InitializeElement<VisualElement>(root, "waypointsContainer");
+            if (waypointsContainer == null)
+            {
+                Debug.LogWarning("[ShipDetailPanel] 找不到 waypointsContainer，無法繪製 waypoint 標記。");
+                return;
+            }
+        }
+        var marker = new VisualElement();
+        marker.AddToClassList("waypoint-marker");
+        marker.style.position = Position.Absolute;
+        marker.style.width = 16;
+        marker.style.height = 16;
+        waypointsContainer.Add(marker);
+        waypointMarkers.Add(marker);
+
+        // 設定初始位置
+        SetWaypointMarkerPosition(marker, worldPos);
+    }
+
+    // 根據世界座標設定 waypoint marker 的 UI 位置（改用 UIHelper）
+    private void SetWaypointMarkerPosition(VisualElement marker, Vector3 worldPos)
+    {
+        UIHelper.BindToWorldPosition(marker, worldPos, cachedCamera, true);
+        marker.style.left = marker.resolvedStyle.left - 8;
+        marker.style.top = marker.resolvedStyle.top - 8;
+    }
+
+    // 新增：每幀更新所有 waypoint marker 的位置
+    private void UpdateWaypointMarkersPosition()
+    {
+        if (ship == null || ship.Waypoints == null) return;
+        int count = Mathf.Min(waypointMarkers.Count, ship.Waypoints.Count);
+        for (int i = 0; i < count; i++)
+        {
+            SetWaypointMarkerPosition(waypointMarkers[i], ship.Waypoints[i]);
+        }
+    }
+    #endregion
+
+    #region Pointer & Selection Events
+    private void HandleShipSelectionForLine(PointerDownEvent evt)
+    {
+        Debug.Log("[ShipDetailPanel] HandleShipSelectionForLine");
+        if (isSelectingShipForLine && evt.button == 0) // 左鍵點擊
+        {
+            Vector2 worldPoint = cachedCamera.ScreenToWorldPoint(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
+            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.down, LayerMask.GetMask("Ship")); // 使用射線檢測
+
+            if (hit.collider != null)
+            {
+                var selectedShip = hit.collider.GetComponent<Warship>(); // 確保檢測到的是 Ship 類型
+                if (selectedShip != null && selectedShip != ship)
+                {
+                    if (selectedShip.IsFollower)
+                    {
+                        Debug.Log($"[ShipDetailPanel] {selectedShip.name} 已經是船隊成員，無法再次選擇。");
+                        //debug ship parent
+                        Debug.Log($"[ShipDetailPanel] {selectedShip.name} 的父物件: {selectedShip.transform.parent.name}");
+                        // check if parent is Fleet
+                        if (selectedShip.transform.parent != null && selectedShip.transform.parent.GetComponent<Fleet>() != null)
+                        {
+                            Debug.Log($"[ShipDetailPanel] {selectedShip.name} 的父物件是 Fleet");
+
+                            // get leader
+                            PlayerShip leader = selectedShip.transform.parent.GetComponent<Fleet>().followers[0] as PlayerShip;
+                            if (leader != null)
+                            {
+                                Debug.Log($"[ShipDetailPanel] {selectedShip.name} 的領導者是: {leader.name}");
+                                // 取消選擇
+                                ship.transform.SetParent(selectedShip.transform.parent.transform);
+                                ship.IsFollower = true;
+                                ship.LeaderShip = leader;
+                                selectedShip.transform.parent.GetComponent<Fleet>().followers.Add(ship);
+                                Debug.Log($"[ShipDetailPanel] {ship.name} 已加入 {selectedShip.name} 的船隊");
+                                isSelectingShipForLine = false; // 停止選擇模式
+                                                                // 關閉 UI
+                                Destroy(gameObject);
+                                Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
+
+                                return;
+
+                            }
+                            else
+                            {
+                                Debug.LogWarning("[ShipDetailPanel] 無法獲取 Fleet 的領導者");
+                                return;
+                            }
+
+                        }
+                    }
+                    if (selectedShip == null)
+                    {
+                        Debug.LogWarning("[ShipDetailPanel] 選擇的物件不是船隻");
+                        return;
+                    }
+                    // 建立 Fleet parent 物件，並設為 ShipCreationManager 的子物件
+                    GameObject fleetParent = new GameObject("FleetGroup");
+                    fleetParent.transform.position = selectedShip.transform.position;
+                    // 設定 fleetParent 為 ShipCreationManager 的子物件
+                    if (ShipCreationManager.Instance != null)
+                        fleetParent.transform.SetParent(ShipCreationManager.Instance.transform);
+
+                    // 將 leader 船與被選擇船設為 parent 的子物件
+                    selectedShip.transform.SetParent(fleetParent.transform);
+                    ship.transform.SetParent(fleetParent.transform);
+
+                    // 掛載 Fleet 組件到 parent
+                    var fleet = fleetParent.AddComponent<Fleet>();
+                    fleet.followers.Add(selectedShip);
+                    fleet.followers.Add(ship);
+
+                    // 設定跟隨狀態
+                    ship.IsFollower = true;
+                    ship.LeaderShip = selectedShip as PlayerShip;
+
+                    Debug.Log($"[ShipDetailPanel] 已建立 FleetGroup 並將 {selectedShip.name} 和 {ship.name} 加入船隊");
+                    isSelectingShipForLine = false; // 停止選擇模式
+
+                    // 關閉 UI
+                    Destroy(gameObject);
+                    Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
+                }
+                else
+                {
+                    Debug.Log($"[ShipDetailPanel] 點擊的物件不是船隻或是自己: {hit.collider.gameObject.name}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[ShipDetailPanel] Raycast 未檢測到任何物件");
+            }
+        }
+        Debug.Log("[ShipDetailPanel] Ship selection for line ended");
+    }
+    #endregion
+
+    #region Utility
+    private void LogError(string message)
+    {
+        // Replace Debug.LogError with centralized logging
+        Debug.LogError($"[ShipDetailPanel] {message}");
     }
     #endregion
 }
