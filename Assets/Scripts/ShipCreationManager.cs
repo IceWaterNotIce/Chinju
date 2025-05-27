@@ -109,6 +109,13 @@ public class ShipCreationManager : MonoBehaviour
         }
 
         Vector3 spawnPosition = mapController.FindNearestOceanTile(chinjuTilePosition);
+        // if have other ship in spawn position, find another position nearby
+        if (Physics2D.OverlapCircle(spawnPosition, 0.5f, LayerMask.GetMask("Ship")) != null)
+        {
+            //randomly add a small offset to spawn position
+            spawnPosition += new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0);
+        }
+
         spawnPosition.z = -1;
 
         GameObject battleShip = Instantiate(shipPrefab, spawnPosition, Quaternion.identity);
