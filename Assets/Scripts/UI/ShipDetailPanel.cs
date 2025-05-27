@@ -71,15 +71,15 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     private VisualElement waypointsContainer; // 新增：waypoint 標記的容器
     private Label lblName; // 新增：顯示船名的 Label
 
-    private VisualElement cachedRoot; // 緩存 rootVisualElement
-    private Camera cachedCamera;      // 緩存 Camera.main
+    private VisualElement root; // 緩存 rootVisualElement
+    private Camera MainCamera;      // 緩存 Camera.main
     #endregion
 
     #region Unity Methods
     void Start()
     {
         InitializeUI();
-        cachedCamera = Camera.main;
+        MainCamera = Camera.main;
     }
 
     void Update()
@@ -87,8 +87,8 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         SetUIPosition();
         SetRectPosition();
         UpdateWaypointMarkersPosition();
-        if (cachedCamera == null)
-            cachedCamera = Camera.main;
+        if (MainCamera == null)
+            MainCamera = Camera.main;
     }
 
     private void OnDestroy()
@@ -161,8 +161,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
             return;
         }
 
-        cachedRoot = uiDoc.rootVisualElement; // 緩存 rootVisualElement
-        var root = cachedRoot;
+        root = uiDoc.rootVisualElement; // 緩存 rootVisualElement
         if (root == null)
         {
             LogError("UIDocument 的 rootVisualElement 為 null！");
@@ -427,7 +426,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         }
 
         // 使用 UIHelper 綁定 UI 到世界座標
-        UIHelper.BindToWorldPosition(UIPanel, ship.transform.position, cachedCamera, true);
+        UIHelper.BindToWorldPosition(UIPanel, ship.transform.position, MainCamera, true);
     }
 
     private void SetRectPosition()
@@ -513,7 +512,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         Debug.Log("[ShipDetailPanel] PointerDownEvent");
         if (rectContainer == null)
         {
-            rectContainer = cachedRoot.Q<VisualElement>("rectContainer");
+            rectContainer = root.Q<VisualElement>("rectContainer");
             if (rectContainer == null)
             {
                 Debug.LogError("[ShipDetailPanel] 找不到名為 'rectContainer' 的 VisualElement！");
@@ -604,7 +603,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     private void DrawSavedRect(Rect rect)
     {
         if (rect == Rect.zero) return; // 如果矩形為零，則不繪製
-        var rectContainer = cachedRoot.Q<VisualElement>("rectContainer");
+        var rectContainer = root.Q<VisualElement>("rectContainer");
 
         if (savedRectElement != null)
         {
@@ -629,8 +628,8 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         Vector3 worldB = new Vector3(rect.xMax, rect.yMax, 0);
 
         // 使用 UIHelper 轉換螢幕座標
-        Vector2 screenA = cachedCamera.WorldToScreenPoint(worldA);
-        Vector2 screenB = cachedCamera.WorldToScreenPoint(worldB);
+        Vector2 screenA = MainCamera.WorldToScreenPoint(worldA);
+        Vector2 screenB = MainCamera.WorldToScreenPoint(worldB);
 
         float left = Mathf.Min(screenA.x, screenB.x);
         float right = Mathf.Max(screenA.x, screenB.x);
@@ -815,7 +814,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         // 取得滑鼠點擊的螢幕座標
         Vector2 screenPos = evt.position;
         // 轉換為世界座標
-        Vector3 worldPos = cachedCamera.ScreenToWorldPoint(new Vector3(screenPos.x, Screen.height - screenPos.y, 0));
+        Vector3 worldPos = MainCamera.ScreenToWorldPoint(new Vector3(screenPos.x, Screen.height - screenPos.y, 0));
         worldPos.z = 0;
         // 傳給 PlayerShip
         ship?.AddWaypoint(worldPos);
@@ -827,7 +826,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     {
         if (waypointsContainer == null)
         {
-            var root = cachedRoot;
+            var root = this.root;
             waypointsContainer = UIHelper.InitializeElement<VisualElement>(root, "waypointsContainer");
             if (waypointsContainer == null)
             {
@@ -850,7 +849,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     // 根據世界座標設定 waypoint marker 的 UI 位置（改用 UIHelper）
     private void SetWaypointMarkerPosition(VisualElement marker, Vector3 worldPos)
     {
-        UIHelper.BindToWorldPosition(marker, worldPos, cachedCamera, true);
+        UIHelper.BindToWorldPosition(marker, worldPos, MainCamera, true);
         marker.style.left = marker.resolvedStyle.left - 8;
         marker.style.top = marker.resolvedStyle.top - 8;
     }
@@ -870,97 +869,33 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     #region Pointer & Selection Events
     private void HandleShipSelectionForLine(PointerDownEvent evt)
     {
-        Debug.Log("[ShipDetailPanel] HandleShipSelectionForLine");
-        if (isSelectingShipForLine && evt.button == 0) // 左鍵點擊
+        if (!isSelectingShipForLine || evt.button != 0) return;
+
+        Vector2 worldPoint = MainCamera.ScreenToWorldPoint(evt.position);
+        RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.down, LayerMask.GetMask("Ship"));
+
+        if (hit.collider == null) return;
+
+        var selectedShip = hit.collider.GetComponent<Warship>();
+        if (selectedShip == null || selectedShip == ship) return;
+
+        if (selectedShip.IsFollower)
         {
-            Vector2 worldPoint = cachedCamera.ScreenToWorldPoint(UnityEngine.InputSystem.Mouse.current.position.ReadValue());
-            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.down, LayerMask.GetMask("Ship")); // 使用射線檢測
-
-            if (hit.collider != null)
+            // 加入現有船隊
+            var fleet = selectedShip.transform.parent.GetComponent<Fleet>();
+            if (fleet != null)
             {
-                var selectedShip = hit.collider.GetComponent<Warship>(); // 確保檢測到的是 Ship 類型
-                if (selectedShip != null && selectedShip != ship)
-                {
-                    if (selectedShip.IsFollower)
-                    {
-                        Debug.Log($"[ShipDetailPanel] {selectedShip.name} 已經是船隊成員，無法再次選擇。");
-                        //debug ship parent
-                        Debug.Log($"[ShipDetailPanel] {selectedShip.name} 的父物件: {selectedShip.transform.parent.name}");
-                        // check if parent is Fleet
-                        if (selectedShip.transform.parent != null && selectedShip.transform.parent.GetComponent<Fleet>() != null)
-                        {
-                            Debug.Log($"[ShipDetailPanel] {selectedShip.name} 的父物件是 Fleet");
-
-                            // get leader
-                            PlayerShip leader = selectedShip.transform.parent.GetComponent<Fleet>().followers[0] as PlayerShip;
-                            if (leader != null)
-                            {
-                                Debug.Log($"[ShipDetailPanel] {selectedShip.name} 的領導者是: {leader.name}");
-                                // 取消選擇
-                                ship.transform.SetParent(selectedShip.transform.parent.transform);
-                                ship.IsFollower = true;
-                                ship.LeaderShip = leader;
-                                selectedShip.transform.parent.GetComponent<Fleet>().followers.Add(ship);
-                                Debug.Log($"[ShipDetailPanel] {ship.name} 已加入 {selectedShip.name} 的船隊");
-                                isSelectingShipForLine = false; // 停止選擇模式
-                                                                // 關閉 UI
-                                Destroy(gameObject);
-                                Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
-
-                                return;
-
-                            }
-                            else
-                            {
-                                Debug.LogWarning("[ShipDetailPanel] 無法獲取 Fleet 的領導者");
-                                return;
-                            }
-
-                        }
-                    }
-                    if (selectedShip == null)
-                    {
-                        Debug.LogWarning("[ShipDetailPanel] 選擇的物件不是船隻");
-                        return;
-                    }
-                    // 建立 Fleet parent 物件，並設為 ShipCreationManager 的子物件
-                    GameObject fleetParent = new GameObject("FleetGroup");
-                    fleetParent.transform.position = selectedShip.transform.position;
-                    // 設定 fleetParent 為 ShipCreationManager 的子物件
-                    if (ShipCreationManager.Instance != null)
-                        fleetParent.transform.SetParent(ShipCreationManager.Instance.transform);
-
-                    // 將 leader 船與被選擇船設為 parent 的子物件
-                    selectedShip.transform.SetParent(fleetParent.transform);
-                    ship.transform.SetParent(fleetParent.transform);
-
-                    // 掛載 Fleet 組件到 parent
-                    var fleet = fleetParent.AddComponent<Fleet>();
-                    fleet.followers.Add(selectedShip);
-                    fleet.followers.Add(ship);
-
-                    // 設定跟隨狀態
-                    ship.IsFollower = true;
-                    ship.LeaderShip = selectedShip as PlayerShip;
-
-                    Debug.Log($"[ShipDetailPanel] 已建立 FleetGroup 並將 {selectedShip.name} 和 {ship.name} 加入船隊");
-                    isSelectingShipForLine = false; // 停止選擇模式
-
-                    // 關閉 UI
-                    Destroy(gameObject);
-                    Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
-                }
-                else
-                {
-                    Debug.Log($"[ShipDetailPanel] 點擊的物件不是船隻或是自己: {hit.collider.gameObject.name}");
-                }
-            }
-            else
-            {
-                Debug.LogWarning("[ShipDetailPanel] Raycast 未檢測到任何物件");
+                FleetManager.Instance.AddShipToFleet(ship, fleet);
             }
         }
-        Debug.Log("[ShipDetailPanel] Ship selection for line ended");
+        else
+        {
+            // 使用 CreateFleet 函數創建新船隊
+            FleetManager.Instance.CreateFleet(new Warship[] { selectedShip, ship });
+        }
+
+        isSelectingShipForLine = false;
+        Destroy(gameObject);
     }
     #endregion
 
