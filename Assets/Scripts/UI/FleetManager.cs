@@ -14,11 +14,21 @@ public class FleetManager : Singleton<FleetManager>
         }
 
         var fleet = fleetParent.AddComponent<Fleet>();
-        foreach (var ship in warships)
+
+        for (int i = 0; i < warships.Length; i++)
         {
+            var ship = warships[i];
             fleet.followers.Add(ship);
+            if (i == 0)
+            {
+            ship.IsFollower = false;
+            ship.LeaderShip = null;
+            }
+            else
+            {
             ship.IsFollower = true;
             ship.LeaderShip = warships[0] as PlayerShip;
+            }
         }
 
         Debug.Log($"[FleetManager] Created fleet with {warships.Length} ships.");
