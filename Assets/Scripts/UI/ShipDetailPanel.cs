@@ -83,11 +83,11 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         cachedCamera = Camera.main;
     }
 
-    void UpdateExperience(float exp,int level)
+    void UpdateExperience(float exp, int level)
     {
         if (lblExperience != null)
         {
-            lblExperience.text = $"經驗值: {exp}/{level*10}";
+            lblExperience.text = $"經驗值: {exp}/{level * 10}";
         }
         if (expBar != null)
         {
@@ -533,16 +533,6 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     }
     #endregion
 
-    #region UI Label/Element Initialization
-    private void InitializeSpeedLabels()
-    {
-        lblSpeedFrontFull = InitializeSpeedLabel("lblSpeedFrontFull", 1.0f);
-        lblSpeedFrontThreeQuarters = InitializeSpeedLabel("lblSpeedFrontThreeQuarters", 0.75f);
-        lblSpeedFrontHalf = InitializeSpeedLabel("lblSpeedFrontHalf", 0.5f);
-        lblSpeedFrontQuarter = InitializeSpeedLabel("lblSpeedFrontQuarter", 0.25f);
-        lblSpeedStop = InitializeSpeedLabel("lblSpeedStop", 0.0f);
-        lblSpeedBackFull = InitializeSpeedLabel("lblSpeedBackFull", -0.25f);
-    }
 
     private Label InitializeSpeedLabel(string name, float speedPercentage)
     {
@@ -551,241 +541,12 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         return label;
     }
 
-    private void InitializeRotationLabels()
-    {
-        lblRotationLeftFull = InitializeRotationLabel("lblRotationLeftFull", 1.0f);
-        lblRotationLeftHalf = InitializeRotationLabel("lblRotationLeftHalf", 0.5f);
-        lblRotationStop = InitializeRotationLabel("lblRotationStop", 0.0f);
-        lblRotationRightHalf = InitializeRotationLabel("lblRotationRightHalf", -0.5f);
-        lblRotationRightFull = InitializeRotationLabel("lblRotationRightFull", -1.0f);
-    }
 
     private Label InitializeRotationLabel(string name, float rotationPercentage)
     {
         var label = UIHelper.InitializeElement<Label>(UIPanel, name);
         label.RegisterCallback<ClickEvent>(ev => RotationControll(rotationPercentage));
         return label;
-    }
-
-    private void InitializeLevelAndExperienceLabels()
-    {
-        // 確保只初始化一次，不重複建立
-        lblLevel = UIHelper.InitializeElement<Label>(UIPanel, "lblLevel");
-        lblExperience = UIHelper.InitializeElement<Label>(UIPanel, "lblExperience");
-    }
-
-    private void InitializeHealthAndFuelLabels()
-    {
-        // 刪除/註解掉 Slider 相關初始化
-        // sliderHealth = InitializeSlider("sliderHealth", 100, 10);
-        // sliderFuel = InitializeSlider("sliderFuel", 100, 5);
-        // sliderExperience = InitializeSlider("sliderExperience", 10, 5);
-
-        // 新增：取得 progress bar VisualElement
-        healthBar = UIHelper.InitializeElement<VisualElement>(UIPanel, "healthBar");
-        fuelBar = UIHelper.InitializeElement<VisualElement>(UIPanel, "fuelBar");
-        expBar = UIHelper.InitializeElement<VisualElement>(UIPanel, "expBar");
-    }
-
-    private Slider InitializeSlider(string name, float maxValue, int marginTop)
-    {
-        var slider = UIPanel.Q<Slider>(name);
-        if (slider == null)
-        {
-            slider = new Slider(0, maxValue);
-            slider.name = name;
-            slider.style.marginTop = marginTop;
-            slider.style.width = 180;
-            slider.style.height = 18;
-            slider.style.unityTextAlign = TextAnchor.MiddleLeft;
-            UIPanel.Add(slider);
-        }
-        slider.highValue = maxValue;
-        slider.value = 0;
-        slider.SetEnabled(false); // 只顯示，不允許用戶操作
-        return slider;
-    }
-
-    private Label InitializeLabel(string name, int marginTop)
-    {
-        var label = UIPanel.Q<Label>(name);
-        if (label == null)
-        {
-            label = new Label();
-            label.name = name;
-            label.style.marginTop = marginTop;
-            label.style.unityTextAlign = TextAnchor.MiddleLeft;
-            UIPanel.Add(label);
-        }
-        return label;
-    }
-
-    private void InitializeWeaponListContainer()
-    {
-        weaponListContainer = UIPanel.Q<VisualElement>("weaponListContainer") ?? new VisualElement
-        {
-            name = "weaponListContainer",
-            style =
-            {
-                flexDirection = FlexDirection.Row,
-                marginTop = 10
-            }
-        };
-        UIPanel.Add(weaponListContainer);
-        weaponListContainer.Clear();
-    }
-
-    private void InitializeCancelFollowButton()
-    {
-        btnCancelFollow = UIHelper.InitializeElement<Button>(UIPanel, "btnCancelFollow");
-        if (btnCancelFollow != null)
-        {
-            btnCancelFollow.clicked += () =>
-            {
-                var cameraController = Camera.main?.GetComponent<CameraBound2D>();
-                if (cameraController != null)
-                {
-                    cameraController.StopFollowing();
-                    Debug.Log("[ShipDetailPanel] 已取消攝影機跟隨。");
-                }
-            };
-        }
-    }
-
-    private void InitializeDrawButton()
-    {
-        var root = GetComponent<UIDocument>().rootVisualElement;
-
-        startDrawButton = root.Q<Button>("StartDrawButton");
-        if (startDrawButton != null)
-        {
-            startDrawButton.clicked += () =>
-            {
-                if (rectContainer != null && rectContainer.childCount > 0)
-                {
-
-                    // Clear existing rectangles and reset PlayerShip data
-                    ClearRectAndData();
-                    startDrawButton.text = "Start Draw"; // Update button text
-                }
-                else
-                {
-                    // Enable drawing mode
-                    EnableDrawing();
-                    startDrawButton.text = "Clear Rect"; // Update button text
-                }
-            };
-        }
-        else
-        {
-            LogError("找不到名為 'StartDrawButton' 的按鈕！");
-        }
-    }
-
-    private void InitializeCloseUIButton()
-    {
-        btnCloseUI = UIHelper.InitializeElement<Button>(UIPanel, "btnCloseUI");
-        if (btnCloseUI != null)
-        {
-            btnCloseUI.clicked += () =>
-            {
-                Destroy(gameObject); // 銷毀 ShipDetailPanel
-                Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
-            };
-        }
-    }
-
-    private void InitializeToggleCombatModeButton()
-    {
-        btnToggleCombatMode = UIHelper.InitializeElement<Button>(UIPanel, "btnToggleCombatMode");
-        if (btnToggleCombatMode != null)
-        {
-            btnToggleCombatMode.clicked += () =>
-            {
-                if (ship != null)
-                {
-                    // 切換枚舉狀態
-                    var mode = ship.Mode;
-                    mode = (CombatMode)(((int)mode + 1) % Enum.GetValues(typeof(CombatMode)).Length);
-                    ship.Mode = mode;
-                    Debug.Log($"[ShipDetailPanel] 戰鬥模式切換為: {mode}");
-                    btnToggleCombatMode.text = $"戰鬥模式: {mode}";
-                }
-            };
-        }
-    }
-
-    private void InitializeFormFleetButton()
-    {
-        btnFormFleet = UIHelper.InitializeElement<Button>(UIPanel, "btnFormFleet");
-        if (btnFormFleet != null)
-        {
-            btnFormFleet.clicked += () =>
-            {
-                isSelectingShipForLine = true; // 啟用選擇船隻模式
-                Debug.Log("[ShipDetailPanel] 選擇船隻以形成船隊模式啟用");
-            };
-        }
-    }
-
-    private void InitializeFleetCombatModeButton()
-    {
-        // 僅當船隻在 fleet 中才顯示
-        if (ship != null && (ship.IsFollower || ship.LeaderShip != null))
-        {
-            btnFleetCombatMode = UIPanel.Q<Button>("btnFleetCombatMode");
-            if (btnFleetCombatMode == null)
-            {
-                btnFleetCombatMode = new Button();
-                btnFleetCombatMode.name = "btnFleetCombatMode";
-                btnFleetCombatMode.text = "編輯船隊戰鬥模式";
-                btnFleetCombatMode.style.marginTop = 10;
-                UIPanel.Add(btnFleetCombatMode);
-            }
-            btnFleetCombatMode.clicked += () =>
-            {
-                // 找到 fleet leader
-                PlayerShip leader = ship.LeaderShip != null ? ship.LeaderShip : ship;
-                Fleet fleet = leader.GetComponent<Fleet>();
-                if (fleet != null && fleet.followers != null)
-                {
-                    // 統一切換到下一個模式
-                    var currentMode = leader.Mode;
-                    var nextMode = (CombatMode)(((int)currentMode + 1) % Enum.GetValues(typeof(CombatMode)).Length);
-                    foreach (var follower in fleet.followers)
-                    {
-                        PlayerShip ps = follower as PlayerShip;
-                        if (ps != null)
-                        {
-                            ps.Mode = nextMode;
-                        }
-                    }
-                    leader.Mode = nextMode;
-                    Debug.Log($"[ShipDetailPanel] 已將船隊所有船隻戰鬥模式設為: {nextMode}");
-                    if (btnToggleCombatMode != null)
-                        btnToggleCombatMode.text = $"戰鬥模式: {nextMode}";
-                }
-            };
-        }
-        else
-        {
-            // 若不在 fleet，移除按鈕
-            var existBtn = UIPanel.Q<Button>("btnFleetCombatMode");
-            if (existBtn != null)
-                existBtn.RemoveFromHierarchy();
-        }
-    }
-
-    private void InitializeDrawWaypointButton()
-    {
-        btnDrawWaypoint = UIHelper.InitializeElement<Button>(UIPanel, "btnDrawWaypoint");
-        if (btnDrawWaypoint == null)
-        {
-            btnDrawWaypoint = new Button() { name = "btnDrawWaypoint", text = "繪製航點" };
-            UIPanel.Add(btnDrawWaypoint);
-        }
-        btnDrawWaypoint.clicked += ToggleDrawWaypointMode;
-        UpdateDrawWaypointButtonState();
     }
 
     private void UpdateDrawWaypointButtonState()
@@ -820,7 +581,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         waypointMarkers.Clear();
         ship?.ClearWaypoints();
     }
-    #endregion
+
 
     #region UI Update & Position
 
@@ -882,15 +643,6 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     #endregion
 
     #region Pointer & Selection Events
-    private void RegisterPointerEvents()
-    {
-        var root = cachedRoot;
-        root.RegisterCallback<PointerDownEvent>(OnPointerDown); // 修正為 PointerDownEvent
-        root.RegisterCallback<PointerMoveEvent>(OnPointerMove); // 修正為 PointerMoveEvent
-        root.RegisterCallback<PointerUpEvent>(OnPointerUp);     // 修正為 PointerUpEvent
-        root.RegisterCallback<PointerDownEvent>(HandleShipSelectionForLine); // 新增處理船隻選擇的事件
-        root.RegisterCallback<PointerDownEvent>(OnWaypointPointerDown); // 新增：繪製 waypoint 模式下的 pointer event
-    }
 
     private void HandleShipSelectionForLine(PointerDownEvent evt)
     {
@@ -932,7 +684,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
                                 Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
 
                                 return;
-                                
+
                             }
                             else
                             {
@@ -1045,16 +797,6 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     }
     #endregion
 
-    #region UnityEvent Subscription
- 
-
-    private void OnShipCombatModeChanged(bool isCombatMode)
-    {
-        if (btnToggleCombatMode != null)
-            btnToggleCombatMode.text = $"戰鬥模式: {ship.Mode}";
-    }
-    #endregion
-
     #region Utility
     private void LogError(string message)
     {
@@ -1110,19 +852,185 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
             return;
         }
 
-        InitializeSpeedLabels();
-        InitializeRotationLabels();
-        InitializeWeaponListContainer();
-        InitializeLevelAndExperienceLabels(); // 確保初始化
-        InitializeHealthAndFuelLabels();
-        InitializeCancelFollowButton();
-        InitializeDrawButton();
-        InitializeCloseUIButton();
-        InitializeFleetCombatModeButton();
-        InitializeToggleCombatModeButton();
-        InitializeFormFleetButton();
-        InitializeDrawWaypointButton(); // 新增
-        RegisterPointerEvents();
+        // --- Inline InitializeSpeedLabels ---
+        lblSpeedFrontFull = InitializeSpeedLabel("lblSpeedFrontFull", 1.0f);
+        lblSpeedFrontThreeQuarters = InitializeSpeedLabel("lblSpeedFrontThreeQuarters", 0.75f);
+        lblSpeedFrontHalf = InitializeSpeedLabel("lblSpeedFrontHalf", 0.5f);
+        lblSpeedFrontQuarter = InitializeSpeedLabel("lblSpeedFrontQuarter", 0.25f);
+        lblSpeedStop = InitializeSpeedLabel("lblSpeedStop", 0.0f);
+        lblSpeedBackFull = InitializeSpeedLabel("lblSpeedBackFull", -0.25f);
+
+        // --- Inline InitializeRotationLabels ---
+        lblRotationLeftFull = InitializeRotationLabel("lblRotationLeftFull", 1.0f);
+        lblRotationLeftHalf = InitializeRotationLabel("lblRotationLeftHalf", 0.5f);
+        lblRotationStop = InitializeRotationLabel("lblRotationStop", 0.0f);
+        lblRotationRightHalf = InitializeRotationLabel("lblRotationRightHalf", -0.5f);
+        lblRotationRightFull = InitializeRotationLabel("lblRotationRightFull", -1.0f);
+
+        // --- Inline InitializeWeaponListContainer ---
+        weaponListContainer = UIPanel.Q<VisualElement>("weaponListContainer") ?? new VisualElement
+        {
+            name = "weaponListContainer",
+            style =
+            {
+                flexDirection = FlexDirection.Row,
+                marginTop = 10
+            }
+        };
+        UIPanel.Add(weaponListContainer);
+        weaponListContainer.Clear();
+
+        // --- Inline InitializeLevelAndExperienceLabels ---
+        lblLevel = UIHelper.InitializeElement<Label>(UIPanel, "lblLevel");
+        lblExperience = UIHelper.InitializeElement<Label>(UIPanel, "lblExperience");
+
+        // --- Inline InitializeHealthAndFuelLabels ---
+        healthBar = UIHelper.InitializeElement<VisualElement>(UIPanel, "healthBar");
+        fuelBar = UIHelper.InitializeElement<VisualElement>(UIPanel, "fuelBar");
+        expBar = UIHelper.InitializeElement<VisualElement>(UIPanel, "expBar");
+
+        // --- Inline InitializeCancelFollowButton ---
+        btnCancelFollow = UIHelper.InitializeElement<Button>(UIPanel, "btnCancelFollow");
+        if (btnCancelFollow != null)
+        {
+            btnCancelFollow.clicked += () =>
+            {
+                var cameraController = Camera.main?.GetComponent<CameraBound2D>();
+                if (cameraController != null)
+                {
+                    cameraController.StopFollowing();
+                    Debug.Log("[ShipDetailPanel] 已取消攝影機跟隨。");
+                }
+            };
+        }
+
+        // --- Inline InitializeDrawButton ---
+        var rootDoc = GetComponent<UIDocument>().rootVisualElement;
+        startDrawButton = rootDoc.Q<Button>("StartDrawButton");
+        if (startDrawButton != null)
+        {
+            startDrawButton.clicked += () =>
+            {
+                if (rectContainer != null && rectContainer.childCount > 0)
+                {
+
+                    // Clear existing rectangles and reset PlayerShip data
+                    ClearRectAndData();
+                    startDrawButton.text = "Start Draw"; // Update button text
+                }
+                else
+                {
+                    // Enable drawing mode
+                    EnableDrawing();
+                    startDrawButton.text = "Clear Rect"; // Update button text
+                }
+            };
+        }
+        else
+        {
+            LogError("找不到名為 'StartDrawButton' 的按鈕！");
+        }
+
+        // --- Inline InitializeCloseUIButton ---
+        btnCloseUI = UIHelper.InitializeElement<Button>(UIPanel, "btnCloseUI");
+        if (btnCloseUI != null)
+        {
+            btnCloseUI.clicked += () =>
+            {
+                Destroy(gameObject); // 銷毀 ShipDetailPanel
+                Debug.Log("[ShipDetailPanel] Ship UI 已關閉。");
+            };
+        }
+
+        // --- Inline InitializeFleetCombatModeButton ---
+        if (ship != null && (ship.IsFollower || ship.LeaderShip != null))
+        {
+            btnFleetCombatMode = UIPanel.Q<Button>("btnFleetCombatMode");
+            if (btnFleetCombatMode == null)
+            {
+                btnFleetCombatMode = new Button();
+                btnFleetCombatMode.name = "btnFleetCombatMode";
+                btnFleetCombatMode.text = "編輯船隊戰鬥模式";
+                btnFleetCombatMode.style.marginTop = 10;
+                UIPanel.Add(btnFleetCombatMode);
+            }
+            btnFleetCombatMode.clicked += () =>
+            {
+                // 找到 fleet leader
+                PlayerShip leader = ship.LeaderShip != null ? ship.LeaderShip : ship;
+                Fleet fleet = leader.GetComponent<Fleet>();
+                if (fleet != null && fleet.followers != null)
+                {
+                    // 統一切換到下一個模式
+                    var currentMode = leader.Mode;
+                    var nextMode = (CombatMode)(((int)currentMode + 1) % Enum.GetValues(typeof(CombatMode)).Length);
+                    foreach (var follower in fleet.followers)
+                    {
+                        PlayerShip ps = follower as PlayerShip;
+                        if (ps != null)
+                        {
+                            ps.Mode = nextMode;
+                        }
+                    }
+                    leader.Mode = nextMode;
+                    Debug.Log($"[ShipDetailPanel] 已將船隊所有船隻戰鬥模式設為: {nextMode}");
+                    if (btnToggleCombatMode != null)
+                        btnToggleCombatMode.text = $"戰鬥模式: {nextMode}";
+                }
+            };
+        }
+        else
+        {
+            var existBtn = UIPanel.Q<Button>("btnFleetCombatMode");
+            if (existBtn != null)
+                existBtn.RemoveFromHierarchy();
+        }
+
+        // --- Inline InitializeToggleCombatModeButton ---
+        btnToggleCombatMode = UIHelper.InitializeElement<Button>(UIPanel, "btnToggleCombatMode");
+        if (btnToggleCombatMode != null)
+        {
+            btnToggleCombatMode.clicked += () =>
+            {
+                if (ship != null)
+                {
+                    // 切換枚舉狀態
+                    var mode = ship.Mode;
+                    mode = (CombatMode)(((int)mode + 1) % Enum.GetValues(typeof(CombatMode)).Length);
+                    ship.Mode = mode;
+                    Debug.Log($"[ShipDetailPanel] 戰鬥模式切換為: {mode}");
+                    btnToggleCombatMode.text = $"戰鬥模式: {mode}";
+                }
+            };
+        }
+
+        // --- Inline InitializeFormFleetButton ---
+        btnFormFleet = UIHelper.InitializeElement<Button>(UIPanel, "btnFormFleet");
+        if (btnFormFleet != null)
+        {
+            btnFormFleet.clicked += () =>
+            {
+                isSelectingShipForLine = true; // 啟用選擇船隻模式
+                Debug.Log("[ShipDetailPanel] 選擇船隻以形成船隊模式啟用");
+            };
+        }
+
+        // --- Inline InitializeDrawWaypointButton ---
+        btnDrawWaypoint = UIHelper.InitializeElement<Button>(UIPanel, "btnDrawWaypoint");
+        if (btnDrawWaypoint == null)
+        {
+            btnDrawWaypoint = new Button() { name = "btnDrawWaypoint", text = "繪製航點" };
+            UIPanel.Add(btnDrawWaypoint);
+        }
+        btnDrawWaypoint.clicked += ToggleDrawWaypointMode;
+        UpdateDrawWaypointButtonState();
+
+        // --- Inline RegisterPointerEvents ---
+        root.RegisterCallback<PointerDownEvent>(OnPointerDown);
+        root.RegisterCallback<PointerMoveEvent>(OnPointerMove);
+        root.RegisterCallback<PointerUpEvent>(OnPointerUp);
+        root.RegisterCallback<PointerDownEvent>(HandleShipSelectionForLine);
+        root.RegisterCallback<PointerDownEvent>(OnWaypointPointerDown);
 
         lblFuel = UIHelper.InitializeElement<Label>(UIPanel, "lblFuel");
         lblHealth = UIHelper.InitializeElement<Label>(UIPanel, "lblHealth");
