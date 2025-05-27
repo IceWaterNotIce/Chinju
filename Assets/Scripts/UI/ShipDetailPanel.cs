@@ -1002,7 +1002,8 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
     {
         if (waypointsContainer == null)
         {
-            waypointsContainer = UIHelper.InitializeElement<VisualElement>(UIPanel, "waypointsContainer");
+            var root = GetComponent<UIDocument>().rootVisualElement;
+            waypointsContainer = UIHelper.InitializeElement<VisualElement>(root, "waypointsContainer");
             if (waypointsContainer == null)
             {
                 Debug.LogWarning("[ShipDetailPanel] 找不到 waypointsContainer，無法繪製 waypoint 標記。");
@@ -1126,12 +1127,12 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         lblName = UIHelper.InitializeElement<Label>(UIPanel, "lblName"); // 新增：初始化 lblName
 
         // 新增：初始化 waypointsContainer
-        waypointsContainer = UIHelper.InitializeElement<VisualElement>(UIPanel, "waypointsContainer");
+        waypointsContainer = UIHelper.InitializeElement<VisualElement>(root, "waypointsContainer");
         if (waypointsContainer == null)
         {
             // 若找不到則建立一個
             waypointsContainer = new VisualElement { name = "waypointsContainer" };
-            UIPanel.Add(waypointsContainer);
+            root.Add(waypointsContainer);
         }
     }
     #endregion
