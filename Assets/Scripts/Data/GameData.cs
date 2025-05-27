@@ -17,38 +17,9 @@ public class GameData
     public class PlayerData
     {
         // 數值型欄位默認值
-        private float _oils = 0;
-        public float Oils
-        {
-            get => _oils;
-            set
-            {
-                _oils = Mathf.Max(0, value); // 確保不為負
-                OnResourceChanged();
-            }
-        }
-
-        private float _gold = 0;
-        public float Gold
-        {
-            get => _gold;
-            set
-            {
-                _gold = Mathf.Max(0, value); // 確保不為負
-                OnResourceChanged();
-            }
-        }
-
-        private int _cube = 0;
-        public int Cube
-        {
-            get => _cube;
-            set
-            {
-                _cube = Mathf.Max(0, value); // 確保不為負
-                OnResourceChanged();
-            }
-        }
+        public int Oils = 0;
+        public int Gold = 0;
+        public int Cube = 0;
 
         // 默認從1級開始
         public int Level = 1;
@@ -66,9 +37,11 @@ public class GameData
         public PlayerData()
         {
             OnResourceChanged = delegate { };
-            _oils = 0;
-            _gold = 0;
-            _cube = 0;
+            // 初始化時設置默認值
+            Oils = 0;
+            Gold = 0;
+            Cube = 0;
+            
             Level = 1;
             Exp = 0;
         }

@@ -99,6 +99,14 @@ public class GameManager : Singleton<GameManager>
             {
                 try
                 {
+                    // 保存玩家資源（確保最新值）
+                    var playerData = GameDataController.Instance.CurrentGameData.playerData;
+                    data.playerData.Oils = playerData.Oils;
+                    data.playerData.Gold = playerData.Gold;
+                    data.playerData.Cube = playerData.Cube;
+                    data.playerData.Level = playerData.Level;
+                    data.playerData.Exp = playerData.Exp;
+
                     // 保存玩家船隻數據
                     var playerShips = GameObject.FindObjectsByType<PlayerShip>(FindObjectsSortMode.None)
                         .Where(ship => ship != null)
@@ -183,6 +191,13 @@ public class GameManager : Singleton<GameManager>
                     if (GameDataController.Instance != null)
                     {
                         GameDataController.Instance.CurrentGameData = data;
+                        // 載入玩家資源到 PlayerData
+                        var playerData = GameDataController.Instance.CurrentGameData.playerData;
+                        playerData.Oils = data.playerData.Oils;
+                        playerData.Gold = data.playerData.Gold;
+                        playerData.Cube = data.playerData.Cube;
+                        playerData.Level = data.playerData.Level;
+                        playerData.Exp = data.playerData.Exp;
                         Debug.Log("[GameManager] 遊戲數據已設置到 GameDataController");
                     }
 
