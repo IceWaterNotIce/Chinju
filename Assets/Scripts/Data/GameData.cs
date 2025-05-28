@@ -4,30 +4,39 @@ using UnityEngine;
 [System.Serializable]
 public class GameData
 {
+    [SerializeField]
+    public int version = 1; // 新增：存檔版本號
+
+    [SerializeField]
     public PlayerData playerData; // 修正命名
+    [SerializeField]
     public MapData mapData;       // 修正命名
 
-    // 新增：遊戲時間（秒）
+    [SerializeField]
     public float gameTime;
 
-    // 新增：敵方船隻數據
+    [SerializeField]
     public List<ShipData> enemyShips = new List<ShipData>();
 
     [System.Serializable]
     public class PlayerData
     {
-        // 數值型欄位默認值
+        [SerializeField]
         public float Oils = 0;
+        [SerializeField]
         public int Gold = 0;
+        [SerializeField]
         public int Cube = 0;
 
-        // 默認從1級開始
+        [SerializeField]
         public int Level = 1;
+        [SerializeField]
         public float Exp = 0;
 
-        // 玩家擁有的船隻數據
+        [SerializeField]
         public List<ShipData> Ships = new List<ShipData>();
 
+        [SerializeField]
         public List<WeaponData> Weapons = new List<WeaponData>(); // 確保初始化
 
         // 初始化資源變動事件
@@ -61,12 +70,17 @@ public class GameData
     [System.Serializable]
     public class MapData
     {
+        [SerializeField]
         public int Seed;
+        [SerializeField]
         public int Width;
+        [SerializeField]
         public int Height;
+        [SerializeField]
         public float IslandDensity;
 
         // chinjuTile的座標
+        [SerializeField]
         public List<Vector3Int> ChinjuTiles = new List<Vector3Int>();
     }
 
@@ -75,24 +89,48 @@ public class GameData
     {
         // 改為全域枚舉
         public enum CombatMode { Peaceful, Defensive, Aggressive }
+        [SerializeField]
         public CombatMode Mode; // 使用新的枚舉
 
+        [SerializeField]
         public string Name;
+        [SerializeField]
         public int Health;
+        [SerializeField]
         public int AttackPower;
+        [SerializeField]
         public int Defense;
+        [SerializeField]
         public Vector3 Position;
+        [SerializeField]
         public float MaxFuel;
+        [SerializeField]
         public float CurrentFuel;
+        [SerializeField]
         public float FuelConsumptionRate;
+        [SerializeField]
         public float Speed;
+        [SerializeField]
         public float Rotation;
+        [SerializeField]
         public int WeaponLimit;
+        [SerializeField]
         public int Level;
+        [SerializeField]
         public float Experience;
+        [SerializeField]
         public List<WeaponData> Weapons = new List<WeaponData>();
+        [SerializeField]
         public string PrefabName;
+        [SerializeField]
         public Rect NavigationArea;
+
+        [SerializeField]
+        public string ShipId; // 唯一識別碼
+        [SerializeField]
+        public string FleetId; // 所屬艦隊Id，可為null
+        [SerializeField]
+        public string ParentShipId; // 父船Id（如有母艦/僚艦關係）
 
         // 燃料百分比屬性
         public float FuelPercent => MaxFuel > 0 ? CurrentFuel / MaxFuel : 0;
@@ -105,18 +143,28 @@ public class GameData
     public class WeaponData
     {
         public enum WeaponType { Primary, Secondary, Special }
+        [SerializeField]
         public WeaponType Type;
 
+        [SerializeField]
         public string Name;
+        [SerializeField]
         public int Damage;
+        [SerializeField]
         public float MaxAttackDistance;
+        [SerializeField]
         public float MinAttackDistance;
+        [SerializeField]
         public float AttackSpeed;
+        [SerializeField]
         public float CooldownTime;
+        [SerializeField]
         public string PrefabName;
+        [SerializeField]
         public int AmmoPerShot;
-
+        [SerializeField]
         public int MaxAmmo;
+        [SerializeField]
         private int _currentAmmo;
         public int CurrentAmmo
         {

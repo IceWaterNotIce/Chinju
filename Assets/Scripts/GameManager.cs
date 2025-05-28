@@ -12,7 +12,11 @@ public class GameManager : Singleton<GameManager>
     public const string serverUrl = "https://icewaternotice.com/games/Word Curse/";
     public const string githubUrl = "https://raw.githubusercontent.com/IceWaterNotIce/Word-Curse/main/";
 
+    public const int SaveDataVersion = 1; // 新增：存檔版本號
+
+    [SerializeField]
     private string currentSaveFileName = "savegame.json";
+    [SerializeField]
     private float gameTime; // 遊戲時間（秒）
 
     // 遊戲內一天的秒數（現實 20 分鐘 = 遊戲 1 天，10 分鐘 = 12 小時）
@@ -28,6 +32,7 @@ public class GameManager : Singleton<GameManager>
     private const string LastSaveFileKey = "LastSaveFileName"; // 新增：PlayerPrefs key
 
     // 新增：自訂存檔資料夾路徑
+    [SerializeField]
     private string customSaveDirectory = null;
     #endregion
 
@@ -145,7 +150,7 @@ public class GameManager : Singleton<GameManager>
                     data.playerData.Level = playerData.Level;
                     data.playerData.Exp = playerData.Exp;
 
-                    // 保存玩家船隻數據
+                    // 保存玩家船隻數據（含艦隊編組/父子關係）
                     var playerShips = GameObject.FindObjectsByType<PlayerShip>(FindObjectsSortMode.None)
                         .Where(ship => ship != null)
                         .ToList();
@@ -153,6 +158,7 @@ public class GameManager : Singleton<GameManager>
                     data.playerData.Ships.Clear();
                     foreach (var ship in playerShips)
                     {
+                        // 只呼叫 SaveShipData，讓 ShipData 內部處理關聯
                         data.playerData.Ships.Add(ship.SaveShipData());
                     }
 
@@ -184,8 +190,11 @@ public class GameManager : Singleton<GameManager>
                         data.enemyShips.Add(shipData);
                     }
 
-                    // 保存遊戲時間
+                    // 儲存遊戲時間
                     data.gameTime = gameTime;
+
+                    // 新增：設置存檔版本號
+                    data.version = SaveDataVersion;
 
                     string json = JsonUtility.ToJson(data, true);
                     string path = GetSaveFilePath(fileName);
@@ -223,6 +232,16 @@ public class GameManager : Singleton<GameManager>
             {
                 string json = File.ReadAllText(path);
                 GameData data = JsonUtility.FromJson<GameData>(json);
+
+                // 新增：檢查版本號
+                if (data != null)
+                {
+                    if (data.version != SaveDataVersion)
+                    {
+                        Debug.LogWarning($"[GameManager] 存檔版本不符，當前版本: {SaveDataVersion}，存檔版本: {data.version}");
+                        // 可在此處做兼容處理
+                    }
+                }
 
                 if (data != null)
                 {
