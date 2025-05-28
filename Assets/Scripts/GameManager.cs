@@ -198,6 +198,16 @@ public class GameManager : Singleton<GameManager>
 
                     string json = JsonUtility.ToJson(data, true);
                     string path = GetSaveFilePath(fileName);
+
+                    // === 新增：自動備份舊存檔 ===
+                    if (File.Exists(path))
+                    {
+                        string backupPath = path + ".bak";
+                        File.Copy(path, backupPath, true);
+                        Debug.Log($"[GameManager] 已備份舊存檔至 {backupPath}");
+                    }
+                    // === 備份結束 ===
+
                     File.WriteAllText(path, json);
                     Debug.Log($"[GameManager] 遊戲已保存至 {path}");
                     // 新增：儲存最後一次存檔檔名
@@ -231,16 +241,46 @@ public class GameManager : Singleton<GameManager>
             try
             {
                 string json = File.ReadAllText(path);
-                GameData data = JsonUtility.FromJson<GameData>(json);
+                GameData data = null;
+                try
+                {
+                    data = JsonUtility.FromJson<GameData>(json);
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"[GameManager] 存檔反序列化失敗，檔案可能已損壞: {ex.Message}");
+                    return null;
+                }
 
-                // 新增：檢查版本號
+                // 驗證存檔完整性，補齊缺失欄位
                 if (data != null)
                 {
-                    if (data.version != SaveDataVersion)
-                    {
-                        Debug.LogWarning($"[GameManager] 存檔版本不符，當前版本: {SaveDataVersion}，存檔版本: {data.version}");
-                        // 可在此處做兼容處理
-                    }
+                    if (data.playerData == null)
+                        data.playerData = new GameData.PlayerData();
+                    if (data.mapData == null)
+                        data.mapData = new GameData.MapData();
+                    if (data.enemyShips == null)
+                        data.enemyShips = new List<GameData.ShipData>();
+                    if (data.version == 0)
+                        data.version = SaveDataVersion;
+                    if (data.playerData.Ships == null)
+                        data.playerData.Ships = new List<GameData.ShipData>();
+                    if (data.playerData.Weapons == null)
+                        data.playerData.Weapons = new List<GameData.WeaponData>();
+                    if (data.mapData.ChinjuTiles == null)
+                        data.mapData.ChinjuTiles = new List<Vector3Int>();
+                }
+                else
+                {
+                    Debug.LogError("[GameManager] 存檔反序列化後為 null，檔案可能已損壞。");
+                    return null;
+                }
+
+                // 檢查版本號
+                if (data.version != SaveDataVersion)
+                {
+                    Debug.LogError($"[GameManager] 存檔版本不兼容，當前版本: {SaveDataVersion}，存檔版本: {data.version}。請升級或轉換存檔格式。");
+                    return null;
                 }
 
                 if (data != null)
