@@ -5,14 +5,10 @@ using UnityEngine.InputSystem; // 新增：使用新輸入系統
 public class SettingMenu : MonoBehaviour
 {
     private VisualElement root;
-    private Button continueButton;
-    private Button saveGameButton;
-    private Button exitGameButton;
-    private Button newGameButton; // 新增
-    private Button selectGameDataButton; // 新增
     private Slider textSizeSlider; // 新增：Slider 欄位
     private Slider BGMSlider; // 新增
     private Slider SFXSlider; // 新增
+    private Button openMenuButtonPanelBtn; // 新增
 
     void Awake()
     {
@@ -34,7 +30,6 @@ public class SettingMenu : MonoBehaviour
 
     void OnDestroy()
     {
-        UnregisterButtonCallbacks();
         // 新增：解除 Slider callback
         if (textSizeSlider != null)
             textSizeSlider.UnregisterValueChangedCallback(OnTextSizeSliderChanged);
@@ -62,18 +57,21 @@ public class SettingMenu : MonoBehaviour
                 return;
             }
 
-            continueButton = UIHelper.InitializeElement<Button>(root, "continueButton");
-            saveGameButton = UIHelper.InitializeElement<Button>(root, "saveGameButton");
-            exitGameButton = UIHelper.InitializeElement<Button>(root, "exitGameButton");
-            newGameButton = UIHelper.InitializeElement<Button>(root, "newGameButton"); // 新增
-            selectGameDataButton = UIHelper.InitializeElement<Button>(root, "selectGameDataButton"); // 新增
+            // 不再掛載 MenuButtonPanel
+
+            // 新增：取得開啟按鈕並註冊事件
+            openMenuButtonPanelBtn = root.Q<Button>("openMenuButtonPanelBtn");
+            if (openMenuButtonPanelBtn != null)
+            {
+                openMenuButtonPanelBtn.clicked += ShowMenuButtonPanel;
+            }
+
             textSizeSlider = UIHelper.InitializeElement<Slider>(root, "textSizeSlider"); // 新增：Slider 初始化
             BGMSlider = UIHelper.InitializeElement<Slider>(root, "BGMSlider"); // 新增
             SFXSlider = UIHelper.InitializeElement<Slider>(root, "SFXSlider"); // 新增
 
-            RegisterButtonCallbacks();
+            // 不再註冊按鈕 callback
 
-            // 新增：註冊 Slider callback
             if (textSizeSlider != null)
             {
                 textSizeSlider.RegisterValueChangedCallback(OnTextSizeSliderChanged);
@@ -101,31 +99,6 @@ public class SettingMenu : MonoBehaviour
             Debug.LogError($"[SettingPanel] UI初始化失敗: {e.Message}\n{e.StackTrace}");
             return; // 新增：初始化失敗直接 return
         }
-    }
-
-    private void RegisterButtonCallbacks()
-    {
-        if (continueButton != null) continueButton.clicked += OnContinueButtonClicked;
-        if (saveGameButton != null) saveGameButton.clicked += OnSaveGameButtonClicked;
-        if (exitGameButton != null) exitGameButton.clicked += OnExitGameButtonClicked;
-        if (newGameButton != null) newGameButton.clicked += OnNewGameButtonClicked;
-        if (selectGameDataButton != null) selectGameDataButton.clicked += OnSelectGameDataButtonClicked;
-        // 若有 closeButton，這裡也註冊
-        // var closeButton = root.Q<Button>("closeButton");
-        // if (closeButton != null) closeButton.clicked += OnCloseButtonClicked;
-    }
-
-    private void UnregisterButtonCallbacks()
-    {
-        if (continueButton != null) continueButton.clicked -= OnContinueButtonClicked;
-        if (saveGameButton != null) saveGameButton.clicked -= OnSaveGameButtonClicked;
-        if (exitGameButton != null) exitGameButton.clicked -= OnExitGameButtonClicked;
-        if (newGameButton != null) newGameButton.clicked -= OnNewGameButtonClicked;
-        if (selectGameDataButton != null) selectGameDataButton.clicked -= OnSelectGameDataButtonClicked;
-
-        // 若有 closeButton，這裡也解除
-        // var closeButton = root.Q<Button>("closeButton");
-        // if (closeButton != null) closeButton.clicked -= OnCloseButtonClicked;
     }
 
     private void ToggleMenu()
@@ -172,20 +145,21 @@ public class SettingMenu : MonoBehaviour
         Debug.Log("[SettingPanel] 隱藏遊戲選單並恢復遊戲");
     }
 
-    private void OnContinueButtonClicked()
+    // 以下按鈕事件需設為 public 以供 MenuButtonPanel 呼叫
+    public void OnContinueButtonClicked()
     {
         Debug.Log("[SettingPanel] 繼續遊戲");
         HideGameMenu();
     }
 
-    private void OnSaveGameButtonClicked()
+    public void OnSaveGameButtonClicked()
     {
         Debug.Log("[SettingPanel] 儲存遊戲");
         if (GameDataController.Instance != null)
             GameManager.Instance.SaveGame(); // Adjusted to match the method signature
     }
 
-    private void OnExitGameButtonClicked()
+    public void OnExitGameButtonClicked()
     {
         Debug.Log("[SettingPanel] 退出遊戲");
         #if UNITY_EDITOR
@@ -195,14 +169,14 @@ public class SettingMenu : MonoBehaviour
         #endif
     }
 
-    private void OnNewGameButtonClicked()
+    public void OnNewGameButtonClicked()
     {
         PopupManager.Instance.ShowPopup("GameDataCreatePanel");
         PopupManager.Instance.HidePopup("SettingMenu");
         HideGameMenu();
     }
 
-    private void OnSelectGameDataButtonClicked()
+    public void OnSelectGameDataButtonClicked()
     {
         PopupManager.Instance.ShowPopup("GameDataSelectPanel");
         PopupManager.Instance.HidePopup("SettingMenu");
@@ -259,5 +233,12 @@ public class SettingMenu : MonoBehaviour
         if (AudioManager.Instance != null)
             AudioManager.Instance.SetSFXVolume(volume);
         // 若無 AudioManager，請自行實作
+    }
+
+    // 新增：顯示 MenuButtonPanel
+    private void ShowMenuButtonPanel()
+    {
+        PopupManager.Instance.ShowPopup("MenuButtonPanel");
+        PopupManager.Instance.HidePopup("SettingMenu");
     }
 }
