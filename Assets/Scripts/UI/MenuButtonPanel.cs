@@ -3,8 +3,6 @@ using UnityEngine.UIElements;
 
 public class MenuButtonPanel : MonoBehaviour
 {
-    public SettingMenu settingMenu;
-
     private Button continueButton;
     private Button newGameButton;
     private Button selectGameDataButton;
@@ -16,11 +14,11 @@ public class MenuButtonPanel : MonoBehaviour
     void Awake()
     {
         PopupManager.Instance.RegisterPopup("MenuButtonPanel", gameObject);
-       
     }
-    void Enable()
+
+    void OnEnable()
     {
-         var doc = GetComponent<UIDocument>();
+        var doc = GetComponent<UIDocument>();
         if (doc != null)
             root = doc.rootVisualElement.Q<VisualElement>("menu-button-panel");
         if (root == null)
@@ -28,23 +26,61 @@ public class MenuButtonPanel : MonoBehaviour
             Debug.LogError("[MenuButtonPanel] root is null. Please ensure the UIDocument is set up correctly.");
             return;
         }
-        Initialize(root, settingMenu);
+        Initialize(root);
     }
-    public void Initialize(VisualElement root, SettingMenu menu)
+
+    public void Initialize(VisualElement root)
     {
-        settingMenu = menu;
-        continueButton = root.Q<Button>("continueButton");
-        newGameButton = root.Q<Button>("newGameButton");
-        selectGameDataButton = root.Q<Button>("selectGameDataButton");
-        saveGameButton = root.Q<Button>("saveGameButton");
-        exitGameButton = root.Q<Button>("exitGameButton");
+        continueButton = UIHelper.InitializeElement<Button>(root, "continueButton");
+        newGameButton = UIHelper.InitializeElement<Button>(root, "newGameButton");
+        selectGameDataButton = UIHelper.InitializeElement<Button>(root, "selectGameDataButton");
+        saveGameButton = UIHelper.InitializeElement<Button>(root, "saveGameButton");
+        exitGameButton = UIHelper.InitializeElement<Button>(root, "exitGameButton");
 
-        if (continueButton != null) continueButton.clicked += settingMenu.OnContinueButtonClicked;
-        if (newGameButton != null) newGameButton.clicked += settingMenu.OnNewGameButtonClicked;
-        if (selectGameDataButton != null) selectGameDataButton.clicked += settingMenu.OnSelectGameDataButtonClicked;
-        if (saveGameButton != null) saveGameButton.clicked += settingMenu.OnSaveGameButtonClicked;
-        if (exitGameButton != null) exitGameButton.clicked += settingMenu.OnExitGameButtonClicked;
+        if (continueButton != null) continueButton.clicked += OnContinueButtonClicked;
+        if (newGameButton != null) newGameButton.clicked += OnNewGameButtonClicked;
+        if (selectGameDataButton != null) selectGameDataButton.clicked += OnSelectGameDataButtonClicked;
+        if (saveGameButton != null) saveGameButton.clicked += OnSaveGameButtonClicked;
+        if (exitGameButton != null) exitGameButton.clicked += OnExitGameButtonClicked;
     }
 
-    // 可在此添加面板相關邏輯
+    private void OnContinueButtonClicked()
+    {
+        Debug.Log("[MenuButtonPanel] 繼續遊戲");
+        PopupManager.Instance.HidePopup("MenuButtonPanel");
+        PopupManager.Instance.ShowPopup("SettingMenu");
+        Time.timeScale = 1f;
+    }
+
+    private void OnSaveGameButtonClicked()
+    {
+        Debug.Log("[MenuButtonPanel] 儲存遊戲");
+        if (GameDataController.Instance != null)
+            GameManager.Instance.SaveGame();
+    }
+
+    private void OnExitGameButtonClicked()
+    {
+        Debug.Log("[MenuButtonPanel] 退出遊戲");
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
+    private void OnNewGameButtonClicked()
+    {
+        PopupManager.Instance.ShowPopup("GameDataCreatePanel");
+        PopupManager.Instance.HidePopup("MenuButtonPanel");
+        PopupManager.Instance.HidePopup("SettingMenu");
+        Time.timeScale = 1f;
+    }
+
+    private void OnSelectGameDataButtonClicked()
+    {
+        PopupManager.Instance.ShowPopup("GameDataSelectPanel");
+        PopupManager.Instance.HidePopup("MenuButtonPanel");
+        PopupManager.Instance.HidePopup("SettingMenu");
+    }
 }
