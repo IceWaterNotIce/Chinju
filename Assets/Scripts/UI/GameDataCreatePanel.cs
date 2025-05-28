@@ -6,8 +6,10 @@ public class GameDataCreatePanel : MonoBehaviour
     private VisualElement root;
     private TextField fileNameField;
     private TextField mapSeedField; // 新增
+    private TextField saveDirField; // 新增
     private Button createButton;
     private Button cancelButton;
+    private Button browseDirButton; // 新增
 
     void Awake()
     {
@@ -20,17 +22,23 @@ public class GameDataCreatePanel : MonoBehaviour
         root = uiDocument.rootVisualElement;
         fileNameField = root.Q<TextField>("fileNameField");
         mapSeedField = root.Q<TextField>("mapSeedField"); // 新增
+        saveDirField = root.Q<TextField>("saveDirField"); // 新增
         createButton = root.Q<Button>("createButton");
         cancelButton = root.Q<Button>("cancelButton");
+        browseDirButton = root.Q<Button>("browseDirButton"); // 新增
 
         createButton.clicked += OnCreateClicked;
         cancelButton.clicked += OnCancelClicked;
+        if (browseDirButton != null)
+            browseDirButton.clicked += OnBrowseDirClicked; // 新增
     }
 
     void OnDisable()
     {
         createButton.clicked -= OnCreateClicked;
         cancelButton.clicked -= OnCancelClicked;
+        if (browseDirButton != null)
+            browseDirButton.clicked -= OnBrowseDirClicked; // 新增
     }
 
     private void OnCreateClicked()
@@ -53,8 +61,15 @@ public class GameDataCreatePanel : MonoBehaviour
                 Debug.LogWarning("[GameDataCreatePanel] 地圖種子格式錯誤，將使用隨機種子");
         }
 
-        // 呼叫 GameManager 建立新遊戲，傳入 mapSeed
-        GameManager.Instance.StartNewGame(fileName, mapSeed);
+        string saveDir = saveDirField != null ? saveDirField.value.Trim() : "";
+        if (string.IsNullOrEmpty(saveDir))
+        {
+            Debug.LogWarning("[GameDataCreatePanel] 請選擇存檔資料夾");
+            return;
+        }
+
+        // 呼叫 GameManager 建立新遊戲，傳入 mapSeed 與 saveDir
+        GameManager.Instance.StartNewGame(fileName, mapSeed, saveDir);
 
         PopupManager.Instance.HidePopup("GameDataCreatePanel");
         PopupManager.Instance.HidePopup("SettingMenu");
@@ -63,5 +78,19 @@ public class GameDataCreatePanel : MonoBehaviour
     private void OnCancelClicked()
     {
         PopupManager.Instance.HidePopup("GameDataCreatePanel");
+    }
+
+    // 新增：開啟資料夾選擇視窗
+    private void OnBrowseDirClicked()
+    {
+#if UNITY_EDITOR
+        string path = UnityEditor.EditorUtility.OpenFolderPanel("選擇存檔資料夾", "", "");
+        if (!string.IsNullOrEmpty(path) && saveDirField != null)
+        {
+            saveDirField.value = path;
+        }
+#else
+        Debug.LogWarning("[GameDataCreatePanel] 僅支援於 Editor 模式選擇資料夾");
+#endif
     }
 }

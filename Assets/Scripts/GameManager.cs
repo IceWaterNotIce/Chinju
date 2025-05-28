@@ -305,8 +305,12 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     /// <param name="newSaveFileName">新遊戲存檔名稱（可為 null，預設自動產生）</param>
     /// <param name="mapSeed">地圖種子（可為 null，null 則隨機）</param>
-    public void StartNewGame(string newSaveFileName = null, int? mapSeed = null)
+    /// <param name="saveDir">自訂存檔資料夾（可為 null 或空字串）</param>
+    public void StartNewGame(string newSaveFileName = null, int? mapSeed = null, string saveDir = null)
     {
+        // 設定自訂存檔資料夾（可為 null）
+        SetCustomSaveDirectory(string.IsNullOrEmpty(saveDir) ? null : saveDir);
+
         // 1. 儲存目前遊戲（如果有資料）
         if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData != null)
         {
@@ -316,7 +320,7 @@ public class GameManager : Singleton<GameManager>
         // 2. 產生新檔名
         if (string.IsNullOrEmpty(newSaveFileName))
         {
-            string timestamp = System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string timestamp = System.DateTime.Now.ToString("yyyyMMdd_HHmms");
             newSaveFileName = $"savegame_{timestamp}.json";
         }
         else if (!newSaveFileName.EndsWith(".json"))
@@ -383,7 +387,7 @@ public class GameManager : Singleton<GameManager>
         // 7. 立即儲存新遊戲檔案
         SaveGame();
 
-        Debug.Log($"[GameManager] 新遊戲已開始，並儲存於 {newSaveFileName}");
+        Debug.Log($"[GameManager] 新遊戲已開始，並儲存於 {newSaveFileName}，資料夾：{(string.IsNullOrEmpty(saveDir) ? Application.persistentDataPath : saveDir)}");
     }
 
     public string GetFormattedGameTime()
