@@ -39,6 +39,9 @@ public class GameData
         [SerializeField]
         public List<WeaponData> Weapons = new List<WeaponData>(); // 確保初始化
 
+        [SerializeField]
+        public List<FleetData> Fleets = new List<FleetData>(); // 新增：玩家艦隊數據
+
         // 初始化資源變動事件
         [System.NonSerialized]
         public System.Action OnResourceChanged = delegate { };
@@ -171,5 +174,22 @@ public class GameData
             get => _currentAmmo;
             set => _currentAmmo = Mathf.Clamp(value, 0, MaxAmmo);
         }
+    }
+
+    [System.Serializable]
+    public class FleetData
+    {
+        [SerializeField]
+        public string FleetId; // 唯一識別碼
+        [SerializeField]
+        public string Name; // 艦隊名稱
+        [SerializeField]
+        public List<string> ShipIds = new List<string>(); // 艦隊中的船隻ID列表
+        [SerializeField]
+        public Vector3 Position; // 艦隊位置
+        [SerializeField]
+        public float Speed; // 艦隊速度
+        [SerializeField]
+        public string FlagshipId; // 旗艦ID
     }
 }

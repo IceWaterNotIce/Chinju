@@ -190,6 +190,17 @@ public class GameManager : Singleton<GameManager>
                         data.enemyShips.Add(shipData);
                     }
 
+                    // 保存玩家艦隊數據
+                    var playerFleets = GameObject.FindObjectsByType<Fleet>(FindObjectsSortMode.None)
+                        .Where(fleet => fleet != null)
+                        .ToList();
+
+                    data.playerData.Fleets.Clear();
+                    foreach (var fleet in playerFleets)
+                    {
+                        data.playerData.Fleets.Add(fleet.SaveFleetData());
+                    }
+
                     // 儲存遊戲時間
                     data.gameTime = gameTime;
 
@@ -328,6 +339,19 @@ public class GameManager : Singleton<GameManager>
                         else
                         {
                             Debug.LogError("[GameManager] EnemyShipSpawner 未初始化，無法生成敵人！");
+                        }
+                    }
+
+                    // 使用 FleetManager 載入玩家艦隊數據並實例化
+                    foreach (var fleetData in data.playerData.Fleets)
+                    {
+                        if (FleetManager.Instance != null)
+                        {
+                            FleetManager.Instance.InstantiateFleetFromData(fleetData);
+                        }
+                        else
+                        {
+                            Debug.LogError("[GameManager] FleetManager 未初始化，無法實例化艦隊！");
                         }
                     }
 

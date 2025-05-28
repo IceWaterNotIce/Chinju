@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -18,6 +19,10 @@ public class Fleet : MonoBehaviour
     public FormationType formation = FormationType.SingleLineAhead;
     public float circleRadius = 3.0f; // For CircularFormation
     public float echelonAngle = 30f; // For EchelonFormation (degrees)
+
+    public string FleetId { get; set; } // 新增：艦隊唯一識別碼
+    public float Speed { get; set; } // 新增：艦隊速度
+    public string FlagshipId { get; set; } // 新增：旗艦ID
 
     void Update()
     {
@@ -153,5 +158,31 @@ public class Fleet : MonoBehaviour
         {
             Debug.LogWarning($"[Fleet] Attempted to remove a ship that is not a follower: {ship.name}");
         }
+    }
+
+    public void AddShip(Ship ship)
+    {
+        if (!followers.Contains(ship))
+        {
+            followers.Add(ship);
+            ship.transform.SetParent(transform);
+            Debug.Log($"[Fleet] Added ship: {ship.name} to fleet: {FleetId}");
+        }
+    }
+
+    public GameData.FleetData SaveFleetData()
+    {
+        var fleetData = new GameData.FleetData
+        {
+            FleetId = this.FleetId,
+            Name = gameObject.name,
+            Position = transform.position,
+            Speed = this.Speed,
+            FlagshipId = this.FlagshipId,
+            ShipIds = followers.Select(ship => ship.ShipId).ToList()
+        };
+
+        Debug.Log($"[Fleet] Saved fleet data: {fleetData.Name} with {fleetData.ShipIds.Count} ships.");
+        return fleetData;
     }
 }

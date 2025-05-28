@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public class Ship : MonoBehaviour
 {
+    public string ShipId { get; set; } // 新增：唯一識別碼
+
     // === Fleet/Follower 屬性（從 Warship 移動過來） ===
     public bool IsFollower;
     public Ship LeaderShip;

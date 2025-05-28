@@ -1,10 +1,10 @@
+using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class FleetManager : Singleton<FleetManager>
 {
-
     public void CreateFleet(Warship[] warships)
     {
         GameObject fleetParent = new GameObject("FleetGroup");
@@ -70,5 +70,25 @@ public class FleetManager : Singleton<FleetManager>
         return FindObjectsByType<Fleet>(FindObjectsSortMode.None).Where(f => f.followers.Count > 0 && f.followers[0] is PlayerShip).ToArray();
     }
 
-    // ...可擴充更多管理功能...
+    public Fleet InstantiateFleetFromData(GameData.FleetData fleetData)
+    {
+        // 根據 FleetData 創建艦隊實例
+        var fleet = new GameObject(fleetData.Name).AddComponent<Fleet>();
+        fleet.FleetId = fleetData.FleetId; // 修正：確保 FleetId 屬性存在於 Fleet 類別
+        fleet.transform.position = fleetData.Position;
+        fleet.Speed = fleetData.Speed; // 修正：確保 Speed 屬性存在於 Fleet 類別
+        fleet.FlagshipId = fleetData.FlagshipId; // 修正：確保 FlagshipId 屬性存在於 Fleet 類別
+
+        // 將船隻加入艦隊
+        foreach (var shipId in fleetData.ShipIds)
+        {
+            var ship = ShipManager.Instance?.GetShipById(shipId); // 修正：確保 ShipManager 存在
+            if (ship != null)
+            {
+                fleet.AddShip(ship); // 修正：確保 AddShip 方法存在於 Fleet 類別
+            }
+        }
+
+        return fleet;
+    }
 }

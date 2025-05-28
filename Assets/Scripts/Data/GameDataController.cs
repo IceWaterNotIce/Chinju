@@ -25,6 +25,7 @@ public class GameDataController : Singleton<GameDataController>
 
     public System.Action<GameData> OnGameDataChanged;
     public System.Action OnMapDataChanged; // 新增：地圖數據變更事件
+    public System.Action OnFleetDataChanged; // 新增：艦隊數據變更事件
 
     private new void Awake()
     {
@@ -55,6 +56,12 @@ public class GameDataController : Singleton<GameDataController>
     {
         OnMapDataChanged?.Invoke(); // 發送地圖數據變更事件
         Debug.Log("[GameDataController] 地圖數據事件已觸發");
+    }
+
+    public void TriggerFleetDataChanged()
+    {
+        OnFleetDataChanged?.Invoke(); // 發送艦隊數據變更事件
+        Debug.Log("[GameDataController] 艦隊數據事件已觸發");
     }
 
     /// <summary>
