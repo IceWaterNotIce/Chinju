@@ -8,6 +8,8 @@ public class GameDataSelectPanel : MonoBehaviour
     private VisualElement root;
     private VisualElement fileListContainer;
     private Button closeButton;
+    // 新增：開啟資料夾按鈕
+    private Button openFolderButton;
 
     private string saveFolderPath;
 
@@ -27,6 +29,13 @@ public class GameDataSelectPanel : MonoBehaviour
         fileListContainer = UIHelper.InitializeElement<VisualElement>(root, "fileListContainer");
         closeButton = UIHelper.InitializeElement<Button>(root, "closeButton");
         closeButton.clicked += () => PopupManager.Instance.HidePopup("GameDataSelectPanel");
+
+        // 新增：取得開啟資料夾按鈕並註冊事件
+        openFolderButton = UIHelper.InitializeElement<Button>(root, "openFolderButton");
+        if (openFolderButton != null)
+        {
+            openFolderButton.clicked += OpenSaveFolderInExplorer;
+        }
 
         saveFolderPath = Application.persistentDataPath;
         RefreshFileList();
@@ -105,5 +114,19 @@ public class GameDataSelectPanel : MonoBehaviour
         {
             Debug.LogWarning($"[GameDataSelectPanel] 檔案不存在: {filePath}");
         }
+    }
+
+    // 新增：開啟存檔資料夾
+    private void OpenSaveFolderInExplorer()
+    {
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
+        System.Diagnostics.Process.Start("explorer.exe", saveFolderPath.Replace("/", "\\"));
+#elif UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX
+        System.Diagnostics.Process.Start("open", saveFolderPath);
+#elif UNITY_EDITOR_LINUX || UNITY_STANDALONE_LINUX
+        System.Diagnostics.Process.Start("xdg-open", saveFolderPath);
+#else
+        Debug.Log("不支援的作業系統，無法開啟資料夾。");
+#endif
     }
 }

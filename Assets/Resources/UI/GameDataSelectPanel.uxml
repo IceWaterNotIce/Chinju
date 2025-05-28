@@ -3,6 +3,7 @@
     <ui:VisualElement name="root" style="flex-direction: column; align-items: center; justify-content: flex-start; width: 1500px; background-color: rgb(34, 34, 34); padding: 20px; border-radius: 10px; -unity-text-align: upper-left; align-self: center; align-content: auto; translate: -50% -50%; position: absolute; top: 50%; left: 50%; height: 800px;">
         <ui:Label text="選擇要載入的存檔" style="font-size: 20px; color: white; margin-bottom: 16px;" />
         <ui:ScrollView name="fileListContainer" vertical-scroller-visibility="Auto" horizontal-scroller-visibility="Hidden" mode="Vertical" focusable="false" touch-scroll-type="Clamped" style="height: 634px; width: 652px; margin-bottom: 16px; -unity-text-align: upper-left; align-items: stretch; justify-content: center; flex-direction: column; flex-wrap: nowrap; align-self: center; align-content: auto;" />
+        <ui:Button name="openFolderButton" text="開啟存檔資料夾" style="width: 180px; align-self: center; margin-bottom: 8px;" />
         <ui:Button name="closeButton" text="關閉" style="width: 100px; align-self: center;" />
     </ui:VisualElement>
 </UXML>
