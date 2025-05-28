@@ -145,43 +145,6 @@ public class SettingMenu : MonoBehaviour
         Debug.Log("[SettingPanel] 隱藏遊戲選單並恢復遊戲");
     }
 
-    // 以下按鈕事件需設為 public 以供 MenuButtonPanel 呼叫
-    public void OnContinueButtonClicked()
-    {
-        Debug.Log("[SettingPanel] 繼續遊戲");
-        HideGameMenu();
-    }
-
-    public void OnSaveGameButtonClicked()
-    {
-        Debug.Log("[SettingPanel] 儲存遊戲");
-        if (GameDataController.Instance != null)
-            GameManager.Instance.SaveGame(); // Adjusted to match the method signature
-    }
-
-    public void OnExitGameButtonClicked()
-    {
-        Debug.Log("[SettingPanel] 退出遊戲");
-        #if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-        #else
-            Application.Quit();
-        #endif
-    }
-
-    public void OnNewGameButtonClicked()
-    {
-        PopupManager.Instance.ShowPopup("GameDataCreatePanel");
-        PopupManager.Instance.HidePopup("SettingMenu");
-        HideGameMenu();
-    }
-
-    public void OnSelectGameDataButtonClicked()
-    {
-        PopupManager.Instance.ShowPopup("GameDataSelectPanel");
-        PopupManager.Instance.HidePopup("SettingMenu");
-    }
-
     // 新增：Slider callback
     private void OnTextSizeSliderChanged(ChangeEvent<float> evt)
     {
