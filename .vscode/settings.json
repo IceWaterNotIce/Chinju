@@ -56,6 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Chinju.sln",
+    "dotnet.defaultSolution": "Chinjufu.sln",
     "markdown-todo.sortByCount": true
 }
