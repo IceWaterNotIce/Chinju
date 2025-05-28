@@ -46,11 +46,6 @@ public class GameDataCreatePanel : MonoBehaviour
     private void OnCreateClicked()
     {
         string fileName = fileNameField.value.Trim();
-        if (string.IsNullOrEmpty(fileName))
-        {
-            Debug.LogWarning("[GameDataCreatePanel] 檔名不可為空");
-            return;
-        }
         if (!fileName.EndsWith(".json"))
             fileName += ".json";
 
@@ -64,11 +59,6 @@ public class GameDataCreatePanel : MonoBehaviour
         }
 
         string saveDir = saveDirField != null ? saveDirField.value.Trim() : "";
-        if (string.IsNullOrEmpty(saveDir))
-        {
-            Debug.LogWarning("[GameDataCreatePanel] 請選擇存檔資料夾");
-            return;
-        }
 
         // 呼叫 GameManager 建立新遊戲，傳入 mapSeed 與 saveDir
         GameManager.Instance.StartNewGame(fileName, mapSeed, saveDir);
