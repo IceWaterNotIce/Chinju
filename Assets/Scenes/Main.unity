@@ -867,10 +867,9 @@ MonoBehaviour:
   oilTile: {fileID: 11400000, guid: 6c79396beaa4f514a8997b471e435bab, type: 2}
   islandDensity: 0.2
   seed: 123456
-  useRandomSeed: 0
   mainCamera: {fileID: 2019224608}
   cameraController: {fileID: 2019224605}
-  oilShipPrefab: {fileID: 0}
+  oilShipPrefab: {fileID: 1414975581038501931, guid: f8dcedc79c57a5b4c924b6423e04f43a, type: 3}
   showOceanLevelText: 0
 --- !u!1 &730569034
 GameObject:

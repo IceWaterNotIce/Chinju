@@ -25,6 +25,9 @@ public class GameManager : Singleton<GameManager>
 
     private const string LastSaveFileKey = "LastSaveFileName"; // 新增：PlayerPrefs key
 
+    // 新增：自訂存檔資料夾路徑
+    private string customSaveDirectory = null;
+
     protected override void Awake()
     {
         base.Awake();
@@ -78,12 +81,32 @@ public class GameManager : Singleton<GameManager>
     }
 
     /// <summary>
+    /// 設定自訂存檔資料夾路徑（傳 null 則恢復預設 Application.persistentDataPath）
+    /// </summary>
+    public void SetCustomSaveDirectory(string directory)
+    {
+        if (!string.IsNullOrEmpty(directory))
+        {
+            customSaveDirectory = directory;
+            // 若資料夾不存在則建立
+            if (!Directory.Exists(customSaveDirectory))
+                Directory.CreateDirectory(customSaveDirectory);
+        }
+        else
+        {
+            customSaveDirectory = null;
+        }
+    }
+
+    /// <summary>
     /// 取得目前存檔的完整路徑
     /// </summary>
     private string GetSaveFilePath(string fileName = null)
     {
         string name = fileName ?? currentSaveFileName;
-        return Path.Combine(Application.persistentDataPath, name);
+        // 若有自訂資料夾則用自訂，否則用預設
+        string dir = string.IsNullOrEmpty(customSaveDirectory) ? Application.persistentDataPath : customSaveDirectory;
+        return Path.Combine(dir, name);
     }
 
     /// <summary>
