@@ -7,6 +7,10 @@ public class TimeControlBar : MonoBehaviour
     private int currentScaleIndex = 2; // 預設為正常速度 (1x)
     private UIDocument uiDocument;
 
+    private VisualElement gameStopUIInstance; // 動態載入的暫停 UI
+    private VisualTreeAsset gameStopUITree;   // 暫停 UI 的 UXML
+    private VisualElement root;               // UI 根元素
+
     void Start()
     {
         uiDocument = GetComponent<UIDocument>();
@@ -16,7 +20,7 @@ public class TimeControlBar : MonoBehaviour
             return;
         }
 
-        var root = uiDocument.rootVisualElement;
+        root = uiDocument.rootVisualElement;
         if (root == null)
         {
             Debug.LogError("無法獲取 UI 根元素！");
@@ -28,6 +32,9 @@ public class TimeControlBar : MonoBehaviour
         BindButton(root, "normal-btn", () => SetTimeScale(2));
         BindButton(root, "fast-btn", () => SetTimeScale(3));
         BindButton(root, "super-fast-btn", () => SetTimeScale(4));
+
+        // 載入 GameStopUI 的 VisualTreeAsset
+        gameStopUITree = Resources.Load<VisualTreeAsset>("UI/GameStopUI");
 
         UpdateTimeScale();
     }
@@ -42,6 +49,38 @@ public class TimeControlBar : MonoBehaviour
     {
         Time.timeScale = timeScales[currentScaleIndex];
         Debug.Log($"時間倍率已更新為: {timeScales[currentScaleIndex]}x");
+
+        // 動態顯示/隱藏 Game Stop UI
+        if (Mathf.Approximately(Time.timeScale, 0f))
+        {
+            ShowGameStopUI();
+        }
+        else
+        {
+            HideGameStopUI();
+        }
+    }
+
+    private void ShowGameStopUI()
+    {
+        if (gameStopUIInstance == null && gameStopUITree != null && root != null)
+        {
+            gameStopUIInstance = gameStopUITree.Instantiate();
+            root.Add(gameStopUIInstance);
+        }
+        else if (gameStopUIInstance != null)
+        {
+            gameStopUIInstance.style.display = DisplayStyle.Flex;
+
+        }
+    }
+
+    private void HideGameStopUI()
+    {
+        if (gameStopUIInstance != null)
+        {
+            gameStopUIInstance.style.display = DisplayStyle.None;
+        }
     }
 
     public void SetTimeScale(int index)

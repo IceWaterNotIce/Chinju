@@ -600,6 +600,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 63afe29e19dce644080c18f345f84764, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentSaveFileName: savegame.json
+  gameTime: 0
+  customSaveDirectory: 
 --- !u!4 &586510289
 Transform:
   m_ObjectHideFlags: 0
