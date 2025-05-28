@@ -637,5 +637,6 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
 
         // 重新產生地圖
         UpdateVisibleChunks();
+        RenderMap(); // 新增：重新渲染地圖
     }
 }
