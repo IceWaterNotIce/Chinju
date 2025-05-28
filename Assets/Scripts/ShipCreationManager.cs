@@ -23,15 +23,9 @@ public class ShipCreationManager : MonoBehaviour
     public PlayerShip TryCreateRandomShip(int inputGold, int inputOil, int inputCube)
     {
 
-        // check if resources are enough
-        GameDataController gameDataController = GameDataController.Instance;
-        if (gameDataController == null)
-        {
-            Debug.LogError("[ShipCreatePanel] GameDataController 為 null，無法建造船隻");
-            return null;
 
-        }
-        GameData.PlayerData playerData = gameDataController.CurrentGameData?.playerData;
+        
+        GameData.PlayerData playerData = GameDataController.Instance.CurrentGameData?.playerData;
 
         if (playerData == null)
         {
@@ -64,7 +58,7 @@ public class ShipCreationManager : MonoBehaviour
             playerData.Gold -= inputGold;
             playerData.Oils -= inputOil;
             playerData.Cube -= inputCube;
-            gameDataController.TriggerResourceChanged();
+            GameDataController.Instance.TriggerResourceChanged();
             return null; // 不再生成新船
         }
 
@@ -72,7 +66,7 @@ public class ShipCreationManager : MonoBehaviour
         playerData.Gold -= inputGold;
         playerData.Oils -= inputOil;
         playerData.Cube -= inputCube;
-        gameDataController.TriggerResourceChanged();
+        GameDataController.Instance.TriggerResourceChanged();
 
         // 實例化船隻
         PlayerShip newShip = InstantiateShip(shipTypeIdx);
