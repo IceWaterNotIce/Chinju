@@ -5,8 +5,10 @@ using System.Linq;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
+#region GameManagerClass
 public class GameManager : Singleton<GameManager>
 {
+    #region ConstantsAndFields
     public const string serverUrl = "https://icewaternotice.com/games/Word Curse/";
     public const string githubUrl = "https://raw.githubusercontent.com/IceWaterNotIce/Word-Curse/main/";
 
@@ -27,7 +29,9 @@ public class GameManager : Singleton<GameManager>
 
     // 新增：自訂存檔資料夾路徑
     private string customSaveDirectory = null;
+    #endregion
 
+    #region UnityLifecycle
     protected override void Awake()
     {
         base.Awake();
@@ -61,12 +65,23 @@ public class GameManager : Singleton<GameManager>
         gameTime += Time.deltaTime * gameSecondsPerRealSecond;
     }
 
+    private void OnApplicationQuit()
+    {
+        if (GameDataController.Instance != null)
+            SaveGame(); // 預設存檔
+        Debug.Log("[GameManager] 遊戲數據已在退出時保存");
+    }
+    #endregion
+
+    #region GameDataInit
     private void InitializeGameData()
     {
         GameDataController.Instance.CurrentGameData = new GameData();
         GameDataController.Instance.TriggerResourceChanged();
     }
+    #endregion
 
+    #region SaveLoad
     /// <summary>
     /// 設定目前操作的存檔檔名（含副檔名 .json）
     /// </summary>
@@ -299,7 +314,9 @@ public class GameManager : Singleton<GameManager>
         var files = Directory.GetFiles(Application.persistentDataPath, "*.json");
         return files.Select(f => Path.GetFileName(f)).ToList();
     }
+    #endregion
 
+    #region NewGame
     /// <summary>
     /// 開始新遊戲，會先儲存目前遊戲，再建立新遊戲資料並切換新檔案
     /// </summary>
@@ -332,26 +349,7 @@ public class GameManager : Singleton<GameManager>
         SetCurrentSaveFileName(newSaveFileName);
 
         // 4. 清除現有船隻（玩家與敵人）
-        var existingFleets = GameObject.FindObjectsByType<Fleet>(FindObjectsSortMode.None);
-        foreach (var fleet in existingFleets)
-        {
-            GameObject.Destroy(fleet.gameObject);
-        }
-        var existingShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
-        foreach (var ship in existingShips)
-        {
-            GameObject.Destroy(ship.gameObject);
-        }
-        var playerShips = GameObject.FindObjectsByType<PlayerShip>(FindObjectsSortMode.None);
-        foreach (var ship in playerShips)
-        {
-            GameObject.Destroy(ship.gameObject);
-        }
-        var enemyShips = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None);
-        foreach (var ship in enemyShips)
-        {
-            GameObject.Destroy(ship.gameObject);
-        }
+        ClearAllShipsAndFleets();
 
         // 5. 重置遊戲數據
         int seed = mapSeed ?? Random.Range(0, int.MaxValue); // 新增：使用指定或隨機種子
@@ -390,6 +388,35 @@ public class GameManager : Singleton<GameManager>
         Debug.Log($"[GameManager] 新遊戲已開始，並儲存於 {newSaveFileName}，資料夾：{(string.IsNullOrEmpty(saveDir) ? Application.persistentDataPath : saveDir)}");
     }
 
+    /// <summary>
+    /// 清除場景中所有 Fleet、Ship、PlayerShip、EnemyShip 物件
+    /// </summary>
+    private void ClearAllShipsAndFleets()
+    {
+        var existingFleets = GameObject.FindObjectsByType<Fleet>(FindObjectsSortMode.None);
+        foreach (var fleet in existingFleets)
+        {
+            GameObject.Destroy(fleet.gameObject);
+        }
+        var existingShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
+        foreach (var ship in existingShips)
+        {
+            GameObject.Destroy(ship.gameObject);
+        }
+        var playerShips = GameObject.FindObjectsByType<PlayerShip>(FindObjectsSortMode.None);
+        foreach (var ship in playerShips)
+        {
+            GameObject.Destroy(ship.gameObject);
+        }
+        var enemyShips = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None);
+        foreach (var ship in enemyShips)
+        {
+            GameObject.Destroy(ship.gameObject);
+        }
+    }
+    #endregion
+
+    #region TimeUtility
     public string GetFormattedGameTime()
     {
         // 將遊戲時間轉換為年月日時分秒
@@ -410,11 +437,6 @@ public class GameManager : Singleton<GameManager>
     {
         return gameTime;
     }
-
-    private void OnApplicationQuit()
-    {
-        if (GameDataController.Instance != null)
-            SaveGame(); // 預設存檔
-        Debug.Log("[GameManager] 遊戲數據已在退出時保存");
-    }
+    #endregion
 }
+#endregion
