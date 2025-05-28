@@ -20,12 +20,12 @@ public class GameDataCreatePanel : MonoBehaviour
     {
         var uiDocument = GetComponent<UIDocument>();
         root = uiDocument.rootVisualElement;
-        fileNameField = root.Q<TextField>("fileNameField");
-        mapSeedField = root.Q<TextField>("mapSeedField"); // 新增
-        saveDirField = root.Q<TextField>("saveDirField"); // 新增
-        createButton = root.Q<Button>("createButton");
-        cancelButton = root.Q<Button>("cancelButton");
-        browseDirButton = root.Q<Button>("browseDirButton"); // 新增
+        fileNameField = UIHelper.InitializeElement<TextField>(root, "fileNameField");
+        mapSeedField = UIHelper.InitializeElement<TextField>(root, "mapSeedField");
+        saveDirField = UIHelper.InitializeElement<TextField>(root, "saveDirField");
+        createButton = UIHelper.InitializeElement<Button>(root, "createButton");
+        cancelButton = UIHelper.InitializeElement<Button>(root, "cancelButton");
+        browseDirButton = UIHelper.InitializeElement<Button>(root, "browseDirButton");
 
         createButton.clicked += OnCreateClicked;
         cancelButton.clicked += OnCancelClicked;
@@ -35,8 +35,10 @@ public class GameDataCreatePanel : MonoBehaviour
 
     void OnDisable()
     {
-        createButton.clicked -= OnCreateClicked;
-        cancelButton.clicked -= OnCancelClicked;
+        if (createButton != null)
+            createButton.clicked -= OnCreateClicked;
+        if (cancelButton != null)
+            cancelButton.clicked -= OnCancelClicked;
         if (browseDirButton != null)
             browseDirButton.clicked -= OnBrowseDirClicked; // 新增
     }
