@@ -93,4 +93,29 @@ public class FleetManager : Singleton<FleetManager>
         Debug.Log($"[FleetManager] InstantiateFleetFromData: {fleetData.Name} with {fleetData.ShipIds.Count} ships.");
         return fleet;
     }
+
+    // 新增：清除空艦隊
+    public void RemoveEmptyFleets()
+    {
+        var allFleets = FindObjectsByType<Fleet>(FindObjectsSortMode.None);
+        foreach (var fleet in allFleets)
+        {
+            if (fleet.followers == null || fleet.followers.Count == 0)
+            {
+                Debug.Log($"[FleetManager] Removing empty fleet: {fleet.name}");
+                Destroy(fleet.gameObject);
+            }
+        }
+    }
+
+    // 新增：驗證艦隊的追隨者
+    public void ValidateFleetFollowers()
+    {
+        var allFleets = FindObjectsByType<Fleet>(FindObjectsSortMode.None);
+        foreach (var fleet in allFleets)
+        {
+            fleet.followers = fleet.followers.Where(ship => ship != null).ToList();
+            Debug.Log($"[FleetManager] Validated fleet: {fleet.name}, remaining followers: {fleet.followers.Count}");
+        }
+    }
 }

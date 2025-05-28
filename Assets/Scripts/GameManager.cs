@@ -355,6 +355,12 @@ public class GameManager : Singleton<GameManager>
                         }
                     }
 
+                    // 新增：清除空艦隊
+                    if (FleetManager.Instance != null)
+                    {
+                        FleetManager.Instance.RemoveEmptyFleets();
+                    }
+
                     // 載入遊戲時間
                     gameTime = data.gameTime;
 
@@ -368,6 +374,12 @@ public class GameManager : Singleton<GameManager>
                 else
                 {
                     Debug.LogWarning("[GameManager] 載入的遊戲數據為 null");
+                }
+
+                // 新增：驗證艦隊的追隨者
+                if (FleetManager.Instance != null)
+                {
+                    FleetManager.Instance.ValidateFleetFollowers();
                 }
 
                 return data;
