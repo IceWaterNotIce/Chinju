@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
+using System; // 新增：解決 Exception 和 ArgumentException 無法識別的問題
 
 #region GameManagerClass
 public class GameManager : Singleton<GameManager>
@@ -25,15 +27,32 @@ public class GameManager : Singleton<GameManager>
 
     public const float RealGameTimeScale = 1200f;
 
-    public delegate void GameEvent();
-    public static event GameEvent OnGameSaved;
-    public static event GameEvent OnGameLoaded;
+    // 新增：靜態列表用於記錄船隻和艦隊
+    private static List<GameObject> registeredShips = new List<GameObject>();
+    private static List<GameObject> registeredFleets = new List<GameObject>();
 
-    private const string LastSaveFileKey = "LastSaveFileName"; // 新增：PlayerPrefs key
+    // 新增：初始配置參數
+    [System.Serializable]
+    public class InitialGameConfig
+    {
+        public int InitialOils = 200;
+        public int InitialGold = 500;
+        public int InitialCube = 100;
+        public int MapWidth = 100;
+        public int MapHeight = 100;
+        public float IslandDensity = 0.1f;
+    }
+
+    [SerializeField]
+    private InitialGameConfig initialConfig = new InitialGameConfig();
 
     // 新增：自訂存檔資料夾路徑
     [SerializeField]
     private string customSaveDirectory = null;
+
+    // 新增：PlayerPrefs 的鍵值常量
+    private const string LastSaveFileKey = "LastSaveFileName";
+
     #endregion
 
     #region UnityLifecycle
@@ -84,6 +103,12 @@ public class GameManager : Singleton<GameManager>
         GameDataController.Instance.CurrentGameData = new GameData();
         GameDataController.Instance.TriggerResourceChanged();
     }
+    #endregion
+
+    #region Events
+    // 修改：使用 UnityEvent 替代靜態事件，避免內存洩漏
+    public UnityEngine.Events.UnityEvent OnGameSavedEvent = new UnityEngine.Events.UnityEvent();
+    public UnityEngine.Events.UnityEvent OnGameLoadedEvent = new UnityEngine.Events.UnityEvent();
     #endregion
 
     #region SaveLoad
@@ -223,7 +248,7 @@ public class GameManager : Singleton<GameManager>
                     Debug.Log($"[GameManager] 遊戲已保存至 {path}");
                     // 新增：儲存最後一次存檔檔名
                     SetCurrentSaveFileName(Path.GetFileName(path));
-                    OnGameSaved?.Invoke(); // 發送保存事件
+                    OnGameSavedEvent.Invoke(); // 發送保存事件
                 }
                 catch (IOException ex)
                 {
@@ -242,6 +267,90 @@ public class GameManager : Singleton<GameManager>
     }
 
     /// <summary>
+    /// 非同步儲存遊戲，可指定檔名
+    /// </summary>
+    public async Task SaveGameAsync(string fileName = null)
+    {
+        if (GameDataController.Instance != null)
+        {
+            var data = GameDataController.Instance.CurrentGameData;
+
+            if (data != null)
+            {
+                try
+                {
+                    // 保存玩家資源
+                    SyncPlayerResources(GameDataController.Instance.CurrentGameData.playerData, data.playerData);
+
+                    // 儲存遊戲時間
+                    data.gameTime = gameTime;
+
+                    // 設置存檔版本號
+                    data.version = SaveDataVersion;
+
+                    string json = JsonUtility.ToJson(data, true);
+                    string path = GetValidatedSavePath(fileName ?? currentSaveFileName);
+
+                    // 自動備份舊存檔
+                    if (File.Exists(path))
+                    {
+                        string backupPath = path + ".bak";
+                        File.Copy(path, backupPath, true);
+                        Debug.Log($"[GameManager] 已備份舊存檔至 {backupPath}");
+                    }
+
+                    // 非同步寫入檔案
+                    using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
+                    {
+                        byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
+                        await stream.WriteAsync(jsonData, 0, jsonData.Length);
+                    }
+
+                    Debug.Log($"[GameManager] 遊戲已非同步保存至 {path}");
+                    SetCurrentSaveFileName(Path.GetFileName(path));
+                    OnGameSavedEvent.Invoke(); // 發送保存事件
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"[GameManager] 非同步儲存遊戲時發生錯誤: {ex.Message}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[GameManager] 無法保存遊戲，GameData 為 null");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] 無法保存遊戲，GameDataController 未初始化");
+        }
+    }
+
+    /// <summary>
+    /// 驗證並取得合法的存檔路徑
+    /// </summary>
+    private string GetValidatedSavePath(string fileName)
+    {
+        if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            throw new ArgumentException($"檔名包含非法字元: {fileName}");
+
+        string dir = string.IsNullOrEmpty(customSaveDirectory) ? Application.persistentDataPath : customSaveDirectory;
+        return Path.Combine(dir, fileName);
+    }
+
+    /// <summary>
+    /// 同步玩家資源數據
+    /// </summary>
+    private void SyncPlayerResources(GameData.PlayerData source, GameData.PlayerData target)
+    {
+        target.Oils = source.Oils;
+        target.Gold = source.Gold;
+        target.Cube = source.Cube;
+        target.Level = source.Level;
+        target.Exp = source.Exp;
+    }
+
+    /// <summary>
     /// 載入遊戲，可指定檔名
     /// </summary>
     public GameData LoadGame(string fileName = null)
@@ -252,16 +361,10 @@ public class GameManager : Singleton<GameManager>
             try
             {
                 string json = File.ReadAllText(path);
-                GameData data = null;
-                try
-                {
-                    data = JsonUtility.FromJson<GameData>(json);
-                }
-                catch (System.Exception ex)
-                {
-                    Debug.LogError($"[GameManager] 存檔反序列化失敗，檔案可能已損壞: {ex.Message}");
-                    return null;
-                }
+                GameData data = JsonUtility.FromJson<GameData>(json);
+
+                // 新增：升級存檔數據
+                data = UpgradeSaveData(data);
 
                 // 驗證存檔完整性，補齊缺失欄位
                 if (data != null)
@@ -365,7 +468,7 @@ public class GameManager : Singleton<GameManager>
                     gameTime = data.gameTime;
 
                     GameDataController.Instance.TriggerResourceChanged();
-                    OnGameLoaded?.Invoke(); // 發送載入事件
+                    OnGameLoadedEvent.Invoke(); // 發送載入事件
 
                     // 新增：載入遊戲後重繪地圖
                     if (MapController.Instance != null)
@@ -399,6 +502,32 @@ public class GameManager : Singleton<GameManager>
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// 升級存檔數據以適配新版本
+    /// </summary>
+    private GameData UpgradeSaveData(GameData data)
+    {
+        if (data.version < SaveDataVersion)
+        {
+            Debug.Log($"[GameManager] 升級存檔版本：{data.version} -> {SaveDataVersion}");
+            // 示例：補齊缺失欄位
+            if (data.playerData == null)
+                data.playerData = new GameData.PlayerData();
+            if (data.mapData == null)
+                data.mapData = new GameData.MapData();
+            if (data.playerData.Ships == null)
+                data.playerData.Ships = new List<GameData.ShipData>();
+            if (data.enemyShips == null)
+                data.enemyShips = new List<GameData.ShipData>();
+            if (data.mapData.ChinjuTiles == null)
+                data.mapData.ChinjuTiles = new List<Vector3Int>();
+
+            // 更新版本號
+            data.version = SaveDataVersion;
+        }
+        return data;
     }
 
     /// <summary>
@@ -447,22 +576,22 @@ public class GameManager : Singleton<GameManager>
         ClearAllShipsAndFleets();
 
         // 5. 重置遊戲數據
-        int seed = mapSeed ?? Random.Range(0, int.MaxValue); // 新增：使用指定或隨機種子
+        int seed = mapSeed ?? UnityEngine.Random.Range(0, int.MaxValue); // 新增：使用指定或隨機種子
         var newGameData = new GameData
         {
             playerData = new GameData.PlayerData
             {
-                Oils = 200,
-                Gold = 500,
-                Cube = 100,
+                Oils = initialConfig.InitialOils,
+                Gold = initialConfig.InitialGold,
+                Cube = initialConfig.InitialCube,
                 Ships = new List<GameData.ShipData>()
             },
             mapData = new GameData.MapData
             {
                 Seed = seed,
-                Width = 100,
-                Height = 100,
-                IslandDensity = 0.1f,
+                Width = initialConfig.MapWidth,
+                Height = initialConfig.MapHeight,
+                IslandDensity = initialConfig.IslandDensity,
                 ChinjuTiles = new List<Vector3Int>()
             }
         };
@@ -488,26 +617,19 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     private void ClearAllShipsAndFleets()
     {
-        var existingFleets = GameObject.FindObjectsByType<Fleet>(FindObjectsSortMode.None);
-        foreach (var fleet in existingFleets)
+        foreach (var fleet in registeredFleets)
         {
-            GameObject.Destroy(fleet.gameObject);
+            if (fleet != null)
+                GameObject.Destroy(fleet);
         }
-        var existingShips = GameObject.FindObjectsByType<Ship>(FindObjectsSortMode.None);
-        foreach (var ship in existingShips)
+        registeredFleets.Clear();
+
+        foreach (var ship in registeredShips)
         {
-            GameObject.Destroy(ship.gameObject);
+            if (ship != null)
+                GameObject.Destroy(ship);
         }
-        var playerShips = GameObject.FindObjectsByType<PlayerShip>(FindObjectsSortMode.None);
-        foreach (var ship in playerShips)
-        {
-            GameObject.Destroy(ship.gameObject);
-        }
-        var enemyShips = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None);
-        foreach (var ship in enemyShips)
-        {
-            GameObject.Destroy(ship.gameObject);
-        }
+        registeredShips.Clear();
     }
     #endregion
 
