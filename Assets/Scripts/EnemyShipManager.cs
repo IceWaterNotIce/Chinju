@@ -267,7 +267,7 @@ public class EnemyShipManager : MonoBehaviour
         }
     }
 
-   
+
     bool IsOceanTile(Vector3 position)
     {
         if (tilemap == null || oceanTile == null)
@@ -339,5 +339,15 @@ public class EnemyShipManager : MonoBehaviour
             enemy.NavigationArea = new Rect(rectMin, new Vector2(width, height));
         }
         Debug.Log($"[EnemyShipManager] 已將所有敵艦導航區域設為以神獸 tile 為中心的 5x5 區域。");
+    }
+
+    // 清除所有船隻
+    public void ClearAllEnemyShips()
+    {
+        //delete all children of this GameObject
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
     }
 }

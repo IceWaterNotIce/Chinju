@@ -220,4 +220,14 @@ public class ShipManager : Singleton<ShipManager>
             return null;
         }
     }
+
+    // 清除所有船隻
+    public void ClearAllShips()
+    {
+        //delete all children of this GameObject
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
+    }
 }

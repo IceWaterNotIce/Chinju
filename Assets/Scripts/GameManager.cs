@@ -638,6 +638,7 @@ public class GameManager : Singleton<GameManager>
 
         // 3. 清除現有船隻（玩家與敵人）
         ClearAllShipsAndFleets();
+        
 
         // 4. 重置遊戲數據
         int seed = mapSeed ?? UnityEngine.Random.Range(0, int.MaxValue); // 新增：使用指定或隨機種子
@@ -694,6 +695,9 @@ public class GameManager : Singleton<GameManager>
                 GameObject.Destroy(ship);
         }
         registeredShips.Clear();
+
+        ShipManager.Instance?.ClearAllShips(); // 清除所有玩家船隻
+        EnemyShipManager.Instance?.ClearAllEnemyShips(); // 清除所有敵人船隻
     }
     #endregion
 
