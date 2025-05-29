@@ -745,10 +745,13 @@ public class GameManager : Singleton<GameManager>
     }
     #endregion
 
-    private IEnumerator DelayedFleetValidation() // 修正返回類型
+    #region Coroutines
+    private System.Collections.IEnumerator DelayedFleetValidation() // 新增方法
     {
         yield return new WaitForSeconds(1f); // 延遲執行
         _fleetManager?.ValidateFleetFollowers();
     }
+    #endregion
+
 }
 #endregion
