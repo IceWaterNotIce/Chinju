@@ -230,7 +230,7 @@ public class GameManager : Singleton<GameManager>
                         .Where(ship => ship != null)
                         .ToList();
 
-                    data.enemyShips.Clear();
+                    data.enemyData.EnemyShips.Clear(); // 修正：改為使用 enemyData.EnemyShips
                     foreach (var ship in enemyShips) // 改用場景中實際存在的敵艦
                     {
                         var shipData = ship.SaveShipData();
@@ -251,7 +251,7 @@ public class GameManager : Singleton<GameManager>
                             shipData.Weapons.Add(weaponData);
                         }
 
-                        data.enemyShips.Add(shipData);
+                        data.enemyData.EnemyShips.Add(shipData); // 修正：改為使用 enemyData.EnemyShips
                     }
                     Debug.Log($"[GameManager] 正在保存 {enemyShips.Count} 艘敵艦");
                     foreach (var ship in enemyShips)
@@ -423,8 +423,8 @@ public class GameManager : Singleton<GameManager>
                 data.mapData = new GameData.MapData();
             if (data.playerData.Ships == null)
                 data.playerData.Ships = new List<GameData.ShipData>();
-            if (data.enemyShips == null)
-                data.enemyShips = new List<GameData.ShipData>();
+            if (data.enemyData.EnemyShips == null)
+                data.enemyData.EnemyShips = new List<GameData.ShipData>();
             if (data.mapData.ChinjuTiles == null)
                 data.mapData.ChinjuTiles = new List<Vector3Int>();
 
@@ -457,8 +457,8 @@ public class GameManager : Singleton<GameManager>
                         data.playerData = new GameData.PlayerData();
                     if (data.mapData == null)
                         data.mapData = new GameData.MapData();
-                    if (data.enemyShips == null)
-                        data.enemyShips = new List<GameData.ShipData>();
+                    if (data.enemyData.EnemyShips == null)
+                        data.enemyData.EnemyShips = new List<GameData.ShipData>();
                     if (data.version == 0)
                         data.version = SaveDataVersion;
                     if (data.playerData.Ships == null)
@@ -516,7 +516,7 @@ public class GameManager : Singleton<GameManager>
                         GameObject.Destroy(enemyShip.gameObject);
                     }
 
-                    foreach (var shipData in data.enemyShips)
+                    foreach (var shipData in data.enemyData.EnemyShips) // 修正：改為使用 enemyData.EnemyShips
                     {
                         if (EnemyShipManager.Instance != null)
                         {

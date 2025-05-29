@@ -19,7 +19,7 @@ public class GameData
     public float gameTime;
 
     [SerializeField]
-    public List<ShipData> enemyShips = new List<ShipData>();
+    public EnemyData enemyData = new EnemyData(); // 新增：敵方數據
 
     [System.Serializable]
     public class PlayerData
@@ -199,6 +199,16 @@ public class GameData
         public string FlagshipId; // 旗艦ID
     }
 
+    [System.Serializable]
+    public class EnemyData
+    {
+        [SerializeField]
+        public List<ShipData> EnemyShips = new List<ShipData>(); // 敵方船隻列表
+
+        [SerializeField]
+        public List<FleetData> EnemyFleets = new List<FleetData>(); // 敵方艦隊列表
+    }
+
     [SerializeField]
     public string lastPlayedTime; // 新增：保存最後遊玩時間
     [SerializeField]
@@ -215,8 +225,6 @@ public class GameData
                 data.mapData = new MapData();
             if (data.playerData.Ships == null)
                 data.playerData.Ships = new List<ShipData>();
-            if (data.enemyShips == null)
-                data.enemyShips = new List<ShipData>();
             if (data.mapData.ChinjuTiles == null)
                 data.mapData.ChinjuTiles = new List<Vector3Int>();
             if (data.playerData.Fleets == null)
