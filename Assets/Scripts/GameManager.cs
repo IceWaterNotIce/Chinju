@@ -354,6 +354,32 @@ public class GameManager : Singleton<GameManager>
     }
 
     /// <summary>
+    /// 升級存檔數據以適配新版本
+    /// </summary>
+    private GameData UpgradeSaveData(GameData data)
+    {
+        if (data.version < SaveDataVersion)
+        {
+            Debug.Log($"[GameManager] 升級存檔版本：{data.version} -> {SaveDataVersion}");
+            // 示例：補齊缺失欄位
+            if (data.playerData == null)
+                data.playerData = new GameData.PlayerData();
+            if (data.mapData == null)
+                data.mapData = new GameData.MapData();
+            if (data.playerData.Ships == null)
+                data.playerData.Ships = new List<GameData.ShipData>();
+            if (data.enemyShips == null)
+                data.enemyShips = new List<GameData.ShipData>();
+            if (data.mapData.ChinjuTiles == null)
+                data.mapData.ChinjuTiles = new List<Vector3Int>();
+
+            // 更新版本號
+            data.version = SaveDataVersion;
+        }
+        return data;
+    }
+
+    /// <summary>
     /// 載入遊戲，可指定檔名
     /// </summary>
     public GameData LoadGame(string fileName = null)
@@ -505,32 +531,6 @@ public class GameManager : Singleton<GameManager>
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// 升級存檔數據以適配新版本
-    /// </summary>
-    private GameData UpgradeSaveData(GameData data)
-    {
-        if (data.version < SaveDataVersion)
-        {
-            Debug.Log($"[GameManager] 升級存檔版本：{data.version} -> {SaveDataVersion}");
-            // 示例：補齊缺失欄位
-            if (data.playerData == null)
-                data.playerData = new GameData.PlayerData();
-            if (data.mapData == null)
-                data.mapData = new GameData.MapData();
-            if (data.playerData.Ships == null)
-                data.playerData.Ships = new List<GameData.ShipData>();
-            if (data.enemyShips == null)
-                data.enemyShips = new List<GameData.ShipData>();
-            if (data.mapData.ChinjuTiles == null)
-                data.mapData.ChinjuTiles = new List<Vector3Int>();
-
-            // 更新版本號
-            data.version = SaveDataVersion;
-        }
-        return data;
     }
 
     /// <summary>
