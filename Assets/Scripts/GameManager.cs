@@ -270,6 +270,12 @@ public class GameManager : Singleton<GameManager>
                     // 保存最後遊玩時間
                     data.lastPlayedTime = DateTime.Now.ToString("o"); // 新增：保存 ISO 格式的最後遊玩時間
 
+                    // 保存彈藥池狀態
+                    if (AmmoManager.Instance != null)
+                    {
+                        data.ammoStates = AmmoManager.Instance.SaveAmmoStates(); // 新增：保存彈藥位置
+                    }
+
                     string json = JsonUtility.ToJson(data, true);
                     string path = GetSaveFilePath(fileName);
 
@@ -556,6 +562,12 @@ public class GameManager : Singleton<GameManager>
                 {
                     TimeSpan timeSinceLastPlayed = DateTime.Now - lastPlayed;
                     gameTime += (float)timeSinceLastPlayed.TotalSeconds; // 新增：根據系統時間更新遊戲時間
+                }
+
+                // 載入彈藥池狀態
+                if (AmmoManager.Instance != null && data.ammoStates != null)
+                {
+                    AmmoManager.Instance.LoadAmmoStates(data.ammoStates); // 新增：載入彈藥位置
                 }
 
                 return data;

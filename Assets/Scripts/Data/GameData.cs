@@ -195,4 +195,6 @@ public class GameData
 
     [SerializeField]
     public string lastPlayedTime; // 新增：保存最後遊玩時間
+    [SerializeField]
+    public List<Vector3> ammoStates = new List<Vector3>(); // 新增：保存彈藥位置
 }

@@ -65,4 +65,34 @@ public class AmmoManager : MonoBehaviour
         ammo.transform.SetParent(transform); // 確保回收的彈藥設置為 AmmoManager 的子物件
         ammoPool.Enqueue(ammo);
     }
+
+    #region SaveLoadAmmo
+    /// <summary>
+    /// 保存彈藥池的狀態
+    /// </summary>
+    public List<Vector3> SaveAmmoStates()
+    {
+        List<Vector3> ammoPositions = new List<Vector3>();
+        foreach (var ammo in ammoPool)
+        {
+            if (ammo != null && ammo.activeSelf)
+            {
+                ammoPositions.Add(ammo.transform.position);
+            }
+        }
+        return ammoPositions;
+    }
+
+    /// <summary>
+    /// 載入彈藥池的狀態
+    /// </summary>
+    public void LoadAmmoStates(List<Vector3> ammoPositions)
+    {
+        foreach (var position in ammoPositions)
+        {
+            GameObject ammo = GetAmmo();
+            ammo.transform.position = position;
+        }
+    }
+    #endregion
 }
