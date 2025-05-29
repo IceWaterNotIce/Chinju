@@ -48,6 +48,6 @@ MonoBehaviour:
   _attackSpeed: 4
   _maxAttackDistance: 33.5
   _cost: 100
-  _damage: 10
+  _damage: 2
   AmmoPrefab: {fileID: 4738637386504094231, guid: 3b14219417392fd42aff884981ad45d1, type: 3}
   _ammoPerShot: 2

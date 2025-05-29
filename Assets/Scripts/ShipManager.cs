@@ -174,7 +174,7 @@ public class ShipManager : Singleton<ShipManager>
             return;
         }
 
-        GameObject shipPrefab = Resources.Load<GameObject>($"Prefabs/Player/{shipData.PrefabName}");
+        GameObject shipPrefab = Resources.Load<GameObject>($"Prefabs/Ships/Warships/{shipData.PrefabName}");
         if (shipPrefab != null)
         {
             GameObject shipObj = Instantiate(shipPrefab, shipData.Position, Quaternion.Euler(0, 0, shipData.Rotation));
