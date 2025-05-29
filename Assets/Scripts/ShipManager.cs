@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class ShipManager : Singleton<ShipManager>
 {
@@ -27,6 +28,7 @@ public class ShipManager : Singleton<ShipManager>
     {
         if (!ships.ContainsKey(ship.ShipId))
         {
+            ship.ShipId = Guid.NewGuid().ToString(); // 確保唯一性
             ships.Add(ship.ShipId, ship);
             Debug.Log($"[ShipManager] Registered ship: {ship.name} with ID: {ship.ShipId}");
         }
@@ -62,7 +64,7 @@ public class ShipManager : Singleton<ShipManager>
             return null;
         }
 
-        int shipTypeIdx = Random.Range(0, shipPrefabs.Count);
+        int shipTypeIdx = UnityEngine.Random.Range(0, shipPrefabs.Count); // 明確使用 UnityEngine.Random
         GameObject shipPrefab = shipPrefabs[shipTypeIdx];
         string shipName = shipPrefab.name;
 
@@ -118,7 +120,7 @@ public class ShipManager : Singleton<ShipManager>
         Vector3 spawnPosition = mapController.FindNearestOceanTile(chinjuTilePosition);
         if (Physics2D.OverlapCircle(spawnPosition, 0.5f, LayerMask.GetMask("Ship")) != null)
         {
-            spawnPosition += new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0);
+            spawnPosition += new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f), 0); // 明確使用 UnityEngine.Random
         }
 
         spawnPosition.z = -1;

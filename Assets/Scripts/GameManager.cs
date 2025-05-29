@@ -238,6 +238,7 @@ public class GameManager : Singleton<GameManager>
                         {
                             var weaponData = new GameData.WeaponData
                             {
+                                WeaponId = weapon.WeaponId, // 保存唯一標識
                                 Name = weapon.name,
                                 Damage = (int)weapon.Damage,
                                 MaxAttackDistance = weapon.MaxAttackDistance,

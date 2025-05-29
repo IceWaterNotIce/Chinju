@@ -23,9 +23,9 @@ public class GameDataController : Singleton<GameDataController>
         }
     }
 
-    public System.Action<GameData> OnGameDataChanged;
-    public System.Action OnMapDataChanged; // 新增：地圖數據變更事件
-    public System.Action OnFleetDataChanged; // 新增：艦隊數據變更事件
+    public event System.Action<GameData> OnGameDataChanged;
+    public event System.Action OnMapDataChanged; // 新增：地圖數據變更事件
+    public event System.Action OnFleetDataChanged; // 新增：艦隊數據變更事件
 
     private new void Awake()
     {

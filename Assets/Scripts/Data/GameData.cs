@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -129,7 +130,7 @@ public class GameData
         public Rect NavigationArea;
 
         [SerializeField]
-        public string ShipId; // 唯一識別碼
+        public string ShipId = Guid.NewGuid().ToString(); // 改為 GUID 確保唯一性
         [SerializeField]
         public string FleetId; // 所屬艦隊Id，可為null
         [SerializeField]
@@ -174,6 +175,9 @@ public class GameData
             get => _currentAmmo;
             set => _currentAmmo = Mathf.Clamp(value, 0, MaxAmmo);
         }
+
+        [SerializeField]
+        public string WeaponId = Guid.NewGuid().ToString(); // 新增唯一標識
     }
 
     [System.Serializable]

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class Weapon : MonoBehaviour
 {
@@ -65,6 +66,14 @@ public class Weapon : MonoBehaviour
         set => _ammoPerShot = Mathf.Max(1, value);
     }
 
+    [SerializeField]
+    private string _weaponId = Guid.NewGuid().ToString(); // 新增唯一標識
+    public string WeaponId
+    {
+        get => _weaponId;
+        set => _weaponId = value;
+    }
+
     private bool isAttacking = false;
     private GameObject currentTarget;
     private Coroutine attackCoroutine;
@@ -90,13 +99,13 @@ public class Weapon : MonoBehaviour
             Vector3 direction = baseDirection;
 
             // 計算攻擊成功率
-            bool isSuccessful = Random.Range(0f, 100f) <= successRate;
+            bool isSuccessful = UnityEngine.Random.Range(0f, 100f) <= successRate; // 明確使用 UnityEngine.Random
 
             float angleOffset = 0f;
             if (!isSuccessful)
             {
                 // 如果攻擊不成功，添加一個小的隨機方向偏移
-                angleOffset = Random.Range(-10f, 10f);
+                angleOffset = UnityEngine.Random.Range(-10f, 10f); // 明確使用 UnityEngine.Random
             }
             // 多發彈藥時，每發有微小角度偏移
             float spread = Mathf.Lerp(-5f, 5f, (AmmoPerShot == 1) ? 0.5f : (float)i / (AmmoPerShot - 1));
