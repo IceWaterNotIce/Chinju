@@ -3,7 +3,7 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class FleetManager : Singleton<FleetManager>
+public class FleetManager : Singleton<FleetManager>, GameManager.IFleetManager // 修改：使用完整命名空間
 {
     public void CreateFleet(Warship[] warships)
     {
@@ -70,30 +70,6 @@ public class FleetManager : Singleton<FleetManager>
         return FindObjectsByType<Fleet>(FindObjectsSortMode.None).Where(f => f.followers.Count > 0 && f.followers[0] is PlayerShip).ToArray();
     }
 
-    public Fleet InstantiateFleetFromData(GameData.FleetData fleetData)
-    {
-        // 根據 FleetData 創建艦隊實例
-        var fleet = new GameObject(fleetData.Name).AddComponent<Fleet>();
-        fleet.FleetId = fleetData.FleetId;
-        fleet.transform.position = fleetData.Position;
-        fleet.Speed = fleetData.Speed;
-        fleet.FlagshipId = fleetData.FlagshipId;
-
-        // 將船隻加入艦隊
-        foreach (var shipId in fleetData.ShipIds)
-        {
-            var ship = ShipManager.Instance?.GetShipById(shipId);
-            if (ship != null)
-            {
-                fleet.AddShip(ship);
-                ship.transform.SetParent(fleet.transform); // 確保父物件正確
-            }
-        }
-
-        Debug.Log($"[FleetManager] InstantiateFleetFromData: {fleetData.Name} with {fleetData.ShipIds.Count} ships.");
-        return fleet;
-    }
-
     // 新增：清除空艦隊
     public void RemoveEmptyFleets()
     {
@@ -117,5 +93,29 @@ public class FleetManager : Singleton<FleetManager>
             fleet.followers = fleet.followers.Where(ship => ship != null).ToList();
             Debug.Log($"[FleetManager] Validated fleet: {fleet.name}, remaining followers: {fleet.followers.Count}");
         }
+    }
+
+    public Fleet InstantiateFleetFromData(GameData.FleetData fleetData)
+    {
+        // 根據 FleetData 創建艦隊實例
+        var fleet = new GameObject(fleetData.Name).AddComponent<Fleet>();
+        fleet.FleetId = fleetData.FleetId;
+        fleet.transform.position = fleetData.Position;
+        fleet.Speed = fleetData.Speed;
+        fleet.FlagshipId = fleetData.FlagshipId;
+
+        // 將船隻加入艦隊
+        foreach (var shipId in fleetData.ShipIds)
+        {
+            var ship = ShipManager.Instance?.GetShipById(shipId);
+            if (ship != null)
+            {
+                fleet.AddShip(ship);
+                ship.transform.SetParent(fleet.transform); // 確保父物件正確
+            }
+        }
+
+        Debug.Log($"[FleetManager] InstantiateFleetFromData: {fleetData.Name} with {fleetData.ShipIds.Count} ships.");
+        return fleet;
     }
 }

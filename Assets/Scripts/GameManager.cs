@@ -102,6 +102,9 @@ public class GameManager : Singleton<GameManager>
     {
         GameDataController.Instance.CurrentGameData = new GameData();
         GameDataController.Instance.TriggerResourceChanged();
+
+        // 新增：驗證艦隊的追隨者
+        _fleetManager?.ValidateFleetFollowers();
     }
     #endregion
 
@@ -461,7 +464,7 @@ public class GameManager : Singleton<GameManager>
                     // 新增：清除空艦隊
                     if (FleetManager.Instance != null)
                     {
-                        FleetManager.Instance.RemoveEmptyFleets();
+                        _fleetManager?.RemoveEmptyFleets();
                     }
 
                     // 載入遊戲時間
@@ -653,6 +656,23 @@ public class GameManager : Singleton<GameManager>
     public float GetGameTimeSeconds()
     {
         return gameTime;
+    }
+    #endregion
+
+    #region FleetManagerInjection
+    public interface IFleetManager
+    {
+        void RemoveEmptyFleets();
+        void ValidateFleetFollowers();
+        Fleet InstantiateFleetFromData(GameData.FleetData fleetData);
+        // 可擴展其他艦隊操作契約
+    }
+
+    private IFleetManager _fleetManager;
+
+    public void SetFleetManager(IFleetManager manager)
+    {
+        _fleetManager = manager;
     }
     #endregion
 }
