@@ -280,4 +280,13 @@ public class EnemyShip : Warship
             }
         }
     }
+
+    public void ResetState()
+    {
+        Health = MaxHealth; // 重置生命值
+        TargetSpeed = 0f;   // 重置速度
+        TargetRotation = 0f; // 重置旋轉
+        weapons.Clear();    // 清空武器列表
+        Debug.Log($"[EnemyShip] {name} 已重置狀態");
+    }
 }

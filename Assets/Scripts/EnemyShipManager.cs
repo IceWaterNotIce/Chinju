@@ -134,6 +134,8 @@ public class EnemyShipManager : MonoBehaviour
             var enemyShip = pool.Dequeue();
             enemyShip.SetActive(true);
             enemyShip.transform.SetParent(this.transform);
+            var enemyComp = enemyShip.GetComponent<EnemyShip>();
+            if (enemyComp != null) enemyComp.ResetState(); // 確保敵人船隻初始化
             return enemyShip;
         }
         else
@@ -249,6 +251,7 @@ public class EnemyShipManager : MonoBehaviour
                     }
                 }
 
+                GameManager.Instance?.RegisterEnemyShip(enemyComp); // 新增：註冊敵人船隻
                 Debug.Log($"[EnemyShipManager] 已成功生成敵人: {shipData.PrefabName}");
             }
             else

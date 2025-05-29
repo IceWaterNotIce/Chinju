@@ -502,14 +502,13 @@ public class GameManager : Singleton<GameManager>
                         }
                     }
 
-                    // CLear existing enemy ships before loading new ones
+                    // 清除現有敵人船隻後載入新敵人
                     var existingEnemyShips = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None);
                     foreach (var enemyShip in existingEnemyShips)
                     {
                         GameObject.Destroy(enemyShip.gameObject);
                     }
 
-                    // 使用 EnemyShipSpawner 載入敵人數據並生成敵人
                     foreach (var shipData in data.enemyShips)
                     {
                         if (EnemyShipManager.Instance != null)
@@ -518,7 +517,7 @@ public class GameManager : Singleton<GameManager>
                         }
                         else
                         {
-                            Debug.LogError("[GameManager] EnemyShipSpawner 未初始化，無法生成敵人！");
+                            Debug.LogError("[GameManager] EnemyShipManager 未初始化，無法生成敵人！");
                         }
                     }
 
