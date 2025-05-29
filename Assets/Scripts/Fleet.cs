@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
@@ -172,17 +173,30 @@ public class Fleet : MonoBehaviour
 
     public GameData.FleetData SaveFleetData()
     {
-        var fleetData = new GameData.FleetData
+        // 只保存有實際船隻的艦隊
+        if (followers.Count == 0 || followers.All(s => string.IsNullOrEmpty(s.ShipId)))
+        {
+            Debug.LogWarning($"[Fleet] 不保存空艦隊: {gameObject.name}");
+            return null;
+        }
+
+        // 確保有有效的 FleetId
+        if (string.IsNullOrEmpty(FleetId))
+            FleetId = Guid.NewGuid().ToString(); // 使用 Guid 生成唯一識別碼
+
+        var validShipIds = followers
+            .Where(ship => !string.IsNullOrEmpty(ship.ShipId))
+            .Select(ship => ship.ShipId)
+            .ToList();
+
+        return new GameData.FleetData
         {
             FleetId = this.FleetId,
             Name = gameObject.name,
             Position = transform.position,
             Speed = this.Speed,
-            FlagshipId = this.FlagshipId,
-            ShipIds = followers.Select(ship => ship.ShipId).ToList()
+            FlagshipId = validShipIds.Count > 0 ? validShipIds[0] : "", // 第一個船隻作為旗艦
+            ShipIds = validShipIds
         };
-
-        Debug.Log($"[Fleet] Saved fleet data: {fleetData.Name} with {fleetData.ShipIds.Count} ships.");
-        return fleetData;
     }
 }

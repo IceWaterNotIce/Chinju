@@ -262,7 +262,9 @@ public class GameManager : Singleton<GameManager>
                     data.playerData.Fleets.Clear();
                     foreach (var fleet in playerFleets)
                     {
-                        data.playerData.Fleets.Add(fleet.SaveFleetData());
+                        var fleetData = fleet.SaveFleetData();
+                        if (fleetData != null) // 只保存有效艦隊
+                            data.playerData.Fleets.Add(fleetData);
                     }
 
                     // 儲存遊戲時間

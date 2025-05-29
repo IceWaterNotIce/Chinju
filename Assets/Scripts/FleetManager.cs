@@ -109,6 +109,13 @@ public class FleetManager : Singleton<FleetManager>, GameManager.IFleetManager /
         fleet.Speed = fleetData.Speed;
         fleet.FlagshipId = fleetData.FlagshipId;
 
+        // 檢查是否有船隻ID
+        if (fleetData.ShipIds == null || fleetData.ShipIds.Count == 0)
+        {
+            Debug.LogWarning($"[FleetManager] Fleet {fleetData.Name} has no ships, skipping instantiation.");
+            return null;
+        }
+
         // 將船隻加入艦隊
         foreach (var shipId in fleetData.ShipIds)
         {
@@ -122,5 +129,24 @@ public class FleetManager : Singleton<FleetManager>, GameManager.IFleetManager /
 
         Debug.Log($"[FleetManager] InstantiateFleetFromData: {fleetData.Name} with {fleetData.ShipIds.Count} ships.");
         return fleet;
+    }
+
+    // 新增：存檔前的清理方法
+    public void CleanupBeforeSave()
+    {
+        var allFleets = FindObjectsByType<Fleet>(FindObjectsSortMode.None);
+        foreach (var fleet in allFleets)
+        {
+            // 移除無效的追隨者
+            fleet.followers = fleet.followers
+                .Where(s => s != null && !string.IsNullOrEmpty(s.ShipId))
+                .ToList();
+
+            // 如果變成空艦隊則銷毀
+            if (fleet.followers.Count == 0)
+            {
+                Destroy(fleet.gameObject);
+            }
+        }
     }
 }
