@@ -260,16 +260,27 @@ public class GameManager : Singleton<GameManager>
                     }
 
                     // 保存玩家艦隊數據
-                    var playerFleets = GameObject.FindObjectsByType<Fleet>(FindObjectsSortMode.None)
+                    var allFleets = GameObject.FindObjectsByType<Fleet>(FindObjectsSortMode.None)
                         .Where(fleet => fleet != null)
                         .ToList();
 
                     data.playerData.Fleets.Clear();
-                    foreach (var fleet in playerFleets)
+                    data.enemyData.EnemyFleets.Clear(); // 修正：清空敵方艦隊列表
+
+                    foreach (var fleet in allFleets)
                     {
                         var fleetData = fleet.SaveFleetData();
                         if (fleetData != null) // 只保存有效艦隊
-                            data.playerData.Fleets.Add(fleetData);
+                        {
+                            if (fleet.IsPlayerFleet) // 判斷是否為玩家艦隊
+                            {
+                                data.playerData.Fleets.Add(fleetData);
+                            }
+                            else // 否則為敵方艦隊
+                            {
+                                data.enemyData.EnemyFleets.Add(fleetData);
+                            }
+                        }
                     }
 
                     // 儲存遊戲時間

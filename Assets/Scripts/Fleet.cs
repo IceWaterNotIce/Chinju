@@ -199,4 +199,13 @@ public class Fleet : MonoBehaviour
             ShipIds = validShipIds
         };
     }
+
+    public bool IsPlayerFleet
+    {
+        get
+        {
+            // 判斷是否為玩家艦隊，根據艦隊中的船隻類型
+            return followers.Any(ship => ship is PlayerShip);
+        }
+    }
 }
