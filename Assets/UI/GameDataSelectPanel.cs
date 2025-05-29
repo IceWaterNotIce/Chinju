@@ -87,6 +87,12 @@ public class GameDataSelectPanel : MonoBehaviour
 
     private void OnSelectFile(string filePath)
     {
+        if (Path.GetFileName(filePath) != "savegame.json") // 僅允許載入統一檔案名稱
+        {
+            Debug.LogWarning($"[GameDataSelectPanel] 不支援載入非統一檔案名稱: {filePath}");
+            return;
+        }
+
         string json = File.ReadAllText(filePath);
         var data = JsonUtility.FromJson<GameData>(json);
         if (data != null)

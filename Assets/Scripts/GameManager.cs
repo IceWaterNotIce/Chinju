@@ -17,7 +17,7 @@ public class GameManager : Singleton<GameManager>
     public const int SaveDataVersion = 1; // 新增：存檔版本號
 
     [SerializeField]
-    private string currentSaveFileName = "savegame.json";
+    private string currentSaveFileName = "savegame.json"; // 統一檔案名稱
     [SerializeField]
     private float gameTime; // 遊戲時間（秒）
 
@@ -623,24 +623,13 @@ public class GameManager : Singleton<GameManager>
             SaveGame(); // 儲存到目前檔案
         }
 
-        // 2. 產生新檔名
-        if (string.IsNullOrEmpty(newSaveFileName))
-        {
-            string timestamp = System.DateTime.Now.ToString("yyyyMMdd_HHmms");
-            newSaveFileName = $"savegame_{timestamp}.json";
-        }
-        else if (!newSaveFileName.EndsWith(".json"))
-        {
-            newSaveFileName += ".json";
-        }
+        // 2. 切換目前存檔名稱
+        currentSaveFileName = "savegame.json"; // 統一檔案名稱
 
-        // 3. 切換目前存檔名稱
-        SetCurrentSaveFileName(newSaveFileName);
-
-        // 4. 清除現有船隻（玩家與敵人）
+        // 3. 清除現有船隻（玩家與敵人）
         ClearAllShipsAndFleets();
 
-        // 5. 重置遊戲數據
+        // 4. 重置遊戲數據
         int seed = mapSeed ?? UnityEngine.Random.Range(0, int.MaxValue); // 新增：使用指定或隨機種子
         var newGameData = new GameData
         {
@@ -661,7 +650,7 @@ public class GameManager : Singleton<GameManager>
             }
         };
 
-        // 6. 設定到 GameDataController
+        // 5. 設定到 GameDataController
         if (GameDataController.Instance != null)
             GameDataController.Instance.CurrentGameData = newGameData;
 
@@ -671,10 +660,10 @@ public class GameManager : Singleton<GameManager>
         if (MapController.Instance != null)
             MapController.Instance.RecalculateMap();
 
-        // 7. 立即儲存新遊戲檔案
+        // 6. 立即儲存新遊戲檔案
         SaveGame();
 
-        Debug.Log($"[GameManager] 新遊戲已開始，並儲存於 {newSaveFileName}，資料夾：{customSaveDirectory}");
+        Debug.Log($"[GameManager] 新遊戲已開始，並儲存於 {currentSaveFileName}，資料夾：{customSaveDirectory}");
     }
 
     /// <summary>

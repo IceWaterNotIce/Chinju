@@ -45,15 +45,7 @@ public class GameDataCreatePanel : MonoBehaviour
 
     private void OnCreateClicked()
     {
-        string fileName = fileNameField.value.Trim();
-        if (string.IsNullOrEmpty(fileName))
-        {
-            Debug.LogWarning("[GameDataCreatePanel] 檔名不可為空，將使用預設檔名 'default.json'");
-            fileName = "default.json";
-        }
-        if (!fileName.EndsWith(".json"))
-            fileName += ".json";
-
+        string fileName = "savegame.json"; // 統一檔案名稱
         int? mapSeed = null;
         if (mapSeedField != null && !string.IsNullOrWhiteSpace(mapSeedField.value))
         {
