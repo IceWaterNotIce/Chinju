@@ -8,7 +8,7 @@ public class ExportScriptsToMarkdown : EditorWindow
     public static void ExportScriptsToMd()
     {
         string scriptsPath = Application.dataPath; // Assets folder
-        string outputDirectory = Path.Combine(Application.dataPath, "ScriptsMarkdown");
+        string outputDirectory = Path.Combine("E:\\Documents\\Notes\\Unity\\Chinjufu");
 
         if (!Directory.Exists(outputDirectory))
         {
@@ -23,7 +23,13 @@ public class ExportScriptsToMarkdown : EditorWindow
 
             using (StreamWriter writer = new StreamWriter(outputPath))
             {
+                writer.WriteLine("---");
+                writer.WriteLine("tags:");
+                writer.WriteLine("  - chinjufu");
+                writer.WriteLine("---");
+                writer.WriteLine();
                 writer.WriteLine($"# {fileName}");
+                writer.WriteLine();
                 writer.WriteLine("```csharp");
 
                 string fileContent = File.ReadAllText(scriptFile);

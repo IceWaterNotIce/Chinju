@@ -159,15 +159,15 @@ public class ShipCreatePanel : MonoBehaviour
     {
         Debug.Log("[ShipCreatePanel] 點擊建造按鈕");
 
-        if (ShipCreationManager.Instance == null)
+        if (ShipManager.Instance == null)
         {
-            Debug.LogError("[ShipCreatePanel] ShipCreationManager.Instance 為 null，無法建造船隻");
+            Debug.LogError("[ShipCreatePanel] ShipManager.Instance 為 null，無法建造船隻");
             return;
         }
 
 
         
-        PlayerShip newShip = ShipCreationManager.Instance.TryCreateRandomShip(goldInputField.value, oilInputField.value, cubeInputField.value);
+        PlayerShip newShip = ShipManager.Instance.TryCreateRandomShip(goldInputField.value, oilInputField.value, cubeInputField.value);
 
         if (newShip == null)
         {

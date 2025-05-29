@@ -602,7 +602,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentSaveFileName: savegame.json
   gameTime: 0
+  initialConfig:
+    InitialOils: 200
+    InitialGold: 500
+    InitialCube: 100
+    MapWidth: 100
+    MapHeight: 100
+    IslandDensity: 0.1
   customSaveDirectory: 
+  OnGameSavedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  OnGameLoadedEvent:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &586510289
 Transform:
   m_ObjectHideFlags: 0
@@ -985,7 +998,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 856271947}
-  - component: {fileID: 856271946}
+  - component: {fileID: 856271948}
   m_Layer: 0
   m_Name: ShipManager
   m_TagString: Untagged
@@ -993,19 +1006,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &856271946
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 856271945}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa9a1f5cdad21154385a2d0a59f85905, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mapController: {fileID: 708504593}
 --- !u!4 &856271947
 Transform:
   m_ObjectHideFlags: 0
@@ -1021,6 +1021,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 158259544}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &856271948
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 856271945}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd9418327758cea4c8a50296b60fe299, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mapController: {fileID: 0}
 --- !u!1 &866310181
 GameObject:
   m_ObjectHideFlags: 0

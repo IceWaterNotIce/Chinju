@@ -412,16 +412,16 @@ public class GameManager : Singleton<GameManager>
                         Debug.Log("[GameManager] 遊戲數據已設置到 GameDataController");
                     }
 
-                    // 使用 ShipCreationManager 載入玩家船隻數據並實例化
+                    // 使用 ShipManager 載入玩家船隻數據並實例化
                     foreach (var shipData in data.playerData.Ships)
                     {
-                        if (ShipCreationManager.Instance != null)
+                        if (ShipManager.Instance != null)
                         {
-                            ShipCreationManager.Instance.InstantiateShipFromData(shipData);
+                            ShipManager.Instance.InstantiateShipFromData(shipData);
                         }
                         else
                         {
-                            Debug.LogError("[GameManager] ShipCreationManager 未初始化，無法實例化船隻！");
+                            Debug.LogError("[GameManager] ShipManager 未初始化，無法實例化船隻！");
                         }
                     }
 
