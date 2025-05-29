@@ -31,7 +31,7 @@ public class GameDataController : Singleton<GameDataController>
     {
         Debug.Log("[GameDataController] Awake 方法執行。");
 
-        // 確保 currentGameData 初始化
+        // 確保 currentGameData 初始化，但避免覆蓋序列化加載的數據
         if (currentGameData == null)
         {
             Debug.Log("[GameDataController] 初始化 currentGameData。");
@@ -42,7 +42,7 @@ public class GameDataController : Singleton<GameDataController>
         }
         else
         {
-            Debug.Log("[GameDataController] currentGameData 已存在。");
+            Debug.Log("[GameDataController] currentGameData 已存在，可能由序列化加載。");
         }
     }
 
@@ -70,9 +70,10 @@ public class GameDataController : Singleton<GameDataController>
     /// <param name="gold">所需金幣</param>
     /// <param name="oil">所需石油</param>
     /// <param name="cube">所需方塊</param>
-    /// <param name="fuel">所需燃料</param> <!-- 新增參數 -->
+    /// <param name="fuel">所需燃料</param>
+    /// <param name="shipId">指定檢查的船隻 ID（可選）</param> <!-- 新增參數 -->
     /// <returns>是否擁有足夠資源</returns>
-    public bool HasEnoughResources(int gold, int oil, int cube, float fuel = 0f) // 新增燃料參數
+    public bool HasEnoughResources(int gold, int oil, int cube, float fuel = 0f, string shipId = null) // 新增船隻檢查
     {
         if (currentGameData?.playerData == null)
         {
@@ -81,10 +82,22 @@ public class GameDataController : Singleton<GameDataController>
         }
 
         var playerData = currentGameData.playerData;
+
+        bool hasEnoughFuel = true;
+        if (!string.IsNullOrEmpty(shipId))
+        {
+            var ship = playerData.Ships.FirstOrDefault(s => s.ShipId == shipId);
+            hasEnoughFuel = ship != null && ship.CurrentFuel >= fuel;
+        }
+        else
+        {
+            hasEnoughFuel = playerData.Ships.All(ship => ship.CurrentFuel >= fuel);
+        }
+
         return playerData.Gold >= gold &&
                playerData.Oils >= oil &&
                playerData.Cube >= cube &&
-               playerData.Ships.All(ship => ship.CurrentFuel >= fuel); // 檢查所有船隻的燃料
+               hasEnoughFuel; // 檢查指定船隻或所有船隻的燃料
     }
 
     /// <summary>
