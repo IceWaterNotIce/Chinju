@@ -92,20 +92,17 @@ public class GameDataSelectPanel : MonoBehaviour
             Debug.LogWarning($"[GameDataSelectPanel] 不支援載入非統一檔案名稱: {filePath}");
             return;
         }
-
-        string json = File.ReadAllText(filePath);
-        var data = JsonUtility.FromJson<GameData>(json);
-        if (data != null)
+        // 檢查檔案是否存在
+        if (!File.Exists(filePath))
         {
-            GameDataController.Instance.CurrentGameData = data;
-            GameManager.Instance.LoadGame(); // 觸發載入流程
-            PopupManager.Instance.HidePopup("GameDataSelectPanel");
-            PopupManager.Instance.HidePopup("SettingMenu");
+            Debug.LogWarning($"[GameDataSelectPanel] 檔案不存在: {filePath}");
+            return;
         }
-        else
-        {
-            Debug.LogWarning($"[GameDataSelectPanel] 載入失敗: {filePath}");
-        }
+        // get the file name without path
+        string fileName = Path.GetFileName(filePath);
+        GameManager.Instance.LoadGame(fileName);
+        PopupManager.Instance.HidePopup("GameDataSelectPanel");
+        PopupManager.Instance.HidePopup("SettingMenu");
     }
 
     // 新增刪除檔案的方法

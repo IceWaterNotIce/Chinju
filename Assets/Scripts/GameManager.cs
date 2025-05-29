@@ -71,12 +71,21 @@ public class GameManager : Singleton<GameManager>
     [SerializeField]
     private float pauseTimeScale = 0f; // 新增：暫停時的時間縮放
 
+    [SerializeField]
+    private float fleetValidationDelay = 1f; // 艦隊驗證延遲時間可配置化
+
+    private readonly float gameSecondsPerRealSecond = GameSecondsPerDay / RealSecondsPerGameDay; // 改為 readonly 變數
+
     #endregion
 
     #region UnityLifecycle
     protected override void Awake()
     {
         base.Awake();
+        registeredShips.Clear(); // 清理靜態列表避免記憶體洩漏
+        registeredFleets.Clear();
+        registeredPlayerShips.Clear();
+        registeredEnemyShips.Clear();
     }
 
     void Start()
@@ -194,6 +203,37 @@ public class GameManager : Singleton<GameManager>
     }
 
     /// <summary>
+    /// 驗證並取得合法的存檔路徑
+    /// </summary>
+    private string GetValidatedSaveFilePath(string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
+            throw new ArgumentException("檔名不能為空");
+
+        if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+            throw new ArgumentException($"檔名包含非法字元: {fileName}");
+
+        string dir = string.IsNullOrEmpty(customSaveDirectory) ? Application.persistentDataPath : customSaveDirectory;
+        return Path.Combine(dir, fileName);
+    }
+
+    private void SaveGameInternal(GameData data, string fileName)
+    {
+        string path = GetValidatedSaveFilePath(fileName);
+
+        if (File.Exists(path))
+        {
+            string backupPath = path + ".bak";
+            File.Copy(path, backupPath, true);
+            Debug.Log($"[GameManager] 已備份舊存檔至 {backupPath}");
+        }
+
+        string json = JsonUtility.ToJson(data, true);
+        File.WriteAllText(path, json);
+        Debug.Log($"[GameManager] 遊戲已保存至 {path}");
+    }
+
+    /// <summary>
     /// 儲存遊戲，可指定檔名
     /// </summary>
     public void SaveGame(string fileName = null)
@@ -201,120 +241,12 @@ public class GameManager : Singleton<GameManager>
         if (GameDataController.Instance != null)
         {
             var data = GameDataController.Instance.CurrentGameData;
-
             if (data != null)
             {
                 try
                 {
-                    // 保存玩家資源（確保最新值）
-                    var playerData = GameDataController.Instance.CurrentGameData.playerData;
-                    data.playerData.Oils = playerData.Oils;
-                    data.playerData.Gold = playerData.Gold;
-                    data.playerData.Cube = playerData.Cube;
-                    data.playerData.Level = playerData.Level;
-                    data.playerData.Exp = playerData.Exp;
-
-                    // 保存玩家船隻數據（含艦隊編組/父子關係）
-                    var playerShips = GameObject.FindObjectsByType<PlayerShip>(FindObjectsSortMode.None)
-                        .Where(ship => ship != null)
-                        .ToList();
-
-                    data.playerData.Ships.Clear();
-                    foreach (var ship in registeredPlayerShips)
-                    {
-                        data.playerData.Ships.Add(ship.SaveShipData());
-                    }
-
-                    // 保存敵人數據
-                    var enemyShips = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None)
-                        .Where(ship => ship != null)
-                        .ToList();
-
-                    data.enemyData.EnemyShips.Clear(); // 修正：改為使用 enemyData.EnemyShips
-                    foreach (var ship in enemyShips) // 改用場景中實際存在的敵艦
-                    {
-                        var shipData = ship.SaveShipData();
-
-                        // 保存武器數據
-                        shipData.Weapons.Clear();
-                        foreach (var weapon in ship.GetWeapons())
-                        {
-                            var weaponData = new GameData.WeaponData
-                            {
-                                WeaponId = weapon.WeaponId, // 保存唯一標識
-                                Name = weapon.name,
-                                Damage = (int)weapon.Damage,
-                                MaxAttackDistance = weapon.MaxAttackDistance,
-                                AttackSpeed = weapon.AttackSpeed,
-                                PrefabName = weapon.Name
-                            };
-                            shipData.Weapons.Add(weaponData);
-                        }
-
-                        data.enemyData.EnemyShips.Add(shipData); // 修正：改為使用 enemyData.EnemyShips
-                    }
-                    Debug.Log($"[GameManager] 正在保存 {enemyShips.Count} 艘敵艦");
-                    foreach (var ship in enemyShips)
-                    {
-                        Debug.Log($"[GameManager] 保存敵艦: {ship.name}, ID: {ship.ShipId}");
-                    }
-
-                    // 保存玩家艦隊數據
-                    var allFleets = GameObject.FindObjectsByType<Fleet>(FindObjectsSortMode.None)
-                        .Where(fleet => fleet != null)
-                        .ToList();
-
-                    data.playerData.Fleets.Clear();
-                    data.enemyData.EnemyFleets.Clear(); // 修正：清空敵方艦隊列表
-
-                    foreach (var fleet in allFleets)
-                    {
-                        var fleetData = fleet.SaveFleetData();
-                        if (fleetData != null) // 只保存有效艦隊
-                        {
-                            if (fleet.IsPlayerFleet) // 判斷是否為玩家艦隊
-                            {
-                                data.playerData.Fleets.Add(fleetData);
-                            }
-                            else // 否則為敵方艦隊
-                            {
-                                data.enemyData.EnemyFleets.Add(fleetData);
-                            }
-                        }
-                    }
-
-                    // 儲存遊戲時間
-                    data.gameTime = gameTime;
-
-                    // 新增：設置存檔版本號
-                    data.version = SaveDataVersion;
-
-                    // 保存最後遊玩時間
-                    data.lastPlayedTime = DateTime.Now.ToString("o"); // 新增：保存 ISO 格式的最後遊玩時間
-
-                    // 保存彈藥池狀態
-                    if (AmmoManager.Instance != null)
-                    {
-                        data.ammoStates = AmmoManager.Instance.SaveAmmoStates(); // 新增：保存彈藥位置
-                    }
-
-                    string json = JsonUtility.ToJson(data, true);
-                    string path = GetSaveFilePath(fileName);
-
-                    // === 新增：自動備份舊存檔 ===
-                    if (File.Exists(path))
-                    {
-                        string backupPath = path + ".bak";
-                        File.Copy(path, backupPath, true);
-                        Debug.Log($"[GameManager] 已備份舊存檔至 {backupPath}");
-                    }
-                    // === 備份結束 ===
-
-                    File.WriteAllText(path, json);
-                    Debug.Log($"[GameManager] 遊戲已保存至 {path}");
-                    // 新增：儲存最後一次存檔檔名
-                    SetCurrentSaveFileName(Path.GetFileName(path));
-                    OnGameSavedEvent.Invoke(); // 發送保存事件
+                    SaveGameInternal(data, fileName ?? currentSaveFileName);
+                    OnGameSavedEvent.Invoke();
                 }
                 catch (IOException ex)
                 {
@@ -340,35 +272,13 @@ public class GameManager : Singleton<GameManager>
         if (GameDataController.Instance != null)
         {
             var data = GameDataController.Instance.CurrentGameData;
-
             if (data != null)
             {
                 try
                 {
-                    // 保存玩家資源
-                    SyncPlayerResources(GameDataController.Instance.CurrentGameData.playerData, data.playerData);
-
-                    // 儲存遊戲時間
-                    data.gameTime = gameTime;
-
-                    // 設置存檔版本號
-                    data.version = SaveDataVersion;
-
-                    // 保存最後遊玩時間
-                    data.lastPlayedTime = DateTime.Now.ToString("o"); // 新增：保存 ISO 格式的最後遊玩時間
-
+                    string path = GetValidatedSaveFilePath(fileName ?? currentSaveFileName);
                     string json = JsonUtility.ToJson(data, true);
-                    string path = GetValidatedSavePath(fileName ?? currentSaveFileName);
 
-                    // 自動備份舊存檔
-                    if (File.Exists(path))
-                    {
-                        string backupPath = path + ".bak";
-                        File.Copy(path, backupPath, true);
-                        Debug.Log($"[GameManager] 已備份舊存檔至 {backupPath}");
-                    }
-
-                    // 非同步寫入檔案
                     using (FileStream stream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
                     {
                         byte[] jsonData = System.Text.Encoding.UTF8.GetBytes(json);
@@ -376,8 +286,7 @@ public class GameManager : Singleton<GameManager>
                     }
 
                     Debug.Log($"[GameManager] 遊戲已非同步保存至 {path}");
-                    SetCurrentSaveFileName(Path.GetFileName(path));
-                    OnGameSavedEvent.Invoke(); // 發送保存事件
+                    OnGameSavedEvent.Invoke();
                 }
                 catch (Exception ex)
                 {
@@ -393,30 +302,6 @@ public class GameManager : Singleton<GameManager>
         {
             Debug.LogWarning("[GameManager] 無法保存遊戲，GameDataController 未初始化");
         }
-    }
-
-    /// <summary>
-    /// 驗證並取得合法的存檔路徑
-    /// </summary>
-    private string GetValidatedSavePath(string fileName)
-    {
-        if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
-            throw new ArgumentException($"檔名包含非法字元: {fileName}");
-
-        string dir = string.IsNullOrEmpty(customSaveDirectory) ? Application.persistentDataPath : customSaveDirectory;
-        return Path.Combine(dir, fileName);
-    }
-
-    /// <summary>
-    /// 同步玩家資源數據
-    /// </summary>
-    private void SyncPlayerResources(GameData.PlayerData source, GameData.PlayerData target)
-    {
-        target.Oils = source.Oils;
-        target.Gold = source.Gold;
-        target.Cube = source.Cube;
-        target.Level = source.Level;
-        target.Exp = source.Exp;
     }
 
     /// <summary>
@@ -767,9 +652,9 @@ public class GameManager : Singleton<GameManager>
     #endregion
 
     #region Coroutines
-    private System.Collections.IEnumerator DelayedFleetValidation() // 新增方法
+    private System.Collections.IEnumerator DelayedFleetValidation()
     {
-        yield return new WaitForSeconds(1f); // 延遲執行
+        yield return new WaitForSeconds(fleetValidationDelay); // 使用可配置的延遲時間
         _fleetManager?.ValidateFleetFollowers();
     }
     #endregion
