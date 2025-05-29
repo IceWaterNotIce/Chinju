@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
@@ -29,10 +30,23 @@ public class EnemyShipManager : MonoBehaviour
     private bool isSpeedBoosted = false; // 用於追蹤是否處於加速狀態
     private float speedBoostTimer = 0f; // 用於計時加速持續時間
 
+    // 敵艦池相關
+    private List<GameObject> enemyShipPrefabs = new List<GameObject>();
+    [SerializeField] private int initialPoolSize = 10;
+    private Queue<GameObject> pool = new Queue<GameObject>();
+
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+            LoadEnemyShipPrefabs();
+            InitializePool();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     void Start()
@@ -88,6 +102,56 @@ public class EnemyShipManager : MonoBehaviour
         UpdateProgressBar();
     }
 
+    private void LoadEnemyShipPrefabs()
+    {
+        var loadedPrefabs = Resources.LoadAll<GameObject>("Prefabs/Ships/Enemies");
+        enemyShipPrefabs.Clear();
+        enemyShipPrefabs.AddRange(loadedPrefabs);
+        if (enemyShipPrefabs.Count == 0)
+        {
+            Debug.LogError("[EnemyShipManager] 無法從 Resources/Prefabs/Ships/Enemies 載入任何敵艦預製物！");
+        }
+    }
+
+    private void InitializePool()
+    {
+        foreach (var prefab in enemyShipPrefabs)
+        {
+            for (int i = 0; i < initialPoolSize; i++)
+            {
+                var enemyShip = Instantiate(prefab);
+                enemyShip.transform.SetParent(this.transform);
+                enemyShip.SetActive(false);
+                pool.Enqueue(enemyShip);
+            }
+        }
+    }
+
+    private GameObject GetEnemyShip()
+    {
+        if (pool.Count > 0)
+        {
+            var enemyShip = pool.Dequeue();
+            enemyShip.SetActive(true);
+            enemyShip.transform.SetParent(this.transform);
+            return enemyShip;
+        }
+        else
+        {
+            var prefab = enemyShipPrefabs[Random.Range(0, enemyShipPrefabs.Count)];
+            var enemyShip = Instantiate(prefab);
+            enemyShip.transform.SetParent(this.transform);
+            return enemyShip;
+        }
+    }
+
+    public void ReturnEnemyShip(GameObject enemyShip)
+    {
+        enemyShip.SetActive(false);
+        enemyShip.transform.SetParent(this.transform);
+        pool.Enqueue(enemyShip);
+    }
+
     void SpawnEnemyShip()
     {
         int currentEnemyCount = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None).Length;
@@ -108,9 +172,10 @@ public class EnemyShipManager : MonoBehaviour
 
             if (IsOceanTile(spawnPos))
             {
-                var enemyShip = EnemyShipPool.Instance.GetEnemyShip();
+                var enemyShip = GetEnemyShip();
                 enemyShip.transform.position = spawnPos;
                 enemyShip.transform.rotation = Quaternion.identity;
+                enemyShip.transform.SetParent(this.transform);
 
                 // 設置為 EnemyShipManager 的子物件
                 enemyShip.transform.SetParent(this.transform);
@@ -148,7 +213,7 @@ public class EnemyShipManager : MonoBehaviour
             return;
         }
 
-        GameObject enemyShip = EnemyShipPool.Instance.GetEnemyShip();
+        GameObject enemyShip = GetEnemyShip();
         if (enemyShip != null)
         {
             var enemyComp = enemyShip.GetComponent<EnemyShip>();
