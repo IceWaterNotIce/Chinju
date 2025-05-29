@@ -1,30 +1,24 @@
 using UnityEngine;
-using UnityEngine.UIElements;
+using System.Collections.Generic;
 
-public class NewMonoBehaviourScript : MonoBehaviour
-{
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        var uiDoc = GetComponent<UIDocument>();
-        if (uiDoc != null)
-        {
-            var chinjuRoot = uiDoc.rootVisualElement;
-            //btn1 
-            var btn1 = chinjuRoot.Q<Button>("btn1");
-            if (btn1 != null)
-            {
-                btn1.clicked += () => Debug.Log("btn1 clicked!");
-                btn1.clicked += () => Debug.Log("btn1 clicked again!");
-                btn1.clicked += () => chinjuRoot.style.display = DisplayStyle.None;
-                btn1.clicked += () => Debug.Log("btn1 clicked and hidden!");
-            }
+public class Vector3ListProvider : MonoBehaviour {
+    public Vector3[] positions; // 在 Inspector 設定
+    private MaterialPropertyBlock _propBlock;
+
+    void Update() {
+        _propBlock = new MaterialPropertyBlock();
+        GetComponent<Renderer>().GetPropertyBlock(_propBlock);
+        
+        // 將 Vector3[] 轉換為 List<Vector4>
+        List<Vector4> vector4List = new List<Vector4>();
+        foreach (var position in positions) {
+            vector4List.Add(new Vector4(position.x, position.y, position.z, 0)); // 添加第四個分量
         }
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-
+        // 傳遞 Vector4 數組
+        _propBlock.SetVectorArray("_Vector3List", vector4List);
+        _propBlock.SetInt("_Vector3Count", vector4List.Count);
+        
+        GetComponent<Renderer>().SetPropertyBlock(_propBlock);
     }
 }
