@@ -7,6 +7,11 @@ public class FleetManager : Singleton<FleetManager>, GameManager.IFleetManager /
 {
     public void CreateFleet(Warship[] warships)
     {
+        if (warships == null || warships.Length == 0)
+        {
+            Debug.LogWarning("[FleetManager] No ships provided to create a fleet.");
+            return;
+        }
         GameObject fleetParent = new GameObject("FleetGroup");
         // get the first ship parent
         var firstShip = warships.FirstOrDefault();
