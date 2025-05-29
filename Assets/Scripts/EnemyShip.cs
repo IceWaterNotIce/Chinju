@@ -51,6 +51,7 @@ public class EnemyShip : Warship
     new void Start()
     {
         base.Start();
+        this.ShipId = System.Guid.NewGuid().ToString(); // 新增：初始化唯一 ShipId
         GameManager.Instance?.RegisterEnemyShip(this); // 確保註冊
         // 取得 MapController 實例
         mapController = FindFirstObjectByType<MapController>();

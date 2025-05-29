@@ -186,6 +186,7 @@ public class EnemyShipManager : MonoBehaviour
                 var enemyComp = enemyShip.GetComponent<EnemyShip>();
                 if (enemyComp != null)
                 {
+                    enemyComp.ShipId = System.Guid.NewGuid().ToString(); // 新增：初始化唯一 ShipId
                     enemyComp.SetLevel(enemyLevel);
                     GameManager.Instance?.RegisterEnemyShip(enemyComp); // 新增註冊
                 }
