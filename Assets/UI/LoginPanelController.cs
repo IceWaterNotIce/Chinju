@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using Unity.Services.Authentication;
 
 public class LoginPanelController : PopupPanelBase
 {
@@ -30,7 +31,20 @@ public class LoginPanelController : PopupPanelBase
         string password = passwordField.value;
 
         Debug.Log($"Login clicked with Username: {username}, Password: {password}");
-        // Call AuthManager.SignInWithUsernamePasswordAsync
+        AuthenticationService.Instance.SignInWithUsernamePasswordAsync(username, password)
+            .ContinueWith(task =>
+            {
+                if (task.IsCompletedSuccessfully)
+                {
+                    Debug.Log("Login successful.");
+                    // Handle successful login (e.g., close panel, load next scene)
+                }
+                else if (task.IsFaulted)
+                {
+                    Debug.LogError($"Login failed: {task.Exception}");
+                    // Handle login failure (e.g., show error message)
+                }
+            });
     }
 
     private void OnSignupClicked()
@@ -39,6 +53,19 @@ public class LoginPanelController : PopupPanelBase
         string password = passwordField.value;
 
         Debug.Log($"Sign Up clicked with Username: {username}, Password: {password}");
-        // Call AuthManager.SignUpWithUsernamePasswordAsync
+        AuthenticationService.Instance.AddUsernamePasswordAsync(username, password)
+            .ContinueWith(task =>
+            {
+                if (task.IsCompletedSuccessfully)
+                {
+                    Debug.Log("Sign Up successful.");
+                    // Handle successful sign-up (e.g., close panel, load next scene)
+                }
+                else if (task.IsFaulted)
+                {
+                    Debug.LogError($"Sign Up failed: {task.Exception}");
+                    // Handle sign-up failure (e.g., show error message)
+                }
+            });
     }
 }

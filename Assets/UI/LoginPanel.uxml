@@ -1,5 +1,6 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements">
-    <ui:VisualElement class="login-panel">
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/LoginPanel.uss?fileID=7433441132597879392&amp;guid=795b70cd50ab7cc45ac12c4d3455d7e5&amp;type=3#LoginPanel" />
+    <ui:VisualElement class="login-panel" style="top: 50%; left: 50%; position: absolute; translate: -50% -50px;">
         <ui:Label text="Login" class="title" />
         <ui:TextField name="usernameField" placeholder="Username" />
         <ui:TextField name="passwordField" placeholder="Password" />
