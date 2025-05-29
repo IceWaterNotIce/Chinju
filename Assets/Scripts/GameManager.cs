@@ -41,6 +41,17 @@ public class GameManager : Singleton<GameManager>
         public int MapWidth = 100;
         public int MapHeight = 100;
         public float IslandDensity = 0.1f;
+
+        // 新增：驗證配置是否有效
+        public bool IsValid()
+        {
+            return InitialOils >= 0 &&
+                   InitialGold >= 0 &&
+                   InitialCube >= 0 &&
+                   MapWidth > 0 &&
+                   MapHeight > 0 &&
+                   IslandDensity >= 0 && IslandDensity <= 1;
+        }
     }
 
     [SerializeField]
@@ -115,6 +126,12 @@ public class GameManager : Singleton<GameManager>
     #region GameDataInit
     private void InitializeGameData()
     {
+        if (!initialConfig.IsValid()) // 新增：檢查配置有效性
+        {
+            Debug.LogError("[GameManager] InitialGameConfig 無效，請檢查配置參數！");
+            return;
+        }
+
         GameDataController.Instance.CurrentGameData = new GameData();
         GameDataController.Instance.TriggerResourceChanged();
 
@@ -579,6 +596,12 @@ public class GameManager : Singleton<GameManager>
     /// <param name="saveDir">自訂存檔資料夾（可為 null 或空字串）</param>
     public void StartNewGame(string newSaveFileName = null, int? mapSeed = null, string saveDir = null)
     {
+        if (!initialConfig.IsValid()) // 新增：檢查配置有效性
+        {
+            Debug.LogError("[GameManager] InitialGameConfig 無效，無法開始新遊戲！");
+            return;
+        }
+
         // 設定自訂存檔資料夾（可為 null）
         SetCustomSaveDirectory(string.IsNullOrEmpty(saveDir) ? null : saveDir);
 
