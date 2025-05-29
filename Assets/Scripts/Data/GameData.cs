@@ -192,4 +192,7 @@ public class GameData
         [SerializeField]
         public string FlagshipId; // 旗艦ID
     }
+
+    [SerializeField]
+    public string lastPlayedTime; // 新增：保存最後遊玩時間
 }

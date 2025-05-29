@@ -53,6 +53,11 @@ public class GameManager : Singleton<GameManager>
     // 新增：PlayerPrefs 的鍵值常量
     private const string LastSaveFileKey = "LastSaveFileName";
 
+    [SerializeField]
+    private bool isPaused = false; // 新增：遊戲暫停狀態
+    [SerializeField]
+    private float pauseTimeScale = 0f; // 新增：暫停時的時間縮放
+
     #endregion
 
     #region UnityLifecycle
@@ -84,9 +89,12 @@ public class GameManager : Singleton<GameManager>
 
     void Update()
     {
-        // 讓現實 10 分鐘等於遊戲 12 小時
-        float gameSecondsPerRealSecond = (GameSecondsPerDay / RealSecondsPerGameDay);
-        gameTime += Time.deltaTime * gameSecondsPerRealSecond;
+        if (!isPaused) // 修改：僅在未暫停時更新遊戲時間
+        {
+            // 讓現實 10 分鐘等於遊戲 12 小時
+            float gameSecondsPerRealSecond = (GameSecondsPerDay / RealSecondsPerGameDay);
+            gameTime += Time.deltaTime * gameSecondsPerRealSecond;
+        }
     }
 
     private void OnApplicationQuit()
@@ -94,6 +102,13 @@ public class GameManager : Singleton<GameManager>
         if (GameDataController.Instance != null)
             SaveGame(); // 預設存檔
         Debug.Log("[GameManager] 遊戲數據已在退出時保存");
+    }
+
+    // 新增：暫停與恢復遊戲
+    public void SetPause(bool pause)
+    {
+        isPaused = pause;
+        Time.timeScale = pause ? pauseTimeScale : 1f; // 控制 Unity 時間縮放
     }
     #endregion
 
@@ -235,6 +250,9 @@ public class GameManager : Singleton<GameManager>
                     // 新增：設置存檔版本號
                     data.version = SaveDataVersion;
 
+                    // 保存最後遊玩時間
+                    data.lastPlayedTime = DateTime.Now.ToString("o"); // 新增：保存 ISO 格式的最後遊玩時間
+
                     string json = JsonUtility.ToJson(data, true);
                     string path = GetSaveFilePath(fileName);
 
@@ -290,6 +308,9 @@ public class GameManager : Singleton<GameManager>
 
                     // 設置存檔版本號
                     data.version = SaveDataVersion;
+
+                    // 保存最後遊玩時間
+                    data.lastPlayedTime = DateTime.Now.ToString("o"); // 新增：保存 ISO 格式的最後遊玩時間
 
                     string json = JsonUtility.ToJson(data, true);
                     string path = GetValidatedSavePath(fileName ?? currentSaveFileName);
@@ -512,6 +533,12 @@ public class GameManager : Singleton<GameManager>
                 if (FleetManager.Instance != null)
                 {
                     FleetManager.Instance.ValidateFleetFollowers();
+                }
+
+                if (DateTime.TryParse(data.lastPlayedTime, out DateTime lastPlayed))
+                {
+                    TimeSpan timeSinceLastPlayed = DateTime.Now - lastPlayed;
+                    gameTime += (float)timeSinceLastPlayed.TotalSeconds; // 新增：根據系統時間更新遊戲時間
                 }
 
                 return data;
