@@ -30,6 +30,8 @@ public class GameManager : Singleton<GameManager>
     // 新增：靜態列表用於記錄船隻和艦隊
     private static List<GameObject> registeredShips = new List<GameObject>();
     private static List<GameObject> registeredFleets = new List<GameObject>();
+    private static List<PlayerShip> registeredPlayerShips = new List<PlayerShip>();
+    private static List<EnemyShip> registeredEnemyShips = new List<EnemyShip>();
 
     // 新增：初始配置參數
     [System.Serializable]
@@ -96,6 +98,8 @@ public class GameManager : Singleton<GameManager>
 
         // 修改：載入最後一次存檔
         LoadGame(currentSaveFileName);
+
+        StartCoroutine(DelayedFleetValidation());
     }
 
     void Update()
@@ -216,9 +220,8 @@ public class GameManager : Singleton<GameManager>
                         .ToList();
 
                     data.playerData.Ships.Clear();
-                    foreach (var ship in playerShips)
+                    foreach (var ship in registeredPlayerShips)
                     {
-                        // 只呼叫 SaveShipData，讓 ShipData 內部處理關聯
                         data.playerData.Ships.Add(ship.SaveShipData());
                     }
 
@@ -228,7 +231,7 @@ public class GameManager : Singleton<GameManager>
                         .ToList();
 
                     data.enemyShips.Clear();
-                    foreach (var ship in enemyShips)
+                    foreach (var ship in registeredEnemyShips)
                     {
                         var shipData = ship.SaveShipData();
 
@@ -725,6 +728,20 @@ public class GameManager : Singleton<GameManager>
     public void SetFleetManager(IFleetManager manager)
     {
         _fleetManager = manager;
+    }
+    #endregion
+
+    #region ShipRegistration
+    public void RegisterPlayerShip(PlayerShip ship)
+    {
+        if (!registeredPlayerShips.Contains(ship))
+            registeredPlayerShips.Add(ship);
+    }
+
+    public void RegisterEnemyShip(EnemyShip ship)
+    {
+        if (!registeredEnemyShips.Contains(ship))
+            registeredEnemyShips.Add(ship);
     }
     #endregion
 }

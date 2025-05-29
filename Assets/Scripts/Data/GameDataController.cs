@@ -112,7 +112,11 @@ public class GameDataController : Singleton<GameDataController>
     {
         if (!HasEnoughResources(gold, oil, cube, fuel))
         {
-            Debug.LogWarning("[GameDataController] 資源不足，無法消耗！");
+            var playerData = currentGameData?.playerData;
+            if (playerData != null)
+            {
+                Debug.LogWarning($"[GameDataController] 資源不足！金幣: {playerData.Gold}/{gold}, 石油: {playerData.Oils}/{oil}, 方塊: {playerData.Cube}/{cube}, 燃料: {fuel}");
+            }
             return false;
         }
 
@@ -129,5 +133,14 @@ public class GameDataController : Singleton<GameDataController>
         TriggerResourceChanged();
         Debug.Log($"[GameDataController] 成功消耗資源：金幣-{gold}，石油-{oil}，方塊-{cube}，燃料-{fuel}");
         return true;
+    }
+
+    private void SyncPlayerResources(GameData.PlayerData source, GameData.PlayerData target)
+    {
+        target.Oils = source.Oils;
+        target.Gold = source.Gold;
+        target.Cube = source.Cube;
+        target.Level = source.Level;
+        target.Exp = source.Exp;
     }
 }

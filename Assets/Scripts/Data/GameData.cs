@@ -201,4 +201,34 @@ public class GameData
     public string lastPlayedTime; // 新增：保存最後遊玩時間
     [SerializeField]
     public List<Vector3> ammoStates = new List<Vector3>(); // 新增：保存彈藥位置
+
+    public GameData UpgradeSaveData(GameData data)
+    {
+        if (data.version < SaveDataVersion)
+        {
+            Debug.Log($"[GameData] 升級存檔版本：{data.version} -> {SaveDataVersion}");
+            if (data.playerData == null)
+                data.playerData = new PlayerData();
+            if (data.mapData == null)
+                data.mapData = new MapData();
+            if (data.playerData.Ships == null)
+                data.playerData.Ships = new List<ShipData>();
+            if (data.enemyShips == null)
+                data.enemyShips = new List<ShipData>();
+            if (data.mapData.ChinjuTiles == null)
+                data.mapData.ChinjuTiles = new List<Vector3Int>();
+            if (data.playerData.Fleets == null)
+                data.playerData.Fleets = new List<FleetData>();
+
+            // 新增：遷移邏輯示例
+            foreach (var ship in data.playerData.Ships)
+            {
+                if (string.IsNullOrEmpty(ship.ShipId))
+                    ship.ShipId = Guid.NewGuid().ToString();
+            }
+
+            data.version = SaveDataVersion;
+        }
+        return data;
+    }
 }
