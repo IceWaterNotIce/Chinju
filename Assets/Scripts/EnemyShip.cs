@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq; // 新增 using 以支援 LINQ
 
 public class EnemyShip : Warship
 {
@@ -50,6 +51,7 @@ public class EnemyShip : Warship
     new void Start()
     {
         base.Start();
+        GameManager.Instance?.RegisterEnemyShip(this); // 確保註冊
         // 取得 MapController 實例
         mapController = FindFirstObjectByType<MapController>();
         PickNewRandomMove();
@@ -288,5 +290,27 @@ public class EnemyShip : Warship
         TargetRotation = 0f; // 重置旋轉
         weapons.Clear();    // 清空武器列表
         Debug.Log($"[EnemyShip] {name} 已重置狀態");
+    }
+
+    public override GameData.ShipData SaveShipData() // 修正：加入 override 關鍵字
+    {
+        return new GameData.ShipData
+        {
+            ShipId = this.ShipId,
+            Name = this.name,
+            Health = this.Health,
+            Position = this.transform.position,
+            Rotation = this.transform.eulerAngles.z,
+            PrefabName = this.name.Replace("(Clone)", ""), // 移除Clone後綴
+            Weapons = GetWeapons().Select(w => new GameData.WeaponData
+            {
+                WeaponId = w.WeaponId,
+                Name = w.name,
+                Damage = (int)w.Damage, // 修正：明確轉型為 int
+                MaxAttackDistance = w.MaxAttackDistance,
+                AttackSpeed = w.AttackSpeed,
+                PrefabName = w.name.Replace("(Clone)", "")
+            }).ToList()
+        };
     }
 }

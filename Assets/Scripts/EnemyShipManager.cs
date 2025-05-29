@@ -187,6 +187,7 @@ public class EnemyShipManager : MonoBehaviour
                 if (enemyComp != null)
                 {
                     enemyComp.SetLevel(enemyLevel);
+                    GameManager.Instance?.RegisterEnemyShip(enemyComp); // 新增註冊
                 }
 
                 Debug.Log($"[EnemyShipManager] 成功生成等級 {enemyLevel} 敵方船隻於位置: {spawnPos}");

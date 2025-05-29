@@ -231,7 +231,7 @@ public class GameManager : Singleton<GameManager>
                         .ToList();
 
                     data.enemyShips.Clear();
-                    foreach (var ship in registeredEnemyShips)
+                    foreach (var ship in enemyShips) // 改用場景中實際存在的敵艦
                     {
                         var shipData = ship.SaveShipData();
 
@@ -252,6 +252,11 @@ public class GameManager : Singleton<GameManager>
                         }
 
                         data.enemyShips.Add(shipData);
+                    }
+                    Debug.Log($"[GameManager] 正在保存 {enemyShips.Count} 艘敵艦");
+                    foreach (var ship in enemyShips)
+                    {
+                        Debug.Log($"[GameManager] 保存敵艦: {ship.name}, ID: {ship.ShipId}");
                     }
 
                     // 保存玩家艦隊數據

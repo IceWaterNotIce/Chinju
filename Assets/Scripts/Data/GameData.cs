@@ -101,7 +101,7 @@ public class GameData
         [SerializeField]
         public string Name;
         [SerializeField]
-        public int Health;
+        public float Health;
         [SerializeField]
         public int AttackPower;
         [SerializeField]
