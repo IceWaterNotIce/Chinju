@@ -7,6 +7,7 @@
         <ui:Button text="選擇存檔" name="selectGameDataButton" class="menu-button" />
         <ui:Button text="儲存遊戲" name="saveGameButton" class="menu-button" />
         <ui:Button text="退出遊戲" name="exitGameButton" class="menu-button" />
+        <ui:Button text="登入/登出" name="loginLogoutButton" class="menu-button" />
     </ui:VisualElement>
     <ui:Label name="gameVersion" class="game-version" style="position: absolute; left: 0; bottom: 0;" />
 </UXML>

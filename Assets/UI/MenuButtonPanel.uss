@@ -18,3 +18,7 @@
     color: white;
     margin-bottom: 24px;
 }
+
+.menu-button {
+    margin-bottom: 10px;
+}

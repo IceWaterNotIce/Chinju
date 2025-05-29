@@ -8,6 +8,7 @@ public class MenuButtonPanel : MonoBehaviour
     private Button selectGameDataButton;
     private Button saveGameButton;
     private Button exitGameButton;
+    private Button loginLogoutButton;
 
     private Image gameIcon;
     private Label gameVersion;
@@ -41,6 +42,7 @@ public class MenuButtonPanel : MonoBehaviour
         exitGameButton = UIHelper.InitializeElement<Button>(root, "exitGameButton");
         gameIcon = UIHelper.InitializeElement<Image>(root, "gameIcon");
         gameVersion = UIHelper.InitializeElement<Label>(root, "gameVersion");
+        loginLogoutButton = UIHelper.InitializeElement<Button>(root, "loginLogoutButton");
 
         if (gameVersion != null)
             gameVersion.text = $"版本: {Application.version}";
@@ -50,6 +52,7 @@ public class MenuButtonPanel : MonoBehaviour
         if (selectGameDataButton != null) selectGameDataButton.clicked += OnSelectGameDataButtonClicked;
         if (saveGameButton != null) saveGameButton.clicked += OnSaveGameButtonClicked;
         if (exitGameButton != null) exitGameButton.clicked += OnExitGameButtonClicked;
+        if (loginLogoutButton != null) loginLogoutButton.clicked += OnLoginLogoutButtonClicked;
     }
 
     private void OnContinueButtonClicked()
@@ -90,5 +93,20 @@ public class MenuButtonPanel : MonoBehaviour
         PopupManager.Instance.ShowPopup("GameDataSelectPanel");
         PopupManager.Instance.HidePopup("MenuButtonPanel");
         PopupManager.Instance.HidePopup("SettingMenu");
+    }
+
+    private void OnLoginLogoutButtonClicked()
+    {
+        Debug.Log("[MenuButtonPanel] 登入/登出");
+        if (AuthenticationService.Instance.IsSignedIn)
+        {
+            AuthenticationService.Instance.SignOut();
+            Debug.Log("已登出");
+        }
+        else
+        {
+            PopupManager.Instance.ShowPopup("LoginPanel");
+            Debug.Log("顯示登入面板");
+        }
     }
 }
