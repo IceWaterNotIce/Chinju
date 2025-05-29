@@ -142,7 +142,7 @@ public class GameManager : Singleton<GameManager>
         }
         else
         {
-            customSaveDirectory = null;
+            customSaveDirectory = Application.persistentDataPath; // 修改：恢復為參數化的預設路徑
         }
     }
 
@@ -152,7 +152,7 @@ public class GameManager : Singleton<GameManager>
     private string GetSaveFilePath(string fileName = null)
     {
         string name = fileName ?? currentSaveFileName;
-        // 若有自訂資料夾則用自訂，否則用預設
+        // 若有自訂資料夾則用自訂，否則用參數化的預設路徑
         string dir = string.IsNullOrEmpty(customSaveDirectory) ? Application.persistentDataPath : customSaveDirectory;
         return Path.Combine(dir, name);
     }
@@ -612,7 +612,7 @@ public class GameManager : Singleton<GameManager>
         // 7. 立即儲存新遊戲檔案
         SaveGame();
 
-        Debug.Log($"[GameManager] 新遊戲已開始，並儲存於 {newSaveFileName}，資料夾：{(string.IsNullOrEmpty(saveDir) ? Application.persistentDataPath : saveDir)}");
+        Debug.Log($"[GameManager] 新遊戲已開始，並儲存於 {newSaveFileName}，資料夾：{customSaveDirectory}");
     }
 
     /// <summary>
