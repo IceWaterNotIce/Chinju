@@ -99,7 +99,7 @@ public class GameManager : Singleton<GameManager>
         // 修改：載入最後一次存檔
         LoadGame(currentSaveFileName);
 
-        StartCoroutine(DelayedFleetValidation());
+        StartCoroutine(DelayedFleetValidation()); // 修正方法引用
     }
 
     void Update()
@@ -744,5 +744,11 @@ public class GameManager : Singleton<GameManager>
             registeredEnemyShips.Add(ship);
     }
     #endregion
+
+    private IEnumerator DelayedFleetValidation() // 修正返回類型
+    {
+        yield return new WaitForSeconds(1f); // 延遲執行
+        _fleetManager?.ValidateFleetFollowers();
+    }
 }
 #endregion

@@ -112,10 +112,10 @@ public class GameDataController : Singleton<GameDataController>
     {
         if (!HasEnoughResources(gold, oil, cube, fuel))
         {
-            var playerData = currentGameData?.playerData;
-            if (playerData != null)
+            var localPlayerData = currentGameData?.playerData; // 修正命名衝突
+            if (localPlayerData != null)
             {
-                Debug.LogWarning($"[GameDataController] 資源不足！金幣: {playerData.Gold}/{gold}, 石油: {playerData.Oils}/{oil}, 方塊: {playerData.Cube}/{cube}, 燃料: {fuel}");
+                Debug.LogWarning($"[GameDataController] 資源不足！金幣: {localPlayerData.Gold}/{gold}, 石油: {localPlayerData.Oils}/{oil}, 方塊: {localPlayerData.Cube}/{cube}, 燃料: {fuel}");
             }
             return false;
         }

@@ -5,6 +5,8 @@ using UnityEngine;
 [System.Serializable]
 public class GameData
 {
+    public const int SaveDataVersion = 1; // 新增：存檔版本常數
+
     [SerializeField]
     public int version = 1; // 新增：存檔版本號
 
