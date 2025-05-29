@@ -6,3 +6,15 @@
     gap: 0px;
     margin-top: 12px;
 }
+
+.game-icon {
+    width: 128px;
+    height: 128px;
+    margin-bottom: 16px;
+}
+
+.game-version {
+    font-size: 16px;
+    color: white;
+    margin-bottom: 24px;
+}

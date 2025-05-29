@@ -9,6 +9,9 @@ public class MenuButtonPanel : MonoBehaviour
     private Button saveGameButton;
     private Button exitGameButton;
 
+    private Image gameIcon;
+    private Label gameVersion;
+
     private VisualElement root;
 
     void Awake()
@@ -36,6 +39,11 @@ public class MenuButtonPanel : MonoBehaviour
         selectGameDataButton = UIHelper.InitializeElement<Button>(root, "selectGameDataButton");
         saveGameButton = UIHelper.InitializeElement<Button>(root, "saveGameButton");
         exitGameButton = UIHelper.InitializeElement<Button>(root, "exitGameButton");
+        gameIcon = UIHelper.InitializeElement<Image>(root, "gameIcon");
+        gameVersion = UIHelper.InitializeElement<Label>(root, "gameVersion");
+
+        if (gameVersion != null)
+            gameVersion.text = $"版本: {Application.version}";
 
         if (continueButton != null) continueButton.clicked += OnContinueButtonClicked;
         if (newGameButton != null) newGameButton.clicked += OnNewGameButtonClicked;

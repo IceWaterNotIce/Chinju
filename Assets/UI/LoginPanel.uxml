@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement class="login-panel">
+        <ui:Label text="Login" class="title" />
+        <ui:TextField name="usernameField" placeholder="Username" />
+        <ui:TextField name="passwordField" placeholder="Password" />
+        <ui:Button name="loginButton" text="Login" />
+        <ui:Button name="signupButton" text="Sign Up" />
+    </ui:VisualElement>
+</ui:UXML>

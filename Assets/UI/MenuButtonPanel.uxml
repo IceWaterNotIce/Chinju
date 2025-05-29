@@ -1,10 +1,12 @@
 <UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False" style="MenuButtonPanel.uss">
-    <Style src="project://database/Assets/Resources/UI/MenuButtonPanel.uss?fileID=7433441132597879392&amp;guid=602f2c2b8b2d47a4d951d4807e7edbce&amp;type=3#MenuButtonPanel" />
+    <Style src="project://database/Assets/UI/MenuButtonPanel.uss?fileID=7433441132597879392&amp;guid=602f2c2b8b2d47a4d951d4807e7edbce&amp;type=3#MenuButtonPanel" />
     <ui:VisualElement name="menu-button-panel" class="menu-button-panel" style="top: 50%; left: 50%; translate: -50% -50%;">
+        <ui:Image name="gameIcon" class="game-icon" style="background-image: resource(&apos;Images/UI/GameIcon&apos;);" />
         <ui:Button text="繼續遊戲" name="continueButton" class="menu-button" />
         <ui:Button text="開始新遊戲" name="newGameButton" class="menu-button" />
         <ui:Button text="選擇存檔" name="selectGameDataButton" class="menu-button" />
         <ui:Button text="儲存遊戲" name="saveGameButton" class="menu-button" />
         <ui:Button text="退出遊戲" name="exitGameButton" class="menu-button" />
     </ui:VisualElement>
+    <ui:Label name="gameVersion" class="game-version" style="position: absolute; left: 0; bottom: 0;" />
 </UXML>
