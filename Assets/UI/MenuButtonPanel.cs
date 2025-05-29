@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using Unity.Services.Core; // 新增命名空間
+using Unity.Services.Authentication;
 
 public class MenuButtonPanel : MonoBehaviour
 {
@@ -15,16 +17,26 @@ public class MenuButtonPanel : MonoBehaviour
 
     private VisualElement root;
 
-    void Awake()
+    async void Awake()
     {
         PopupManager.Instance.RegisterPopup("MenuButtonPanel", gameObject);
+
+        try
+        {
+            await UnityServices.InitializeAsync(); // 初始化 Unity Services
+            Debug.Log("Unity Services 已初始化");
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogError($"Unity Services 初始化失敗: {ex.Message}");
+        }
     }
 
     void OnEnable()
     {
         var doc = GetComponent<UIDocument>();
         if (doc != null)
-            root = doc.rootVisualElement.Q<VisualElement>("menu-button-panel");
+            root = doc.rootVisualElement;
         if (root == null)
         {
             Debug.LogError("[MenuButtonPanel] root is null. Please ensure the UIDocument is set up correctly.");

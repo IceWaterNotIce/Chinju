@@ -610,6 +610,8 @@ MonoBehaviour:
     MapHeight: 100
     IslandDensity: 0.1
   customSaveDirectory: 
+  isPaused: 0
+  pauseTimeScale: 0
   OnGameSavedEvent:
     m_PersistentCalls:
       m_Calls: []

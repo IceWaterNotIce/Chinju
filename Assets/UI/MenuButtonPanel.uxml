@@ -9,5 +9,5 @@
         <ui:Button text="退出遊戲" name="exitGameButton" class="menu-button" />
         <ui:Button text="登入/登出" name="loginLogoutButton" class="menu-button" />
     </ui:VisualElement>
-    <ui:Label name="gameVersion" class="game-version" style="position: absolute; left: 0; bottom: 0;" />
+    <ui:Label name="gameVersion" text="0.0.0" class="game-version" style="position: absolute; left: 0; bottom: 0; white-space: pre; -unity-text-align: lower-left; width: auto; height: auto; margin-top: 5px; margin-right: 5px; margin-bottom: 5px; margin-left: 5px; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0;" />
 </UXML>
