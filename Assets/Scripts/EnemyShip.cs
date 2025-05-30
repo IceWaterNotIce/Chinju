@@ -300,6 +300,10 @@ public class EnemyShip : Warship
             ShipId = this.ShipId,
             Name = this.name,
             Health = this.Health,
+            Level = this.Level,
+            Speed = this.MaxSpeed,
+            MaxFuel = this.MaxFuel,
+            CurrentFuel = this.CurrentFuel,
             Position = this.transform.position,
             Rotation = this.transform.eulerAngles.z,
             PrefabName = this.name.Replace("(Clone)", ""), // 移除Clone後綴

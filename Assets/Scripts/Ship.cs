@@ -311,9 +311,14 @@ public class Ship : MonoBehaviour
     }
     public virtual void LoadShipData(GameData.ShipData shipData)
     {
-        this.name = shipData.Name; this.transform.position = shipData.Position;
+        this.name = shipData.Name;
+         this.transform.position = shipData.Position;
         this.transform.rotation = Quaternion.Euler(0, 0, shipData.Rotation);
-        this.MaxFuel = shipData.MaxFuel; this.CurrentFuel = shipData.CurrentFuel;
+        this.MaxFuel = shipData.MaxFuel;
+        this.CurrentFuel = shipData.CurrentFuel;
+        this.Health = shipData.Health;
+        this.FuelConsumptionRate = shipData.FuelConsumptionRate;
+
     }
     #region Debug
     private void OnValidate()
