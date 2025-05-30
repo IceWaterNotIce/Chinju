@@ -47,22 +47,9 @@ public class ShipBaseUI : MonoBehaviour
     {
         // 這裡假設 Ship 有 name、level、health 屬性，否則需檢查型別
         string shipName = ship.name;
-        int shipLevel = 1;
-        float currentHealth = 1, maxHealth = 1;
-
-        // 嘗試轉型為 Warship 或 PlayerShip 以取得更多資訊
-        var warship = ship as Warship;
-        if (warship != null)
-        {
-            shipLevel = warship.Level;
-            currentHealth = warship.Health;
-            maxHealth = warship.MaxHealth;
-        }
-        else
-        {
-            // fallback: 只顯示名稱
-            shipName = ship.name;
-        }
+        int shipLevel = ship as Warship ? ((Warship)ship).Level : 1; // 假設 Warship 有 Level 屬性
+        float currentHealth = ship.Health;
+        float maxHealth = ship.MaxHealth;
 
         UpdateName(shipName);
         UpdateLevel(shipLevel);
@@ -84,15 +71,6 @@ public class ShipBaseUI : MonoBehaviour
         float percent = Mathf.Clamp01(current / max);
         // 只更新 width，顏色交由 USS 控制
         healthBarFill.style.width = Length.Percent(percent * 100);
-        // 若仍需根據血量改變顏色，可保留下方程式，否則移除
-        /*
-        if (percent > 0.6f)
-            healthBarFill.style.backgroundColor = Color.green;
-        else if (percent > 0.3f)
-            healthBarFill.style.backgroundColor = Color.yellow;
-        else
-            healthBarFill.style.backgroundColor = Color.red;
-        */
     }
 
     private void Update()
