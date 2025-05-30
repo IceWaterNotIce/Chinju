@@ -52,6 +52,7 @@ public class MiniMapManager : MonoBehaviour
     private VisualElement minimapView;
     private Button zoomInButton;
     private Button zoomOutButton;
+    private Button resetCameraButton;
 
     private Vector2 dragStartPosition;
     private bool isDragging;
@@ -122,6 +123,7 @@ public class MiniMapManager : MonoBehaviour
         minimapView = root.Q<VisualElement>("minimap");
         zoomInButton = root.Q<Button>("minimap-zoom-in");
         zoomOutButton = root.Q<Button>("minimap-zoom-out");
+        resetCameraButton = root.Q<Button>("minimap-reset-camera");
 
         if (minimapContainer == null || minimapView == null)
         {
@@ -147,6 +149,12 @@ public class MiniMapManager : MonoBehaviour
         {
             zoomOutButton.RegisterCallback<ClickEvent>(OnZoomOut);
             Debug.Log("[MiniMapManager] Zoom Out button registered");
+        }
+
+        if (resetCameraButton != null)
+        {
+            resetCameraButton.RegisterCallback<ClickEvent>(OnResetCamera);
+            Debug.Log("[MiniMapManager] Reset Camera button registered");
         }
 
         // 註冊拖動事件
@@ -178,6 +186,19 @@ public class MiniMapManager : MonoBehaviour
         Debug.Log("[MiniMapManager] OnZoomOut");
         zoomLevel = Mathf.Max(zoomLevel - 5f, MIN_ZOOM);
         UpdateZoom();
+        evt.StopPropagation();
+    }
+
+    /// <summary>
+    /// 處理重置相機按鈕點擊
+    /// </summary>
+    private void OnResetCamera(ClickEvent evt)
+    {
+        Debug.Log("[MiniMapManager] OnResetCamera");
+        if (mainCamera != null)
+        {
+            mainCamera.transform.position = new Vector3(0, 0, mainCamera.transform.position.z);
+        }
         evt.StopPropagation();
     }
 

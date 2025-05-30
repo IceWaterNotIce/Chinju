@@ -6,6 +6,7 @@
         <engine:VisualElement style="flex-direction: row; gap: 5px;">
             <engine:Button name="minimap-zoom-in" text="+" class="minimap-button" />
             <engine:Button name="minimap-zoom-out" text="-" class="minimap-button" />
+            <engine:Button name="minimap-reset-camera" text="Reset" class="minimap-button" />
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>

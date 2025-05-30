@@ -375,13 +375,6 @@ public class MapController : Singleton<MapController>
     // Modify GetTileTypeAt to use lower frequency noise
     protected TileType GetTileTypeAt(int x, int y)
     {
-        // 特殊处理镇守府及周边
-        if (x == 0 && y == 0) return TileType.Chinju;
-        if ((x == 0 && (y == 1 || y == -1)) || (y == 0 && (x == 1 || x == -1)))
-        {
-            return TileType.Grass;
-        }
-
         // 计算2x2组的坐标（每组左上角）
         int groupX = x / 2;
         int groupY = y / 2;
