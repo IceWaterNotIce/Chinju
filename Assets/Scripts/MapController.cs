@@ -216,26 +216,6 @@ public class MapController : Singleton<MapController>
 
                     TileType groupType = generatedTiles[groupCenterPos];
 
-                    // 渲染组内所有瓦片（2x2=4个）
-                    for (int dx = 0; dx < groupSize; dx++)
-                    {
-                        for (int dy = 0; dy < groupSize; dy++)
-                        {
-                            Vector3Int pos = new Vector3Int(
-                                startX + dx,
-                                startY + dy,
-                                0
-                            );
-
-                            if (!renderedTiles.Contains(pos) && !pendingTiles.Contains(pos))
-                            {
-                                RenderTile(pos, groupType); // 修改后的渲染方法
-                                renderedTiles.Add(pos);
-                                pendingTiles.Add(pos);
-                            }
-                        }
-                    }
-
                     // 在生成组类型后存储到临时字典
                     chunkGroupTypes[groupCenterPos] = groupType;
 
