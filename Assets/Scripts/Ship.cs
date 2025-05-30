@@ -131,6 +131,8 @@ public class Ship : MonoBehaviour
     [SerializeField] public TileBase oceanTile;
     #endregion
 
+    [SerializeField] private float navigationBoundaryBuffer = 2f; // 可配置邊界緩衝值
+
     public virtual void Start()
     {
         tilemap = FindFirstObjectByType<Tilemap>();
@@ -225,18 +227,12 @@ public class Ship : MonoBehaviour
 
         if (IsOutOfNavigationBounds())
         {
-            m_cachedCenter = GetNavigationAreaCenter();
-            m_cachedDirection = m_cachedCenter;
-            m_cachedDirection -= transform.position;
-            m_cachedDirection.Normalize();
+            m_cachedDirection = CalculateDirection(GetNavigationAreaCenter());
             SetNavigation(m_cachedDirection, 2f);
         }
         else if (tilemap != null && oceanTile != null && !IsNextPositionOceanTile())
         {
-            m_cachedNextPosition = GetNextPosition();
-            m_cachedDirection = transform.position;
-            m_cachedDirection -= m_cachedNextPosition;
-            m_cachedDirection.Normalize();
+            m_cachedDirection = CalculateDirection(transform.position - GetNextPosition());
             SetNavigation(m_cachedDirection, 2f);
         }
         else
@@ -249,8 +245,15 @@ public class Ship : MonoBehaviour
 
     protected virtual bool IsOutOfNavigationBounds()
     {
-        return transform.position.x < NavigationArea.xMin + 2 || transform.position.x > NavigationArea.xMax - 2 ||
-               transform.position.y < NavigationArea.yMin + 2 || transform.position.y > NavigationArea.yMax - 2;
+        return transform.position.x < NavigationArea.xMin + navigationBoundaryBuffer ||
+               transform.position.x > NavigationArea.xMax - navigationBoundaryBuffer ||
+               transform.position.y < NavigationArea.yMin + navigationBoundaryBuffer ||
+               transform.position.y > NavigationArea.yMax - navigationBoundaryBuffer;
+    }
+
+    private Vector3 CalculateDirection(Vector3 target)
+    {
+        return (target - transform.position).normalized;
     }
 
     protected virtual Vector3 GetNavigationAreaCenter()

@@ -12,6 +12,12 @@ public class ShipBaseUI : MonoBehaviour
     
     private Ship ship; // 假設有一個基礎的 Ship 類別
 
+    [SerializeField] private float hideUIAreaThreshold = 30f; // 可配置相機閾值
+    [SerializeField] private float baseFontSize = 14f; // 基準字體大小
+    [SerializeField] private float baseBarHeight = 10f; // 基準血條高度
+    [SerializeField] private float minFontSize = 8f, maxFontSize = 32f; // 字體大小範圍
+    [SerializeField] private float minBarHeight = 5f, maxBarHeight = 20f; // 血條高度範圍
+
     private void Awake()
     {
         InitializeUI();
@@ -35,9 +41,27 @@ public class ShipBaseUI : MonoBehaviour
         healthBarFill = UIHelper.InitializeElement<VisualElement>(uiDocument.rootVisualElement, "health-bar-fill");
     }
 
+    private void SubscribeToShipEvents()
+    {
+        if (ship != null)
+        {
+            ship.OnHealthChanged += (currentHealth) => UpdateHealth(currentHealth, ship.MaxHealth);
+        }
+    }
+
+    private void UnsubscribeFromShipEvents()
+    {
+        if (ship != null)
+        {
+            ship.OnHealthChanged -= (currentHealth) => UpdateHealth(currentHealth, ship.MaxHealth);
+        }
+    }
+
     public void SetShip(Ship targetShip)
     {
+        UnsubscribeFromShipEvents();
         ship = targetShip;
+        SubscribeToShipEvents();
         if (ship != null)
             UpdateUI();
         // 移除事件訂閱，因為 Ship 沒有這些事件
@@ -78,7 +102,7 @@ public class ShipBaseUI : MonoBehaviour
         var cam = Camera.main;
         if (ship != null && cam != null)
         {
-            if (cam.orthographicSize > 30f)
+            if (cam.orthographicSize > hideUIAreaThreshold)
             {
                 root.style.visibility = Visibility.Hidden;
             }
@@ -125,24 +149,16 @@ public class ShipBaseUI : MonoBehaviour
         var cam = Camera.main;
         if (cam == null) return;
 
-        float baseOrtho = 20f; // 基準視野
-        float scale = cam.orthographicSize / baseOrtho;
+        float scale = cam.orthographicSize / baseFontSize;
 
-        // 動態字體大小
-        int baseNameFontSize = 14;
-        int baseLevelFontSize = 12;
-        int minFontSize = 8, maxFontSize = 32;
-        nameLabel.style.fontSize = Mathf.Clamp(Mathf.RoundToInt(baseNameFontSize * scale), minFontSize, maxFontSize);
-        levelLabel.style.fontSize = Mathf.Clamp(Mathf.RoundToInt(baseLevelFontSize * scale), minFontSize, maxFontSize);
+        nameLabel.style.fontSize = Mathf.Clamp(Mathf.RoundToInt(baseFontSize * scale), minFontSize, maxFontSize);
+        levelLabel.style.fontSize = Mathf.Clamp(Mathf.RoundToInt(baseFontSize * scale * 0.85f), minFontSize, maxFontSize);
 
-        // 動態血條
-        float baseBarHeight = 10f;
-        float minBarHeight = 5f, maxBarHeight = 20f;
         healthBar.style.height = Mathf.Clamp(baseBarHeight * scale, minBarHeight, maxBarHeight);
     }
 
     private void OnDestroy()
     {
-        // 無需事件解除訂閱
+        UnsubscribeFromShipEvents();
     }
 }
