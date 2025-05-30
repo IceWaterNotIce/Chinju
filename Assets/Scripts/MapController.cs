@@ -149,21 +149,22 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
         Vector3 camWorldPos = mainCamera.transform.position;
         Vector3Int camCell = groundTilemap.WorldToCell(camWorldPos);
 
-        int chunkX = Mathf.FloorToInt((float)camCell.x / chunkSize);
-        int chunkY = Mathf.FloorToInt((float)camCell.y / chunkSize);
+        int chunkIndexX = Mathf.FloorToInt((float)camCell.x / chunkSize);
+        int chunkIndexY = Mathf.FloorToInt((float)camCell.y / chunkSize);
 
         List<Vector2Int> chunkOffsets = GetClockwiseChunkOffsets(renderRadius);
 
         HashSet<Vector3Int> shouldRender = new HashSet<Vector3Int>();
         foreach (var offset in chunkOffsets)
         {
-            int cx = chunkX + offset.x;
-            int cy = chunkY + offset.y;
+            int startX = (chunkIndexX + offset.x) * chunkSize;
+            int startY = (chunkIndexY + offset.y) * chunkSize;
+
             for (int x = 0; x < chunkSize; x++)
             {
                 for (int y = 0; y < chunkSize; y++)
                 {
-                    Vector3Int pos = new Vector3Int(cx * chunkSize + x, cy * chunkSize + y, 0);
+                    Vector3Int pos = new Vector3Int(startX + x, startY + y, 0);
                     shouldRender.Add(pos);
                     if (!renderedTiles.Contains(pos) && !pendingTiles.Contains(pos))
                     {
@@ -177,7 +178,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
         {
             StopCoroutine(chunkRenderCoroutine);
         }
-        chunkRenderCoroutine = StartCoroutine(RenderTilesCoroutine(chunkOffsets, chunkX, chunkY));
+        chunkRenderCoroutine = StartCoroutine(RenderTilesCoroutine(chunkOffsets, chunkIndexX, chunkIndexY));
     }
 
     private List<Vector2Int> GetClockwiseChunkOffsets(int radius)
@@ -200,18 +201,19 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
     {
         List<Vector3Int> orderedTiles = new List<Vector3Int>();
         HashSet<Vector3Int> added = new HashSet<Vector3Int>();
-        int chunkCount = 0; // 新增
+        int chunkCount = 0;
 
         foreach (var offset in chunkOffsets)
         {
-            int cx = centerChunkX + offset.x;
-            int cy = centerChunkY + offset.y;
+            int startX = (centerChunkX + offset.x) * chunkSize;
+            int startY = (centerChunkY + offset.y) * chunkSize;
+
             for (int x = 0; x < chunkSize; x++)
             {
                 for (int y = 0; y < chunkSize; y++)
                 {
-                    Vector3Int pos = new Vector3Int(cx * chunkSize + x, cy * chunkSize + y, 0);
-                    if (pendingTiles.Contains(pos) && !added.Contains(pos))
+                    Vector3Int pos = new Vector3Int(startX + x, startY + y, 0);
+                    if (!added.Contains(pos))
                     {
                         orderedTiles.Add(pos);
                         added.Add(pos);
@@ -570,8 +572,8 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
         Vector3 camWorldPos = mainCamera.transform.position;
         Vector3Int camCell = groundTilemap.WorldToCell(camWorldPos);
 
-        int chunkX = Mathf.FloorToInt((float)camCell.x / chunkSize);
-        int chunkY = Mathf.FloorToInt((float)camCell.y / chunkSize);
+        int chunkIndexX = Mathf.FloorToInt((float)camCell.x / chunkSize);
+        int chunkIndexY = Mathf.FloorToInt((float)camCell.y / chunkSize);
 
         Gizmos.color = Color.yellow;
 
@@ -579,12 +581,13 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
         {
             for (int y = -renderRadius; y <= renderRadius; y++)
             {
-                int cx = chunkX + x;
-                int cy = chunkY + y;
+                int chunkX = (chunkIndexX + x);
+                int chunkY = (chunkIndexY + y);
 
-                Vector3 chunkWorldPos = groundTilemap.GetCellCenterWorld(new Vector3Int(cx * chunkSize, cy * chunkSize, 0));
+                Vector3 chunkWorldPos = groundTilemap.GetCellCenterWorld(
+                    new Vector3Int(chunkX * chunkSize, chunkY * chunkSize, 0));
+
                 Vector3 chunkSizeWorld = new Vector3(chunkSize, chunkSize, 0);
-
                 Gizmos.DrawWireCube(chunkWorldPos, chunkSizeWorld);
             }
         }
