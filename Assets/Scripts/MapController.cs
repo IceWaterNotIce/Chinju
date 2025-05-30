@@ -172,8 +172,6 @@ public class MapController : Singleton<MapController>
 
     private IEnumerator RenderTilesCoroutine(int centerChunkX, int centerChunkY)
     {
-        List<Vector3Int> tilesToRender = new List<Vector3Int>();
-        HashSet<Vector3Int> currentRendering = new HashSet<Vector3Int>();
 
         int processed = 0; // 新增 processed 變數
 
@@ -231,6 +229,10 @@ public class MapController : Singleton<MapController>
 
         // 移除孤立的2x2岛屿
         RemoveIsolatedIslands(chunkGroupTypes);
+
+        //create chinju tile
+        chunkGroupTypes[Vector3Int.zero] = TileType.Chinju;
+        chinjuTilePositions.Add(Vector3Int.zero);
 
         // 重新渲染当前区块
         foreach (var group in chunkGroupTypes)
