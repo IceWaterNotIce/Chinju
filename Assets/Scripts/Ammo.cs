@@ -66,9 +66,9 @@ public class Ammo : MonoBehaviour
                 // 假設 DamageTextController 是一個管理傷害數字顯示的類別
                 // 範例：當攻擊命中時
                 DamagePopupManager.Instance.CreateDamagePopup(
-                    damage: 25,
+                    damage: (int)Damage,
                     worldPos: enemyShip.transform.position,
-                    isCritical: Random.Range(0, 100) < 30
+                    isCritical: false // 假設這裡沒有暴擊
                 );
             }
             Destroy(gameObject);

@@ -12,7 +12,9 @@ public class DamagePopupManager : MonoBehaviour
         Instance = this;
     }
 
-    public void CreateDamagePopup(int damage, Vector3 worldPos, bool isCritical = false) {
+    public void CreateDamagePopup(int damage, Vector3 worldPos, bool isCritical = false)
+    {
+        Debug.Log($"Creating damage popup: {damage} at {worldPos} (Critical: {isCritical})");
         // 世界座標轉螢幕座標
         Vector2 screenPos = RuntimePanelUtils.CameraTransformWorldToPanel(
             _uiDocument.rootVisualElement.panel, worldPos, Camera.main
@@ -26,5 +28,6 @@ public class DamagePopupManager : MonoBehaviour
         GameObject popupGO = new GameObject("DamagePopup");
         DamagePopupUI popupUI = popupGO.AddComponent<DamagePopupUI>();
         popupUI.Init(popup, damage, screenPos, isCritical);
+        popupGO.transform.SetParent(transform, false); // 設置父物件以便於管理
     }
 }

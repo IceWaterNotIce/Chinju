@@ -36,7 +36,7 @@ public class DamagePopupUI : MonoBehaviour
             _root.style.opacity = 0;
             if (_root.style.opacity.value <= 0.01f) {
                 _root.RemoveFromHierarchy();
-                Destroy(this);
+                Destroy(this.gameObject);
             }
         }
     }
