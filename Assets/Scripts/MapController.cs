@@ -19,6 +19,7 @@ public class MapController : Singleton<MapController>
     public TileBase oilTile;
     [Range(0.01f, 0.5f)] public float islandDensity = 0.1f;
 
+
     [Header("Random Seed")]
     public int seed = 12345;
 
@@ -266,39 +267,44 @@ public class MapController : Singleton<MapController>
         var key = new Vector2Int(x, y);
         if (!_noiseCache.TryGetValue(key, out float value))
         {
-            // FIX: Use different scales for x and y to prevent identical values
-            float xCoord = x * 0.1f + seed * 0.3f;
-            float yCoord = y * 0.1f + seed * 0.7f;
+            // 使用哈希函数创建唯一种子
+            uint hash = (uint)key.GetHashCode();
+            uint seedHash = (uint)seed.GetHashCode();
+            uint combined = hash ^ seedHash;
+
+            // 创建独特坐标
+            float xCoord = (combined & 0xFFFF) / 65536f * 100f + x * 0.1f;
+            float yCoord = ((combined >> 16) & 0xFFFF) / 65536f * 100f + y * 0.1f;
+
             value = Mathf.PerlinNoise(xCoord, yCoord);
             _noiseCache[key] = value;
         }
         return value;
     }
 
+    // Modify GetTileTypeAt to use lower frequency noise
     protected TileType GetTileTypeAt(int x, int y)
     {
-        if (x == 0 && y == 0)
+        if (x == 0 && y == 0) return TileType.Chinju;
+
+        // Force neighbors around Chinju to be land
+        if ((x == 0 && (y == 1 || y == -1)) || (y == 0 && (x == 1 || x == -1)))
         {
-            return TileType.Chinju;
+            return TileType.Grass;
         }
 
-        // Combined noise with multiple octaves
-        float noiseValue = 0.5f * GetCachedNoise(x, y);
-        noiseValue += 0.25f * GetCachedNoise(x * 2, y * 2);
-        noiseValue += 0.125f * GetCachedNoise(x * 4, y * 4);
+        // Use lower frequency noise for larger landmasses
+        float noiseValue = 0.6f * GetCachedNoise(x / 2, y / 2);
+        noiseValue += 0.3f * GetCachedNoise(x, y);
+        noiseValue += 0.1f * GetCachedNoise(x * 2, y * 2);
         noiseValue = Mathf.Clamp01(noiseValue);
 
-        float densityCurve = Mathf.Pow(noiseValue, 2.5f);
-        Debug.Log($"Tile at ({x}, {y}) - Noise: {noiseValue}, Density: {densityCurve}");
-
-        if (densityCurve > 1f - islandDensity)
+        if (noiseValue > 1f - islandDensity)
         {
-            float oilNoise = GetCachedNoise(x + 1000, y + 1000);
-            return oilNoise > 0.7f ? TileType.Oil : TileType.Grass;
+            return TileType.Grass;
         }
         return TileType.Ocean;
     }
-
     private void HandleMouseClick()
     {
         if (mainCamera == null) return;
