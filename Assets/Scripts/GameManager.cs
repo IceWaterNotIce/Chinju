@@ -333,9 +333,11 @@ public class GameManager : Singleton<GameManager>
     /// <summary>
     /// 載入遊戲，可指定檔名
     /// </summary>
-    public GameData LoadGame(string fileName = null)
+    public GameData LoadGame(string fileName = null, string filedir = null)
     {
-        string path = GetSaveFilePath(fileName);
+        string dir = string.IsNullOrEmpty(filedir) ? Application.persistentDataPath : filedir;
+        string path = Path.Combine(dir, fileName ?? currentSaveFileName); // 支持自訂檔案目錄和檔名
+
         if (File.Exists(path))
         {
             try
@@ -412,7 +414,7 @@ public class GameManager : Singleton<GameManager>
                         GameObject.Destroy(enemyShip.gameObject);
                     }
 
-                    foreach (var shipData in data.enemyData.EnemyShips) // 修正：改為使用 enemyData.EnemyShips
+                    foreach (var shipData in data.enemyData.EnemyShips)
                     {
                         if (EnemyShipManager.Instance != null)
                         {
