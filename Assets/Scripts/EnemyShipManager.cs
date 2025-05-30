@@ -349,4 +349,47 @@ public class EnemyShipManager : MonoBehaviour
             Destroy(child.gameObject);
         }
     }
+
+    public GameData.EnemyData GetEnemyData()
+    {
+        GameData.EnemyData enemyData = new GameData.EnemyData();
+
+        #region Get All Enemy Fleets
+
+        // get all enemy fleets objs under this GameObject
+        var enemyFleetObjs = GetComponentsInChildren<Fleet>();
+        foreach (var fleet in enemyFleetObjs)
+        {
+            if (fleet != null)
+            {
+                GameData.FleetData fleetData = fleet.SaveFleetData();
+                if (fleetData != null)
+                {
+                    enemyData.EnemyFleets.Add(fleetData);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Get All Enemy Ships
+        // get all enemy ships objs but not in fleet under this GameObject
+        var enemyShipObjs = GetComponentsInChildren<EnemyShip>();
+        foreach (var ship in enemyShipObjs)
+        {
+            if (ship != null && !string.IsNullOrEmpty(ship.ShipId) && !ship.IsInFleet())
+            {
+                // 確保船隻有唯一的 ShipId 並且不在艦隊中
+                GameData.ShipData shipData = ship.SaveShipData();
+                if (shipData != null)
+                {
+                    enemyData.EnemyShips.Add(shipData);
+                }
+            }
+        }
+
+        #endregion
+
+        return enemyData;
+    }
 }

@@ -323,4 +323,9 @@ public class Ship : MonoBehaviour
         CurrentFuel = m_fuel;
     }
     #endregion
+
+    public bool IsInFleet()
+    {
+        return IsFollower || LeaderShip != null;
+    }
 }
