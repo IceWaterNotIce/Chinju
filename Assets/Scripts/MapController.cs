@@ -181,6 +181,9 @@ public class MapController : Singleton<MapController>
         int groupSize = 2;
         int groupsPerChunk = chunkSize / groupSize;
 
+        // 存储当前区块的所有组类型（用于岛屿检测）
+        Dictionary<Vector3Int, TileType> chunkGroupTypes = new Dictionary<Vector3Int, TileType>();
+
         foreach (var offset in spiralChunkOffsets)
         {
             int chunkStartX = (centerChunkX + offset.x) * chunkSize;
@@ -194,23 +197,23 @@ public class MapController : Singleton<MapController>
                     // 计算组起始位置
                     int startX = chunkStartX + gx * groupSize;
                     int startY = chunkStartY + gy * groupSize;
-                    
+
                     // 确定整个组的类型（使用组中心点）
                     Vector3Int groupCenterPos = new Vector3Int(
-                        startX + groupSize / 2, 
-                        startY + groupSize / 2, 
+                        startX + groupSize / 2,
+                        startY + groupSize / 2,
                         0
                     );
-                    
+
                     // 获取或生成组类型
                     if (!generatedTiles.ContainsKey(groupCenterPos))
                     {
                         generatedTiles[groupCenterPos] = GetTileTypeAt(
-                            groupCenterPos.x, 
+                            groupCenterPos.x,
                             groupCenterPos.y
                         );
                     }
-                    
+
                     TileType groupType = generatedTiles[groupCenterPos];
 
                     // 渲染组内所有瓦片（2x2=4个）
@@ -219,11 +222,11 @@ public class MapController : Singleton<MapController>
                         for (int dy = 0; dy < groupSize; dy++)
                         {
                             Vector3Int pos = new Vector3Int(
-                                startX + dx, 
-                                startY + dy, 
+                                startX + dx,
+                                startY + dy,
                                 0
                             );
-                            
+
                             if (!renderedTiles.Contains(pos) && !pendingTiles.Contains(pos))
                             {
                                 RenderTile(pos, groupType); // 修改后的渲染方法
@@ -232,7 +235,10 @@ public class MapController : Singleton<MapController>
                             }
                         }
                     }
-                    
+
+                    // 在生成组类型后存储到临时字典
+                    chunkGroupTypes[groupCenterPos] = groupType;
+
                     processed++;
                     if (processed >= ChunksPerFrame * groupsPerChunk * groupsPerChunk)
                     {
@@ -242,7 +248,39 @@ public class MapController : Singleton<MapController>
                 }
             }
         }
-        
+
+        // 移除孤立的2x2岛屿
+        RemoveIsolatedIslands(chunkGroupTypes);
+
+        // 重新渲染当前区块
+        foreach (var group in chunkGroupTypes)
+        {
+            Vector3Int groupCenterPos = group.Key;
+            TileType groupType = group.Value;
+
+            // 计算组起始位置
+            int startX = groupCenterPos.x - groupSize / 2;
+            int startY = groupCenterPos.y - groupSize / 2;
+
+            // 渲染组内所有瓦片
+            for (int dx = 0; dx < groupSize; dx++)
+            {
+                for (int dy = 0; dy < groupSize; dy++)
+                {
+                    Vector3Int pos = new Vector3Int(startX + dx, startY + dy, 0);
+                    RenderTile(pos, groupType);
+                    renderedTiles.Add(pos);
+                }
+            }
+
+            processed++;
+            if (processed >= ChunksPerFrame * groupsPerChunk * groupsPerChunk)
+            {
+                processed = 0;
+                yield return null;
+            }
+        }
+
         CalculateOceanLevels();
         UpdateOceanLevelTexts();
     }
@@ -307,7 +345,53 @@ public class MapController : Singleton<MapController>
         }
         return value;
     }
+    private void RemoveIsolatedIslands(Dictionary<Vector3Int, TileType> groupTypes)
+    {
+        // 需要检查的四个方向（上、下、左、右）
+        Vector3Int[] directions = {
+        new Vector3Int(2, 0, 0),  // 右
+        new Vector3Int(-2, 0, 0), // 左
+        new Vector3Int(0, 2, 0),  // 上
+        new Vector3Int(0, -2, 0)  // 下
+    };
 
+        // 存储需要移除的岛屿组
+        List<Vector3Int> islandsToRemove = new List<Vector3Int>();
+
+        foreach (var group in groupTypes)
+        {
+            // 只检查陆地组
+            if (group.Value != TileType.Grass) continue;
+
+            bool isIsolated = true;
+
+            // 检查所有相邻组
+            foreach (var dir in directions)
+            {
+                Vector3Int neighborPos = group.Key + dir;
+
+                // 如果邻居存在且是陆地，则不是孤立岛屿
+                if (groupTypes.TryGetValue(neighborPos, out TileType neighborType) &&
+                    neighborType == TileType.Grass)
+                {
+                    isIsolated = false;
+                    break;
+                }
+            }
+
+            // 如果是孤立岛屿，标记为需要移除
+            if (isIsolated)
+            {
+                islandsToRemove.Add(group.Key);
+            }
+        }
+
+        // 将孤立岛屿转换为海洋
+        foreach (var islandPos in islandsToRemove)
+        {
+            groupTypes[islandPos] = TileType.Ocean;
+        }
+    }
     // Modify GetTileTypeAt to use lower frequency noise
     protected TileType GetTileTypeAt(int x, int y)
     {
@@ -321,7 +405,7 @@ public class MapController : Singleton<MapController>
         // 计算2x2组的坐标（每组左上角）
         int groupX = x / 2;
         int groupY = y / 2;
-        
+
         // 使用组坐标计算噪声（降低频率）
         float noiseValue = 0.6f * GetCachedNoise(groupX, groupY);
         noiseValue += 0.3f * GetCachedNoise(groupX * 2, groupY * 2);
