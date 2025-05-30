@@ -113,7 +113,7 @@ public class GameManager : Singleton<GameManager>
         string lastSaveFile = PlayerPrefs.GetString(LastSaveFileKey, "savegame.json");
         SetCurrentSaveFileName(lastSaveFile);
 
-        if (GameDataController.Instance != null && 
+        if (GameDataController.Instance != null &&
             GameDataController.Instance.CurrentGameData == null)
         {
             InitializeGameData();
@@ -128,8 +128,6 @@ public class GameManager : Singleton<GameManager>
         currentSaveFileName = "savegame.json";
         // 不再直接設定 saveFilePath，改用方法動態取得
         Debug.Log("[GameManager] 初始化完成");
-
-        StartCoroutine(DelayedFleetValidation()); // 修正方法引用
     }
 
     void Update()
@@ -168,7 +166,7 @@ public class GameManager : Singleton<GameManager>
         GameDataController.Instance.TriggerResourceChanged();
 
         // 新增：驗證艦隊的追隨者
-        _fleetManager?.ValidateFleetFollowers();
+        FleetManager.Instance?.ValidateFleetFollowers();
     }
     #endregion
 
@@ -466,7 +464,7 @@ public class GameManager : Singleton<GameManager>
                     // 新增：清除空艦隊
                     if (FleetManager.Instance != null)
                     {
-                        _fleetManager?.RemoveEmptyFleets();
+                        FleetManager.Instance.RemoveEmptyFleets();
                     }
 
                     // 載入遊戲時間
@@ -476,7 +474,7 @@ public class GameManager : Singleton<GameManager>
                     OnGameLoadedEvent.Invoke(); // 發送載入事件
 
                     // 新增：載入遊戲後重繪地圖
-                    StartCoroutine(DelayedMapRecalculation());
+                    MapController.Instance?.RecalculateMap();
                 }
                 else
                 {
@@ -501,8 +499,8 @@ public class GameManager : Singleton<GameManager>
                     AmmoManager.Instance.LoadAmmoStates(data.ammoStates); // 新增：載入彈藥位置
                 }
 
-                // 在載入完成後加入延遲驗證
-                StartCoroutine(DelayedFleetValidation());
+                // 在
+                FleetManager.Instance.RemoveEmptyFleets(); // 確保載入後清理空艦隊
 
                 return data;
             }
@@ -662,14 +660,6 @@ public class GameManager : Singleton<GameManager>
         // 可擴展其他艦隊操作契約
     }
 
-    private IFleetManager _fleetManager;
-
-    public void SetFleetManager(IFleetManager manager)
-    {
-        _fleetManager = manager;
-    }
-    #endregion
-
     #region ShipRegistration
     public void RegisterPlayerShip(PlayerShip ship)
     {
@@ -689,42 +679,6 @@ public class GameManager : Singleton<GameManager>
             registeredFleets.Add(fleet);
     }
     #endregion
-
-    #region Coroutines
-    private System.Collections.IEnumerator DelayedMapRecalculation()
-    {
-        yield return new WaitForEndOfFrame();
-        if (MapController.Instance != null)
-            MapController.Instance.RecalculateMap();
-
-        Debug.Log("[GameManager] 地圖重繪完成");
-    }
-
-    private System.Collections.IEnumerator DelayedFleetValidation()
-    {
-        yield return new WaitForSeconds(fleetValidationDelay);
-
-        if (_fleetManager == null)
-        {
-            // 嘗試自動獲取艦隊管理器
-            var fleetManagerObj = FindFirstObjectByType<FleetManager>();
-            if (fleetManagerObj != null) 
-            {
-                _fleetManager = fleetManagerObj;
-            }
-        }
-
-        if (_fleetManager != null)
-        {
-            _fleetManager.ValidateFleetFollowers();
-            _fleetManager.RemoveEmptyFleets();
-        }
-        else
-        {
-            Debug.LogWarning("[FleetValidation] 艦隊管理器不可用，跳過驗證");
-        }
-    }
     #endregion
-
+    #endregion
 }
-#endregion
