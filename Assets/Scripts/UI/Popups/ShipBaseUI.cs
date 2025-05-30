@@ -47,6 +47,12 @@ public class ShipBaseUI : MonoBehaviour
         {
             ship.OnHealthChanged += (currentHealth) => UpdateHealth(currentHealth, ship.MaxHealth);
         }
+        if( GetComponent<Warship>() != null)
+        {
+            Warship warship = GetComponent<Warship>();
+            // 假設 Warship 有 OnLevelChanged 事件
+            warship.OnLevelChanged += (newLevel) => UpdateLevel(newLevel);
+        }
     }
 
     private void UnsubscribeFromShipEvents()
@@ -54,6 +60,12 @@ public class ShipBaseUI : MonoBehaviour
         if (ship != null)
         {
             ship.OnHealthChanged -= (currentHealth) => UpdateHealth(currentHealth, ship.MaxHealth);
+        }
+        if (GetComponent<Warship>() != null)
+        {
+            Warship warship = GetComponent<Warship>();
+            // 假設 Warship 有 OnLevelChanged 事件
+            warship.OnLevelChanged -= (newLevel) => UpdateLevel(newLevel);
         }
     }
 
