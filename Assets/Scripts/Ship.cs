@@ -5,17 +5,16 @@ using System.Collections.Generic;
 
 public class Ship : MonoBehaviour
 {
-    public string ShipId { get; set; } // 新增：唯一識別碼
+    public string ShipId { get; set; } 
 
-    // === Fleet/Follower 屬性（從 Warship 移動過來） ===
+
     public bool IsFollower;
     public Ship LeaderShip;
 
-    // === NavigationArea 與 Waypoints（從 PlayerShip 移動過來） ===
+
     [Header("Navigation Settings")]
     [SerializeField] private Rect m_navigationArea;
-    protected float m_navigationUpdateTimer = 0f; // 新增：導航更新計時器
-    public Rect NavigationArea
+    protected float m_navigationUpdateTimer = 0f;    public Rect NavigationArea
     {
         get => m_navigationArea;
         set
@@ -74,30 +73,22 @@ public class Ship : MonoBehaviour
         }
     }
 
-    // === 記憶體與 GC 優化：重用 Vector3 變數 ===
+
     private Vector3 m_cachedDirection;
     private Vector3 m_cachedTarget;
     private Vector3 m_cachedCenter;
     private Vector3 m_cachedNextPosition;
 
-    // === 事件宣告（修正 CS0103） ===
+
     public event Action<float> OnHealthChanged;
     public event Action<float> OnFuelChanged;
-
-    // === 建議：事件回調改用方法註冊，減少 lambda 分配 ===
-    // 請於外部註冊時改為：
-    // OnHealthChanged += HandleHealthChanged;
-    // OnFuelChanged += HandleFuelChanged;
-    // 並實作對應方法
-    // protected virtual void HandleHealthChanged(float health) { ... }
-    // protected virtual void HandleFuelChanged(float fuel) { ... }
 
     protected virtual void OnDeath()
     {
         Destroy(gameObject);
         if (this is PlayerShip && ShipDetailPanel.Instance != null)
         {
-            Destroy(ShipDetailPanel.Instance.gameObject); // 銷毀 ShipDetailPanel
+            Destroy(ShipDetailPanel.Instance.gameObject); 
             Debug.Log("[Ship] ShipDetailPanel 已銷毀");
         }
     }
@@ -174,10 +165,10 @@ public class Ship : MonoBehaviour
 
     protected virtual void Move()
     {
-        // --- 優化導航邏輯：分幀與動態間隔 ---
+
         float updateInterval = (Speed < 0.1f) ? 1.0f : 0.2f;
         m_navigationUpdateTimer += Time.deltaTime;
-        // 分幀處理：每 10 幀分散處理不同船隻
+
         if (!IsFollower && Time.frameCount % 10 == GetInstanceID() % 10)
         {
             if (m_navigationUpdateTimer >= updateInterval)
@@ -194,7 +185,7 @@ public class Ship : MonoBehaviour
                 }
             }
         }
-        // --- 原本的移動邏輯 ---
+
         if (CurrentFuel <= 0) return;
 
         m_speed = Mathf.MoveTowards(m_speed, m_targetSpeed, m_acceleration * Time.deltaTime);
@@ -203,16 +194,14 @@ public class Ship : MonoBehaviour
         float kmPerSecond = m_speed * 1.852f / 3600f;
         Vector3 newPosition = transform.position + transform.right * kmPerSecond * Time.deltaTime * GameManager.RealGameTimeScale;
 
-        // 直接移動，不再檢查 oceanTile
         transform.position = newPosition;
         CurrentFuel -= FuelConsumptionRate * m_speed * Time.deltaTime;
     }
 
-    // --- 以下為從 PlayerShip 移動過來的導航相關方法 ---
+
     protected virtual void NavigateToWaypoint()
     {
-        // Vector3 target = m_waypoints[0];
-        // Vector3 direction = (target - transform.position).normalized;
+
         m_cachedTarget = m_waypoints[0];
         m_cachedDirection = m_cachedTarget;
         m_cachedDirection -= transform.position;
@@ -236,8 +225,6 @@ public class Ship : MonoBehaviour
 
         if (IsOutOfNavigationBounds())
         {
-            // Vector3 center = GetNavigationAreaCenter();
-            // Vector3 direction = (center - transform.position).normalized;
             m_cachedCenter = GetNavigationAreaCenter();
             m_cachedDirection = m_cachedCenter;
             m_cachedDirection -= transform.position;
@@ -246,7 +233,6 @@ public class Ship : MonoBehaviour
         }
         else if (tilemap != null && oceanTile != null && !IsNextPositionOceanTile())
         {
-            // Vector3 direction = (transform.position - GetNextPosition()).normalized;
             m_cachedNextPosition = GetNextPosition();
             m_cachedDirection = transform.position;
             m_cachedDirection -= m_cachedNextPosition;
