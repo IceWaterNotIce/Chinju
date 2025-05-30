@@ -357,7 +357,12 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
 
         int gx = x / 2;
         int gy = y / 2;
-        float noiseValue = GetCombinedNoise(gx, gy); // 使用多層噪聲
+        float noiseValue = Mathf.Clamp01(GetCombinedNoise(gx, gy)); // 正規化噪聲值
+
+        // 引入區塊內的隨機性
+        float localNoise = Mathf.PerlinNoise(x * 0.1f + seed, y * 0.1f + seed);
+        noiseValue = (noiseValue + localNoise) / 2f; // 混合全局和局部噪聲
+
         if (noiseValue > 1f - islandDensity)
         {
             float oilNoise = Mathf.PerlinNoise((gx + seed) * 0.2f, (gy + seed) * 0.2f);
