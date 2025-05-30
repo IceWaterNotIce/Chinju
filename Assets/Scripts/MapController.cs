@@ -16,6 +16,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
 
     [SerializeField] public Tilemap oceanTilemap;
     [SerializeField] public Tilemap groundTilemap;
+    [SerializeField] public Tilemap chinjufuTilemap; // 新增：管理 Chinjufu Tilemap
     public TileBase oceanTile, grassTile;
     public TileBase chinjuTile;
     public TileBase oilTile;
@@ -71,7 +72,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
 
         if (cameraController != null)
         {
-            cameraController.targetTilemap = groundTilemap;
+            cameraController.targetTilemap = groundTilemap; // 修改：可擴展支持 chinjufuTilemap
             cameraController.RefreshBounds();
         }
 
@@ -82,6 +83,13 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
 
         // 初始化海洋層級標記
         InitializeTileLevels();
+
+        // 新增：初始化 Chinjufu Tilemap
+        if (chinjufuTilemap != null)
+        {
+            chinjufuTilemap.ClearAllTiles();
+            Debug.Log("[MapController] Chinjufu Tilemap 已初始化！");
+        }
     }
 
     private IEnumerator FocusOnChinjuTileAfterMapGeneration()
@@ -524,5 +532,32 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
     public Vector3 GetChinjuTileWorldPosition()
     {
         return groundTilemap.GetCellCenterWorld(Vector3Int.zero); // 返回神獸 Tile 的世界座標
+    }
+
+    /// <summary>
+    /// 找到最近的海洋瓦片的世界座標
+    /// </summary>
+    public Vector3 FindNearestOceanTile(Vector3 referencePoint)
+    {
+        Vector3Int[] directions = new Vector3Int[]
+        {
+            new Vector3Int(0, 1, 0),
+            new Vector3Int(0, -1, 0),
+            new Vector3Int(-1, 0, 0),
+            new Vector3Int(1, 0, 0)
+        };
+
+        Vector3Int referenceTile = groundTilemap.WorldToCell(referencePoint);
+
+        foreach (var direction in directions)
+        {
+            Vector3Int neighborTile = referenceTile + direction;
+            if (oceanTilemap.GetTile(neighborTile) == oceanTile)
+            {
+                return oceanTilemap.GetCellCenterWorld(neighborTile);
+            }
+        }
+
+        return Vector3.zero; // 如果找不到，返回 Vector3.zero
     }
 }

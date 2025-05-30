@@ -117,7 +117,7 @@ public class ShipManager : Singleton<ShipManager>
             return null;
         }
 
-        Vector3 spawnPosition = mapController.FindNearestOceanTile(chinjuTilePosition);
+        Vector3 spawnPosition = mapController.FindNearestOceanTile(chinjuTilePosition); // 修正：正確調用方法
         if (Physics2D.OverlapCircle(spawnPosition, 0.5f, LayerMask.GetMask("Ship")) != null)
         {
             spawnPosition += new Vector3(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f), 0); // 明確使用 UnityEngine.Random
