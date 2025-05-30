@@ -98,10 +98,7 @@ public class GameManager : Singleton<GameManager>
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        registeredShips.Clear();
-        registeredFleets.Clear();
-        registeredPlayerShips.Clear();
-        registeredEnemyShips.Clear();
+        ClearAllShipsAndFleets();
     }
 
     private void OnDisable()
@@ -116,9 +113,14 @@ public class GameManager : Singleton<GameManager>
         string lastSaveFile = PlayerPrefs.GetString(LastSaveFileKey, "savegame.json");
         SetCurrentSaveFileName(lastSaveFile);
 
-        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData == null)
+        if (GameDataController.Instance != null && 
+            GameDataController.Instance.CurrentGameData == null)
         {
             InitializeGameData();
+        }
+        else
+        {
+            LoadGame(currentSaveFileName);
         }
 
         Debug.Log("[GameManager] 初始化開始");
@@ -126,9 +128,6 @@ public class GameManager : Singleton<GameManager>
         currentSaveFileName = "savegame.json";
         // 不再直接設定 saveFilePath，改用方法動態取得
         Debug.Log("[GameManager] 初始化完成");
-
-        // 修改：載入最後一次存檔
-        LoadGame(currentSaveFileName);
 
         StartCoroutine(DelayedFleetValidation()); // 修正方法引用
     }
@@ -332,15 +331,20 @@ public class GameManager : Singleton<GameManager>
         int currentVersion = data.version;
         while (currentVersion < SaveDataVersion)
         {
-            if (_upgradeActions.ContainsKey(currentVersion))
+            if (_upgradeActions.TryGetValue(currentVersion, out var upgradeAction))
             {
-                _upgradeActions[currentVersion](data);
+                upgradeAction(data);
                 currentVersion++;
+                Debug.Log($"[存檔升級] 應用版本 {currentVersion} 升級");
             }
-            else break;
+            else
+            {
+                Debug.LogError($"[存檔升級] 找不到版本 {currentVersion} 的升級處理");
+                break;
+            }
         }
         data.version = SaveDataVersion;
-        return data; // 修正：返回升級後的 GameData
+        return data;
     }
 
     /// <summary>
@@ -678,6 +682,12 @@ public class GameManager : Singleton<GameManager>
         if (!registeredEnemyShips.Contains(ship))
             registeredEnemyShips.Add(ship);
     }
+
+    public void RegisterFleet(GameObject fleet)
+    {
+        if (!registeredFleets.Contains(fleet))
+            registeredFleets.Add(fleet);
+    }
     #endregion
 
     #region Coroutines
@@ -696,13 +706,23 @@ public class GameManager : Singleton<GameManager>
 
         if (_fleetManager == null)
         {
-            Debug.LogError("FleetManager 未註冊!");
-            yield break;
+            // 嘗試自動獲取艦隊管理器
+            var fleetManagerObj = FindFirstObjectByType<FleetManager>();
+            if (fleetManagerObj != null) 
+            {
+                _fleetManager = fleetManagerObj;
+            }
         }
 
-        Debug.Log($"[FleetValidation] 開始驗證艦隊，當前艦隊數量: {registeredFleets?.Count ?? 0}");
-        _fleetManager.ValidateFleetFollowers();
-        _fleetManager.RemoveEmptyFleets();
+        if (_fleetManager != null)
+        {
+            _fleetManager.ValidateFleetFollowers();
+            _fleetManager.RemoveEmptyFleets();
+        }
+        else
+        {
+            Debug.LogWarning("[FleetValidation] 艦隊管理器不可用，跳過驗證");
+        }
     }
     #endregion
 
