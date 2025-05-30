@@ -41,8 +41,6 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
     private HashSet<Vector3Int> pendingTiles = new HashSet<Vector3Int>();
     private const int ChunksPerFrame = 1; // 每幀處理幾個 chunk
 
-    private Queue<GameObject> oilShipPool = new Queue<GameObject>();
-
     // 新增：儲存每個海洋瓦片的層級
     public Dictionary<Vector3Int, int> oceanTileLevels = new Dictionary<Vector3Int, int>();
 
@@ -53,6 +51,8 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
     public bool showOceanLevelText = true;
 
     protected Dictionary<Vector2Int, float> _noiseCache = new Dictionary<Vector2Int, float>();
+
+    [SerializeField] private float updateThreshold = 1.0f; // 攝影機移動閾值
 
     void Start()
     {
@@ -121,7 +121,8 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
 
     private void Update()
     {
-        if (mainCamera != null && mainCamera.transform.position != lastCameraPosition)
+        if (mainCamera != null && 
+            Vector3.Distance(mainCamera.transform.position, lastCameraPosition) > updateThreshold)
         {
             UpdateVisibleChunks();
             lastCameraPosition = mainCamera.transform.position;
@@ -315,7 +316,8 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
     {
         if (oceanLevelTexts.TryGetValue(pos, out var textObj) && textObj != null)
         {
-            textObj.SetActive(false);
+            Destroy(textObj); // 修正：銷毀物件以避免記憶體洩漏
+            oceanLevelTexts.Remove(pos);
         }
     }
 
@@ -330,6 +332,13 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
         return _noiseCache[key];
     }
 
+    private float GetCombinedNoise(int x, int y)
+    {
+        float baseNoise = GetCachedNoise(x / 2, y / 2) * 0.7f;
+        float detailNoise = GetCachedNoise(x, y) * 0.3f;
+        return baseNoise + detailNoise; // 新增：多層噪聲混合
+    }
+
     protected TileType GetTileTypeAt(int x, int y)
     {
         if (x == 0 && y == 0)
@@ -340,8 +349,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
 
         int gx = x / 2;
         int gy = y / 2;
-        // 使用快取的柏林噪聲
-        float noiseValue = GetCachedNoise(gx, gy);
+        float noiseValue = GetCombinedNoise(gx, gy); // 使用多層噪聲
         if (noiseValue > 1f - islandDensity)
         {
             float oilNoise = Mathf.PerlinNoise((gx + seed) * 0.2f, (gy + seed) * 0.2f);
@@ -389,7 +397,7 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
             else if (tile == oilTile)
             {
                 Debug.Log("[MapController] 這是石油 Tile");
-                HandleOilTileClick(tilePosition);
+                // 移除：HandleOilTileClick(tilePosition);
             }
         }
         else
@@ -401,135 +409,6 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
                 Debug.Log("[MapController] 這是海洋 Tile");
             }
         }
-    }
-
-    private void HandleOilTileClick(Vector3Int tilePosition)
-    {
-        var gameData = GameDataController.Instance?.CurrentGameData;
-        if (gameData?.playerData == null)
-        {
-            Debug.LogError("[MapController] 無法處理石油 Tile 點擊，GameData 或 PlayerData 為 null！");
-            return;
-        }
-
-        if (gameData.playerData.Gold >= 50)
-        {
-            gameData.playerData.Gold -= 50;
-            gameData.playerData.OnResourceChanged?.Invoke();
-
-            Debug.Log("[MapController] 已解鎖石油 Tile，開始運輸石油！");
-            StartCoroutine(TransportOilToChinju(tilePosition));
-        }
-        else
-        {
-            Debug.Log("[MapController] 金幣不足，無法解鎖石油 Tile！");
-        }
-    }
-
-    private System.Collections.IEnumerator TransportOilToChinju(Vector3Int oilTilePosition)
-    {
-        while (true)
-        {
-            yield return new WaitForSeconds(120f);
-
-            var gameData = GameDataController.Instance?.CurrentGameData;
-            if (gameData?.playerData != null)
-            {
-                Vector3 oilTileWorldPosition = groundTilemap.GetCellCenterWorld(oilTilePosition);
-                Vector3 spawnPosition = FindNearestOceanTile(oilTileWorldPosition);
-
-                if (spawnPosition != Vector3.zero && oilShipPrefab != null)
-                {
-                    GameObject oilShip = GetOilShip(spawnPosition);
-                    StartCoroutine(MoveOilShipToChinju(oilShip, oilTileWorldPosition));
-                    Debug.Log("[MapController] 石油船已生成並開始運輸石油！");
-                }
-                else
-                {
-                    Debug.LogWarning("[MapController] 無法生成石油船，可能是附近沒有海洋格子或未設置石油船預製物！");
-                }
-            }
-        }
-    }
-
-    private System.Collections.IEnumerator MoveOilShipToChinju(GameObject oilShip, Vector3 oilTileWorldPosition)
-    {
-        Vector3 chinjuTileWorldPosition = GetChinjuTileWorldPosition();
-        if (chinjuTileWorldPosition == Vector3.zero)
-        {
-            Debug.LogError("[MapController] 無法找到神獸 Tile 的位置！");
-            yield break;
-        }
-
-        float travelTime = 30f;
-        float elapsedTime = 0f;
-
-        while (elapsedTime < travelTime)
-        {
-            if (oilShip == null) yield break;
-            oilShip.transform.position = Vector3.Lerp(oilTileWorldPosition, chinjuTileWorldPosition, elapsedTime / travelTime);
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        if (oilShip != null)
-        {
-            ReturnOilShip(oilShip);
-            var gameData = GameDataController.Instance?.CurrentGameData;
-            if (gameData?.playerData != null)
-            {
-                gameData.playerData.Oils += 20;
-                gameData.playerData.OnResourceChanged?.Invoke();
-                Debug.Log("[MapController] 石油船到達神獸 Tile，+20 石油！");
-            }
-        }
-    }
-
-    private GameObject GetOilShip(Vector3 position)
-    {
-        if (oilShipPool.Count > 0)
-        {
-            var ship = oilShipPool.Dequeue();
-            ship.transform.position = position;
-            ship.SetActive(true);
-            return ship;
-        }
-        return Instantiate(oilShipPrefab, position, Quaternion.identity);
-    }
-
-    private void ReturnOilShip(GameObject ship)
-    {
-        ship.SetActive(false);
-        oilShipPool.Enqueue(ship);
-    }
-
-    public Vector3 FindNearestOceanTile(Vector3 referencePoint)
-    {
-        Vector3Int[] directions = new Vector3Int[]
-        {
-            new Vector3Int(0, 1, 0),
-            new Vector3Int(0, -1, 0),
-            new Vector3Int(-1, 0, 0),
-            new Vector3Int(1, 0, 0)
-        };
-
-        Vector3Int referenceTile = groundTilemap.WorldToCell(referencePoint);
-
-        foreach (var direction in directions)
-        {
-            Vector3Int neighborTile = referenceTile + direction;
-            if (oceanTilemap.GetTile(neighborTile) == oceanTile)
-            {
-                return oceanTilemap.GetCellCenterWorld(neighborTile);
-            }
-        }
-
-        return Vector3.zero;
-    }
-
-    public Vector3 GetChinjuTileWorldPosition()
-    {
-        return groundTilemap.GetCellCenterWorld(Vector3Int.zero);
     }
 
     // 初始化所有海洋瓦片為 0，陸地瓦片為 -1
@@ -636,7 +515,14 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
         if (groundTilemap != null) groundTilemap.ClearAllTiles();
 
         // 重新產生地圖
-        UpdateVisibleChunks();
-        RenderMap(); // 新增：重新渲染地圖
+        RenderMap();
+    }
+
+    /// <summary>
+    /// 獲取神獸 Tile 的世界座標
+    /// </summary>
+    public Vector3 GetChinjuTileWorldPosition()
+    {
+        return groundTilemap.GetCellCenterWorld(Vector3Int.zero); // 返回神獸 Tile 的世界座標
     }
 }

@@ -316,12 +316,11 @@ public class EnemyShipManager : MonoBehaviour
     {
         Debug.Log($"[EnemyShipManager] Spawn interval decreased to {spawnInterval} seconds.");
 
-        // 新增：將所有現有敵艦的 NavigationArea 設為以神獸 tile 為中心的 5x5 區域
         Vector3 chinjuCenter = Vector3.zero;
         var mapController = FindFirstObjectByType<MapController>();
         if (mapController != null)
         {
-            chinjuCenter = mapController.GetChinjuTileWorldPosition();
+            chinjuCenter = mapController.GetChinjuTileWorldPosition(); // 修正：正確調用方法
         }
         else
         {

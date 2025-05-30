@@ -75,6 +75,13 @@ public class GameManager : Singleton<GameManager>
     private float fleetValidationDelay = 1f; // 艦隊驗證延遲時間可配置化
 
     private readonly float gameSecondsPerRealSecond = GameSecondsPerDay / RealSecondsPerGameDay; // 改為 readonly 變數
+    private float _cachedTimeScale; // 新增：緩存遊戲時間縮放比例
+
+    private Dictionary<int, Action<GameData>> _upgradeActions = new()
+    {
+        { 1, data => { /* 版本1升級邏輯 */ } },
+        { 2, data => { /* 版本2升級邏輯 */ } }
+    };
 
     #endregion
 
@@ -86,10 +93,25 @@ public class GameManager : Singleton<GameManager>
         registeredFleets.Clear();
         registeredPlayerShips.Clear();
         registeredEnemyShips.Clear();
+        SceneManager.sceneLoaded += OnSceneLoaded; // 新增：場景切換事件
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        registeredShips.Clear();
+        registeredFleets.Clear();
+        registeredPlayerShips.Clear();
+        registeredEnemyShips.Clear();
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded; // 移除事件
     }
 
     void Start()
     {
+        _cachedTimeScale = GameSecondsPerDay / RealSecondsPerGameDay; // 新增：緩存計算
         // 新增：從 PlayerPrefs 讀取最後一次存檔檔名
         string lastSaveFile = PlayerPrefs.GetString(LastSaveFileKey, "savegame.json");
         SetCurrentSaveFileName(lastSaveFile);
@@ -113,11 +135,9 @@ public class GameManager : Singleton<GameManager>
 
     void Update()
     {
-        if (!isPaused) // 修改：僅在未暫停時更新遊戲時間
+        if (!isPaused)
         {
-            // 讓現實 10 分鐘等於遊戲 12 小時
-            float gameSecondsPerRealSecond = (GameSecondsPerDay / RealSecondsPerGameDay);
-            gameTime += Time.deltaTime * gameSecondsPerRealSecond;
+            gameTime += Time.deltaTime * _cachedTimeScale; // 使用緩存值
         }
     }
 
@@ -309,25 +329,18 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     private GameData UpgradeSaveData(GameData data)
     {
-        if (data.version < SaveDataVersion)
+        int currentVersion = data.version;
+        while (currentVersion < SaveDataVersion)
         {
-            Debug.Log($"[GameManager] 升級存檔版本：{data.version} -> {SaveDataVersion}");
-            // 示例：補齊缺失欄位
-            if (data.playerData == null)
-                data.playerData = new GameData.PlayerData();
-            if (data.mapData == null)
-                data.mapData = new GameData.MapData();
-            if (data.playerData.Ships == null)
-                data.playerData.Ships = new List<GameData.ShipData>();
-            if (data.enemyData.EnemyShips == null)
-                data.enemyData.EnemyShips = new List<GameData.ShipData>();
-            if (data.mapData.ChinjuTiles == null)
-                data.mapData.ChinjuTiles = new List<Vector3Int>();
-
-            // 更新版本號
-            data.version = SaveDataVersion;
+            if (_upgradeActions.ContainsKey(currentVersion))
+            {
+                _upgradeActions[currentVersion](data);
+                currentVersion++;
+            }
+            else break;
         }
-        return data;
+        data.version = SaveDataVersion;
+        return data; // 修正：返回升級後的 GameData
     }
 
     /// <summary>
@@ -459,8 +472,7 @@ public class GameManager : Singleton<GameManager>
                     OnGameLoadedEvent.Invoke(); // 發送載入事件
 
                     // 新增：載入遊戲後重繪地圖
-                    if (MapController.Instance != null)
-                        MapController.Instance.RecalculateMap();
+                    StartCoroutine(DelayedMapRecalculation());
                 }
                 else
                 {
@@ -669,17 +681,28 @@ public class GameManager : Singleton<GameManager>
     #endregion
 
     #region Coroutines
+    private System.Collections.IEnumerator DelayedMapRecalculation()
+    {
+        yield return new WaitForEndOfFrame();
+        if (MapController.Instance != null)
+            MapController.Instance.RecalculateMap();
+
+        Debug.Log("[GameManager] 地圖重繪完成");
+    }
+
     private System.Collections.IEnumerator DelayedFleetValidation()
     {
         yield return new WaitForSeconds(fleetValidationDelay);
 
-        // 增加調試日誌
+        if (_fleetManager == null)
+        {
+            Debug.LogError("FleetManager 未註冊!");
+            yield break;
+        }
+
         Debug.Log($"[FleetValidation] 開始驗證艦隊，當前艦隊數量: {registeredFleets?.Count ?? 0}");
-
-        _fleetManager?.ValidateFleetFollowers();
-
-        // 驗證後再次檢查空艦隊
-        _fleetManager?.RemoveEmptyFleets();
+        _fleetManager.ValidateFleetFollowers();
+        _fleetManager.RemoveEmptyFleets();
     }
     #endregion
 
