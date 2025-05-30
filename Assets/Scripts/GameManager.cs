@@ -253,17 +253,125 @@ public class GameManager : Singleton<GameManager>
     /// <summary>
     /// 儲存遊戲，可指定檔名
     /// </summary>
-    public void SaveGame(string fileName = null)
+   public void SaveGame(string fileName = null)
     {
         if (GameDataController.Instance != null)
         {
             var data = GameDataController.Instance.CurrentGameData;
+
             if (data != null)
             {
                 try
                 {
-                    SaveGameInternal(data, fileName ?? currentSaveFileName);
-                    OnGameSavedEvent.Invoke();
+                    // 保存玩家資源（確保最新值）
+                    var playerData = GameDataController.Instance.CurrentGameData.playerData;
+                    data.playerData.Oils = playerData.Oils;
+                    data.playerData.Gold = playerData.Gold;
+                    data.playerData.Cube = playerData.Cube;
+                    data.playerData.Level = playerData.Level;
+                    data.playerData.Exp = playerData.Exp;
+
+                    // 保存玩家船隻數據（含艦隊編組/父子關係）
+                    var playerShips = GameObject.FindObjectsByType<PlayerShip>(FindObjectsSortMode.None)
+                        .Where(ship => ship != null)
+                        .ToList();
+
+                    data.playerData.Ships.Clear();
+                    foreach (var ship in registeredPlayerShips)
+                    {
+                        data.playerData.Ships.Add(ship.SaveShipData());
+                    }
+
+                    // 保存敵人數據
+                    var enemyShips = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None)
+                        .Where(ship => ship != null)
+                        .ToList();
+
+                    data.enemyData.EnemyShips.Clear(); // 修正：改為使用 enemyData.EnemyShips
+                    foreach (var ship in enemyShips) // 改用場景中實際存在的敵艦
+                    {
+                        var shipData = ship.SaveShipData();
+
+                        // 保存武器數據
+                        shipData.Weapons.Clear();
+                        foreach (var weapon in ship.GetWeapons())
+                        {
+                            var weaponData = new GameData.WeaponData
+                            {
+                                WeaponId = weapon.WeaponId, // 保存唯一標識
+                                Name = weapon.name,
+                                Damage = (int)weapon.Damage,
+                                MaxAttackDistance = weapon.MaxAttackDistance,
+                                AttackSpeed = weapon.AttackSpeed,
+                                PrefabName = weapon.Name
+                            };
+                            shipData.Weapons.Add(weaponData);
+                        }
+
+                        data.enemyData.EnemyShips.Add(shipData); // 修正：改為使用 enemyData.EnemyShips
+                    }
+                    Debug.Log($"[GameManager] 正在保存 {enemyShips.Count} 艘敵艦");
+                    foreach (var ship in enemyShips)
+                    {
+                        Debug.Log($"[GameManager] 保存敵艦: {ship.name}, ID: {ship.ShipId}");
+                    }
+
+                    // 保存玩家艦隊數據
+                    var allFleets = GameObject.FindObjectsByType<Fleet>(FindObjectsSortMode.None)
+                        .Where(fleet => fleet != null)
+                        .ToList();
+
+                    data.playerData.Fleets.Clear();
+                    data.enemyData.EnemyFleets.Clear(); // 修正：清空敵方艦隊列表
+
+                    foreach (var fleet in allFleets)
+                    {
+                        var fleetData = fleet.SaveFleetData();
+                        if (fleetData != null) // 只保存有效艦隊
+                        {
+                            if (fleet.IsPlayerFleet) // 判斷是否為玩家艦隊
+                            {
+                                data.playerData.Fleets.Add(fleetData);
+                            }
+                            else // 否則為敵方艦隊
+                            {
+                                data.enemyData.EnemyFleets.Add(fleetData);
+                            }
+                        }
+                    }
+
+                    // 儲存遊戲時間
+                    data.gameTime = gameTime;
+
+                    // 新增：設置存檔版本號
+                    data.version = SaveDataVersion;
+
+                    // 保存最後遊玩時間
+                    data.lastPlayedTime = DateTime.Now.ToString("o"); // 新增：保存 ISO 格式的最後遊玩時間
+
+                    // 保存彈藥池狀態
+                    if (AmmoManager.Instance != null)
+                    {
+                        data.ammoStates = AmmoManager.Instance.SaveAmmoStates(); // 新增：保存彈藥位置
+                    }
+
+                    string json = JsonUtility.ToJson(data, true);
+                    string path = GetSaveFilePath(fileName);
+
+                    // === 新增：自動備份舊存檔 ===
+                    if (File.Exists(path))
+                    {
+                        string backupPath = path + ".bak";
+                        File.Copy(path, backupPath, true);
+                        Debug.Log($"[GameManager] 已備份舊存檔至 {backupPath}");
+                    }
+                    // === 備份結束 ===
+
+                    File.WriteAllText(path, json);
+                    Debug.Log($"[GameManager] 遊戲已保存至 {path}");
+                    // 新增：儲存最後一次存檔檔名
+                    SetCurrentSaveFileName(Path.GetFileName(path));
+                    OnGameSavedEvent.Invoke(); // 發送保存事件
                 }
                 catch (IOException ex)
                 {
