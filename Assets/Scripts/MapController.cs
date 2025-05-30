@@ -175,54 +175,80 @@ public class MapController : Singleton<MapController>
         List<Vector3Int> tilesToRender = new List<Vector3Int>();
         HashSet<Vector3Int> currentRendering = new HashSet<Vector3Int>();
 
+        int processed = 0; // 新增 processed 變數
+
+        // 按2x2组处理瓦片
+        int groupSize = 2;
+        int groupsPerChunk = chunkSize / groupSize;
+
         foreach (var offset in spiralChunkOffsets)
         {
-            int startX = (centerChunkX + offset.x) * chunkSize;
-            int startY = (centerChunkY + offset.y) * chunkSize;
+            int chunkStartX = (centerChunkX + offset.x) * chunkSize;
+            int chunkStartY = (centerChunkY + offset.y) * chunkSize;
 
-            for (int x = 0; x < chunkSize; x++)
+            // 按组遍历（8x8组）
+            for (int gx = 0; gx < groupsPerChunk; gx++)
             {
-                for (int y = 0; y < chunkSize; y++)
+                for (int gy = 0; gy < groupsPerChunk; gy++)
                 {
-                    Vector3Int pos = new Vector3Int(startX + x, startY + y, 0);
-                    if (!renderedTiles.Contains(pos) && !currentRendering.Contains(pos))
+                    // 计算组起始位置
+                    int startX = chunkStartX + gx * groupSize;
+                    int startY = chunkStartY + gy * groupSize;
+                    
+                    // 确定整个组的类型（使用组中心点）
+                    Vector3Int groupCenterPos = new Vector3Int(
+                        startX + groupSize / 2, 
+                        startY + groupSize / 2, 
+                        0
+                    );
+                    
+                    // 获取或生成组类型
+                    if (!generatedTiles.ContainsKey(groupCenterPos))
                     {
-                        tilesToRender.Add(pos);
-                        currentRendering.Add(pos);
+                        generatedTiles[groupCenterPos] = GetTileTypeAt(
+                            groupCenterPos.x, 
+                            groupCenterPos.y
+                        );
+                    }
+                    
+                    TileType groupType = generatedTiles[groupCenterPos];
+
+                    // 渲染组内所有瓦片（2x2=4个）
+                    for (int dx = 0; dx < groupSize; dx++)
+                    {
+                        for (int dy = 0; dy < groupSize; dy++)
+                        {
+                            Vector3Int pos = new Vector3Int(
+                                startX + dx, 
+                                startY + dy, 
+                                0
+                            );
+                            
+                            if (!renderedTiles.Contains(pos) && !pendingTiles.Contains(pos))
+                            {
+                                RenderTile(pos, groupType); // 修改后的渲染方法
+                                renderedTiles.Add(pos);
+                                pendingTiles.Add(pos);
+                            }
+                        }
+                    }
+                    
+                    processed++;
+                    if (processed >= ChunksPerFrame * groupsPerChunk * groupsPerChunk)
+                    {
+                        processed = 0;
+                        yield return null;
                     }
                 }
             }
         }
-
-        pendingTiles.Clear();
-
-        // Process tiles in batches
-        int processed = 0;
-        foreach (var pos in tilesToRender)
-        {
-            if (!generatedTiles.ContainsKey(pos))
-            {
-                generatedTiles[pos] = GetTileTypeAt(pos.x, pos.y);
-            }
-
-            RenderTile(pos);
-            renderedTiles.Add(pos);
-
-            processed++;
-            if (processed >= ChunksPerFrame * chunkSize * chunkSize)
-            {
-                processed = 0;
-                yield return null;
-            }
-        }
-
+        
         CalculateOceanLevels();
         UpdateOceanLevelTexts();
     }
 
-    private void RenderTile(Vector3Int pos)
+    private void RenderTile(Vector3Int pos, TileType tileType)
     {
-        TileType tileType = generatedTiles[pos];
         oceanTilemap.SetTile(pos, null);
         groundTilemap.SetTile(pos, null);
 
@@ -285,25 +311,24 @@ public class MapController : Singleton<MapController>
     // Modify GetTileTypeAt to use lower frequency noise
     protected TileType GetTileTypeAt(int x, int y)
     {
+        // 特殊处理镇守府及周边
         if (x == 0 && y == 0) return TileType.Chinju;
-
-        // Force neighbors around Chinju to be land
         if ((x == 0 && (y == 1 || y == -1)) || (y == 0 && (x == 1 || x == -1)))
         {
             return TileType.Grass;
         }
 
-        // Use lower frequency noise for larger landmasses
-        float noiseValue = 0.6f * GetCachedNoise(x / 2, y / 2);
-        noiseValue += 0.3f * GetCachedNoise(x, y);
-        noiseValue += 0.1f * GetCachedNoise(x * 2, y * 2);
+        // 计算2x2组的坐标（每组左上角）
+        int groupX = x / 2;
+        int groupY = y / 2;
+        
+        // 使用组坐标计算噪声（降低频率）
+        float noiseValue = 0.6f * GetCachedNoise(groupX, groupY);
+        noiseValue += 0.3f * GetCachedNoise(groupX * 2, groupY * 2);
+        noiseValue += 0.1f * GetCachedNoise(groupX * 4, groupY * 4);
         noiseValue = Mathf.Clamp01(noiseValue);
 
-        if (noiseValue > 1f - islandDensity)
-        {
-            return TileType.Grass;
-        }
-        return TileType.Ocean;
+        return noiseValue > 1f - islandDensity ? TileType.Grass : TileType.Ocean;
     }
     private void HandleMouseClick()
     {
