@@ -102,28 +102,29 @@ public class FleetManager : Singleton<FleetManager>, GameManager.IFleetManager /
 
     public Fleet InstantiateFleetFromData(GameData.FleetData fleetData)
     {
-        // 根據 FleetData 創建艦隊實例
         var fleet = new GameObject(fleetData.Name).AddComponent<Fleet>();
         fleet.FleetId = fleetData.FleetId;
         fleet.transform.position = fleetData.Position;
         fleet.Speed = fleetData.Speed;
         fleet.FlagshipId = fleetData.FlagshipId;
 
-        // 檢查是否有船隻ID
         if (fleetData.ShipIds == null || fleetData.ShipIds.Count == 0)
         {
             Debug.LogWarning($"[FleetManager] Fleet {fleetData.Name} has no ships, skipping instantiation.");
             return null;
         }
 
-        // 將船隻加入艦隊
         foreach (var shipId in fleetData.ShipIds)
         {
             var ship = ShipManager.Instance?.GetShipById(shipId);
             if (ship != null)
             {
                 fleet.AddShip(ship);
-                ship.transform.SetParent(fleet.transform); // 確保父物件正確
+                ship.transform.SetParent(fleet.transform);
+            }
+            else
+            {
+                Debug.LogWarning($"[FleetManager] Ship with ID {shipId} not found for fleet {fleetData.Name}.");
             }
         }
 
