@@ -248,17 +248,14 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
                     oceanTilesToShow.Add(pos);
                     break;
                 case TileType.Grass:
-                    oceanTilemap.SetTile(pos, oceanTile);
                     groundTilemap.SetTile(pos, grassTile);
                     HideOceanLevelText(pos);
                     break;
                 case TileType.Oil:
-                    oceanTilemap.SetTile(pos, oceanTile);
                     groundTilemap.SetTile(pos, oilTile);
                     HideOceanLevelText(pos);
                     break;
                 case TileType.Chinju:
-                    oceanTilemap.SetTile(pos, oceanTile);
                     groundTilemap.SetTile(pos, chinjuTile);
                     HideOceanLevelText(pos);
                     break;
@@ -564,5 +561,32 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
         }
 
         return Vector3.zero; // 如果找不到，返回 Vector3.zero
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (mainCamera == null || groundTilemap == null) return;
+
+        Vector3 camWorldPos = mainCamera.transform.position;
+        Vector3Int camCell = groundTilemap.WorldToCell(camWorldPos);
+
+        int chunkX = Mathf.FloorToInt((float)camCell.x / chunkSize);
+        int chunkY = Mathf.FloorToInt((float)camCell.y / chunkSize);
+
+        Gizmos.color = Color.yellow;
+
+        for (int x = -renderRadius; x <= renderRadius; x++)
+        {
+            for (int y = -renderRadius; y <= renderRadius; y++)
+            {
+                int cx = chunkX + x;
+                int cy = chunkY + y;
+
+                Vector3 chunkWorldPos = groundTilemap.GetCellCenterWorld(new Vector3Int(cx * chunkSize, cy * chunkSize, 0));
+                Vector3 chunkSizeWorld = new Vector3(chunkSize, chunkSize, 0);
+
+                Gizmos.DrawWireCube(chunkWorldPos, chunkSizeWorld);
+            }
+        }
     }
 }

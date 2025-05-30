@@ -794,7 +794,7 @@ MonoBehaviour:
   grassTile: {fileID: 11400000, guid: b306ad7cb7c9cc44280d8a71f116a2d3, type: 2}
   chinjuTile: {fileID: 11400000, guid: dd2b4b2c1d45e6743a8978e499247e12, type: 2}
   oilTile: {fileID: 11400000, guid: 6c79396beaa4f514a8997b471e435bab, type: 2}
-  islandDensity: 0.9
+  islandDensity: 0.5
   seed: 123456
   mainCamera: {fileID: 2019224608}
   cameraController: {fileID: 2019224605}
@@ -1891,7 +1891,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 0
   m_IsActive: 1
 --- !u!1839735485 &1920876237
 Tilemap:

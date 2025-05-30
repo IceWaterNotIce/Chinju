@@ -579,12 +579,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   oceanTilemap: {fileID: 197554929}
   groundTilemap: {fileID: 1996857966}
-  chinjufuTilemap: {fileID: 1497946732}
+  chinjufuTilemap: {fileID: 0}
   oceanTile: {fileID: 11400000, guid: eebb48b0c18a5314b8bf7ee79b56cdc9, type: 2}
   grassTile: {fileID: 11400000, guid: b306ad7cb7c9cc44280d8a71f116a2d3, type: 2}
   chinjuTile: {fileID: 11400000, guid: dd2b4b2c1d45e6743a8978e499247e12, type: 2}
   oilTile: {fileID: 11400000, guid: 6c79396beaa4f514a8997b471e435bab, type: 2}
-  islandDensity: 0.3
+  islandDensity: 50
   seed: 123456
   mainCamera: {fileID: 764087068}
   cameraController: {fileID: 0}
