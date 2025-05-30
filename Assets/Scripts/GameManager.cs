@@ -340,6 +340,8 @@ public class GameManager : Singleton<GameManager>
         {
             InitializeGameData();
         }
+
+        ClearAllShipsAndFleets();
         string dir = string.IsNullOrEmpty(filedir) ? Application.persistentDataPath : filedir;
         string path = Path.Combine(dir, fileName ?? currentSaveFileName); // 支持自訂檔案目錄和檔名
 
