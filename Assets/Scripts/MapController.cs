@@ -581,14 +581,16 @@ public class MapController : Singleton<MapController> // 改為繼承 Singleton
         {
             for (int y = -renderRadius; y <= renderRadius; y++)
             {
-                int chunkX = (chunkIndexX + x);
-                int chunkY = (chunkIndexY + y);
+                int chunkX = (chunkIndexX + x) * chunkSize;
+                int chunkY = (chunkIndexY + y) * chunkSize;
 
-                Vector3 chunkWorldPos = groundTilemap.GetCellCenterWorld(
-                    new Vector3Int(chunkX * chunkSize, chunkY * chunkSize, 0));
+                Vector3 chunkWorldPos = groundTilemap.CellToWorld(new Vector3Int(chunkX, chunkY, 0)); // 修改：從左下角開始
 
-                Vector3 chunkSizeWorld = new Vector3(chunkSize, chunkSize, 0);
-                Gizmos.DrawWireCube(chunkWorldPos, chunkSizeWorld);
+                // 繪製 chunk 邊界
+                Gizmos.DrawLine(chunkWorldPos, chunkWorldPos + new Vector3(chunkSize, 0, 0)); // 下邊界
+                Gizmos.DrawLine(chunkWorldPos, chunkWorldPos + new Vector3(0, chunkSize, 0)); // 左邊界
+                Gizmos.DrawLine(chunkWorldPos + new Vector3(chunkSize, 0, 0), chunkWorldPos + new Vector3(chunkSize, chunkSize, 0)); // 上邊界
+                Gizmos.DrawLine(chunkWorldPos + new Vector3(0, chunkSize, 0), chunkWorldPos + new Vector3(chunkSize, chunkSize, 0)); // 右邊界
             }
         }
     }
