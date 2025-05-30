@@ -335,6 +335,11 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     public GameData LoadGame(string fileName = null, string filedir = null)
     {
+
+        if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData == null)
+        {
+            InitializeGameData();
+        }
         string dir = string.IsNullOrEmpty(filedir) ? Application.persistentDataPath : filedir;
         string path = Path.Combine(dir, fileName ?? currentSaveFileName); // 支持自訂檔案目錄和檔名
 
@@ -536,7 +541,7 @@ public class GameManager : Singleton<GameManager>
 
         // 3. 清除現有船隻（玩家與敵人）
         ClearAllShipsAndFleets();
-        
+
 
         // 4. 重置遊戲數據
         int seed = mapSeed ?? UnityEngine.Random.Range(0, int.MaxValue); // 新增：使用指定或隨機種子
