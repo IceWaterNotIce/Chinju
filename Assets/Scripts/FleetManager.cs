@@ -149,4 +149,14 @@ public class FleetManager : Singleton<FleetManager>, GameManager.IFleetManager /
             }
         }
     }
+
+    public void ResetAllFleets()
+    {
+        var allFleets = FindObjectsByType<Fleet>(FindObjectsSortMode.None);
+        foreach (var fleet in allFleets)
+        {
+            Destroy(fleet.gameObject); // 銷毀所有艦隊物件
+        }
+        Debug.Log("[FleetManager] 已重置所有艦隊");
+    }
 }

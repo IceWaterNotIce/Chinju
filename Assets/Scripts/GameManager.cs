@@ -483,6 +483,9 @@ public class GameManager : Singleton<GameManager>
                     AmmoManager.Instance.LoadAmmoStates(data.ammoStates); // 新增：載入彈藥位置
                 }
 
+                // 在載入完成後加入延遲驗證
+                StartCoroutine(DelayedFleetValidation());
+
                 return data;
             }
             catch (IOException ex)
@@ -585,6 +588,8 @@ public class GameManager : Singleton<GameManager>
     /// </summary>
     private void ClearAllShipsAndFleets()
     {
+        Debug.Log("[Cleanup] 開始清除所有船隻和艦隊");
+
         foreach (var fleet in registeredFleets)
         {
             if (fleet != null)
@@ -601,6 +606,9 @@ public class GameManager : Singleton<GameManager>
 
         ShipManager.Instance?.ClearAllShips(); // 清除所有玩家船隻
         EnemyShipManager.Instance?.ClearAllEnemyShips(); // 清除所有敵人船隻
+
+        // 確保 FleetManager 也清除內部狀態
+        FleetManager.Instance?.ResetAllFleets();
     }
     #endregion
 
@@ -661,8 +669,15 @@ public class GameManager : Singleton<GameManager>
     #region Coroutines
     private System.Collections.IEnumerator DelayedFleetValidation()
     {
-        yield return new WaitForSeconds(fleetValidationDelay); // 使用可配置的延遲時間
+        yield return new WaitForSeconds(fleetValidationDelay);
+
+        // 增加調試日誌
+        Debug.Log($"[FleetValidation] 開始驗證艦隊，當前艦隊數量: {registeredFleets?.Count ?? 0}");
+
         _fleetManager?.ValidateFleetFollowers();
+
+        // 驗證後再次檢查空艦隊
+        _fleetManager?.RemoveEmptyFleets();
     }
     #endregion
 
