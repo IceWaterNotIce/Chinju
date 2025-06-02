@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using System.Linq; // 新增引用
 using System.Collections.Generic;
+using System.IO; // 保留：用於文件操作
 
 // 遊戲資料控制器，集中管理 GameData 實例
 public class GameDataController : Singleton<GameDataController>
@@ -136,32 +137,37 @@ public class GameDataController : Singleton<GameDataController>
         return true;
     }
 
-    private void SyncPlayerResources(GameData.PlayerData source, GameData.PlayerData target)
-    {
-        target.Oils = source.Oils;
-        target.Gold = source.Gold;
-        target.Cube = source.Cube;
-        target.Level = source.Level;
-        target.Exp = source.Exp;
-    }
-
     public void SaveGameData()
     {
-
         if (currentGameData == null)
         {
             Debug.LogError("[GameDataController] 無法保存遊戲數據，currentGameData 為 null！");
             return;
         }
 
-        // 確保玩家數據存在
-        if (currentGameData.players == null || currentGameData.players.Count == 0)
+        try
         {
-            Debug.LogWarning("[GameDataController] 玩家數據列表為空，無法保存！");
-            return;
+            string json = JsonUtility.ToJson(currentGameData, true);
+            string path = Path.Combine(Application.persistentDataPath, "savegame.json");
+            File.WriteAllText(path, json);
+            Debug.Log($"[GameDataController] 遊戲數據已保存至 {path}");
         }
+        catch (Exception ex)
+        {
+            Debug.LogError($"[GameDataController] 保存遊戲數據時發生錯誤: {ex.Message}");
+        }
+    }
 
-        Debug.Log("[GameDataController] 遊戲數據已成功保存。");
+    private void SyncPlayerResources(GameData.PlayerData source, GameData.PlayerData target)
+    {
+        if (source != null && target != null)
+        {
+            target.Oils = source.Oils;
+            target.Gold = source.Gold;
+            target.Cube = source.Cube;
+            target.Level = source.Level;
+            target.Exp = source.Exp;
+        }
     }
 
     public void LoadGameData(GameData data)

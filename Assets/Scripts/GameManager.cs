@@ -765,6 +765,11 @@ public class GameManager : Singleton<GameManager>
     {
         return gameTime;
     }
+
+    public TimeSpan GetGameTime()
+    {
+        return TimeSpan.FromSeconds(gameTime);
+    }
     #endregion
 
     #region FleetManagerInjection

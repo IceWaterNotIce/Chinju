@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq; // 新增：解決 LINQ 擴充方法錯誤
 using UnityEngine;
 
 [System.Serializable]
@@ -22,9 +23,25 @@ public class GameData
         {
             Debug.Log($"[GameData] 升級存檔版本：{data.version} -> {SaveDataVersion}");
 
+            if (data.version == 1)
+            {
+                // Example upgrade logic for version 1 to 2
+                foreach (var weapon in data.players.SelectMany(p => p.Weapons))
+                {
+                    if (weapon.Damage < 0) weapon.Damage = 0; // 確保武器傷害值有效
+                }
+            }
+
             data.version = SaveDataVersion;
         }
         return data;
+    }
+
+    private bool ValidateData()
+    {
+        // Example validation logic
+        return players.All(p => p.Oils >= 0 && p.Gold >= 0 && p.Cube >= 0) &&
+               players.SelectMany(p => p.Weapons).All(w => w.Damage >= 0 && w.MaxAttackDistance > 0);
     }
 
     #region Map
