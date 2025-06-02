@@ -9,6 +9,7 @@ public class SettingMenu : MonoBehaviour
     private Slider BGMSlider; // 新增
     private Slider SFXSlider; // 新增
     private Button openMenuButtonPanelBtn; // 新增
+    private Button openServerListPanelBtn; // 新增
 
     void Awake()
     {
@@ -64,6 +65,12 @@ public class SettingMenu : MonoBehaviour
             if (openMenuButtonPanelBtn != null)
             {
                 openMenuButtonPanelBtn.clicked += ShowMenuButtonPanel;
+            }
+
+            openServerListPanelBtn = root.Q<Button>("openServerListPanelBtn"); // 新增
+            if (openServerListPanelBtn != null)
+            {
+                openServerListPanelBtn.clicked += ShowServerListPanel; // 新增
             }
 
             textSizeSlider = UIHelper.InitializeElement<Slider>(root, "textSizeSlider"); // 新增：Slider 初始化
@@ -202,6 +209,13 @@ public class SettingMenu : MonoBehaviour
     private void ShowMenuButtonPanel()
     {
         PopupManager.Instance.ShowPopup("MenuButtonPanel");
+        PopupManager.Instance.HidePopup("SettingMenu");
+    }
+
+    // 新增：顯示 ServerListPanel
+    private void ShowServerListPanel()
+    {
+        PopupManager.Instance.ShowPopup("ServerListPanel");
         PopupManager.Instance.HidePopup("SettingMenu");
     }
 }

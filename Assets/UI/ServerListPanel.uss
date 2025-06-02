@@ -1,0 +1,51 @@
+.server-list-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #222;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.server-list-title {
+    font-size: 24px;
+    color: white;
+    margin-bottom: 20px;
+    text-align: center;
+    -unity-font-style: bold;
+}
+
+.server-list-scrollview {
+    width: 300px;
+    height: 400px;
+    background-color: #333;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.menu-button {
+    width: 200px;
+    height: 40px;
+    background-color: #333;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    margin: 10px 0;
+    -unity-text-align: center;
+    -unity-font-style: bold;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.menu-button:hover {
+    background-color: #444;
+}
+
+.menu-button:active {
+    background-color: #555;
+}

@@ -100,7 +100,7 @@ public class GameDataSelectPanel : MonoBehaviour
         }
         // get the file name without path
         string fileName = Path.GetFileName(filePath);
-        GameManager.Instance.LoadGame(fileName);
+        GameManager.Instance.LoadGame(fileName, isServer: true); // 修正：加入 isServer 參數
         PopupManager.Instance.HidePopup("GameDataSelectPanel");
         PopupManager.Instance.HidePopup("SettingMenu");
     }

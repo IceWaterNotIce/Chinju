@@ -58,7 +58,7 @@ public class GameDataCreatePanel : MonoBehaviour
         string saveDir = saveDirField != null ? saveDirField.value.Trim() : "";
 
         // 呼叫 GameManager 建立新遊戲，傳入 mapSeed 與 saveDir
-        GameManager.Instance.StartNewGame(fileName, mapSeed, saveDir);
+        GameManager.Instance.StartNewGame(fileName, mapSeed, saveDir, isServer: true); // 修正：加入 isServer 參數
 
         PopupManager.Instance.HidePopup("GameDataCreatePanel");
         PopupManager.Instance.HidePopup("SettingMenu");

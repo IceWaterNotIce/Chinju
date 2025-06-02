@@ -14,6 +14,7 @@ public class GameData
     [SerializeField] public List<PlayerData> players = new List<PlayerData>(); // 新增：玩家列表
     [SerializeField] public EnemyData enemyData = new EnemyData(); // 新增：敵方數據
     [SerializeField] public List<Vector3> ammoStates = new List<Vector3>(); // 新增：保存彈藥位置
+    [SerializeField] public bool isServer = false; // 新增：是否為伺服器
 
     public GameData UpgradeSaveData(GameData data)
     {

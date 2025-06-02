@@ -456,7 +456,7 @@ public class GameManager : Singleton<GameManager>
     /// <summary>
     /// 載入遊戲，可指定檔名
     /// </summary>
-    public GameData LoadGame(string fileName = null, string filedir = null)
+    public GameData LoadGame(string fileName = null, string filedir = null, bool isServer = false) // 新增 isServer 參數
     {
 
         if (GameDataController.Instance != null && GameDataController.Instance.CurrentGameData == null)
@@ -477,6 +477,9 @@ public class GameManager : Singleton<GameManager>
 
                 // 新增：升級存檔數據
                 data = UpgradeSaveData(data);
+
+                // 新增：設定是否為伺服器
+                data.isServer = isServer;
 
                 // 驗證存檔完整性，補齊缺失欄位
                 if (data != null)
@@ -646,7 +649,7 @@ public class GameManager : Singleton<GameManager>
     /// <param name="newSaveFileName">新遊戲存檔名稱（可為 null，預設自動產生）</param>
     /// <param name="mapSeed">地圖種子（可為 null，null 則隨機）</param>
     /// <param name="saveDir">自訂存檔資料夾（可為 null 或空字串）</param>
-    public void StartNewGame(string newSaveFileName = null, int? mapSeed = null, string saveDir = null)
+    public void StartNewGame(string newSaveFileName = null, int? mapSeed = null, string saveDir = null, bool isServer = false) // 新增 isServer 參數
     {
         if (!initialConfig.IsValid()) // 新增：檢查配置有效性
         {
@@ -668,7 +671,6 @@ public class GameManager : Singleton<GameManager>
 
         // 3. 清除現有船隻（玩家與敵人）
         ClearAllShipsAndFleets();
-
 
         // 4. 重置遊戲數據
         int seed = mapSeed ?? UnityEngine.Random.Range(0, int.MaxValue); // 新增：使用指定或隨機種子
@@ -693,6 +695,9 @@ public class GameManager : Singleton<GameManager>
                 ChinjuTiles = new List<Vector3Int>()
             }
         };
+
+        // 新增：設定是否為伺服器
+        newGameData.isServer = isServer;
 
         // 5. 設定到 GameDataController
         if (GameDataController.Instance != null)

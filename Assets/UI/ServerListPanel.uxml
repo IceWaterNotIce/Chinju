@@ -1,0 +1,10 @@
+<UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False" style="Assets/Resources/UI/ServerListPanel.uss">
+    <Style src="project://database/Assets/Resources/UI/ServerListPanel.uss?fileID=7433441132597879392&amp;guid=abcd1234abcd1234abcd1234abcd1234&amp;type=3#ServerListPanel" />
+    <ui:VisualElement name="server-list-container" class="server-list-container">
+        <ui:Label text="伺服器列表" class="server-list-title" />
+        <ui:ScrollView name="serverListScrollView" class="server-list-scrollview">
+            <!-- 伺服器項目將動態生成 -->
+        </ui:ScrollView>
+        <ui:Button text="返回" name="backToSettingMenuBtn" class="menu-button" />
+    </ui:VisualElement>
+</UXML>

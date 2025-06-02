@@ -21,6 +21,8 @@
             </ui:VisualElement>
             <!-- 新增：開啟 MenuButtonPanel 的按鈕 -->
             <ui:Button text="開啟選單按鈕" name="openMenuButtonPanelBtn" class="menu-button" />
+            <!-- 新增：伺服器列表按鈕 -->
+            <ui:Button text="伺服器列表" name="openServerListPanelBtn" class="menu-button" />
         </ui:VisualElement>
     </ui:VisualElement>
 </UXML>
