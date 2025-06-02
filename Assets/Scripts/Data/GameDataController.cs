@@ -2,7 +2,8 @@ using System;
 using UnityEngine;
 using System.Linq; // 新增引用
 using System.Collections.Generic;
-using System.IO; // 保留：用於文件操作
+using System.IO; // 新增引用
+
 
 // 遊戲資料控制器，集中管理 GameData 實例
 public class GameDataController : Singleton<GameDataController>
@@ -25,9 +26,9 @@ public class GameDataController : Singleton<GameDataController>
         }
     }
 
-    public event System.Action<GameData> OnGameDataChanged;
-    public event System.Action OnMapDataChanged; // 新增：地圖數據變更事件
-    public event System.Action OnFleetDataChanged; // 新增：艦隊數據變更事件
+    public event Action<GameData> OnGameDataChanged;
+    public event Action OnMapDataChanged; // 新增：地圖數據變更事件
+    public event Action OnFleetDataChanged; // 新增：艦隊數據變更事件
 
     private new void Awake()
     {

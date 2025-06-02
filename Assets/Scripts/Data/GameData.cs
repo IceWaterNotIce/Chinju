@@ -4,18 +4,51 @@ using System.Linq; // 新增：解決 LINQ 擴充方法錯誤
 using UnityEngine;
 
 [System.Serializable]
-public class GameData
-{
-    public const int SaveDataVersion = 1; // 新增：存檔版本常數
+public class GameData {
+    /// <summary>
+    /// 存檔版本常數，用於版本控制
+    /// </summary>
+    public const int SaveDataVersion = 1;
 
-    [SerializeField] public int version = 1; // 新增：存檔版本號
+    /// <summary>
+    /// 存檔版本號
+    /// </summary>
+    [SerializeField] public int version = 1;
+
+    /// <summary>
+    /// 遊戲時間（秒）
+    /// </summary>
     [SerializeField] public float gameTime;
-    [SerializeField] public string lastPlayedTime; // 新增：保存最後遊玩時間
-    [SerializeField] public MapData mapData; // 修正命名
-    [SerializeField] public List<PlayerData> players = new List<PlayerData>(); // 新增：玩家列表
-    [SerializeField] public EnemyData enemyData = new EnemyData(); // 新增：敵方數據
-    [SerializeField] public List<Vector3> ammoStates = new List<Vector3>(); // 新增：保存彈藥位置
-    [SerializeField] public bool isServer = false; // 新增：是否為伺服器
+
+    /// <summary>
+    /// 最後遊玩時間（ISO格式）
+    /// </summary>
+    [SerializeField] public string lastPlayedTime;
+
+    /// <summary>
+    /// 地圖數據
+    /// </summary>
+    [SerializeField] public MapData mapData;
+
+    /// <summary>
+    /// 玩家列表
+    /// </summary>
+    [SerializeField] public List<PlayerData> players = new List<PlayerData>();
+
+    /// <summary>
+    /// 敵方數據
+    /// </summary>
+    [SerializeField] public EnemyData enemyData = new EnemyData();
+
+    /// <summary>
+    /// 保存彈藥位置
+    /// </summary>
+    [SerializeField] public List<Vector3> ammoStates = new List<Vector3>();
+
+    /// <summary>
+    /// 是否為伺服器
+    /// </summary>
+    [SerializeField] public bool isServer = false;
 
     public GameData UpgradeSaveData(GameData data)
     {
