@@ -46,7 +46,6 @@ public class GameData
         [SerializeField] public string PlayerName = "Player";
         [SerializeField] public Color PlayerColor = Color.white;
         [SerializeField] public string Avatar;
-
         [SerializeField] public int Level = 1;
         [SerializeField] public float Exp = 0;
         public void TryLevelUp()
@@ -146,7 +145,7 @@ public class GameData
         public enum WeaponType { Primary, Secondary, Special }
         [SerializeField] public WeaponType Type;
         [SerializeField] public string Name;
-        
+
         [SerializeField] public int Damage;
         [SerializeField] public float MaxAttackDistance;
         [SerializeField] public float MinAttackDistance;

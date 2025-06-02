@@ -230,4 +230,25 @@ public class ShipManager : Singleton<ShipManager>
             Destroy(child.gameObject);
         }
     }
+    public List<GameData.FleetData> GetAllPlayerFleets()
+    {
+        var playerData = GameDataController.Instance.CurrentGameData?.players.FirstOrDefault();
+        if (playerData == null)
+        {
+            Debug.LogWarning("[ShipManager] PlayerData 為 null，無法獲取玩家艦隊！");
+            return new List<GameData.FleetData>();
+        }
+        return playerData.Fleets ?? new List<GameData.FleetData>();
+    }
+    
+    public List<GameData.ShipData> GetAllPlayerShips()
+    {
+        var playerData = GameDataController.Instance.CurrentGameData?.players.FirstOrDefault();
+        if (playerData == null)
+        {
+            Debug.LogWarning("[ShipManager] PlayerData 為 null，無法獲取玩家船隻！");
+            return new List<GameData.ShipData>();
+        }
+        return playerData.Ships ?? new List<GameData.ShipData>();
+    }
 }

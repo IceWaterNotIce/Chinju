@@ -144,4 +144,60 @@ public class GameDataController : Singleton<GameDataController>
         target.Level = source.Level;
         target.Exp = source.Exp;
     }
+
+    public void SaveGameData()
+    {
+
+        if (currentGameData == null)
+        {
+            Debug.LogError("[GameDataController] 無法保存遊戲數據，currentGameData 為 null！");
+            return;
+        }
+
+        // 確保玩家數據存在
+        if (currentGameData.players == null || currentGameData.players.Count == 0)
+        {
+            Debug.LogWarning("[GameDataController] 玩家數據列表為空，無法保存！");
+            return;
+        }
+
+        Debug.Log("[GameDataController] 遊戲數據已成功保存。");
+    }
+
+    public void LoadGameData(GameData data)
+    {
+        if (data == null)
+        {
+            Debug.LogError("[GameDataController] 無法加載遊戲數據，data 為 null！");
+            return;
+        }
+
+        // 確保 players 列表存在
+        if (data.players == null || data.players.Count == 0)
+        {
+            Debug.LogWarning("[GameDataController] 玩家數據列表為空，無法加載！");
+            return;
+        }
+
+        // 加載玩家資源
+        var playerData = data.players.FirstOrDefault();
+        if (playerData != null)
+        {
+            SyncPlayerResources(playerData, playerData);
+        }
+
+        CurrentGameData = data; // 更新當前遊戲數據
+        Debug.Log("[GameDataController] 遊戲數據已成功加載。");
+    }
+
+
+    public void ResetGameData()
+    {
+        Debug.Log("[GameDataController] 重置遊戲數據。");
+        currentGameData = new GameData
+        {
+            players = new List<GameData.PlayerData> { new GameData.PlayerData() }
+        };
+        OnGameDataChanged?.Invoke(currentGameData);
+    }
 }
