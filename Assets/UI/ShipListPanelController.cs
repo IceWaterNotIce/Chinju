@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections;
 using System.Collections.Generic;
-
+using System.Linq;
 public class ShipListPanelController : MonoBehaviour
 {
     public VisualElement root;
@@ -51,7 +51,7 @@ public class ShipListPanelController : MonoBehaviour
     {
         shipListContainer.Clear();
 
-        var playerData = GameDataController.Instance.CurrentGameData.playerData;
+        var playerData = GameDataController.Instance.CurrentGameData.players.FirstOrDefault();
         if (playerData == null || playerData.Ships == null || playerData.Ships.Count == 0)
         {
             var noShipLabel = new Label("目前沒有船隻可顯示。");

@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
-
+using System.Linq;
 public class WeaponCreatePanelController : MonoBehaviour
 {
     public List<Weapon> weaponPrefabs = new List<Weapon>(); // 修改為直接存儲 Weapon 預製體
@@ -40,7 +40,7 @@ public class WeaponCreatePanelController : MonoBehaviour
 
         void UpdateResourceLabel()
         {
-            var playerData = GameDataController.Instance?.CurrentGameData?.playerData;
+            var playerData = GameDataController.Instance?.CurrentGameData?.players.FirstOrDefault();
             if (playerData != null)
             {
                 resourceLabel.text = $"目前金幣：{playerData.Gold}";
@@ -55,7 +55,7 @@ public class WeaponCreatePanelController : MonoBehaviour
 
         createButton.clicked += () =>
         {
-            var playerData = GameDataController.Instance?.CurrentGameData?.playerData;
+            var playerData = GameDataController.Instance?.CurrentGameData?.players.FirstOrDefault();
             if (playerData == null)
             {
                 Debug.LogError("[WeaponCreatePanelController] 無法取得玩家資料，無法創建武器。");

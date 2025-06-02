@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections;
+using System.Linq;
 
 /// <summary>
 /// 處理玩家資源狀態的UI顯示
@@ -56,9 +57,9 @@ public class PlayerStatsUI : MonoBehaviour
         if (GameDataController.Instance != null)
             GameDataController.Instance.OnGameDataChanged -= OnGameDataChanged;
 
-        if (gameData != null && gameData.playerData != null)
+        if (gameData != null && gameData.players.FirstOrDefault() != null)
         {
-            gameData.playerData.OnResourceChanged -= UpdateAllResourcesFromData;
+            gameData.players.FirstOrDefault().OnResourceChanged -= UpdateAllResourcesFromData;
         }
     }
 
@@ -76,14 +77,14 @@ public class PlayerStatsUI : MonoBehaviour
     public void SetGameDataFromController()
     {
         var data = GameDataController.Instance != null ? GameDataController.Instance.CurrentGameData : null;
-        if (gameData != null && gameData.playerData != null)
+        if (gameData != null && gameData.players.FirstOrDefault() != null)
         {
-            gameData.playerData.OnResourceChanged -= UpdateAllResourcesFromData;
+            gameData.players.FirstOrDefault().OnResourceChanged -= UpdateAllResourcesFromData;
         }
         gameData = data;
-        if (gameData != null && gameData.playerData != null)
+        if (gameData != null && gameData.players.FirstOrDefault() != null)
         {
-            gameData.playerData.OnResourceChanged += UpdateAllResourcesFromData;
+            gameData.players.FirstOrDefault().OnResourceChanged += UpdateAllResourcesFromData;
 
             // 新增：立即更新 UI
             UpdateAllResourcesFromData();
@@ -144,12 +145,12 @@ public class PlayerStatsUI : MonoBehaviour
     // 新增：從 GameData 更新 UI
     private void UpdateAllResourcesFromData()
     {
-        if (gameData != null && gameData.playerData != null)
+        if (gameData != null && gameData.players.FirstOrDefault() != null)
         {
             UpdateResourceDisplay(
-                Mathf.RoundToInt(gameData.playerData.Gold),
-                Mathf.RoundToInt(gameData.playerData.Oils),
-                gameData.playerData.Cube
+                Mathf.RoundToInt(gameData.players.FirstOrDefault().Gold),
+                Mathf.RoundToInt(gameData.players.FirstOrDefault().Oils),
+                gameData.players.FirstOrDefault().Cube
             );
             UpdateGameTimeUI(); // 新增：同步刷新遊戲時間
             UpdatePlayerLevelAndExpUI(); // 新增：同步刷新等級與經驗
@@ -177,15 +178,15 @@ public class PlayerStatsUI : MonoBehaviour
     // 新增：刷新玩家等級與經驗 UI
     private void UpdatePlayerLevelAndExpUI()
     {
-        if (gameData != null && gameData.playerData != null)
+        if (gameData != null && gameData.players.FirstOrDefault() != null)
         {
             if (playerLevelLabel != null)
-                playerLevelLabel.text = $"等級: {gameData.playerData.Level}";
+                playerLevelLabel.text = $"等級: {gameData.players.FirstOrDefault().Level}";
 
             if (playerExpLabel != null)
             {
-                int nextLevelExp = gameData.playerData.Level * 10;
-                playerExpLabel.text = $"經驗: {Mathf.FloorToInt(gameData.playerData.Exp)}/{nextLevelExp}";
+                int nextLevelExp = gameData.players.FirstOrDefault().Level * 10;
+                playerExpLabel.text = $"經驗: {Mathf.FloorToInt(gameData.players.FirstOrDefault().Exp)}/{nextLevelExp}";
             }
         }
     }

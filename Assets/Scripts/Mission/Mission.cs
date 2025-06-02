@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using System.Linq;
 public abstract class Mission : ScriptableObject
 {
     [SerializeField] protected string id;
@@ -26,7 +26,7 @@ public abstract class Mission : ScriptableObject
         if (!isCompleted)
         {
             isCompleted = true;
-            var playerData = GameDataController.Instance.CurrentGameData.playerData;
+            var playerData = GameDataController.Instance.CurrentGameData.players.FirstOrDefault();
             playerData.Gold += rewardGold;
             playerData.Oils += rewardOil;
             playerData.Cube += rewardCube;

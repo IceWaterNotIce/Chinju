@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using System.Linq;
 
 public class ChinjuUIController : MonoBehaviour
 {
@@ -31,14 +32,14 @@ public class ChinjuUIController : MonoBehaviour
     private void FillAllPlayerShipFuel()
     {
         var gameData = GameDataController.Instance.CurrentGameData;
-        if (gameData == null || gameData.playerData == null)
+        if (gameData == null || gameData.players.FirstOrDefault() == null)
         {
             Debug.LogWarning("[ChinjuUIController] 無法加滿燃料，GameData 為 null");
             return;
         }
 
         float totalOilNeeded = 0f;
-        foreach (var ship in gameData.playerData.Ships)
+        foreach (var ship in gameData.players.FirstOrDefault().Ships)
         {
             float need = Mathf.Max(0, ship.MaxFuel - ship.CurrentFuel);
             totalOilNeeded += need;
@@ -50,7 +51,7 @@ public class ChinjuUIController : MonoBehaviour
             return;
         }
 
-        if (gameData.playerData.Oils < totalOilNeeded)
+        if (gameData.players.FirstOrDefault().Oils < totalOilNeeded)
         {
             Debug.Log("[ChinjuUIController] 石油不足，無法全部加滿燃料");
             // 可加提示UI
@@ -58,8 +59,8 @@ public class ChinjuUIController : MonoBehaviour
         }
 
         // 扣除石油並加滿燃料
-        gameData.playerData.Oils -= totalOilNeeded;
-        foreach (var ship in gameData.playerData.Ships)
+        gameData.players.FirstOrDefault().Oils -= totalOilNeeded;
+        foreach (var ship in gameData.players.FirstOrDefault().Ships)
         {
             ship.CurrentFuel = ship.MaxFuel;
             Debug.Log($"[ChinjuUIController] {ship.Name} 燃料已加滿");

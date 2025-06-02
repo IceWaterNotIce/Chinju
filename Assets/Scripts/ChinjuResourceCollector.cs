@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using System.Linq;
 public class ChinjuResourceCollector : MonoBehaviour
 {
     public int GoldPerMinute = 3;
@@ -58,15 +58,15 @@ public class ChinjuResourceCollector : MonoBehaviour
     private void CollectResources()
     {
         var gameData = GameDataController.Instance.CurrentGameData;
-        if (gameData.playerData != null)
+        if (gameData.players.FirstOrDefault() != null)
         {
             // 合併資源更新邏輯
-            gameData.playerData.Gold += GoldPerMinute;
-            gameData.playerData.Oils += OilPerMinute;
-            gameData.playerData.Cube += CubePerMinute;
+            gameData.players.FirstOrDefault().Gold += GoldPerMinute;
+            gameData.players.FirstOrDefault().Oils += OilPerMinute;
+            gameData.players.FirstOrDefault().Cube += CubePerMinute;
 
             // 觸發資源變更事件
-            gameData.playerData.OnResourceChanged?.Invoke();
+            gameData.players.FirstOrDefault().OnResourceChanged?.Invoke();
 
             Debug.Log($"[ChinjuResourceCollector] 收集資源成功：金幣 +{GoldPerMinute}，石油 +{OilPerMinute}，方塊 +{CubePerMinute}");
         }

@@ -264,22 +264,22 @@ public class GameManager : Singleton<GameManager>
                 try
                 {
                     // 保存玩家資源（確保最新值）
-                    var playerData = GameDataController.Instance.CurrentGameData.playerData;
-                    data.playerData.Oils = playerData.Oils;
-                    data.playerData.Gold = playerData.Gold;
-                    data.playerData.Cube = playerData.Cube;
-                    data.playerData.Level = playerData.Level;
-                    data.playerData.Exp = playerData.Exp;
+                    var playerData = GameDataController.Instance.CurrentGameData.players.FirstOrDefault();
+                    data.players[0].Oils = playerData.Oils;
+                    data.players[0].Gold = playerData.Gold;
+                    data.players[0].Cube = playerData.Cube;
+                    data.players[0].Level = playerData.Level;
+                    data.players[0].Exp = playerData.Exp;
 
                     // 保存玩家船隻數據（含艦隊編組/父子關係）
                     var playerShips = GameObject.FindObjectsByType<PlayerShip>(FindObjectsSortMode.None)
                         .Where(ship => ship != null)
                         .ToList();
 
-                    data.playerData.Ships.Clear();
+                    data.players[0].Ships.Clear();
                     foreach (var ship in registeredPlayerShips)
                     {
-                        data.playerData.Ships.Add(ship.SaveShipData());
+                        data.players[0].Ships.Add(ship.SaveShipData());
                     }
 
                     // 保存敵人數據
@@ -321,7 +321,7 @@ public class GameManager : Singleton<GameManager>
                         .Where(fleet => fleet != null)
                         .ToList();
 
-                    data.playerData.Fleets.Clear();
+                    data.players[0].Fleets.Clear();
                     data.enemyData.EnemyFleets.Clear(); // 修正：清空敵方艦隊列表
 
                     foreach (var fleet in allFleets)
@@ -331,7 +331,7 @@ public class GameManager : Singleton<GameManager>
                         {
                             if (fleet.IsPlayerFleet) // 判斷是否為玩家艦隊
                             {
-                                data.playerData.Fleets.Add(fleetData);
+                                data.players[0].Fleets.Add(fleetData);
                             }
                             else // 否則為敵方艦隊
                             {
@@ -481,18 +481,18 @@ public class GameManager : Singleton<GameManager>
                 // 驗證存檔完整性，補齊缺失欄位
                 if (data != null)
                 {
-                    if (data.playerData == null)
-                        data.playerData = new GameData.PlayerData();
+                    if (data.players == null || data.players.Count == 0)
+                        data.players = new List<GameData.PlayerData> { new GameData.PlayerData() };
                     if (data.mapData == null)
                         data.mapData = new GameData.MapData();
                     if (data.enemyData.EnemyShips == null)
                         data.enemyData.EnemyShips = new List<GameData.ShipData>();
                     if (data.version == 0)
                         data.version = SaveDataVersion;
-                    if (data.playerData.Ships == null)
-                        data.playerData.Ships = new List<GameData.ShipData>();
-                    if (data.playerData.Weapons == null)
-                        data.playerData.Weapons = new List<GameData.WeaponData>();
+                    if (data.players[0].Ships == null)
+                        data.players[0].Ships = new List<GameData.ShipData>();
+                    if (data.players[0].Weapons == null)
+                        data.players[0].Weapons = new List<GameData.WeaponData>();
                     if (data.mapData.ChinjuTiles == null)
                         data.mapData.ChinjuTiles = new List<Vector3Int>();
                 }
@@ -515,17 +515,17 @@ public class GameManager : Singleton<GameManager>
                     {
                         GameDataController.Instance.CurrentGameData = data;
                         // 載入玩家資源到 PlayerData
-                        var playerData = GameDataController.Instance.CurrentGameData.playerData;
-                        playerData.Oils = data.playerData.Oils;
-                        playerData.Gold = data.playerData.Gold;
-                        playerData.Cube = data.playerData.Cube;
-                        playerData.Level = data.playerData.Level;
-                        playerData.Exp = data.playerData.Exp;
+                        var playerData = GameDataController.Instance.CurrentGameData.players[0];
+                        playerData.Oils = data.players[0].Oils;
+                        playerData.Gold = data.players[0].Gold;
+                        playerData.Cube = data.players[0].Cube;
+                        playerData.Level = data.players[0].Level;
+                        playerData.Exp = data.players[0].Exp;
                         Debug.Log("[GameManager] 遊戲數據已設置到 GameDataController");
                     }
 
                     // 使用 ShipManager 載入玩家船隻數據並實例化
-                    foreach (var shipData in data.playerData.Ships)
+                    foreach (var shipData in data.players[0].Ships)
                     {
                         if (ShipManager.Instance != null)
                         {
@@ -557,7 +557,7 @@ public class GameManager : Singleton<GameManager>
                     }
 
                     // 使用 FleetManager 載入玩家艦隊數據並實例化
-                    foreach (var fleetData in data.playerData.Fleets)
+                    foreach (var fleetData in data.players[0].Fleets)
                     {
                         if (FleetManager.Instance != null)
                         {
@@ -674,12 +674,15 @@ public class GameManager : Singleton<GameManager>
         int seed = mapSeed ?? UnityEngine.Random.Range(0, int.MaxValue); // 新增：使用指定或隨機種子
         var newGameData = new GameData
         {
-            playerData = new GameData.PlayerData
+            players = new List<GameData.PlayerData>
             {
-                Oils = initialConfig.InitialOils,
-                Gold = initialConfig.InitialGold,
-                Cube = initialConfig.InitialCube,
-                Ships = new List<GameData.ShipData>()
+                new GameData.PlayerData
+                {
+                    Oils = initialConfig.InitialOils,
+                    Gold = initialConfig.InitialGold,
+                    Cube = initialConfig.InitialCube,
+                    Ships = new List<GameData.ShipData>()
+                }
             },
             mapData = new GameData.MapData
             {

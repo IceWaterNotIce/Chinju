@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-
+using System.Linq;
 public class ShipManager : Singleton<ShipManager>
 {
     private Dictionary<string, Ship> ships = new Dictionary<string, Ship>();
@@ -45,7 +45,7 @@ public class ShipManager : Singleton<ShipManager>
 
     public PlayerShip TryCreateRandomShip(int inputGold, int inputOil, int inputCube)
     {
-        GameData.PlayerData playerData = GameDataController.Instance.CurrentGameData?.playerData;
+        GameData.PlayerData playerData = GameDataController.Instance.CurrentGameData?.players.FirstOrDefault();
 
         if (playerData == null)
         {
@@ -143,7 +143,7 @@ public class ShipManager : Singleton<ShipManager>
     private void SaveShipData(Vector3 position)
     {
         var data = GameDataController.Instance.CurrentGameData;
-        if (data != null && data.playerData != null)
+        if (data != null && data.players.FirstOrDefault() != null)
         {
             string prefabName = shipPrefabs.Count > 0 ? shipPrefabs[shipPrefabs.Count - 1].name : "";
             var shipData = new GameData.ShipData
@@ -159,7 +159,7 @@ public class ShipManager : Singleton<ShipManager>
                 Level = 1,
                 PrefabName = prefabName
             };
-            data.playerData.Ships.Add(shipData);
+            data.players.FirstOrDefault().Ships.Add(shipData);
             Debug.Log("[ShipManager] 已將新戰艦資料存入 GameData");
         }
         else

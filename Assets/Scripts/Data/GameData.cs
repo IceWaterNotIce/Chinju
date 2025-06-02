@@ -108,33 +108,33 @@ public class GameData
     [System.Serializable]
     public class ShipData
     {
-        public enum CombatMode { Peaceful, Defensive, Aggressive }
-        [SerializeField] public CombatMode Mode; // 使用新的枚舉
+        [SerializeField] public string ShipId = Guid.NewGuid().ToString();
+        [SerializeField] public string FleetId; 
         [SerializeField] public string Name;
+
+        [SerializeField] public int Level;
+        [SerializeField] public float Experience;
+
         [SerializeField] public float Health;
         [SerializeField] public int AttackPower;
         [SerializeField] public int Defense;
+        public enum CombatMode { Peaceful, Defensive, Aggressive }
+        [SerializeField] public CombatMode Mode; 
+
         [SerializeField] public Vector3 Position;
+        [SerializeField] public float Speed;
+        [SerializeField] public float Rotation;
+        [SerializeField] public Rect NavigationArea;
+        public bool CanMove() => CurrentFuel > 0 && Health > 0;
+
         [SerializeField] public float MaxFuel;
         [SerializeField] public float CurrentFuel;
         [SerializeField] public float FuelConsumptionRate;
-        [SerializeField] public float Speed;
-        [SerializeField] public float Rotation;
+        public float FuelPercent => MaxFuel > 0 ? CurrentFuel / MaxFuel : 0;
+        
         [SerializeField] public int WeaponLimit;
-        [SerializeField] public int Level;
-        [SerializeField] public float Experience;
         [SerializeField] public List<WeaponData> Weapons = new List<WeaponData>();
         [SerializeField] public string PrefabName;
-        [SerializeField] public Rect NavigationArea;
-        [SerializeField] public string ShipId = Guid.NewGuid().ToString(); // 改為 GUID 確保唯一性
-        [SerializeField] public string FleetId; // 所屬艦隊Id，可為null
-        [SerializeField] public string ParentShipId; // 父船Id（如有母艦/僚艦關係）
-
-        // 燃料百分比屬性
-        public float FuelPercent => MaxFuel > 0 ? CurrentFuel / MaxFuel : 0;
-
-        // 狀態檢查
-        public bool CanMove() => CurrentFuel > 0 && Health > 0;
     }
     #endregion
 
@@ -146,6 +146,7 @@ public class GameData
         public enum WeaponType { Primary, Secondary, Special }
         [SerializeField] public WeaponType Type;
         [SerializeField] public string Name;
+        
         [SerializeField] public int Damage;
         [SerializeField] public float MaxAttackDistance;
         [SerializeField] public float MinAttackDistance;

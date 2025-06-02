@@ -3,7 +3,7 @@ using UnityEngine.UIElements;
 using UnityEngine.Events; // 新增
 using System.Collections.Generic;
 using System; // <--- 加入這行
-
+using System.Linq;
 public class ShipDetailPanel : Singleton<ShipDetailPanel>
 {
     #region Fields
@@ -688,7 +688,7 @@ public class ShipDetailPanel : Singleton<ShipDetailPanel>
         weaponDetailPopup.Add(title);
 
         // 從玩家資料中獲取武器清單
-        var playerData = GameDataController.Instance.CurrentGameData.playerData;
+        var playerData = GameDataController.Instance.CurrentGameData.players.FirstOrDefault();
         if (playerData != null && playerData.Weapons != null)
         {
             foreach (var weaponData in playerData.Weapons)

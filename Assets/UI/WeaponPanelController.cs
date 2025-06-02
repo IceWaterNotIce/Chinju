@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
-
+using System.Linq;
 public class WeaponPanelController : MonoBehaviour
 {
     public VisualElement root;
@@ -29,7 +29,7 @@ public class WeaponPanelController : MonoBehaviour
             yield return null;
         }
 
-        var playerData = GameDataController.Instance.CurrentGameData.playerData;
+        var playerData = GameDataController.Instance.CurrentGameData.players.FirstOrDefault();
         InitializeWeaponList(playerData);
     }
 
