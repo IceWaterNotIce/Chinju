@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UIElements;
 using UnityEngine.Events;
 using UnityEngine.Tilemaps; // ← 新增
+using Unity.Netcode;
 
 public class PlayerShip : Warship, IPointerClickHandler
 {
@@ -17,6 +18,11 @@ public class PlayerShip : Warship, IPointerClickHandler
     #region Player Settings
     [Header("Player Settings")]
     private float m_healthRegenTimer = 0f; // 用於計時的變數
+    /**
+     * @type {NetworkVariable<float>}
+     * @description 同步回血計時器
+     */
+    public NetworkVariable<float> NetworkHealthRegenTimer = new NetworkVariable<float>(0f);
     #endregion
 
     #region Movement Logic
@@ -29,6 +35,15 @@ public class PlayerShip : Warship, IPointerClickHandler
     #region Health Logic
     public override void Update()
     {
+        // 網路同步：只有 Owner 可以寫入，其他 Client 只讀取
+        if (IsOwner)
+        {
+            NetworkHealthRegenTimer.Value = m_healthRegenTimer;
+        }
+        else
+        {
+            m_healthRegenTimer = NetworkHealthRegenTimer.Value;
+        }
         // 每分鐘增加 1 點健康值
         m_healthRegenTimer += Time.deltaTime;
         if (m_healthRegenTimer >= 60f)
@@ -37,7 +52,6 @@ public class PlayerShip : Warship, IPointerClickHandler
             m_healthRegenTimer = 0f;
             Debug.Log($"[PlayerShip] Health increased by 1. Current Health: {Health}");
         }
-
         base.Update(); // 使用基類的更新邏輯
     }
     #endregion

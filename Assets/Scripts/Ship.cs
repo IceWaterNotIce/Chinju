@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 
-public class Ship : MonoBehaviour
+public class Ship : NetworkBehaviour
 {
     public string ShipId { get; set; } 
 
@@ -133,7 +134,28 @@ public class Ship : MonoBehaviour
 
     [SerializeField] private float navigationBoundaryBuffer = 2f; // 可配置邊界緩衝值
 
-    public virtual void Start()
+    /**
+     * @type {NetworkVariable<Vector3>}
+     * @description 同步艦船位置
+     */
+    public NetworkVariable<Vector3> NetworkPosition = new NetworkVariable<Vector3>();
+    /**
+     * @type {NetworkVariable<float>}
+     * @description 同步艦船血量
+     */
+    public NetworkVariable<float> NetworkHealth = new NetworkVariable<float>();
+    /**
+     * @type {NetworkVariable<float>}
+     * @description 同步艦船速度
+     */
+    public NetworkVariable<float> NetworkSpeed = new NetworkVariable<float>();
+    /**
+     * @type {NetworkVariable<float>}
+     * @description 同步艦船旋轉角度
+     */
+    public NetworkVariable<float> NetworkRotation = new NetworkVariable<float>();
+
+    public  void Start()
     {
         tilemap = FindFirstObjectByType<Tilemap>();
         oceanTile = Resources.Load<TileBase>("Tiles/OceanTile");
@@ -141,10 +163,25 @@ public class Ship : MonoBehaviour
             Debug.LogError("Tilemap or Ocean Tile not found!", this);
     }
 
-    public virtual void Update()
+    public void Update()
     {
-        Rotate();
-        Move();
+        // 網路同步：只有 Owner 可以寫入，其他 Client 只讀取
+        if (IsOwner)
+        {
+            NetworkPosition.Value = transform.position;
+            NetworkHealth.Value = Health;
+            NetworkSpeed.Value = Speed;
+            NetworkRotation.Value = transform.eulerAngles.z;
+        }
+        else
+        {
+            transform.position = NetworkPosition.Value;
+            Health = NetworkHealth.Value;
+            Speed = NetworkSpeed.Value;
+            var rot = transform.eulerAngles;
+            rot.z = NetworkRotation.Value;
+            transform.eulerAngles = rot;
+        }
     }
 
     protected virtual void Rotate()

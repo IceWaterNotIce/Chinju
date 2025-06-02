@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using Unity.Netcode;
 
-public class Fleet : MonoBehaviour
+public class Fleet : NetworkBehaviour
 {
     public enum FormationType
     {
@@ -14,6 +15,27 @@ public class Fleet : MonoBehaviour
         CircularFormation,
         EchelonFormation
     }
+
+    /**
+     * @type {NetworkList<ulong>}
+     * @description 同步艦隊成員 NetworkObjectId
+     */
+    public NetworkList<ulong> NetworkFollowers;
+    /**
+     * @type {NetworkVariable<int>}
+     * @description 同步隊形類型
+     */
+    public NetworkVariable<int> NetworkFormation = new NetworkVariable<int>(0);
+    /**
+     * @type {NetworkVariable<float>}
+     * @description 同步圓形隊形半徑
+     */
+    public NetworkVariable<float> NetworkCircleRadius = new NetworkVariable<float>(3.0f);
+    /**
+     * @type {NetworkVariable<float>}
+     * @description 同步斜隊角度
+     */
+    public NetworkVariable<float> NetworkEchelonAngle = new NetworkVariable<float>(30f);
 
     public List<Ship> followers = new List<Ship>(); // List of follower ships
     public float distanceBetweenFollowers = 1.0f; // Distance between followers
@@ -25,8 +47,35 @@ public class Fleet : MonoBehaviour
     public float Speed { get; set; } // 新增：艦隊速度
     public string FlagshipId { get; set; } // 新增：旗艦ID
 
+    void Awake()
+    {
+        NetworkFollowers = new NetworkList<ulong>();
+    }
+
     void Update()
     {
+        // 網路同步：只有 Server 可以寫入，其他 Client 只讀取
+        if (IsServer)
+        {
+            NetworkFormation.Value = (int)formation;
+            NetworkCircleRadius.Value = circleRadius;
+            NetworkEchelonAngle.Value = echelonAngle;
+            // 同步 followers
+            NetworkFollowers.Clear();
+            foreach (var ship in followers)
+            {
+                if (ship != null && ship.TryGetComponent<NetworkObject>(out var netObj))
+                    NetworkFollowers.Add(netObj.NetworkObjectId);
+            }
+        }
+        else
+        {
+            formation = (FormationType)NetworkFormation.Value;
+            circleRadius = NetworkCircleRadius.Value;
+            echelonAngle = NetworkEchelonAngle.Value;
+            // followers 由伺服器同步，這裡僅可讀 NetworkFollowers
+            // followers 清單同步需額外處理（如根據 NetworkObjectId 取得 Ship 實例）
+        }
         switch (formation)
         {
             case FormationType.SingleLineAhead:

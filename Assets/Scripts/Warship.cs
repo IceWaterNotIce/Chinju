@@ -3,6 +3,7 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using UnityEngine.Tilemaps;
+using Unity.Netcode;
 
 // 全域定義 CombatMode 枚舉
 public enum CombatMode { Peaceful, Defensive, Aggressive }
@@ -47,8 +48,37 @@ public class Warship : Ship
     }
     #endregion
 
+    /**
+     * @type {NetworkVariable<int>}
+     * @description 同步艦船等級
+     */
+    public NetworkVariable<int> NetworkLevel = new NetworkVariable<int>(1);
+    /**
+     * @type {NetworkVariable<float>}
+     * @description 同步艦船經驗值
+     */
+    public NetworkVariable<float> NetworkExperience = new NetworkVariable<float>(0f);
+    /**
+     * @type {NetworkVariable<int>}
+     * @description 同步戰鬥模式
+     */
+    public NetworkVariable<int> NetworkCombatMode = new NetworkVariable<int>(0); // 0: Peaceful
+
     public override void Update()
     {
+        // 網路同步：只有 Owner 可以寫入，其他 Client 只讀取
+        if (IsOwner)
+        {
+            NetworkLevel.Value = Level;
+            NetworkExperience.Value = Experience;
+            NetworkCombatMode.Value = (int)Mode;
+        }
+        else
+        {
+            Level = NetworkLevel.Value;
+            Experience = NetworkExperience.Value;
+            Mode = (CombatMode)NetworkCombatMode.Value;
+        }
         base.Update();
         if (m_combatMode != CombatMode.Peaceful) DetectAndAttackTarget();
     }

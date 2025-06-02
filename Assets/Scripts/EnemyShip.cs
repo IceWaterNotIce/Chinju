@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq; // 新增 using 以支援 LINQ
+using Unity.Netcode;
 
 public class EnemyShip : Warship
 {
@@ -48,6 +49,17 @@ public class EnemyShip : Warship
 
     private MapController mapController; // 新增
 
+    /**
+     * @type {NetworkVariable<float>}
+     * @description 同步攻擊冷卻計時器
+     */
+    public NetworkVariable<float> NetworkLastAttackTime = new NetworkVariable<float>(0f);
+    /**
+     * @type {NetworkVariable<Vector3>}
+     * @description 同步目標玩家位置
+     */
+    public NetworkVariable<Vector3> NetworkPlayerTargetPosition = new NetworkVariable<Vector3>();
+
     new void Start()
     {
         base.Start();
@@ -62,6 +74,19 @@ public class EnemyShip : Warship
     // 覆寫父類 Update 加入敵艦邏輯
     new void Update()
     {
+        // 網路同步：只有 Server 可以寫入，其他 Client 只讀取
+        if (IsServer)
+        {
+            NetworkLastAttackTime.Value = m_lastAttackTime;
+            if (PlayerTarget != null)
+                NetworkPlayerTargetPosition.Value = PlayerTarget.position;
+        }
+        else
+        {
+            m_lastAttackTime = NetworkLastAttackTime.Value;
+            if (PlayerTarget != null)
+                PlayerTarget.position = NetworkPlayerTargetPosition.Value;
+        }
         base.Update();  // 呼叫父類的 Update 方法
         HandleAIBehavior();
         TryFormFleetWithNearbyEnemies();
