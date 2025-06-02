@@ -191,6 +191,14 @@ public class EnemyShipManager : MonoBehaviour
                     GameManager.Instance?.RegisterEnemyShip(enemyComp); // 新增註冊
                 }
 
+                GameDataController.Instance?.CurrentGameData?.enemyData?.EnemyShips.Add(new GameData.ShipData
+                {
+                    PrefabName = enemyShip.name,
+                    Position = spawnPos,
+                    Level = enemyLevel,
+                    ShipId = enemyComp?.ShipId // 確保 ShipId 正確設置
+                });
+
                 Debug.Log($"[EnemyShipManager] 成功生成等級 {enemyLevel} 敵方船隻於位置: {spawnPos}");
                 break;
             }
