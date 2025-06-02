@@ -11,8 +11,6 @@ public class GameData
     public int version = 1; // 新增：存檔版本號
 
     [SerializeField]
-    public PlayerData playerData; // 修正命名
-    [SerializeField]
     public MapData mapData;       // 修正命名
 
     [SerializeField]
@@ -20,6 +18,9 @@ public class GameData
 
     [SerializeField]
     public EnemyData enemyData = new EnemyData(); // 新增：敵方數據
+
+    [SerializeField]
+    public List<PlayerData> players = new List<PlayerData>(); // 新增：玩家列表
 
     [System.Serializable]
     public class PlayerData
@@ -219,23 +220,6 @@ public class GameData
         if (data.version < SaveDataVersion)
         {
             Debug.Log($"[GameData] 升級存檔版本：{data.version} -> {SaveDataVersion}");
-            if (data.playerData == null)
-                data.playerData = new PlayerData();
-            if (data.mapData == null)
-                data.mapData = new MapData();
-            if (data.playerData.Ships == null)
-                data.playerData.Ships = new List<ShipData>();
-            if (data.mapData.ChinjuTiles == null)
-                data.mapData.ChinjuTiles = new List<Vector3Int>();
-            if (data.playerData.Fleets == null)
-                data.playerData.Fleets = new List<FleetData>();
-
-            // 新增：遷移邏輯示例
-            foreach (var ship in data.playerData.Ships)
-            {
-                if (string.IsNullOrEmpty(ship.ShipId))
-                    ship.ShipId = Guid.NewGuid().ToString();
-            }
 
             data.version = SaveDataVersion;
         }

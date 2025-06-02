@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Linq; // 新增引用
+using System.Collections.Generic;
 
 // 遊戲資料控制器，集中管理 GameData 實例
 public class GameDataController : Singleton<GameDataController>
@@ -18,7 +19,7 @@ public class GameDataController : Singleton<GameDataController>
                 OnGameDataChanged?.Invoke(currentGameData);
 
                 // 主動觸發資源事件，讓 UI 立即刷新
-                currentGameData?.playerData?.OnResourceChanged?.Invoke();
+                currentGameData?.players.FirstOrDefault()?.OnResourceChanged?.Invoke();
             }
         }
     }
@@ -37,7 +38,7 @@ public class GameDataController : Singleton<GameDataController>
             Debug.Log("[GameDataController] 初始化 currentGameData。");
             currentGameData = new GameData
             {
-                playerData = new GameData.PlayerData()
+                players = new List<GameData.PlayerData> { new GameData.PlayerData() }
             };
         }
         else
@@ -48,7 +49,7 @@ public class GameDataController : Singleton<GameDataController>
 
     public void TriggerResourceChanged()
     {
-        currentGameData?.playerData?.OnResourceChanged?.Invoke();
+        currentGameData?.players.FirstOrDefault()?.OnResourceChanged?.Invoke();
         Debug.Log("[GameDataController] 資源事件已觸發，UI 更新完成");
     }
 
@@ -75,13 +76,13 @@ public class GameDataController : Singleton<GameDataController>
     /// <returns>是否擁有足夠資源</returns>
     public bool HasEnoughResources(int gold, int oil, int cube, float fuel = 0f, string shipId = null) // 新增船隻檢查
     {
-        if (currentGameData?.playerData == null)
+        if (currentGameData?.players == null)
         {
             Debug.LogWarning("[GameDataController] 無法檢查資源，PlayerData 為 null！");
             return false;
         }
 
-        var playerData = currentGameData.playerData;
+        var playerData = currentGameData.players.FirstOrDefault();
 
         bool hasEnoughFuel = true;
         if (!string.IsNullOrEmpty(shipId))
@@ -112,7 +113,7 @@ public class GameDataController : Singleton<GameDataController>
     {
         if (!HasEnoughResources(gold, oil, cube, fuel))
         {
-            var localPlayerData = currentGameData?.playerData; // 修正命名衝突
+            var localPlayerData = currentGameData?.players.FirstOrDefault(); // 修正命名衝突
             if (localPlayerData != null)
             {
                 Debug.LogWarning($"[GameDataController] 資源不足！金幣: {localPlayerData.Gold}/{gold}, 石油: {localPlayerData.Oils}/{oil}, 方塊: {localPlayerData.Cube}/{cube}, 燃料: {fuel}");
@@ -120,7 +121,7 @@ public class GameDataController : Singleton<GameDataController>
             return false;
         }
 
-        var playerData = currentGameData.playerData;
+        var playerData = currentGameData.players.FirstOrDefault();
         playerData.Gold -= gold;
         playerData.Oils -= oil;
         playerData.Cube -= cube;
