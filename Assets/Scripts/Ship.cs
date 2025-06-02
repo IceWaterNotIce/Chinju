@@ -163,7 +163,7 @@ public class Ship : NetworkBehaviour
             Debug.LogError("Tilemap or Ocean Tile not found!", this);
     }
 
-    public void Update()
+    public virtual void Update()
     {
         // 網路同步：只有 Owner 可以寫入，其他 Client 只讀取
         if (IsOwner)
