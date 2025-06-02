@@ -197,13 +197,14 @@ public class Ship : MonoBehaviour
         Vector3 newPosition = transform.position + transform.right * kmPerSecond * Time.deltaTime * GameManager.RealGameTimeScale;
 
         transform.position = newPosition;
+        GameDataController.Instance?.UpdateShipPosition(ShipId, newPosition);
         CurrentFuel -= FuelConsumptionRate * m_speed * Time.deltaTime;
+        GameDataController.Instance?.UpdateShipFuel(ShipId, CurrentFuel);
     }
 
 
     protected virtual void NavigateToWaypoint()
     {
-
         m_cachedTarget = m_waypoints[0];
         m_cachedDirection = m_cachedTarget;
         m_cachedDirection -= transform.position;
@@ -301,7 +302,7 @@ public class Ship : MonoBehaviour
     public virtual void LoadShipData(GameData.ShipData shipData)
     {
         this.name = shipData.Name;
-         this.transform.position = shipData.Position;
+        this.transform.position = shipData.Position;
         this.transform.rotation = Quaternion.Euler(0, 0, shipData.Rotation);
         this.MaxFuel = shipData.MaxFuel;
         this.CurrentFuel = shipData.CurrentFuel;

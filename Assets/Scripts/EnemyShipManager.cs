@@ -127,6 +127,10 @@ public class EnemyShipManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 從池中獲取或實例化一個敵人船隻
+    /// </summary>
+    /// <returns>敵人船隻物件</returns>
     private GameObject GetEnemyShip()
     {
         if (pool.Count > 0)

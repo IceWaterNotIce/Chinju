@@ -200,4 +200,74 @@ public class GameDataController : Singleton<GameDataController>
         };
         OnGameDataChanged?.Invoke(currentGameData);
     }
+
+    public void UpdateShipPosition(String ShipId, Vector3 newPosition)
+    {
+        if (currentGameData == null || currentGameData.players == null)
+        {
+            Debug.LogWarning("[GameDataController] 無法更新船隻位置，GameData 或 PlayerData 為 null！");
+            return;
+        }
+
+        var playerData = currentGameData.players.FirstOrDefault();
+        if (playerData != null)
+        {
+            var shipData = playerData.Ships.FirstOrDefault(s => s.ShipId == ShipId);
+            if (shipData != null)
+            {
+                shipData.Position = newPosition;
+                Debug.Log($"[GameDataController] 更新船隻 {ShipId} 的位置為: {newPosition}");
+            }
+            else
+            {
+                Debug.LogWarning($"[GameDataController] 找不到船隻 {ShipId} 的數據，無法更新位置。");
+            }
+        }
+
+        var enemyShipData = currentGameData.enemyData?.EnemyShips?.FirstOrDefault(s => s.ShipId == ShipId);
+        if (enemyShipData != null)
+        {
+            enemyShipData.Position = newPosition;
+            Debug.Log($"[GameDataController] 更新敵方船隻 {ShipId} 的位置為: {newPosition}");
+        }
+        else
+        {
+            Debug.LogWarning($"[GameDataController] 找不到敵方船隻 {ShipId} 的數據，無法更新位置。");
+        }
+    }
+
+    public void UpdateShipFuel(string shipId, float newFuel)
+    {
+        if (currentGameData == null || currentGameData.players == null)
+        {
+            Debug.LogWarning("[GameDataController] 無法更新船隻燃料，GameData 或 PlayerData 為 null！");
+            return;
+        }
+
+        var playerData = currentGameData.players.FirstOrDefault();
+        if (playerData != null)
+        {
+            var shipData = playerData.Ships.FirstOrDefault(s => s.ShipId == shipId);
+            if (shipData != null)
+            {
+                shipData.CurrentFuel = newFuel;
+                Debug.Log($"[GameDataController] 更新船隻 {shipId} 的燃料為: {newFuel}");
+            }
+            else
+            {
+                Debug.LogWarning($"[GameDataController] 找不到船隻 {shipId} 的數據，無法更新燃料。");
+            }
+        }
+
+        var enemyShipData = currentGameData.enemyData?.EnemyShips?.FirstOrDefault(s => s.ShipId == shipId);
+        if (enemyShipData != null)
+        {
+            enemyShipData.CurrentFuel = newFuel;
+            Debug.Log($"[GameDataController] 更新敵方船隻 {shipId} 的燃料為: {newFuel}");
+        }
+        else
+        {
+            Debug.LogWarning($"[GameDataController] 找不到敵方船隻 {shipId} 的數據，無法更新燃料。");
+        }
+    }
 }
