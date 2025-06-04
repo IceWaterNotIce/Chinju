@@ -299,7 +299,7 @@ public class EnemyShip : Warship
                         follower = leader == this ? other : this;
                     }
 
-                    // 使用 FleetManager 建立 Fleet
+                    // 使用 FleetManager 建立 Fleet，確保 NetworkObject 的正確父子關係
                     FleetManager.Instance.CreateFleet(new Warship[] { leader, follower });
 
                     Debug.Log($"[EnemyShip] {leader.name} 與 {follower.name} 自動組成 Fleet");

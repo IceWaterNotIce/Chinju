@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using Unity.Netcode;
 
 public class FleetManager : Singleton<FleetManager>, GameManager.IFleetManager // 修改：使用完整命名空間
 {
@@ -12,8 +13,14 @@ public class FleetManager : Singleton<FleetManager>, GameManager.IFleetManager /
             Debug.LogWarning("[FleetManager] No ships provided to create a fleet.");
             return;
         }
+
+        // 創建 Fleet 並確保它是 NetworkObject
         GameObject fleetParent = new GameObject("FleetGroup");
-        // get the first ship parent
+        var fleet = fleetParent.AddComponent<Fleet>();
+        var fleetNetworkObject = fleetParent.AddComponent<NetworkObject>();
+        fleetNetworkObject.Spawn(); // 確保 Fleet 的 NetworkObject 被正確生成
+
+        // 設置 Fleet 的父物件
         var firstShip = warships.FirstOrDefault();
         var parentTransform = firstShip != null ? firstShip.transform.parent : null;
         if (parentTransform != null)
@@ -25,18 +32,23 @@ public class FleetManager : Singleton<FleetManager>, GameManager.IFleetManager /
             fleetParent.transform.position = Vector3.zero; // 如果沒有父物件，則放在世界原點
         }
 
-
         foreach (var ship in warships)
         {
-            ship.transform.SetParent(fleetParent.transform);
-        }
+            if (ship.TryGetComponent<NetworkObject>(out var shipNetworkObject))
+            {
+                if (!shipNetworkObject.IsSpawned)
+                {
+                    shipNetworkObject.Spawn(); // 確保船隻的 NetworkObject 已生成
+                }
+            }
 
-        var fleet = fleetParent.AddComponent<Fleet>();
+            ship.transform.SetParent(fleetParent.transform); // 設置為 Fleet 的子物件
+            fleet.followers.Add(ship);
+        }
 
         for (int i = 0; i < warships.Length; i++)
         {
             var ship = warships[i];
-            fleet.followers.Add(ship);
             if (i == 0)
             {
                 ship.IsFollower = false;

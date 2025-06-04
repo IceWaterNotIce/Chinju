@@ -215,7 +215,16 @@ public class Fleet : NetworkBehaviour
         if (!followers.Contains(ship))
         {
             followers.Add(ship);
-            ship.transform.SetParent(transform);
+
+            // 確保船隻的 NetworkObject 父子關係正確
+            if (ship.TryGetComponent<NetworkObject>(out var networkObject))
+            {
+                if (!networkObject.IsSpawned)
+                {
+                    networkObject.Spawn(); // 確保 NetworkObject 已生成
+                }
+            }
+
             Debug.Log($"[Fleet] Added ship: {ship.name} to fleet: {FleetId}");
         }
     }
