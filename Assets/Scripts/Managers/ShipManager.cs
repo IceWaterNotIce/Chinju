@@ -8,9 +8,14 @@ public class ShipManager : Singleton<ShipManager>
     private List<GameObject> shipPrefabs = new List<GameObject>();
     [SerializeField] private MapController mapController;
 
-    private new void Awake() // 使用 new 關鍵字以隱藏基類的 Awake 方法
-    {
-        base.Awake(); // 呼叫基類的 Awake 方法以確保 Singleton 正常運作
+    protected override void Awake() {
+        base.Awake();
+
+        if (transform.parent == null) {
+            DontDestroyOnLoad(gameObject); // 確保 ShipManager 是根物件
+        } else {
+            Debug.LogWarning("[ShipManager] ShipManager 必須是根物件才能使用 DontDestroyOnLoad！");
+        }
 
         // 自動載入船隻預製物
         var loadedPrefabs = Resources.LoadAll<GameObject>("Prefabs/Ships/Warships");

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Netcode; // 新增：解決 NetworkManager 未定義的錯誤
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
@@ -115,6 +116,12 @@ public class EnemyShipManager : MonoBehaviour
 
     private void InitializePool()
     {
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
+        {
+            Debug.LogError("[EnemyShipManager] NetworkManager 未啟動，無法初始化敵艦池！");
+            return;
+        }
+
         foreach (var prefab in enemyShipPrefabs)
         {
             for (int i = 0; i < initialPoolSize; i++)
@@ -160,6 +167,12 @@ public class EnemyShipManager : MonoBehaviour
 
     void SpawnEnemyShip()
     {
+        if (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
+        {
+            Debug.LogError("[EnemyShipManager] NetworkManager 未啟動，無法生成敵艦！");
+            return;
+        }
+
         int currentEnemyCount = GameObject.FindObjectsByType<EnemyShip>(FindObjectsSortMode.None).Length;
         if (currentEnemyCount >= maxEnemyShips)
         {

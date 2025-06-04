@@ -430,8 +430,19 @@ public class MapController : Singleton<MapController>
         }
     }
 
+    private Dictionary<Vector3Int, float> oceanLevelDictionary = new Dictionary<Vector3Int, float>(); // 新增：定義 oceanLevelDictionary
     private void CalculateOceanLevels()
     {
+        Vector3Int key = new Vector3Int(0, 0, 0);
+
+        if (!oceanLevelDictionary.ContainsKey(key))
+        {
+            Debug.LogError($"[MapController] 字典中不存在鍵值 {key}！");
+            return;
+        }
+
+        var oceanLevel = oceanLevelDictionary[key];
+
         Queue<Vector3Int> queue = new Queue<Vector3Int>();
         Vector3Int[] directions = {
             Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right

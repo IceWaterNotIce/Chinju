@@ -87,6 +87,16 @@ public class GameManager : Singleton<GameManager>
     protected override void Awake()
     {
         base.Awake();
+
+        if (transform.parent == null)
+        {
+            DontDestroyOnLoad(gameObject); // 確保 GameManager 是根物件
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] GameManager 必須是根物件才能使用 DontDestroyOnLoad！");
+        }
+
         registeredShips.Clear(); // 清理靜態列表避免記憶體洩漏
         registeredFleets.Clear();
         registeredPlayerShips.Clear();
