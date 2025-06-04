@@ -106,6 +106,7 @@ public class GameManager : Singleton<GameManager>
     void Start()
     {
         PopupManager.Instance?.ShowPopup("MenuButtonPanel");
+        
     }
     void Update()
     {
