@@ -3,6 +3,7 @@ using Unity.Netcode; // 新增：解決 NetworkManager 未定義的錯誤
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
+using System.Collections;
 
 public class EnemyShipManager : Singleton<EnemyShipManager>
 {
@@ -47,6 +48,18 @@ public class EnemyShipManager : Singleton<EnemyShipManager>
             Debug.LogWarning("[EnemyShipManager] EnemyShipManager 必須是根物件才能使用 DontDestroyOnLoad！");
         }
 
+        StartCoroutine(WaitForNetworkManagerInitialization());
+    }
+
+    private IEnumerator WaitForNetworkManagerInitialization()
+    {
+        while (NetworkManager.Singleton == null || !NetworkManager.Singleton.IsListening)
+        {
+            Debug.Log("[EnemyShipManager] 等待 NetworkManager 初始化...");
+            yield return new WaitForSeconds(0.5f);
+        }
+
+        Debug.Log("[EnemyShipManager] NetworkManager 已初始化，開始初始化敵艦池！");
         LoadEnemyShipPrefabs();
         InitializePool();
     }
@@ -128,8 +141,12 @@ public class EnemyShipManager : Singleton<EnemyShipManager>
             for (int i = 0; i < initialPoolSize; i++)
             {
                 var enemyShip = Instantiate(prefab);
-                enemyShip.transform.SetParent(this.transform);
-                enemyShip.SetActive(false);
+                var networkObject = enemyShip.GetComponent<NetworkObject>();
+                if (networkObject != null)
+                {
+                    networkObject.Spawn(false); // Spawn NetworkObject 並設置為未激活
+                }
+                enemyShip.SetActive(false); // 確保物件在池中處於非激活狀態
                 pool.Enqueue(enemyShip);
             }
         }
@@ -145,7 +162,6 @@ public class EnemyShipManager : Singleton<EnemyShipManager>
         {
             var enemyShip = pool.Dequeue();
             enemyShip.SetActive(true);
-            enemyShip.transform.SetParent(this.transform);
             var enemyComp = enemyShip.GetComponent<EnemyShip>();
             if (enemyComp != null) enemyComp.ResetState(); // 確保敵人船隻初始化
             return enemyShip;
@@ -154,7 +170,11 @@ public class EnemyShipManager : Singleton<EnemyShipManager>
         {
             var prefab = enemyShipPrefabs[Random.Range(0, enemyShipPrefabs.Count)];
             var enemyShip = Instantiate(prefab);
-            enemyShip.transform.SetParent(this.transform);
+            var networkObject = enemyShip.GetComponent<NetworkObject>();
+            if (networkObject != null)
+            {
+                networkObject.Spawn(false); // 確保 NetworkObject 被正確生成
+            }
             return enemyShip;
         }
     }
@@ -195,10 +215,6 @@ public class EnemyShipManager : Singleton<EnemyShipManager>
                 var enemyShip = GetEnemyShip();
                 enemyShip.transform.position = spawnPos;
                 enemyShip.transform.rotation = Quaternion.identity;
-                enemyShip.transform.SetParent(this.transform);
-
-                // 設置為 EnemyShipManager 的子物件
-                enemyShip.transform.SetParent(this.transform);
 
                 // 設定敵艦等級
                 var enemyComp = enemyShip.GetComponent<EnemyShip>();

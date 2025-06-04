@@ -5,7 +5,9 @@ using System.Linq;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
-using System; // 新增：解決 Exception 和 ArgumentException 無法識別的問題
+using System;
+using Unity.Netcode;
+using System.Threading; // 新增：解決 Exception 和 ArgumentException 無法識別的問題
 
 #region GameManagerClass
 public class GameManager : Singleton<GameManager>
@@ -133,6 +135,9 @@ public class GameManager : Singleton<GameManager>
         Debug.Log("[GameManager] 遊戲數據已在退出時保存");
     }
     #endregion
+
+    #region Resume, Pause, New, Clear
+
 
     #region GameDataInit
     private void InitializeGameData()
@@ -445,6 +450,8 @@ public class GameManager : Singleton<GameManager>
             InitializeGameData();
         }
 
+        NetworkManager.Singleton?.StartHost(); // 確保網路管理器啟動
+
         ClearAllShipsAndFleets();
         string dir = string.IsNullOrEmpty(filedir) ? Application.persistentDataPath : filedir;
         string path = Path.Combine(dir, fileName ?? currentSaveFileName); // 支持自訂檔案目錄和檔名
@@ -718,10 +725,17 @@ public class GameManager : Singleton<GameManager>
         registeredShips.Clear();
 
         ShipManager.Instance?.ClearAllShips(); // 清除所有玩家船隻
-        EnemyShipManager.Instance?.ClearAllEnemyShips(); // 清除所有敵人船隻
 
-        // 確保 FleetManager 也清除內部狀態
-        FleetManager.Instance?.ResetAllFleets();
+        if (EnemyShipManager.Instance != null)
+        {
+            EnemyShipManager.Instance.ClearAllEnemyShips(); // 清除所有敵人船隻
+        }
+        else
+        {
+            Debug.LogWarning("[GameManager] EnemyShipManager 未初始化，無法清除敵人船隻！");
+        }
+
+        FleetManager.Instance?.ResetAllFleets(); // 確保 FleetManager 也清除內部狀態
     }
     #endregion
 
@@ -780,6 +794,7 @@ public class GameManager : Singleton<GameManager>
         if (!registeredFleets.Contains(fleet))
             registeredFleets.Add(fleet);
     }
+    #endregion
     #endregion
     #endregion
     #endregion

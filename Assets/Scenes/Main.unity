@@ -295,6 +295,7 @@ MonoBehaviour:
     NetworkTopology: 0
     UseCMBService: 0
     AutoSpawnPlayerPrefabClientSide: 1
+    NetworkMessageMetrics: 1
     NetworkProfilingMetrics: 1
     OldPrefabList: []
   RunInBackground: 1
@@ -1741,7 +1742,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1671735913
 Transform:
   m_ObjectHideFlags: 0
@@ -2667,9 +2668,9 @@ MonoBehaviour:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 191982576}
   - {fileID: 158259544}
   - {fileID: 2019224609}
   - {fileID: 1028576060}
   - {fileID: 794751195}
   - {fileID: 708504591}
-  - {fileID: 191982576}

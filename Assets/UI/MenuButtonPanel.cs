@@ -71,8 +71,7 @@ public class MenuButtonPanel : MonoBehaviour
     {
         Debug.Log("[MenuButtonPanel] 繼續遊戲");
         PopupManager.Instance.HidePopup("MenuButtonPanel");
-        PopupManager.Instance.ShowPopup("SettingMenu");
-        Time.timeScale = 1f;
+        GameManager.Instance.LoadGame();
     }
 
     private void OnSaveGameButtonClicked()
