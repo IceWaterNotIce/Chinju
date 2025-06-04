@@ -4,10 +4,8 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
 
-public class EnemyShipManager : MonoBehaviour
+public class EnemyShipManager : Singleton<EnemyShipManager>
 {
-    public static EnemyShipManager Instance { get; private set; }
-
     [Header("Spawn Settings")]
     public float spawnInterval = 2f;
     public int maxEnemyShips = 100;
@@ -36,22 +34,25 @@ public class EnemyShipManager : MonoBehaviour
     [SerializeField] private int initialPoolSize = 10;
     private Queue<GameObject> pool = new Queue<GameObject>();
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null)
+        base.Awake();
+
+        if (transform.parent == null)
         {
-            Instance = this;
-            LoadEnemyShipPrefabs();
-            InitializePool();
+            DontDestroyOnLoad(gameObject); // 確保 EnemyShipManager 是根物件
         }
         else
         {
-            Destroy(gameObject);
+            Debug.LogWarning("[EnemyShipManager] EnemyShipManager 必須是根物件才能使用 DontDestroyOnLoad！");
         }
+
+        LoadEnemyShipPrefabs();
+        InitializePool();
     }
 
     void Start()
-    {
+    {         
         tilemap = FindFirstObjectByType<Tilemap>();
         if (tilemap == null)
         {
