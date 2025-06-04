@@ -73,9 +73,7 @@ public class GameManager : Singleton<GameManager>
 
     [SerializeField]
     private float fleetValidationDelay = 1f; // 艦隊驗證延遲時間可配置化
-
-    private readonly float gameSecondsPerRealSecond = GameSecondsPerDay / RealSecondsPerGameDay; // 改為 readonly 變數
-    private float _cachedTimeScale; // 新增：緩存遊戲時間縮放比例
+    private float _cachedTimeScale = GameSecondsPerDay / RealSecondsPerGameDay; // 新增：緩存遊戲時間縮放比例
 
     private Dictionary<int, Action<GameData>> _upgradeActions = new()
     {
@@ -95,6 +93,17 @@ public class GameManager : Singleton<GameManager>
         registeredEnemyShips.Clear();
         SceneManager.sceneLoaded += OnSceneLoaded; // 新增：場景切換事件
     }
+    void Start()
+    {
+        PopupManager.Instance?.ShowPopup("MenuButtonPanel");
+    }
+    void Update()
+    {
+        if (!isPaused)
+        {
+            gameTime += Time.deltaTime * _cachedTimeScale; // 使用緩存值
+        }
+    }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
@@ -106,50 +115,11 @@ public class GameManager : Singleton<GameManager>
         SceneManager.sceneLoaded -= OnSceneLoaded; // 移除事件
     }
 
-    void Start()
-    {
-        _cachedTimeScale = GameSecondsPerDay / RealSecondsPerGameDay; // 新增：緩存計算
-        // 新增：從 PlayerPrefs 讀取最後一次存檔檔名
-        string lastSaveFile = PlayerPrefs.GetString(LastSaveFileKey, "savegame.json");
-        SetCurrentSaveFileName(lastSaveFile);
-
-        if (GameDataController.Instance != null &&
-            GameDataController.Instance.CurrentGameData == null)
-        {
-            InitializeGameData();
-        }
-        else
-        {
-            LoadGame(currentSaveFileName);
-        }
-
-        Debug.Log("[GameManager] 初始化開始");
-        // 預設存檔名稱
-        currentSaveFileName = "savegame.json";
-        // 不再直接設定 saveFilePath，改用方法動態取得
-        Debug.Log("[GameManager] 初始化完成");
-    }
-
-    void Update()
-    {
-        if (!isPaused)
-        {
-            gameTime += Time.deltaTime * _cachedTimeScale; // 使用緩存值
-        }
-    }
-
     private void OnApplicationQuit()
     {
         if (GameDataController.Instance != null)
             SaveGame(); // 預設存檔
         Debug.Log("[GameManager] 遊戲數據已在退出時保存");
-    }
-
-    // 新增：暫停與恢復遊戲
-    public void SetPause(bool pause)
-    {
-        isPaused = pause;
-        Time.timeScale = pause ? pauseTimeScale : 1f; // 控制 Unity 時間縮放
     }
     #endregion
 
@@ -253,7 +223,7 @@ public class GameManager : Singleton<GameManager>
     /// <summary>
     /// 儲存遊戲，可指定檔名
     /// </summary>
-   public void SaveGame(string fileName = null)
+    public void SaveGame(string fileName = null)
     {
         if (GameDataController.Instance != null)
         {
