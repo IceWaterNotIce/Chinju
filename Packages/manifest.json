@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "com.gamelovers.mcp-unity": "https://github.com/CoderGamester/mcp-unity.git",
+    "com.icewaternotice.build-helper": "https://github.com/IceWaterNotIce/Build-Helper.git",
     "com.unity.ai.navigation": "2.0.4",
     "com.unity.collab-proxy": "2.6.0",
     "com.unity.feature.2d": "2.0.1",
