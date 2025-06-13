@@ -10,9 +10,11 @@ public class LoginPanelController : PopupPanelBase
     private Button loginButton;
     private Button signupButton;
 
-    protected override void Awake() {
+    protected override void Awake()
+    {
         var uiDocument = GetComponent<UIDocument>();
-        if (uiDocument == null || uiDocument.rootVisualElement == null) {
+        if (uiDocument == null || uiDocument.rootVisualElement == null)
+        {
             Debug.LogError("[LoginPanelController] rootVisualElement 為 null，無法初始化 LoginPanel！");
             return;
         }
@@ -24,13 +26,15 @@ public class LoginPanelController : PopupPanelBase
         loginButton = root.Q<Button>("loginButton");
         signupButton = root.Q<Button>("signupButton");
 
-        if (loginButton == null) {
+        if (loginButton == null)
+        {
             Debug.LogError("[LoginPanelController] LoginButton 未找到！");
             return;
         }
 
         loginButton.clicked += OnLoginClicked;
         signupButton.clicked += OnSignupClicked;
+        
     }
 
     private void OnLoginClicked()
