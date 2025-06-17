@@ -1,1 +1,1 @@
-window_intel64
+StandaloneWindows64
